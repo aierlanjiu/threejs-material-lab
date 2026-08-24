@@ -2072,13 +2072,9 @@ function rebuildMatrix() {
 
         const material = createMaterialPreset(matType, colorVal);
         
-        // 关键透视渲染保障：确保内部内雕与后背衬底能被 Three.js 物理折射完美捕捉
-        if (state.layerMode === 'inside' || state.layerMode === 'back') {
+        // 关键透视保障：仅对透射折射类材质在内雕/后底模式下关闭前表面深度写入，绝不破坏不透明材质的金属与微表面质感
+        if ((state.layerMode === 'inside' || state.layerMode === 'back') && material.transmission > 0) {
           material.depthWrite = false;
-          if (['wool', 'silk', 'sand', 'alloy'].includes(matType)) {
-            material.transparent = true;
-            material.opacity = 0.88;
-          }
         }
 
         const blockMesh = new THREE.Mesh(currentRoundedGeo, material);
@@ -2087,8 +2083,8 @@ function rebuildMatrix() {
         blockMesh.renderOrder = 5;
         unitGroup.add(blockMesh);
 
-        // 3D 羊绒立体微绒毛外壳 (采用 Alpha-Test 针尖微离散剔除与逆光微绒毛发光，彻底根除切线角深黑虚空暗褐色脏晕！)
-        if (matType === 'wool' && state.layerMode !== 'inside' && state.layerMode !== 'back') {
+        // 3D 羊绒立体微绒毛外壳 (在所有层级模式下均完整保留，确保 3D 毛茸茸触感始终如一！)
+        if (matType === 'wool') {
           const fuzzScales = [1.016, 1.032];
           fuzzScales.forEach((sc, sIdx) => {
             const shellMat = new THREE.MeshPhysicalMaterial({
