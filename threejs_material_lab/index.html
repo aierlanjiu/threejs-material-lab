@@ -1602,7 +1602,7 @@ function createMaterialPreset(type, colorHex) {
 
   switch (type) {
     case 'prism':
-      // 极光光谱棱镜：纯净通透高色散，正对视角纯澈通透
+      // 极光光谱棱镜：纯澈高色散光学玻璃，高光处折射耀眼彩虹
       return new THREE.MeshPhysicalMaterial({
         ...basePBR,
         color: color,
@@ -1614,17 +1614,18 @@ function createMaterialPreset(type, colorHex) {
         dispersion: dispersionVal,
         attenuationColor: color,
         attenuationDistance: 16.0,
-        iridescence: 0.15,
-        iridescenceIOR: 1.3,
-        iridescenceThicknessRange: [80, 240],
+        iridescence: 0.28,
+        iridescenceIOR: 1.35,
+        iridescenceThicknessRange: [90, 320],
         clearcoat: 1.0,
         clearcoatRoughness: 0.0,
+        envMapIntensity: Math.max(3.5, envVal),
         transparent: true,
         opacity: 1.0
       });
 
     case 'crystal':
-      // 天然水晶：高透纯澈，极高折射率
+      // 天然水晶：高透纯澈，极高折射率与镜面反射
       return new THREE.MeshPhysicalMaterial({
         ...basePBR,
         color: color,
@@ -1633,171 +1634,186 @@ function createMaterialPreset(type, colorHex) {
         transmission: transVal,
         thickness: thicknessVal,
         ior: iorVal,
-        dispersion: 0.20,
+        dispersion: 0.22,
         attenuationColor: color,
         attenuationDistance: 20.0,
         clearcoat: 1.0,
         clearcoatRoughness: 0.0,
+        envMapIntensity: Math.max(3.8, envVal),
         transparent: true,
         opacity: 1.0
       });
 
     case 'ice':
+      // 北极天然冰晶：微表面冰霜裂纹与冷冽折射
       return new THREE.MeshPhysicalMaterial({
         ...basePBR,
         color: color,
         metalness: 0,
-        roughness: Math.max(0.04, roughnessVal),
+        roughness: Math.max(0.03, roughnessVal),
         transmission: Math.min(0.96, transVal),
         thickness: thicknessVal,
         ior: 1.31,
-        dispersion: 0.06,
+        dispersion: 0.10,
         attenuationColor: color,
-        attenuationDistance: 20.0,
+        attenuationDistance: 18.0,
         bumpMap: noiseBumpTexture,
-        bumpScale: 0.025,
-        clearcoat: 0.95,
-        clearcoatRoughness: 0.04,
+        bumpScale: 0.04,
+        clearcoat: 1.0,
+        clearcoatRoughness: 0.02,
+        envMapIntensity: envVal,
         transparent: true
       });
 
     case 'frosted':
+      // 天鹅绒透光磨砂：柔和哑光漫反射与内发光
       return new THREE.MeshPhysicalMaterial({
         ...basePBR,
         color: color,
         metalness: 0,
-        roughness: Math.max(0.24, roughnessVal),
+        roughness: Math.max(0.26, roughnessVal),
         transmission: Math.min(0.88, transVal),
         thickness: thicknessVal,
         ior: 1.48,
-        dispersion: 0.02,
+        dispersion: 0.04,
         attenuationColor: color,
         attenuationDistance: 12.0,
-        clearcoat: 0.4,
-        clearcoatRoughness: 0.15,
+        clearcoat: 0.5,
+        clearcoatRoughness: 0.12,
+        envMapIntensity: envVal,
         transparent: true
       });
 
     case 'smoke':
+      // 黑曜石 / 烟晶：深邃吸光与奢华高光
       return new THREE.MeshPhysicalMaterial({
         ...basePBR,
         color: color,
         metalness: 0.04,
-        roughness: Math.max(0.02, roughnessVal),
-        transmission: Math.min(0.70, transVal),
+        roughness: Math.max(0.01, roughnessVal),
+        transmission: Math.min(0.72, transVal),
         thickness: thicknessVal,
-        ior: 1.56,
+        ior: 1.58,
         attenuationColor: color,
-        attenuationDistance: 5.0,
+        attenuationDistance: 5.5,
         clearcoat: 1.0,
-        clearcoatRoughness: 0.02,
+        clearcoatRoughness: 0.01,
+        envMapIntensity: Math.max(3.5, envVal),
         transparent: true
       });
 
     case 'silk':
+      // 重磅各向异性真丝：高密编织法线与真丝丝光散射
       return new THREE.MeshPhysicalMaterial({
         color: color,
-        metalness: 0.02,
-        roughness: Math.max(0.26, roughnessVal),
+        metalness: 0.04,
+        roughness: Math.max(0.24, roughnessVal),
         sheen: 1.0,
-        sheenColor: color.clone().lerp(new THREE.Color(0xffffff), 0.5),
-        sheenRoughness: 0.22,
+        sheenColor: color.clone().lerp(new THREE.Color(0xffffff), 0.70),
+        sheenRoughness: 0.16,
         normalMap: weaveNormalTexture,
-        normalScale: new THREE.Vector2(0.35, 0.35),
-        clearcoat: 0.08,
-        clearcoatRoughness: 0.12,
-        envMapIntensity: envVal
+        normalScale: new THREE.Vector2(0.65, 0.65),
+        clearcoat: 0.22,
+        clearcoatRoughness: 0.10,
+        envMapIntensity: Math.max(3.2, envVal)
       });
 
     case 'wool':
+      // 细腻羊绒针织：超触感微绒毛散射与丰富凹凸
       return new THREE.MeshPhysicalMaterial({
         color: color,
         metalness: 0.0,
-        roughness: 0.88,
+        roughness: 0.85,
         sheen: 1.0,
-        sheenColor: color.clone().lerp(new THREE.Color(0xffffff), 0.6),
-        sheenRoughness: 0.85,
+        sheenColor: color.clone().lerp(new THREE.Color(0xffffff), 0.75),
+        sheenRoughness: 0.75,
         bumpMap: noiseBumpTexture,
-        bumpScale: 0.025,
-        envMapIntensity: Math.min(1.2, envVal)
+        bumpScale: 0.055,
+        envMapIntensity: Math.min(1.8, envVal)
       });
 
     case 'cloud':
+      // 真实蓬松流云：棉花糖体积感与微透光
       return new THREE.MeshPhysicalMaterial({
         color: color.clone().lerp(new THREE.Color(0xffffff), 0.85),
-        roughness: 0.85,
+        roughness: 0.82,
         metalness: 0,
         transparent: true,
-        opacity: 0.88,
-        transmission: 0.45,
+        opacity: 0.90,
+        transmission: 0.52,
         thickness: 1.8,
         ior: 1.15,
         map: cloudVolumeTexture,
         sheen: 1.0,
         sheenColor: new THREE.Color(0xffffff),
         sheenRoughness: 0.35,
-        envMapIntensity: Math.min(1.5, envVal),
+        envMapIntensity: Math.min(2.0, envVal),
         depthWrite: false
       });
 
     case 'sand':
+      // 细密金耀流沙：流沙波纹与金晶微粒闪烁
       return new THREE.MeshPhysicalMaterial({
         color: color.clone().lerp(new THREE.Color(0xeab308), 0.35),
-        metalness: 0.35,
-        roughness: 0.68,
+        metalness: 0.45,
+        roughness: 0.56,
         normalMap: sandDuneNormal,
-        normalScale: new THREE.Vector2(0.5, 0.5),
-        sheen: 0.85,
-        sheenColor: new THREE.Color(0xfffbeb),
-        sheenRoughness: 0.35,
-        clearcoat: 0.15,
-        clearcoatRoughness: 0.3,
-        envMapIntensity: envVal
+        normalScale: new THREE.Vector2(0.85, 0.85),
+        sheen: 1.0,
+        sheenColor: new THREE.Color(0xfef08a),
+        sheenRoughness: 0.30,
+        clearcoat: 0.35,
+        clearcoatRoughness: 0.22,
+        envMapIntensity: Math.max(3.2, envVal)
       });
 
     case 'shell':
+      // 炫彩珍珠母贝：双折射彩虹珍珠层与丝滑贝光
       return new THREE.MeshPhysicalMaterial({
-        color: color.clone().lerp(new THREE.Color(0xffffff), 0.5),
-        metalness: 0.05,
-        roughness: 0.12,
-        transmission: 0.28,
-        thickness: 1.1,
-        ior: 1.52,
+        color: color.clone().lerp(new THREE.Color(0xffffff), 0.55),
+        metalness: 0.06,
+        roughness: 0.10,
+        transmission: 0.36,
+        thickness: 1.2,
+        ior: 1.56,
         iridescence: 1.0,
-        iridescenceIOR: 1.45,
-        iridescenceThicknessRange: [180, 750],
+        iridescenceIOR: 1.55,
+        iridescenceThicknessRange: [180, 800],
         clearcoat: 1.0,
-        clearcoatRoughness: 0.04,
-        sheen: 0.8,
-        sheenColor: new THREE.Color(0xfff0f5),
-        envMapIntensity: Math.max(2.0, envVal)
+        clearcoatRoughness: 0.02,
+        sheen: 1.0,
+        sheenColor: new THREE.Color(0xffe4e6),
+        envMapIntensity: Math.max(3.8, envVal)
       });
 
     case 'alloy':
+      // 航空拉丝合金：高密微拉丝阳极氧化与强镜面各向异性高光
       return new THREE.MeshPhysicalMaterial({
-        color: color.clone().lerp(new THREE.Color(0xd1d5db), 0.4),
-        metalness: 0.96,
-        roughness: 0.18,
+        color: color.clone().lerp(new THREE.Color(0xd1d5db), 0.35),
+        metalness: 0.98,
+        roughness: 0.14,
         normalMap: brushedMetalNormal,
-        normalScale: new THREE.Vector2(0.35, 0.35),
-        clearcoat: 0.25,
-        clearcoatRoughness: 0.1,
-        envMapIntensity: envVal * 1.2
+        normalScale: new THREE.Vector2(0.70, 0.70),
+        clearcoat: 0.50,
+        clearcoatRoughness: 0.08,
+        envMapIntensity: Math.max(4.2, envVal * 1.3)
       });
 
     case 'jade':
+      // 冰种飘花翡翠：水头透润、温润油脂光泽与内部青翠飘花
       return new THREE.MeshPhysicalMaterial({
-        color: color.clone().lerp(new THREE.Color(0x059669), 0.3),
+        color: color.clone().lerp(new THREE.Color(0x059669), 0.35),
         metalness: 0.02,
-        roughness: 0.06,
-        transmission: 0.65,
-        thickness: 1.8,
+        roughness: 0.04,
+        transmission: 0.75,
+        thickness: 1.7,
         ior: 1.66,
-        attenuationColor: new THREE.Color(0x047857),
-        attenuationDistance: 8.0,
+        attenuationColor: new THREE.Color(0x065f46),
+        attenuationDistance: 7.0,
         map: jadeMarblingTexture,
         clearcoat: 1.0,
-        clearcoatRoughness: 0.015,
+        clearcoatRoughness: 0.01,
+        envMapIntensity: Math.max(3.5, envVal),
         transparent: true
       });
 
@@ -2402,21 +2418,21 @@ function updateMasterChoreography() {
   const baseThickness = +ui.thickness.value;
 
   // 呼吸微光晕 (0.08 ~ 0.16)
-  const dynamicBloom = Math.min(0.18, baseBloom + (state.bassEnergy * 0.06));
+  const dynamicBloom = Math.min(0.18, baseBloom + (state.bassEnergy * 0.07));
   bloomPass.strength = dynamicBloom;
 
-  // 影棚主光 (0.08 ~ 0.18)
-  const dynamicKeyLight = Math.min(0.22, baseLight + (state.bassEnergy * 0.08));
+  // 影棚主光 (0.08 ~ 0.20)
+  const dynamicKeyLight = Math.min(0.24, baseLight + (state.bassEnergy * 0.10));
   keyLight.intensity = dynamicKeyLight;
 
-  // 动态彩虹色散与环境反射
-  const dynamicDispersion = Math.min(0.50, baseDispersion + (state.bassEnergy * 0.18 + state.trebleEnergy * 0.08));
-  const dynamicEnv = baseEnv + (state.midEnergy * 0.85);
+  // 动态彩虹色散与环境反射 (随低音高音重击炸裂)
+  const dynamicDispersion = Math.min(0.50, baseDispersion + (state.bassEnergy * 0.24 + state.trebleEnergy * 0.10));
+  const dynamicEnv = baseEnv + (state.midEnergy * 0.95);
 
   // 粗糙度、IOR与光学厚度动态共振
-  const dynamicRoughness = Math.min(0.08, baseRoughness + (state.midEnergy * 0.03));
-  const dynamicIor = baseIor + (state.bassEnergy * 0.14);
-  const dynamicThickness = baseThickness + (state.bassEnergy * 0.35);
+  const dynamicRoughness = Math.min(0.08, baseRoughness + (state.midEnergy * 0.04));
+  const dynamicIor = baseIor + (state.bassEnergy * 0.18);
+  const dynamicThickness = baseThickness + (state.bassEnergy * 0.45);
 
   // 实时注入材质物理属性
   matrixGroup.children.forEach(unit => {
@@ -2433,6 +2449,17 @@ function updateMasterChoreography() {
       }
     });
   });
+
+  // 实时将 9 大动态脉动数值映射到 UI 界面输出
+  if (state.isPlayingMusic) {
+    ui.roughness.nextElementSibling.textContent = dynamicRoughness.toFixed(2);
+    ui.ior.nextElementSibling.textContent = dynamicIor.toFixed(2);
+    ui.thickness.nextElementSibling.textContent = dynamicThickness.toFixed(2);
+    ui.dispersion.nextElementSibling.textContent = dynamicDispersion.toFixed(2);
+    ui.bloom.nextElementSibling.textContent = dynamicBloom.toFixed(2);
+    ui.envIntensity.nextElementSibling.textContent = dynamicEnv.toFixed(2);
+    ui.light.nextElementSibling.textContent = dynamicKeyLight.toFixed(2);
+  }
 }
 
 // -------------------------------------------------------------
@@ -2442,22 +2469,7 @@ function animate() {
   state.time += 0.016 * state.speedMultiplier;
   controls.update();
 
-  // 非音乐状态下的常开运镜判断
-  if (!state.isPlayingMusic && state.camMotionMode === 'on') {
-    const maxDim = Math.max(state.gridCols, state.gridRows, state.gridLayers);
-    const camDist = 4.2 + maxDim * 2.2;
-    if (state.orbitMode === 'arc') {
-      const angle = Math.sin(state.time * 0.5) * 0.65;
-      camera.position.x = Math.sin(angle) * camDist;
-      camera.position.z = Math.cos(angle) * camDist;
-      camera.position.y = maxDim * 0.8;
-      controls.target.set(0, 0, 0);
-    } else {
-      matrixGroup.rotation.y += 0.0032 * state.speedMultiplier;
-    }
-  }
-
-  // 音频 FFT 能量分析 & 实时 Beat 打击检测 (为上传音乐精准推进乐章)
+  // 音频 FFT 能量分析 & 实时 Beat 打击检测 (为上传音乐和合成器精准推进乐章)
   if (state.analyser && state.audioDataArray && state.isPlayingMusic) {
     state.analyser.getByteFrequencyData(state.audioDataArray);
     
@@ -2466,14 +2478,19 @@ function animate() {
     for (let i = 4; i < 20; i++) midSum += state.audioDataArray[i];
     for (let i = 20; i < 48; i++) trebleSum += state.audioDataArray[i];
 
-    state.bassEnergy = bassSum / 4 / 255;
-    state.midEnergy = midSum / 16 / 255;
-    state.trebleEnergy = trebleSum / 28 / 255;
+    const rawBass = bassSum / 4 / 255;
+    const rawMid = midSum / 16 / 255;
+    const rawTreble = trebleSum / 28 / 255;
+
+    // 动态包络平滑跟随
+    state.bassEnergy = Math.max(rawBass, state.bassEnergy * 0.88);
+    state.midEnergy = Math.max(rawMid, state.midEnergy * 0.88);
+    state.trebleEnergy = Math.max(rawTreble, state.trebleEnergy * 0.88);
 
     // 实时打击卡点检测
     const now = performance.now();
     const minBeatInterval = (60 / (180 * state.speedMultiplier)) * 1000;
-    if (state.bassEnergy > 0.42 && (state.bassEnergy - state.lastBassEnergy) > 0.08 && (now - state.lastBeatTime) > minBeatInterval) {
+    if (state.bassEnergy > 0.40 && (state.bassEnergy - state.lastBassEnergy) > 0.07 && (now - state.lastBeatTime) > minBeatInterval) {
       state.beatCount++;
       state.lastBeatTime = now;
     }
@@ -2493,6 +2510,21 @@ function animate() {
     state.bassEnergy *= 0.9;
     state.midEnergy *= 0.9;
     state.trebleEnergy *= 0.9;
+  }
+
+  // 非音乐状态下的常开运镜判断
+  if (!state.isPlayingMusic && state.camMotionMode === 'on') {
+    const maxDim = Math.max(state.gridCols, state.gridRows, state.gridLayers);
+    const camDist = 4.2 + maxDim * 2.2;
+    if (state.orbitMode === 'arc') {
+      const angle = Math.sin(state.time * 0.5) * 0.65;
+      camera.position.x = Math.sin(angle) * camDist;
+      camera.position.z = Math.cos(angle) * camDist;
+      camera.position.y = maxDim * 0.8;
+      controls.target.set(0, 0, 0);
+    } else {
+      matrixGroup.rotation.y += 0.0032 * state.speedMultiplier;
+    }
   }
 
   updateMasterChoreography();
@@ -2602,6 +2634,7 @@ function animate() {
 
 // 15. UI 事件监听
 function syncSliderOutputs() {
+  if (state.isPlayingMusic) return; // 播放时保留实时律动脉动数值呈现
   $$('.range').forEach(row => {
     const input = row.querySelector('input');
     const output = row.querySelector('output');
