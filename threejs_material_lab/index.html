@@ -1075,19 +1075,42 @@ composer.addPass(bloomPass);
 const outputPass = new OutputPass();
 composer.addPass(outputPass);
 
-// 4. 纯净超清摄影棚环境贴图 (彻底杜绝偏色泛绿)
+// 4. 纯净超清摄影棚 HDR 环境贴图 (多角度顶级柔光箱与轮廓反光板，杜绝泛绿与浑浊)
 const pmrem = new THREE.PMREMGenerator(renderer);
 pmrem.compileEquirectangularShader();
 const neutralEnvScene = new THREE.Scene();
-neutralEnvScene.background = new THREE.Color(0xffffff);
+neutralEnvScene.background = new THREE.Color(0x060911);
 
-const envLight1 = new THREE.DirectionalLight(0xffffff, 2.0);
-envLight1.position.set(1, 1, 1);
-neutralEnvScene.add(envLight1);
+// 顶部主柔光箱 (Top Key Softbox)
+const topBoxGeo = new THREE.PlaneGeometry(16, 16);
+const topBoxMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+const topBox = new THREE.Mesh(topBoxGeo, topBoxMat);
+topBox.position.set(0, 10, 0);
+topBox.rotation.x = Math.PI / 2;
+neutralEnvScene.add(topBox);
 
-const envLight2 = new THREE.DirectionalLight(0xe0f2fe, 1.5);
-envLight2.position.set(-1, -1, -1);
-neutralEnvScene.add(envLight2);
+// 左侧银色垂直长条光带 (Left Studio Rim Strip)
+const leftStripGeo = new THREE.PlaneGeometry(3, 18);
+const leftStripMat = new THREE.MeshBasicMaterial({ color: 0xe0f2fe });
+const leftStrip = new THREE.Mesh(leftStripGeo, leftStripMat);
+leftStrip.position.set(-10, 2, 2);
+leftStrip.rotation.y = Math.PI / 2;
+neutralEnvScene.add(leftStrip);
+
+// 右侧温润暖白反光板 (Right Fill Strip)
+const rightStripGeo = new THREE.PlaneGeometry(4, 18);
+const rightStripMat = new THREE.MeshBasicMaterial({ color: 0xfff1f2 });
+const rightStrip = new THREE.Mesh(rightStripGeo, rightStripMat);
+rightStrip.position.set(10, 2, -2);
+rightStrip.rotation.y = -Math.PI / 2;
+neutralEnvScene.add(rightStrip);
+
+// 后方天际冷调轮廓光 (Back Accent Rim)
+const backStripGeo = new THREE.PlaneGeometry(20, 4);
+const backStripMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+const backStrip = new THREE.Mesh(backStripGeo, backStripMat);
+backStrip.position.set(0, -2, -12);
+neutralEnvScene.add(backStrip);
 
 const envRT = pmrem.fromScene(neutralEnvScene, 0.04);
 scene.environment = envRT.texture;
@@ -1125,26 +1148,40 @@ function createRoundedSquircleGeometry(radius = 0.20) {
 }
 let currentRoundedGeo = createRoundedSquircleGeometry(0.20);
 
-// 程序化纹理库
+// -------------------------------------------------------------
+// 高精度超触感程序化纹理库 (Procedural PBR Textures)
+// -------------------------------------------------------------
 function createWeaveNormal() {
-  const size = 256;
+  const size = 512;
   const c = document.createElement('canvas');
   c.width = c.height = size;
   const ctx = c.getContext('2d');
   ctx.fillStyle = '#8080ff';
   ctx.fillRect(0, 0, size, size);
+
+  // 2x2 重磅双绉真丝斜纹编织 (Twill Silk Weave)
+  const threadW = 8;
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
-      const warp = Math.sin(x * 0.35) * 16;
-      const weft = Math.sin(y * 0.35) * 16;
-      const v = 128 + warp + weft;
-      ctx.fillStyle = `rgb(${Math.max(70, Math.min(185, v))},${Math.max(70, Math.min(185, v))},255)`;
+      const u = (x % threadW) / threadW;
+      const v = (y % threadW) / threadW;
+      const cellX = Math.floor(x / threadW);
+      const cellY = Math.floor(y / threadW);
+      const isWarp = ((cellX + cellY) % 2 === 0);
+
+      const threadProfile = Math.sin((isWarp ? u : v) * Math.PI);
+      const fibril = (Math.random() - 0.5) * 14;
+      const nx = isWarp ? (128 + (u - 0.5) * 120 + fibril) : 128;
+      const ny = !isWarp ? (128 + (v - 0.5) * 120 + fibril) : 128;
+      const nz = 180 + threadProfile * 70;
+
+      ctx.fillStyle = `rgb(${Math.max(30, Math.min(225, nx | 0))},${Math.max(30, Math.min(225, ny | 0))},${Math.min(255, nz | 0)})`;
       ctx.fillRect(x, y, 1, 1);
     }
   }
   const t = new THREE.CanvasTexture(c);
   t.wrapS = t.wrapT = THREE.RepeatWrapping;
-  t.repeat.set(4, 4);
+  t.repeat.set(6, 6);
   return t;
 }
 
@@ -1166,91 +1203,106 @@ function createNoiseMap() {
   return t;
 }
 
-function createBrushedMetalNormal() {
-  const size = 256;
+function createGlacialIceNormal() {
+  const size = 512;
   const c = document.createElement('canvas');
   c.width = c.height = size;
   const ctx = c.getContext('2d');
   ctx.fillStyle = '#8080ff';
   ctx.fillRect(0, 0, size, size);
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      const stroke = (Math.random() - 0.5) * 60;
-      const r = Math.max(80, Math.min(175, 128 + stroke));
-      ctx.fillStyle = `rgb(${r},128,255)`;
-      ctx.fillRect(x, y, 1, 1);
+
+  // 1. 冰川天然深层微裂纹 (Glacial Fractures)
+  ctx.strokeStyle = '#4040ff';
+  ctx.lineWidth = 1.6;
+  for (let i = 0; i < 32; i++) {
+    let px = Math.random() * size, py = Math.random() * size;
+    ctx.beginPath();
+    ctx.moveTo(px, py);
+    for (let s = 0; s < 5; s++) {
+      px += (Math.random() - 0.5) * 60;
+      py += (Math.random() - 0.5) * 60;
+      ctx.lineTo(px, py);
     }
+    ctx.stroke();
   }
+
+  // 2. 冰晶晶面微法线 (Crystal Facet Bump)
+  const img = ctx.getImageData(0, 0, size, size);
+  for (let i = 0; i < img.data.length; i += 4) {
+    const frost = (Math.random() - 0.5) * 28;
+    img.data[i] = Math.max(30, Math.min(225, img.data[i] + frost));
+    img.data[i + 1] = Math.max(30, Math.min(225, img.data[i + 1] + frost));
+    img.data[i + 2] = 255;
+    img.data[i + 3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+
   const t = new THREE.CanvasTexture(c);
   t.wrapS = t.wrapT = THREE.RepeatWrapping;
-  t.repeat.set(4, 4);
+  t.repeat.set(2.5, 2.5);
   return t;
 }
 
-function createSandDuneNormal() {
-  const size = 256;
+function createAcidEtchedFrostedNormal() {
+  const size = 512;
   const c = document.createElement('canvas');
   c.width = c.height = size;
   const ctx = c.getContext('2d');
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      const duneWave = Math.sin(x * 0.12 + y * 0.06) * 24;
-      const grain = (Math.random() - 0.5) * 60;
-      const nx = 128 + Math.cos(x * 0.12) * 30 + grain;
-      const ny = 128 + duneWave * 0.6 + grain;
-      ctx.fillStyle = `rgb(${Math.max(50, Math.min(205, nx))},${Math.max(50, Math.min(205, ny))},255)`;
-      ctx.fillRect(x, y, 1, 1);
-    }
-  }
-  const t = new THREE.CanvasTexture(c);
-  t.wrapS = t.wrapT = THREE.RepeatWrapping;
-  t.repeat.set(2, 2);
-  return t;
-}
-
-function createJadeMarblingTexture() {
-  const size = 256;
-  const c = document.createElement('canvas');
-  c.width = c.height = size;
-  const ctx = c.getContext('2d');
-  ctx.fillStyle = '#047857';
+  ctx.fillStyle = '#8080ff';
   ctx.fillRect(0, 0, size, size);
-  for (let i = 0; i < 28; i++) {
-    const rx = Math.random() * size, ry = Math.random() * size;
-    const rad = 25 + Math.random() * 60;
-    const grad = ctx.createRadialGradient(rx, ry, 2, rx, ry, rad);
-    grad.addColorStop(0, 'rgba(110, 231, 183, 0.45)');
-    grad.addColorStop(0.6, 'rgba(16, 185, 129, 0.25)');
-    grad.addColorStop(1, 'rgba(4, 120, 87, 0)');
-    ctx.fillStyle = grad;
-    ctx.beginPath(); ctx.arc(rx, ry, rad, 0, Math.PI * 2); ctx.fill();
+
+  // 建筑级酸洗微蚀刻漫反射微坑 (Acid-Etched Micro Pits)
+  const img = ctx.getImageData(0, 0, size, size);
+  for (let i = 0; i < img.data.length; i += 4) {
+    const pitX = (Math.random() - 0.5) * 48;
+    const pitY = (Math.random() - 0.5) * 48;
+    img.data[i] = Math.max(40, Math.min(215, 128 + pitX));
+    img.data[i + 1] = Math.max(40, Math.min(215, 128 + pitY));
+    img.data[i + 2] = 255;
+    img.data[i + 3] = 255;
   }
+  ctx.putImageData(img, 0, 0);
+
   const t = new THREE.CanvasTexture(c);
   t.wrapS = t.wrapT = THREE.RepeatWrapping;
-  t.repeat.set(1.5, 1.5);
+  t.repeat.set(5, 5);
   return t;
 }
 
-function createCloudVolumeNoiseTexture() {
-  const size = 256;
+function createHairlineBrushedNormal() {
+  const size = 512;
   const c = document.createElement('canvas');
   c.width = c.height = size;
   const ctx = c.getContext('2d');
-  ctx.fillStyle = '#ffffff';
+  ctx.fillStyle = '#8080ff';
   ctx.fillRect(0, 0, size, size);
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      const fbm = Math.sin(x * 0.05) * Math.cos(y * 0.05) * 40 +
-                  Math.sin(x * 0.1 + y * 0.08) * 20 +
-                  Math.sin(x * 0.2) * 10;
-      const v = Math.max(180, Math.min(255, 220 + fbm));
-      ctx.fillStyle = `rgb(${v},${v},${v})`;
-      ctx.fillRect(x, y, 1, 1);
-    }
+
+  // 420 道高密度横向 CNC 机械微拉丝发丝线条
+  const numHairlines = 420;
+  for (let i = 0; i < numHairlines; i++) {
+    const y = Math.random() * size;
+    const h = 0.6 + Math.random() * 2.2;
+    const intensity = (Math.random() - 0.5) * 120;
+    const ny = Math.max(40, Math.min(215, 128 + intensity));
+
+    ctx.fillStyle = `rgb(128,${ny | 0},245)`;
+    ctx.fillRect(0, y, size, h);
   }
+
+  // 叠加金属晶粒微噪点
+  const img = ctx.getImageData(0, 0, size, size);
+  for (let i = 0; i < img.data.length; i += 4) {
+    const grain = (Math.random() - 0.5) * 18;
+    img.data[i] = 128 + grain;
+    img.data[i + 1] = Math.max(30, Math.min(225, img.data[i + 1] + grain));
+    img.data[i + 2] = 255;
+    img.data[i + 3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+
   const t = new THREE.CanvasTexture(c);
   t.wrapS = t.wrapT = THREE.RepeatWrapping;
-  t.repeat.set(1.5, 1.5);
+  t.repeat.set(2, 6);
   return t;
 }
 
@@ -1297,43 +1349,6 @@ function createCashmereKnitNormal() {
   return t;
 }
 
-function createHairlineBrushedNormal() {
-  const size = 512;
-  const c = document.createElement('canvas');
-  c.width = c.height = size;
-  const ctx = c.getContext('2d');
-  ctx.fillStyle = '#8080ff';
-  ctx.fillRect(0, 0, size, size);
-
-  // 420 道高密度横向 CNC 机械微拉丝发丝线条
-  const numHairlines = 420;
-  for (let i = 0; i < numHairlines; i++) {
-    const y = Math.random() * size;
-    const h = 0.6 + Math.random() * 2.2;
-    const intensity = (Math.random() - 0.5) * 120;
-    const ny = Math.max(40, Math.min(215, 128 + intensity));
-
-    ctx.fillStyle = `rgb(128,${ny | 0},245)`;
-    ctx.fillRect(0, y, size, h);
-  }
-
-  // 叠加金属晶粒微噪点
-  const img = ctx.getImageData(0, 0, size, size);
-  for (let i = 0; i < img.data.length; i += 4) {
-    const grain = (Math.random() - 0.5) * 18;
-    img.data[i] = 128 + grain;
-    img.data[i + 1] = Math.max(30, Math.min(225, img.data[i + 1] + grain));
-    img.data[i + 2] = 255;
-    img.data[i + 3] = 255;
-  }
-  ctx.putImageData(img, 0, 0);
-
-  const t = new THREE.CanvasTexture(c);
-  t.wrapS = t.wrapT = THREE.RepeatWrapping;
-  t.repeat.set(2, 6);
-  return t;
-}
-
 function createWoolFiberFuzzTexture() {
   const size = 512;
   const c = document.createElement('canvas');
@@ -1359,6 +1374,86 @@ function createWoolFiberFuzzTexture() {
   return t;
 }
 
+function createSandDuneNormal() {
+  const size = 512;
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const ctx = c.getContext('2d');
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const duneWave = Math.sin(x * 0.08 + y * 0.04) * 20;
+      const grain = (Math.random() - 0.5) * 45;
+      const nx = 128 + Math.cos(x * 0.08) * 28 + grain;
+      const ny = 128 + duneWave * 0.6 + grain;
+      ctx.fillStyle = `rgb(${Math.max(40, Math.min(215, nx | 0))},${Math.max(40, Math.min(215, ny | 0))},255)`;
+      ctx.fillRect(x, y, 1, 1);
+    }
+  }
+  // 叠加热烈闪烁的金晶微粒 (Sparkling Crystal Facets)
+  for (let i = 0; i < 3200; i++) {
+    const rx = Math.random() * size, ry = Math.random() * size;
+    const facetDx = (Math.random() - 0.5) * 110;
+    const facetDy = (Math.random() - 0.5) * 110;
+    ctx.fillStyle = `rgb(${Math.max(20, Math.min(235, 128 + facetDx | 0))},${Math.max(20, Math.min(235, 128 + facetDy | 0))},255)`;
+    ctx.fillRect(rx, ry, 1, 1);
+  }
+
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(3, 3);
+  return t;
+}
+
+function createJadeMarblingTexture() {
+  const size = 512;
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#064e3b';
+  ctx.fillRect(0, 0, size, size);
+
+  // 老坑冰种飘花翠绿云雾 (Floating Emerald Moss Veins)
+  for (let i = 0; i < 42; i++) {
+    const rx = Math.random() * size, ry = Math.random() * size;
+    const rad = 30 + Math.random() * 80;
+    const grad = ctx.createRadialGradient(rx, ry, 2, rx, ry, rad);
+    grad.addColorStop(0, 'rgba(110, 231, 183, 0.65)');
+    grad.addColorStop(0.4, 'rgba(16, 185, 129, 0.40)');
+    grad.addColorStop(0.8, 'rgba(4, 120, 87, 0.15)');
+    grad.addColorStop(1, 'rgba(6, 78, 59, 0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath(); ctx.arc(rx, ry, rad, 0, Math.PI * 2); ctx.fill();
+  }
+
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(1.5, 1.5);
+  return t;
+}
+
+function createCloudVolumeNoiseTexture() {
+  const size = 512;
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, size, size);
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const fbm = Math.sin(x * 0.035) * Math.cos(y * 0.035) * 35 +
+                  Math.sin(x * 0.08 + y * 0.06) * 18 +
+                  Math.sin(x * 0.15) * 8;
+      const v = Math.max(170, Math.min(255, 215 + fbm));
+      ctx.fillStyle = `rgb(${v},${v},${v})`;
+      ctx.fillRect(x, y, 1, 1);
+    }
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(1.5, 1.5);
+  return t;
+}
+
 const weaveNormalTexture = createWeaveNormal();
 const noiseBumpTexture = createNoiseMap();
 const brushedMetalNormal = createHairlineBrushedNormal();
@@ -1367,6 +1462,8 @@ const woolFiberFuzzTexture = createWoolFiberFuzzTexture();
 const sandDuneNormal = createSandDuneNormal();
 const jadeMarblingTexture = createJadeMarblingTexture();
 const cloudVolumeTexture = createCloudVolumeNoiseTexture();
+const glacialIceNormal = createGlacialIceNormal();
+const acidEtchedNormal = createAcidEtchedFrostedNormal();
 
 // -------------------------------------------------------------
 // 7. OneWorks 活体智能体生命渲染引擎
@@ -1854,7 +1951,7 @@ function createMaterialPreset(type, colorHex) {
 
   switch (type) {
     case 'prism':
-      // 极光光谱棱镜：纯澈高色散光学玻璃，高光处折射耀眼彩虹
+      // 极光光谱棱镜：纯澈高色散光学玻璃，高光处折射耀眼彩虹与双层清漆
       return new THREE.MeshPhysicalMaterial({
         ...basePBR,
         color: color,
@@ -1863,15 +1960,15 @@ function createMaterialPreset(type, colorHex) {
         transmission: transVal,
         thickness: thicknessVal,
         ior: iorVal,
-        dispersion: dispersionVal,
+        dispersion: Math.max(0.28, dispersionVal),
         attenuationColor: color,
-        attenuationDistance: 16.0,
-        iridescence: 0.28,
+        attenuationDistance: 24.0,
+        iridescence: 0.32,
         iridescenceIOR: 1.35,
         iridescenceThicknessRange: [90, 320],
         clearcoat: 1.0,
         clearcoatRoughness: 0.0,
-        envMapIntensity: Math.max(3.5, envVal),
+        envMapIntensity: Math.max(4.2, envVal),
         transparent: true,
         opacity: 1.0
       });
@@ -1886,58 +1983,65 @@ function createMaterialPreset(type, colorHex) {
         transmission: transVal,
         thickness: thicknessVal,
         ior: iorVal,
-        dispersion: 0.22,
+        dispersion: 0.24,
         attenuationColor: color,
-        attenuationDistance: 20.0,
+        attenuationDistance: 28.0,
         clearcoat: 1.0,
         clearcoatRoughness: 0.0,
-        envMapIntensity: Math.max(3.8, envVal),
+        envMapIntensity: Math.max(4.6, envVal),
         transparent: true,
         opacity: 1.0
       });
 
     case 'ice':
-      // 北极天然冰晶：微表面冰霜裂纹与冷冽折射
+      // 北极天然冰晶：微表面冰霜裂纹、晶面法线与冷冽高透折射
       return new THREE.MeshPhysicalMaterial({
         ...basePBR,
         color: color,
         metalness: 0,
-        roughness: Math.max(0.03, roughnessVal),
+        roughness: Math.max(0.02, roughnessVal),
         transmission: Math.min(0.96, transVal),
         thickness: thicknessVal,
         ior: 1.31,
-        dispersion: 0.10,
-        attenuationColor: color,
+        dispersion: 0.14,
+        attenuationColor: color.clone().lerp(new THREE.Color(0xa5f3fc), 0.35),
         attenuationDistance: 18.0,
+        normalMap: glacialIceNormal,
+        normalScale: new THREE.Vector2(0.55, 0.55),
         bumpMap: noiseBumpTexture,
         bumpScale: 0.04,
         clearcoat: 1.0,
         clearcoatRoughness: 0.02,
-        envMapIntensity: envVal,
+        envMapIntensity: Math.max(4.0, envVal),
         transparent: true
       });
 
     case 'frosted':
-      // 天鹅绒透光磨砂：柔和哑光漫反射与内发光
+      // 天鹅绒透光磨砂：建筑级酸洗微蚀刻漫反射与内发光天鹅绒丝光
       return new THREE.MeshPhysicalMaterial({
         ...basePBR,
         color: color,
         metalness: 0,
-        roughness: Math.max(0.26, roughnessVal),
-        transmission: Math.min(0.88, transVal),
+        roughness: Math.max(0.24, roughnessVal),
+        transmission: Math.min(0.90, transVal),
         thickness: thicknessVal,
-        ior: 1.48,
-        dispersion: 0.04,
+        ior: 1.50,
+        dispersion: 0.06,
         attenuationColor: color,
-        attenuationDistance: 12.0,
-        clearcoat: 0.5,
-        clearcoatRoughness: 0.12,
-        envMapIntensity: envVal,
+        attenuationDistance: 14.0,
+        normalMap: acidEtchedNormal,
+        normalScale: new THREE.Vector2(0.65, 0.65),
+        sheen: 0.85,
+        sheenColor: new THREE.Color(0xffffff),
+        sheenRoughness: 0.40,
+        clearcoat: 0.60,
+        clearcoatRoughness: 0.14,
+        envMapIntensity: Math.max(3.2, envVal),
         transparent: true
       });
 
     case 'smoke':
-      // 黑曜石 / 烟晶：深邃吸光与奢华高光
+      // 黑曜石 / 烟晶：深邃吸光、清透质地与奢华镜面高光
       return new THREE.MeshPhysicalMaterial({
         ...basePBR,
         color: color,
@@ -1945,29 +2049,31 @@ function createMaterialPreset(type, colorHex) {
         roughness: Math.max(0.01, roughnessVal),
         transmission: Math.min(0.72, transVal),
         thickness: thicknessVal,
-        ior: 1.58,
-        attenuationColor: color,
-        attenuationDistance: 5.5,
+        ior: 1.62,
+        attenuationColor: color.clone().lerp(new THREE.Color(0x0f172a), 0.6),
+        attenuationDistance: 4.8,
         clearcoat: 1.0,
         clearcoatRoughness: 0.01,
-        envMapIntensity: Math.max(3.5, envVal),
+        envMapIntensity: Math.max(4.5, envVal),
         transparent: true
       });
 
     case 'silk':
-      // 重磅各向异性真丝：高密编织法线与真丝丝光散射
+      // 重磅各向异性真丝：2x2斜纹经纬织法微法线与双向真丝丝光散射
       return new THREE.MeshPhysicalMaterial({
         color: color,
-        metalness: 0.04,
-        roughness: Math.max(0.24, roughnessVal),
+        metalness: 0.06,
+        roughness: Math.max(0.22, roughnessVal),
         sheen: 1.0,
-        sheenColor: color.clone().lerp(new THREE.Color(0xffffff), 0.70),
-        sheenRoughness: 0.16,
+        sheenColor: color.clone().lerp(new THREE.Color(0xffffff), 0.80),
+        sheenRoughness: 0.14,
         normalMap: weaveNormalTexture,
-        normalScale: new THREE.Vector2(0.65, 0.65),
-        clearcoat: 0.22,
+        normalScale: new THREE.Vector2(0.85, 0.85),
+        anisotropy: 0.80,
+        anisotropyRotation: Math.PI / 4,
+        clearcoat: 0.35,
         clearcoatRoughness: 0.10,
-        envMapIntensity: Math.max(3.2, envVal)
+        envMapIntensity: Math.max(3.6, envVal)
       });
 
     case 'wool':
@@ -1975,101 +2081,105 @@ function createMaterialPreset(type, colorHex) {
       return new THREE.MeshPhysicalMaterial({
         color: color,
         metalness: 0.0,
-        roughness: 0.94,
+        roughness: 0.95,
         sheen: 1.0,
-        sheenColor: color.clone().lerp(new THREE.Color(0xffffff), 0.85),
-        sheenRoughness: 0.60,
+        sheenColor: color.clone().lerp(new THREE.Color(0xffffff), 0.88),
+        sheenRoughness: 0.55,
         normalMap: cashmereKnitNormal,
-        normalScale: new THREE.Vector2(0.95, 0.95),
+        normalScale: new THREE.Vector2(1.05, 1.05),
         bumpMap: noiseBumpTexture,
-        bumpScale: 0.04,
-        envMapIntensity: Math.min(1.5, envVal)
+        bumpScale: 0.045,
+        envMapIntensity: Math.min(1.4, envVal)
       });
 
     case 'cloud':
-      // 真实蓬松流云：棉花糖体积感与微透光
+      // 真实蓬松流云：棉花糖体积感、动态FBM密度与内部漫透光
       return new THREE.MeshPhysicalMaterial({
         color: color.clone().lerp(new THREE.Color(0xffffff), 0.85),
-        roughness: 0.82,
+        roughness: 0.85,
         metalness: 0,
         transparent: true,
-        opacity: 0.90,
-        transmission: 0.52,
-        thickness: 1.8,
+        opacity: 0.92,
+        transmission: 0.56,
+        thickness: 1.85,
         ior: 1.15,
         map: cloudVolumeTexture,
         sheen: 1.0,
         sheenColor: new THREE.Color(0xffffff),
-        sheenRoughness: 0.35,
+        sheenRoughness: 0.40,
         envMapIntensity: Math.min(2.0, envVal),
         depthWrite: false
       });
 
     case 'sand':
-      // 细密金耀流沙：流沙波纹与金晶微粒闪烁
+      // 细密金耀流沙：流沙波纹与三千晶面微粒热烈闪烁
       return new THREE.MeshPhysicalMaterial({
         color: color.clone().lerp(new THREE.Color(0xeab308), 0.35),
-        metalness: 0.45,
-        roughness: 0.56,
+        metalness: 0.52,
+        roughness: 0.50,
         normalMap: sandDuneNormal,
-        normalScale: new THREE.Vector2(0.85, 0.85),
+        normalScale: new THREE.Vector2(1.1, 1.1),
         sheen: 1.0,
         sheenColor: new THREE.Color(0xfef08a),
-        sheenRoughness: 0.30,
-        clearcoat: 0.35,
-        clearcoatRoughness: 0.22,
-        envMapIntensity: Math.max(3.2, envVal)
+        sheenRoughness: 0.25,
+        clearcoat: 0.55,
+        clearcoatRoughness: 0.18,
+        envMapIntensity: Math.max(3.6, envVal)
       });
 
     case 'shell':
-      // 炫彩珍珠母贝：双折射彩虹珍珠层与丝滑贝光
+      // 炫彩珍珠母贝：文石多晶片干涉彩虹珍珠层与高光清漆
       return new THREE.MeshPhysicalMaterial({
         color: color.clone().lerp(new THREE.Color(0xffffff), 0.55),
         metalness: 0.06,
-        roughness: 0.10,
-        transmission: 0.36,
-        thickness: 1.2,
-        ior: 1.56,
+        roughness: 0.08,
+        transmission: 0.38,
+        thickness: 1.25,
+        ior: 1.58,
         iridescence: 1.0,
-        iridescenceIOR: 1.55,
-        iridescenceThicknessRange: [180, 800],
+        iridescenceIOR: 1.65,
+        iridescenceThicknessRange: [220, 850],
         clearcoat: 1.0,
         clearcoatRoughness: 0.02,
         sheen: 1.0,
         sheenColor: new THREE.Color(0xffe4e6),
-        envMapIntensity: Math.max(3.8, envVal)
+        sheenRoughness: 0.20,
+        envMapIntensity: Math.max(4.2, envVal)
       });
 
     case 'alloy':
-      // 航空拉丝合金：CNC发丝级定向微拉丝、各向异性高光与阳极氧化坚硬镀膜
+      // 航空拉丝合金：420道CNC发丝级定向微拉丝、各向异性强高光与阳极氧化坚硬镀膜
       return new THREE.MeshPhysicalMaterial({
         color: color.clone().lerp(new THREE.Color(0xd1d5db), 0.30),
         metalness: 0.98,
-        roughness: 0.20,
+        roughness: 0.16,
         normalMap: brushedMetalNormal,
-        normalScale: new THREE.Vector2(1.15, 1.15),
-        clearcoat: 0.70,
-        clearcoatRoughness: 0.10,
-        anisotropy: 0.90,
+        normalScale: new THREE.Vector2(1.25, 1.25),
+        clearcoat: 0.75,
+        clearcoatRoughness: 0.08,
+        anisotropy: 0.95,
         anisotropyRotation: 0,
-        envMapIntensity: Math.max(4.6, envVal * 1.35)
+        envMapIntensity: Math.max(4.8, envVal * 1.4)
       });
 
     case 'jade':
-      // 冰种飘花翡翠：水头透润、温润油脂光泽与内部青翠飘花
+      // 冰种飘花翡翠：老坑水头透润、温润油脂光泽与内部青翠飘花
       return new THREE.MeshPhysicalMaterial({
         color: color.clone().lerp(new THREE.Color(0x059669), 0.35),
         metalness: 0.02,
-        roughness: 0.04,
-        transmission: 0.75,
-        thickness: 1.7,
+        roughness: 0.03,
+        transmission: 0.78,
+        thickness: 1.8,
         ior: 1.66,
-        attenuationColor: new THREE.Color(0x065f46),
-        attenuationDistance: 7.0,
+        attenuationColor: new THREE.Color(0x064e3b),
+        attenuationDistance: 6.5,
         map: jadeMarblingTexture,
+        sheen: 0.65,
+        sheenColor: new THREE.Color(0xa7f3d0),
+        sheenRoughness: 0.25,
         clearcoat: 1.0,
         clearcoatRoughness: 0.01,
-        envMapIntensity: Math.max(3.5, envVal),
+        envMapIntensity: Math.max(3.8, envVal),
         transparent: true
       });
 
