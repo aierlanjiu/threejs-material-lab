@@ -1333,10 +1333,36 @@ function createHairlineBrushedNormal() {
   return t;
 }
 
+function createWoolFiberFuzzTexture() {
+  const size = 512;
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(0, 0, size, size);
+
+  // 生成数千个高密度羊绒微纤维绒尖 (Alpha Cutout Fiber Tips)
+  ctx.fillStyle = '#ffffff';
+  for (let i = 0; i < 4800; i++) {
+    const rx = Math.random() * size;
+    const ry = Math.random() * size;
+    const r = 0.6 + Math.random() * 1.5;
+    ctx.beginPath();
+    ctx.arc(rx, ry, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(4, 4);
+  return t;
+}
+
 const weaveNormalTexture = createWeaveNormal();
 const noiseBumpTexture = createNoiseMap();
 const brushedMetalNormal = createHairlineBrushedNormal();
 const cashmereKnitNormal = createCashmereKnitNormal();
+const woolFiberFuzzTexture = createWoolFiberFuzzTexture();
 const sandDuneNormal = createSandDuneNormal();
 const jadeMarblingTexture = createJadeMarblingTexture();
 const cloudVolumeTexture = createCloudVolumeNoiseTexture();
@@ -1917,6 +1943,9 @@ function clearMatrixGroup() {
           if (m.map && !Object.values(liveTextureMap).includes(m.map) && m.map !== state.customImageTexture && m.map !== jadeMarblingTexture && m.map !== cloudVolumeTexture) {
             m.map.dispose();
           }
+          if (m.alphaMap && m.alphaMap !== woolFiberFuzzTexture) {
+            m.alphaMap.dispose();
+          }
           m.dispose();
         });
       }
@@ -2057,6 +2086,33 @@ function rebuildMatrix() {
         blockMesh.receiveShadow = true;
         blockMesh.renderOrder = 5;
         unitGroup.add(blockMesh);
+
+        // 3D 羊绒立体微绒毛外壳 (采用 Alpha-Test 针尖微离散剔除与逆光微绒毛发光，彻底根除切线角深黑虚空暗褐色脏晕！)
+        if (matType === 'wool' && state.layerMode !== 'inside' && state.layerMode !== 'back') {
+          const fuzzScales = [1.016, 1.032];
+          fuzzScales.forEach((sc, sIdx) => {
+            const shellMat = new THREE.MeshPhysicalMaterial({
+              color: new THREE.Color(colorVal).lerp(new THREE.Color(0xffffff), 0.35 + sIdx * 0.35),
+              roughness: 0.96,
+              metalness: 0.0,
+              alphaMap: woolFiberFuzzTexture,
+              transparent: true,
+              alphaTest: 0.28 + sIdx * 0.12,
+              depthWrite: true,
+              sheen: 1.0,
+              sheenColor: new THREE.Color(0xffffff),
+              sheenRoughness: 0.5,
+              side: THREE.FrontSide
+            });
+            shellMat.renderOrder = 6 + sIdx;
+
+            const shellMesh = new THREE.Mesh(currentRoundedGeo, shellMat);
+            shellMesh.scale.set(sc, sc, sc);
+            shellMesh.castShadow = false;
+            shellMesh.receiveShadow = true;
+            unitGroup.add(shellMesh);
+          });
+        }
 
         if (shouldRenderContent && texture) {
           placedCount++;
