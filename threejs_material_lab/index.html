@@ -564,6 +564,16 @@
         <button class="btn active" id="toggleLyricsDisplay">文字展示：开</button>
       </div>
 
+      <!-- 全局 1/2/3 挡律动强度自适应调节 -->
+      <div style="margin-top: 9px;">
+        <label><span><svg class="svg-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> 全局律动强度挡位 (声波与9大物理参数自适应增益)</span></label>
+        <div class="pill-group" id="intensityTierGroup">
+          <button class="pill-btn" data-tier="1">1 挡 · 沉静微澜 (0.5x)</button>
+          <button class="pill-btn active" data-tier="2">2 挡 · 动感均衡 (1.0x)</button>
+          <button class="pill-btn" data-tier="3">3 挡 · 极致狂热 (2.0x)</button>
+        </div>
+      </div>
+
       <!-- 乐章切换速率 & 律动幅度 -->
       <div style="margin-top: 9px;">
         <label><span><svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> 乐章流变切换频率 (控制数量/材质/底色流转快慢)</span></label>
@@ -626,6 +636,19 @@
         <button class="pill-btn" data-size="8x8">8×8 巨阵</button>
         <button class="pill-btn" data-size="10x10">10×10 超宏大</button>
         <button class="pill-btn" data-size="3d_stack">双层立体</button>
+      </div>
+
+      <!-- 乐章方阵数目变化序列 -->
+      <div style="margin-top: 9px;">
+        <label><span><svg class="svg-icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg> 乐章方阵数目变化序列 (编排大秀流变路径)</span></label>
+        <select id="matrixSequenceSelect">
+          <option value="standard" selected>标准经典序列 (4×4 → 5×5 → 4×4×2 → 3×3 → 6×6)</option>
+          <option value="expansion">宏大巨幕膨胀 (1×1 → 3×3 → 5×5 → 8×8 → 10×10)</option>
+          <option value="volumetric">3D立体纵深矩阵 (3×3×1 → 4×4×2 → 5×5×2 → 3×3×3)</option>
+          <option value="snap">极速对冲骤变 (10×10 ↔ 1×1 极速缩放)</option>
+          <option value="compact">精英特写聚焦 (2×2 → 3×3 → 4×4 精致循环)</option>
+          <option value="locked">固定当前方阵 (锁定当前行列，不随乐章改变)</option>
+        </select>
       </div>
 
       <div style="margin-top: 8px;">
@@ -814,6 +837,14 @@ FLOW</textarea>
         <button class="swatch" title="黑曜深灰" style="--c:#334155" data-c="#334155"></button>
       </div>
 
+      <!-- 锁定当前材质开关 -->
+      <div style="margin-top: 8px;">
+        <button class="btn" id="lockMaterialToggle" style="width: 100%;">
+          <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          乐章材质流变：自动轮转 (点击锁定当前材质)
+        </button>
+      </div>
+
       <div style="margin-top: 12px;">
         <div class="range"><span>圆角半径</span><input id="bevelRadius" type="range" min="0.05" max="0.32" step="0.01" value="0.20"><output>0.20</output></div>
         <div class="range"><span>粗糙度</span><input id="roughness" type="range" min="0" max="1" step="0.01" value="0.00"><output>0.00</output></div>
@@ -953,6 +984,14 @@ const state = {
   gridCols: 4,
   gridRows: 4,
   gridLayers: 1,
+  matrixSequence: 'standard', // standard | expansion | volumetric | snap | compact | locked
+
+  // 1/2/3 挡全局律动强度自适应增益
+  intensityTier: 2, // 1 | 2 | 3
+  tierMultiplier: 1.0, // 0.5 | 1.0 | 2.0
+
+  // 材质固定控制
+  lockMaterial: false,
 
   // 乐章流变与动态控制
   isChoreographyShow: true,
@@ -2729,6 +2768,55 @@ const CHOREOGRAPHY_MOVEMENTS = [
   { mat: 'crystal', color: '#82cfff', dist: 'all', cols: 4, rows: 4, layers: 1, wave: 'ripple', fov: 'sine', isIntro: false }
 ];
 
+const MATRIX_PROGRESSION_SEQUENCES = {
+  standard: [
+    { cols: 4, rows: 4, layers: 1 },
+    { cols: 5, rows: 5, layers: 1 },
+    { cols: 4, rows: 4, layers: 2 },
+    { cols: 3, rows: 3, layers: 1 },
+    { cols: 6, rows: 6, layers: 1 },
+    { cols: 4, rows: 4, layers: 1 },
+    { cols: 4, rows: 4, layers: 1 }
+  ],
+  expansion: [
+    { cols: 1, rows: 1, layers: 1 },
+    { cols: 3, rows: 3, layers: 1 },
+    { cols: 5, rows: 5, layers: 1 },
+    { cols: 8, rows: 8, layers: 1 },
+    { cols: 10, rows: 10, layers: 1 },
+    { cols: 6, rows: 6, layers: 1 },
+    { cols: 4, rows: 4, layers: 1 }
+  ],
+  volumetric: [
+    { cols: 3, rows: 3, layers: 1 },
+    { cols: 4, rows: 4, layers: 2 },
+    { cols: 5, rows: 5, layers: 2 },
+    { cols: 3, rows: 3, layers: 3 },
+    { cols: 4, rows: 4, layers: 3 },
+    { cols: 4, rows: 4, layers: 1 },
+    { cols: 5, rows: 5, layers: 1 }
+  ],
+  snap: [
+    { cols: 10, rows: 10, layers: 1 },
+    { cols: 1, rows: 1, layers: 1 },
+    { cols: 6, rows: 6, layers: 2 },
+    { cols: 2, rows: 2, layers: 1 },
+    { cols: 8, rows: 8, layers: 1 },
+    { cols: 3, rows: 3, layers: 1 },
+    { cols: 5, rows: 5, layers: 1 }
+  ],
+  compact: [
+    { cols: 2, rows: 2, layers: 1 },
+    { cols: 3, rows: 3, layers: 1 },
+    { cols: 4, rows: 4, layers: 1 },
+    { cols: 3, rows: 3, layers: 2 },
+    { cols: 4, rows: 4, layers: 1 },
+    { cols: 2, rows: 2, layers: 1 },
+    { cols: 3, rows: 3, layers: 1 }
+  ],
+  locked: null
+};
+
 let lastMovementIdx = -1;
 
 function updateMasterChoreography() {
@@ -2744,14 +2832,23 @@ function updateMasterChoreography() {
 
     state.isIntroPlaying = mov.isIntro && state.enableTitleIntro;
     state.avatarDist = mov.dist;
-    state.gridCols = mov.cols;
-    state.gridRows = mov.rows;
-    state.gridLayers = mov.layers;
-    ui.gridCols.value = mov.cols;
-    ui.gridRows.value = mov.rows;
-    ui.gridLayers.value = mov.layers;
 
-    ui.material.value = mov.mat;
+    // 方阵数目变化序列映射
+    const seq = MATRIX_PROGRESSION_SEQUENCES[state.matrixSequence || 'standard'];
+    if (seq) {
+      const dim = seq[moveIdx % seq.length];
+      state.gridCols = dim.cols;
+      state.gridRows = dim.rows;
+      state.gridLayers = dim.layers;
+      ui.gridCols.value = dim.cols;
+      ui.gridRows.value = dim.rows;
+      ui.gridLayers.value = dim.layers;
+    }
+
+    // 材质锁定判断：若用户锁定材质，则不随乐章自动切换
+    if (!state.lockMaterial) {
+      ui.material.value = mov.mat;
+    }
     ui.color.value = mov.color;
 
     if (mov.wave) {
@@ -2772,17 +2869,18 @@ function updateMasterChoreography() {
   let baseCamDist = 4.2 + maxDim * 2.2;
   const baseFov = +ui.fov.value;
   let targetFov = baseFov;
+  const tMul = state.tierMultiplier || 1.0;
 
   if (state.enableDynamicFov) {
     if (state.fovMode === 'bass') {
       // 重低音爆发冲击：踩点瞬间 FOV 骤紧特写，随后弹性回弹广角
-      const kickImpulse = Math.pow(state.bassEnergy, 1.3) * state.fovPulseAmp;
-      const breath = Math.sin(state.time * 2.5) * (state.fovPulseAmp * 0.22);
+      const kickImpulse = Math.pow(state.bassEnergy, 1.3) * state.fovPulseAmp * tMul;
+      const breath = Math.sin(state.time * 2.5) * (state.fovPulseAmp * 0.22 * tMul);
       targetFov = baseFov - kickImpulse + breath;
     } else if (state.fovMode === 'dolly') {
       // 希区柯克滑动变焦 (Hitchcock Dolly Zoom): 空间透视剧烈扭曲，主体大小恒定
       const dollyOsc = Math.sin(state.time * 1.5 * state.speedMultiplier);
-      targetFov = baseFov + dollyOsc * state.fovPulseAmp;
+      targetFov = baseFov + dollyOsc * state.fovPulseAmp * tMul;
       // 距离动态反向补偿
       const fovRad1 = (baseFov * Math.PI) / 360;
       const clampedFov = Math.max(15, Math.min(75, targetFov));
@@ -2790,11 +2888,11 @@ function updateMasterChoreography() {
       baseCamDist = baseCamDist * (Math.tan(fovRad1) / Math.tan(fovRad2));
     } else if (state.fovMode === 'sine') {
       // 电影级慢速呼吸
-      targetFov = baseFov + Math.sin(state.time * 1.6 * state.speedMultiplier) * state.fovPulseAmp;
+      targetFov = baseFov + Math.sin(state.time * 1.6 * state.speedMultiplier) * state.fovPulseAmp * tMul;
     } else if (state.fovMode === 'snap') {
       // 节拍抽搐切镜：每 4 拍在特写 (Narrow) 与广角 (Wide) 之间瞬切
       const beatCycle = Math.floor(state.beatCount / 4) % 2;
-      const snapOffset = (beatCycle === 0 ? -1 : 1) * state.fovPulseAmp;
+      const snapOffset = (beatCycle === 0 ? -1 : 1) * state.fovPulseAmp * tMul;
       targetFov = baseFov + snapOffset;
     }
   }
@@ -2805,7 +2903,7 @@ function updateMasterChoreography() {
   camera.updateProjectionMatrix();
 
   if (shouldMoveCam) {
-    const camDist = baseCamDist + Math.sin(state.time * 0.4) * 1.8 - (state.bassEnergy * 0.8);
+    const camDist = baseCamDist + Math.sin(state.time * 0.4) * 1.8 - (state.bassEnergy * 0.8 * tMul);
     
     if (state.orbitMode === 'arc') {
       const camAngle = Math.sin(state.time * 0.45) * 0.72; // ±41.2°
@@ -2821,7 +2919,7 @@ function updateMasterChoreography() {
     controls.target.set(0, 0, 0);
   }
 
-  // 2. 9 大核心物理参数随音乐律动实时脉动 (由用户指定的黄金基准值驱动)
+  // 2. 9 大核心物理参数随音乐律动实时脉动 (由 1/2/3 挡位系数自适应增益)
   const baseBloom = +ui.bloom.value;
   const baseLight = +ui.light.value;
   const baseDispersion = +ui.dispersion.value;
@@ -2830,22 +2928,22 @@ function updateMasterChoreography() {
   const baseIor = +ui.ior.value;
   const baseThickness = +ui.thickness.value;
 
-  // 呼吸微光晕 (0.08 ~ 0.16)
-  const dynamicBloom = Math.min(0.18, baseBloom + (state.bassEnergy * 0.07));
+  // 呼吸微光晕 (自适应 1/2/3 挡)
+  const dynamicBloom = Math.min(0.25, baseBloom + (state.bassEnergy * 0.07 * tMul));
   bloomPass.strength = dynamicBloom;
 
-  // 影棚主光 (0.08 ~ 0.20)
-  const dynamicKeyLight = Math.min(0.24, baseLight + (state.bassEnergy * 0.10));
+  // 影棚主光
+  const dynamicKeyLight = Math.min(0.28, baseLight + (state.bassEnergy * 0.10 * tMul));
   keyLight.intensity = dynamicKeyLight;
 
-  // 动态彩虹色散与环境反射 (随低音高音重击炸裂)
-  const dynamicDispersion = Math.min(0.50, baseDispersion + (state.bassEnergy * 0.24 + state.trebleEnergy * 0.10));
-  const dynamicEnv = baseEnv + (state.midEnergy * 0.95);
+  // 动态彩虹色散与环境反射
+  const dynamicDispersion = Math.min(0.50, baseDispersion + (state.bassEnergy * 0.24 + state.trebleEnergy * 0.10) * tMul);
+  const dynamicEnv = baseEnv + (state.midEnergy * 0.95 * tMul);
 
   // 粗糙度、IOR与光学厚度动态共振
-  const dynamicRoughness = Math.min(0.08, baseRoughness + (state.midEnergy * 0.04));
-  const dynamicIor = baseIor + (state.bassEnergy * 0.18);
-  const dynamicThickness = baseThickness + (state.bassEnergy * 0.45);
+  const dynamicRoughness = Math.min(0.12, baseRoughness + (state.midEnergy * 0.04 * tMul));
+  const dynamicIor = baseIor + (state.bassEnergy * 0.18 * tMul);
+  const dynamicThickness = baseThickness + (state.bassEnergy * 0.45 * tMul);
 
   // 实时注入材质物理属性
   matrixGroup.children.forEach(unit => {
@@ -2879,7 +2977,7 @@ function updateMasterChoreography() {
 // 14. 主渲染循环 (6 大声波形态与全曲目 Beat 卡点)
 // -------------------------------------------------------------
 function animate() {
-  state.time += 0.016 * state.speedMultiplier;
+  state.time += 0.016 * state.speedMultiplier * (state.intensityTier === 1 ? 0.75 : (state.intensityTier === 3 ? 1.35 : 1.0));
   controls.update();
 
   // 音频 FFT 能量分析 & 实时 Beat 打击检测 (为上传音乐和合成器精准推进乐章)
@@ -2950,7 +3048,7 @@ function animate() {
 
   // 6 大声波物理矩阵动态形态计算
   if (state.waveMotion && matrixGroup.children.length) {
-    const amp = state.waveAmpMultiplier;
+    const amp = state.waveAmpMultiplier * (state.tierMultiplier || 1.0);
 
     matrixGroup.children.forEach(unit => {
       const uData = unit.userData;
@@ -3117,6 +3215,39 @@ $('#toggleLyricsDisplay').addEventListener('click', e => {
   e.currentTarget.classList.toggle('active', state.enableLyricsDisplay);
   e.currentTarget.textContent = `文字展示：${state.enableLyricsDisplay ? '开' : '关'}`;
   rebuildMatrix();
+});
+
+// 全局 1/2/3 挡律动强度自适应调节
+$('#intensityTierGroup').addEventListener('click', e => {
+  const btn = e.target.closest('.pill-btn');
+  if (!btn) return;
+  $$('#intensityTierGroup .pill-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  state.intensityTier = +btn.dataset.tier;
+  state.tierMultiplier = (state.intensityTier === 1 ? 0.5 : (state.intensityTier === 3 ? 2.0 : 1.0));
+});
+
+// 乐章方阵数目变化序列选择
+$('#matrixSequenceSelect').addEventListener('change', e => {
+  state.matrixSequence = e.target.value;
+  lastMovementIdx = -1;
+});
+
+// 乐章材质锁定切换
+$('#lockMaterialToggle').addEventListener('click', e => {
+  state.lockMaterial = !state.lockMaterial;
+  e.currentTarget.classList.toggle('active', state.lockMaterial);
+  const selectedText = ui.material.options[ui.material.selectedIndex]?.text?.split(' ')?.[0] || '当前材质';
+  e.currentTarget.innerHTML = state.lockMaterial
+    ? `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> 乐章材质流变：🔒 已锁定【${selectedText}】`
+    : `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> 乐章材质流变：自动轮转 (点击锁定当前材质)`;
+});
+
+ui.material.addEventListener('change', () => {
+  if (state.lockMaterial) {
+    const selectedText = ui.material.options[ui.material.selectedIndex]?.text?.split(' ')?.[0] || '当前材质';
+    $('#lockMaterialToggle').innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> 乐章材质流变：🔒 已锁定【${selectedText}】`;
+  }
 });
 
 // 乐章流变频率调节 (4 / 8 / 16 / 32)
