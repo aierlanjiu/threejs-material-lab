@@ -460,8 +460,9 @@
       width: 280px;
       height: 280px;
       margin: 0 auto;
-      border-radius: 12px;
+      border-radius: 24%;
       border: 2px dashed var(--accent);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.25), inset 0 0 15px rgba(0, 0, 0, 0.6);
       overflow: hidden;
       position: relative;
       background: #090c10;
@@ -1395,7 +1396,7 @@ AVATAR_KEYS.forEach(key => {
   liveTextureMap[key] = tex;
 });
 
-function drawLiveAvatar(canvas, avatarKey, time, lookX, lookY, isBlinking, emote, bassEnergy = 0) {
+function drawLiveAvatar(canvas, avatarKey, time, lookX, lookY, isBlinking, emote, bassEnergy = 0, midEnergy = 0, trebleEnergy = 0) {
   const ctx = canvas.getContext('2d');
   const size = canvas.width;
   ctx.clearRect(0, 0, size, size);
@@ -1412,16 +1413,27 @@ function drawLiveAvatar(canvas, avatarKey, time, lookX, lookY, isBlinking, emote
   ctx.fillStyle = item.bg;
   ctx.fillRect(pad, pad, cardSize, cardSize);
 
-  const breathY = Math.sin(time * 3) * (size * 0.012) - (bassEnergy * size * 0.035);
-  const breathScale = 1.0 + (Math.cos(time * 3) * 0.01) + (bassEnergy * 0.04);
+  // 随音乐节拍律动起伏与头部微晃
+  const headBob = Math.sin(time * 3.5) * (size * 0.012) - (bassEnergy * size * 0.038);
+  const headTilt = Math.sin(time * 2.6) * 0.04 * (1.0 + bassEnergy * 0.8);
+  const breathScale = 1.0 + (Math.cos(time * 3) * 0.01) + (bassEnergy * 0.05);
   const cx = size / 2;
-  const cy = size * 0.62 + breathY;
+  const cy = size * 0.62 + headBob;
+
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(headTilt);
+  ctx.translate(-cx, -cy);
 
   const eyeGazeX = lookX * (size * 0.035);
   const eyeGazeY = lookY * (size * 0.025);
 
   let eyeHeightFactor = isBlinking ? 0.08 : 1.0;
   if (emote === 'wink') eyeHeightFactor = 0.08;
+
+  // 歌唱律动张嘴幅度 (随中频人声和低音跳动)
+  const vocalMouth = (emote === 'sing' || midEnergy > 0.25) ? (midEnergy * size * 0.09 + bassEnergy * size * 0.04) : 0;
+  const isHappy = (emote === 'happy' || emote === 'sing' || bassEnergy > 0.50);
 
   ctx.shadowColor = 'rgba(0, 0, 0, 0.16)';
   ctx.shadowBlur = 12;
@@ -1443,17 +1455,24 @@ function drawLiveAvatar(canvas, avatarKey, time, lookX, lookY, isBlinking, emote
     ctx.fill();
     ctx.restore();
 
+    // 绘制可爱腮红
+    if (isHappy || emote === 'wink') {
+      ctx.fillStyle = 'rgba(244, 63, 94, 0.45)';
+      ctx.beginPath(); ctx.arc(cx - size * 0.22, cy + size * 0.08, size * 0.045, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx + size * 0.22, cy + size * 0.08, size * 0.045, 0, Math.PI * 2); ctx.fill();
+    }
+
     ctx.shadowBlur = 0;
     ctx.fillStyle = '#050608';
     const eyeW = size * 0.07;
     const baseEyeH = size * 0.14;
-    const eyeH = baseEyeH * (emote === 'happy' ? 0.15 : eyeHeightFactor);
+    const eyeH = baseEyeH * (isHappy ? 0.15 : eyeHeightFactor);
     const eyeRx = eyeW / 2;
     const eyeLeftX = cx + size * 0.02 + eyeGazeX;
     const eyeRightX = cx + size * 0.16 + eyeGazeX;
     const eyeY = cy - size * 0.02 + eyeGazeY + (baseEyeH - eyeH) / 2;
 
-    if (emote === 'happy') {
+    if (isHappy) {
       ctx.lineWidth = size * 0.025;
       ctx.strokeStyle = '#050608';
       ctx.lineCap = 'round';
@@ -1463,8 +1482,14 @@ function drawLiveAvatar(canvas, avatarKey, time, lookX, lookY, isBlinking, emote
       ctx.beginPath(); ctx.roundRect(eyeLeftX, eyeY, eyeW, eyeH, eyeRx); ctx.fill();
       ctx.beginPath(); ctx.roundRect(eyeRightX, eyeY, eyeW, (emote === 'wink' ? baseEyeH : eyeH), eyeRx); ctx.fill();
     }
+
+    // 律动张嘴唱响
+    if (vocalMouth > 2) {
+      ctx.fillStyle = '#050608';
+      ctx.beginPath(); ctx.ellipse(cx + size * 0.09, cy + size * 0.14, size * 0.035, vocalMouth * 0.45, 0, 0, Math.PI * 2); ctx.fill();
+    }
   } else if (item.type === 'rabbit') {
-    const earBounce = Math.sin(time * 4) * 0.05 + (bassEnergy * 0.1);
+    const earBounce = Math.sin(time * 4) * 0.05 + (bassEnergy * 0.12);
     ctx.save();
     ctx.translate(cx - size * 0.18, cy - size * 0.28);
     ctx.rotate(-0.15 + earBounce);
@@ -1481,21 +1506,42 @@ function drawLiveAvatar(canvas, avatarKey, time, lookX, lookY, isBlinking, emote
     ctx.ellipse(cx + size * 0.05, cy + size * 0.15, size * 0.36 * breathScale, size * 0.36 * breathScale, 0, 0, Math.PI * 2);
     ctx.fill();
 
+    if (isHappy || emote === 'wink') {
+      ctx.fillStyle = 'rgba(244, 63, 94, 0.45)';
+      ctx.beginPath(); ctx.arc(cx - size * 0.12, cy + size * 0.18, size * 0.045, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx + size * 0.24, cy + size * 0.18, size * 0.045, 0, Math.PI * 2); ctx.fill();
+    }
+
     ctx.shadowBlur = 0;
     ctx.fillStyle = '#1e293b';
     const eyeW = size * 0.065;
-    const eyeH = size * 0.13 * eyeHeightFactor;
+    const eyeH = size * 0.13 * (isHappy ? 0.18 : eyeHeightFactor);
     ctx.save();
     ctx.translate(cx + size * 0.02 + eyeGazeX, cy + size * 0.08 + eyeGazeY);
     ctx.rotate(-0.1);
-    ctx.beginPath(); ctx.roundRect(-eyeW / 2, -eyeH / 2, eyeW, eyeH, eyeW / 2); ctx.fill();
+    if (isHappy) {
+      ctx.lineWidth = size * 0.022; ctx.strokeStyle = '#1e293b'; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.arc(0, 0, eyeW, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
+    } else {
+      ctx.beginPath(); ctx.roundRect(-eyeW / 2, -eyeH / 2, eyeW, eyeH, eyeW / 2); ctx.fill();
+    }
     ctx.restore();
 
     ctx.save();
     ctx.translate(cx + size * 0.18 + eyeGazeX, cy + size * 0.1 + eyeGazeY);
     ctx.rotate(0.1);
-    ctx.beginPath(); ctx.roundRect(-eyeW / 2, -eyeH / 2, eyeW, eyeH, eyeW / 2); ctx.fill();
+    if (isHappy) {
+      ctx.lineWidth = size * 0.022; ctx.strokeStyle = '#1e293b'; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.arc(0, 0, eyeW, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
+    } else {
+      ctx.beginPath(); ctx.roundRect(-eyeW / 2, -eyeH / 2, eyeW, (emote === 'wink' ? size * 0.13 : eyeH), eyeW / 2); ctx.fill();
+    }
     ctx.restore();
+
+    if (vocalMouth > 2) {
+      ctx.fillStyle = '#f43f5e';
+      ctx.beginPath(); ctx.ellipse(cx + size * 0.10, cy + size * 0.22, size * 0.03, vocalMouth * 0.4, 0, 0, Math.PI * 2); ctx.fill();
+    }
   } else if (item.type === 'sun') {
     const rotSpeed = time * 0.5 + (bassEnergy * 0.6);
     for (let a = 0; a < 6; a++) {
@@ -1513,16 +1559,33 @@ function drawLiveAvatar(canvas, avatarKey, time, lookX, lookY, isBlinking, emote
     ctx.arc(cx, cy, size * 0.28 * breathScale, 0, Math.PI * 2);
     ctx.fill();
 
+    if (isHappy || emote === 'wink') {
+      ctx.fillStyle = 'rgba(239, 68, 68, 0.45)';
+      ctx.beginPath(); ctx.arc(cx - size * 0.18, cy + size * 0.02, size * 0.04, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx + size * 0.18, cy + size * 0.02, size * 0.04, 0, Math.PI * 2); ctx.fill();
+    }
+
     ctx.shadowBlur = 0;
     ctx.fillStyle = '#33272b';
     const eyeW = size * 0.06;
-    const eyeH = size * 0.11 * eyeHeightFactor;
-    ctx.beginPath(); ctx.roundRect(cx - size * 0.12 + eyeGazeX, cy - size * 0.06 + eyeGazeY, eyeW, eyeH, eyeW / 2); ctx.fill();
-    ctx.beginPath(); ctx.roundRect(cx + size * 0.06 + eyeGazeX, cy - size * 0.06 + eyeGazeY, eyeW, eyeH, eyeW / 2); ctx.fill();
+    const eyeH = size * 0.11 * (isHappy ? 0.18 : eyeHeightFactor);
+    if (isHappy) {
+      ctx.lineWidth = size * 0.022; ctx.strokeStyle = '#33272b'; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.arc(cx - size * 0.09 + eyeGazeX, cy - size * 0.06 + eyeGazeY, eyeW, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx + size * 0.09 + eyeGazeX, cy - size * 0.06 + eyeGazeY, eyeW, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
+    } else {
+      ctx.beginPath(); ctx.roundRect(cx - size * 0.12 + eyeGazeX, cy - size * 0.06 + eyeGazeY, eyeW, eyeH, eyeW / 2); ctx.fill();
+      ctx.beginPath(); ctx.roundRect(cx + size * 0.06 + eyeGazeX, cy - size * 0.06 + eyeGazeY, eyeW, (emote === 'wink' ? size * 0.11 : eyeH), eyeW / 2); ctx.fill();
+    }
 
     ctx.strokeStyle = ctx.fillStyle; ctx.lineWidth = size * 0.024; ctx.lineCap = 'round';
     const mouthW = size * (0.09 + bassEnergy * 0.04);
-    ctx.beginPath(); ctx.arc(cx, cy + size * 0.04, mouthW, 0.18 * Math.PI, 0.82 * Math.PI); ctx.stroke();
+    if (vocalMouth > 2) {
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath(); ctx.ellipse(cx, cy + size * 0.06, size * 0.04, vocalMouth * 0.5, 0, 0, Math.PI * 2); ctx.fill();
+    } else {
+      ctx.beginPath(); ctx.arc(cx, cy + size * 0.04, mouthW, 0.18 * Math.PI, 0.82 * Math.PI); ctx.stroke();
+    }
   } else if (item.type === 'bear') {
     const earWiggle = Math.sin(time * 5) * 0.07 + (bassEnergy * 0.12);
     ctx.beginPath(); ctx.arc(cx - size * 0.22, cy - size * 0.22 + earWiggle * 10, size * 0.12, 0, Math.PI * 2); ctx.fill();
@@ -1534,11 +1597,28 @@ function drawLiveAvatar(canvas, avatarKey, time, lookX, lookY, isBlinking, emote
     ctx.fillStyle = item.bodyColor;
     ctx.beginPath(); ctx.arc(cx, cy + size * 0.05, size * 0.32 * breathScale, 0, Math.PI * 2); ctx.fill();
 
+    if (isHappy || emote === 'wink') {
+      ctx.fillStyle = 'rgba(244, 63, 94, 0.40)';
+      ctx.beginPath(); ctx.arc(cx - size * 0.18, cy + size * 0.06, size * 0.04, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx + size * 0.18, cy + size * 0.06, size * 0.04, 0, Math.PI * 2); ctx.fill();
+    }
+
     ctx.shadowBlur = 0; ctx.fillStyle = '#2b1d18';
-    const eyeW = size * 0.055, eyeH = size * 0.10 * eyeHeightFactor;
-    ctx.beginPath(); ctx.roundRect(cx - size * 0.12 + eyeGazeX, cy - size * 0.02 + eyeGazeY, eyeW, eyeH, eyeW / 2); ctx.fill();
-    ctx.beginPath(); ctx.roundRect(cx + size * 0.08 + eyeGazeX, cy - size * 0.02 + eyeGazeY, eyeW, eyeH, eyeW / 2); ctx.fill();
+    const eyeW = size * 0.055, eyeH = size * 0.10 * (isHappy ? 0.18 : eyeHeightFactor);
+    if (isHappy) {
+      ctx.lineWidth = size * 0.02; ctx.strokeStyle = '#2b1d18'; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.arc(cx - size * 0.09 + eyeGazeX, cy - size * 0.02 + eyeGazeY, eyeW, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx + size * 0.09 + eyeGazeX, cy - size * 0.02 + eyeGazeY, eyeW, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
+    } else {
+      ctx.beginPath(); ctx.roundRect(cx - size * 0.12 + eyeGazeX, cy - size * 0.02 + eyeGazeY, eyeW, eyeH, eyeW / 2); ctx.fill();
+      ctx.beginPath(); ctx.roundRect(cx + size * 0.08 + eyeGazeX, cy - size * 0.02 + eyeGazeY, eyeW, (emote === 'wink' ? size * 0.10 : eyeH), eyeW / 2); ctx.fill();
+    }
     ctx.beginPath(); ctx.arc(cx - size * 0.02, cy + size * 0.08, size * 0.025, 0, Math.PI * 2); ctx.fill();
+
+    if (vocalMouth > 2) {
+      ctx.fillStyle = '#f43f5e';
+      ctx.beginPath(); ctx.ellipse(cx - size * 0.02, cy + size * 0.14, size * 0.03, vocalMouth * 0.45, 0, 0, Math.PI * 2); ctx.fill();
+    }
   } else if (item.type === 'dog') {
     const earSwing = Math.sin(time * 3.5) * 0.08 + (bassEnergy * 0.12);
     ctx.fillStyle = '#64748b';
@@ -1548,45 +1628,110 @@ function drawLiveAvatar(canvas, avatarKey, time, lookX, lookY, isBlinking, emote
     ctx.fillStyle = item.bodyColor;
     ctx.beginPath(); ctx.arc(cx, cy + size * 0.08, size * 0.32 * breathScale, 0, Math.PI * 2); ctx.fill();
 
+    if (isHappy || emote === 'wink') {
+      ctx.fillStyle = 'rgba(244, 63, 94, 0.40)';
+      ctx.beginPath(); ctx.arc(cx - size * 0.18, cy + size * 0.10, size * 0.04, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx + size * 0.18, cy + size * 0.10, size * 0.04, 0, Math.PI * 2); ctx.fill();
+    }
+
     ctx.shadowBlur = 0; ctx.fillStyle = '#1e293b';
-    const eyeW = size * 0.055, eyeH = size * 0.10 * eyeHeightFactor;
-    ctx.beginPath(); ctx.roundRect(cx - size * 0.11 + eyeGazeX, cy + size * 0.02 + eyeGazeY, eyeW, eyeH, eyeW / 2); ctx.fill();
-    ctx.beginPath(); ctx.roundRect(cx + size * 0.07 + eyeGazeX, cy + size * 0.02 + eyeGazeY, eyeW, eyeH, eyeW / 2); ctx.fill();
+    const eyeW = size * 0.055, eyeH = size * 0.10 * (isHappy ? 0.18 : eyeHeightFactor);
+    if (isHappy) {
+      ctx.lineWidth = size * 0.02; ctx.strokeStyle = '#1e293b'; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.arc(cx - size * 0.09 + eyeGazeX, cy + size * 0.02 + eyeGazeY, eyeW, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx + size * 0.09 + eyeGazeX, cy + size * 0.02 + eyeGazeY, eyeW, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
+    } else {
+      ctx.beginPath(); ctx.roundRect(cx - size * 0.11 + eyeGazeX, cy + size * 0.02 + eyeGazeY, eyeW, eyeH, eyeW / 2); ctx.fill();
+      ctx.beginPath(); ctx.roundRect(cx + size * 0.07 + eyeGazeX, cy + size * 0.02 + eyeGazeY, eyeW, (emote === 'wink' ? size * 0.10 : eyeH), eyeW / 2); ctx.fill();
+    }
     ctx.beginPath(); ctx.moveTo(cx - size * 0.025, cy + size * 0.13); ctx.lineTo(cx + size * 0.025, cy + size * 0.13); ctx.lineTo(cx, cy + size * 0.16); ctx.fill();
+
+    if (vocalMouth > 2) {
+      ctx.fillStyle = '#f43f5e';
+      ctx.beginPath(); ctx.ellipse(cx, cy + size * 0.20, size * 0.035, vocalMouth * 0.45, 0, 0, Math.PI * 2); ctx.fill();
+    }
   } else if (item.type === 'agent') {
     ctx.beginPath(); ctx.arc(cx, cy, size * 0.32 * breathScale, 0, Math.PI * 2); ctx.fill();
     ctx.shadowBlur = 0; ctx.fillStyle = '#ffffff';
-    const eyeW = size * 0.065, eyeH = size * 0.13 * eyeHeightFactor;
-    ctx.beginPath(); ctx.roundRect(cx - size * 0.12 + eyeGazeX, cy - size * 0.06 + eyeGazeY, eyeW, eyeH, eyeW / 2); ctx.fill();
-    ctx.beginPath(); ctx.roundRect(cx + size * 0.06 + eyeGazeX, cy - size * 0.06 + eyeGazeY, eyeW, eyeH, eyeW / 2); ctx.fill();
+    const eyeW = size * 0.065, eyeH = size * 0.13 * (isHappy ? 0.18 : eyeHeightFactor);
+    if (isHappy) {
+      ctx.lineWidth = size * 0.022; ctx.strokeStyle = '#ffffff'; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.arc(cx - size * 0.09 + eyeGazeX, cy - size * 0.06 + eyeGazeY, eyeW, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx + size * 0.09 + eyeGazeX, cy - size * 0.06 + eyeGazeY, eyeW, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
+    } else {
+      ctx.beginPath(); ctx.roundRect(cx - size * 0.12 + eyeGazeX, cy - size * 0.06 + eyeGazeY, eyeW, eyeH, eyeW / 2); ctx.fill();
+      ctx.beginPath(); ctx.roundRect(cx + size * 0.06 + eyeGazeX, cy - size * 0.06 + eyeGazeY, eyeW, (emote === 'wink' ? size * 0.13 : eyeH), eyeW / 2); ctx.fill();
+    }
     ctx.strokeStyle = ctx.fillStyle; ctx.lineWidth = size * 0.024; ctx.lineCap = 'round';
-    ctx.beginPath(); ctx.arc(cx, cy + size * 0.06, size * 0.08, 0.15 * Math.PI, 0.85 * Math.PI); ctx.stroke();
+    if (vocalMouth > 2) {
+      ctx.fillStyle = '#38bdf8';
+      ctx.beginPath(); ctx.ellipse(cx, cy + size * 0.10, size * 0.04, vocalMouth * 0.5, 0, 0, Math.PI * 2); ctx.fill();
+    } else {
+      ctx.beginPath(); ctx.arc(cx, cy + size * 0.06, size * 0.08, 0.15 * Math.PI, 0.85 * Math.PI); ctx.stroke();
+    }
   } else if (item.type === 'cat') {
     const earTwitch = Math.sin(time * 6) * 0.06 + (bassEnergy * 0.1);
     ctx.beginPath(); ctx.moveTo(cx - size * 0.28, cy - size * 0.1 + earTwitch * 8); ctx.lineTo(cx - size * 0.2, cy - size * 0.32); ctx.lineTo(cx - size * 0.06, cy - size * 0.16); ctx.fill();
     ctx.beginPath(); ctx.moveTo(cx + size * 0.28, cy - size * 0.1 - earTwitch * 8); ctx.lineTo(cx + size * 0.2, cy - size * 0.32); ctx.lineTo(cx + size * 0.06, cy - size * 0.16); ctx.fill();
     ctx.beginPath(); ctx.arc(cx, cy + size * 0.04, size * 0.32 * breathScale, 0, Math.PI * 2); ctx.fill();
 
+    if (isHappy || emote === 'wink') {
+      ctx.fillStyle = 'rgba(244, 63, 94, 0.40)';
+      ctx.beginPath(); ctx.arc(cx - size * 0.18, cy + size * 0.06, size * 0.04, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx + size * 0.18, cy + size * 0.06, size * 0.04, 0, Math.PI * 2); ctx.fill();
+    }
+
     ctx.shadowBlur = 0; ctx.fillStyle = '#050608';
-    const eyeW = size * 0.06, eyeH = size * 0.11 * eyeHeightFactor;
-    ctx.beginPath(); ctx.roundRect(cx - size * 0.12 + eyeGazeX, cy - size * 0.02 + eyeGazeY, eyeW, eyeH, eyeW / 2); ctx.fill();
-    ctx.beginPath(); ctx.roundRect(cx + size * 0.06 + eyeGazeX, cy - size * 0.02 + eyeGazeY, eyeW, eyeH, eyeW / 2); ctx.fill();
+    const eyeW = size * 0.06, eyeH = size * 0.11 * (isHappy ? 0.18 : eyeHeightFactor);
+    if (isHappy) {
+      ctx.lineWidth = size * 0.02; ctx.strokeStyle = '#050608'; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.arc(cx - size * 0.09 + eyeGazeX, cy - size * 0.02 + eyeGazeY, eyeW, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx + size * 0.09 + eyeGazeX, cy - size * 0.02 + eyeGazeY, eyeW, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
+    } else {
+      ctx.beginPath(); ctx.roundRect(cx - size * 0.12 + eyeGazeX, cy - size * 0.02 + eyeGazeY, eyeW, eyeH, eyeW / 2); ctx.fill();
+      ctx.beginPath(); ctx.roundRect(cx + size * 0.06 + eyeGazeX, cy - size * 0.02 + eyeGazeY, eyeW, (emote === 'wink' ? size * 0.11 : eyeH), eyeW / 2); ctx.fill();
+    }
     ctx.strokeStyle = ctx.fillStyle; ctx.lineWidth = size * 0.02;
     ctx.beginPath(); ctx.arc(cx - size * 0.04, cy + size * 0.1, size * 0.04, 0, Math.PI); ctx.stroke();
     ctx.beginPath(); ctx.arc(cx + size * 0.04, cy + size * 0.1, size * 0.04, 0, Math.PI); ctx.stroke();
+
+    if (vocalMouth > 2) {
+      ctx.fillStyle = '#f43f5e';
+      ctx.beginPath(); ctx.ellipse(cx, cy + size * 0.16, size * 0.03, vocalMouth * 0.45, 0, 0, Math.PI * 2); ctx.fill();
+    }
   } else {
+    // bun
     ctx.beginPath(); ctx.ellipse(cx, cy + size * 0.06, size * 0.34 * breathScale, size * 0.28 * breathScale, 0, 0, Math.PI * 2); ctx.fill();
+
+    if (isHappy || emote === 'wink') {
+      ctx.fillStyle = 'rgba(244, 63, 94, 0.45)';
+      ctx.beginPath(); ctx.arc(cx - size * 0.18, cy + size * 0.08, size * 0.045, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx + size * 0.18, cy + size * 0.08, size * 0.045, 0, Math.PI * 2); ctx.fill();
+    }
+
     ctx.shadowBlur = 0; ctx.fillStyle = '#1e293b';
-    const eyeR = size * 0.06 * eyeHeightFactor;
-    ctx.beginPath(); ctx.arc(cx - size * 0.12 + eyeGazeX, cy - size * 0.02 + eyeGazeY, eyeR, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(cx + size * 0.12 + eyeGazeX, cy - size * 0.02 + eyeGazeY, eyeR, 0, Math.PI * 2); ctx.fill();
-    if (!isBlinking && eyeHeightFactor > 0.5) {
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath(); ctx.arc(cx - size * 0.14 + eyeGazeX, cy - size * 0.04 + eyeGazeY, eyeR * 0.45, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(cx + size * 0.10 + eyeGazeX, cy - size * 0.04 + eyeGazeY, eyeR * 0.45, 0, Math.PI * 2); ctx.fill();
+    const eyeR = size * 0.06 * (isHappy ? 0.20 : eyeHeightFactor);
+    if (isHappy) {
+      ctx.lineWidth = size * 0.022; ctx.strokeStyle = '#1e293b'; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.arc(cx - size * 0.12 + eyeGazeX, cy - size * 0.02 + eyeGazeY, eyeR * 2.5, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx + size * 0.12 + eyeGazeX, cy - size * 0.02 + eyeGazeY, eyeR * 2.5, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
+    } else {
+      ctx.beginPath(); ctx.arc(cx - size * 0.12 + eyeGazeX, cy - size * 0.02 + eyeGazeY, eyeR, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx + size * 0.12 + eyeGazeX, cy - size * 0.02 + eyeGazeY, (emote === 'wink' ? size * 0.06 : eyeR), 0, Math.PI * 2); ctx.fill();
+      if (!isBlinking && eyeHeightFactor > 0.5) {
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath(); ctx.arc(cx - size * 0.14 + eyeGazeX, cy - size * 0.04 + eyeGazeY, eyeR * 0.45, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(cx + size * 0.10 + eyeGazeX, cy - size * 0.04 + eyeGazeY, eyeR * 0.45, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+
+    if (vocalMouth > 2) {
+      ctx.fillStyle = '#f43f5e';
+      ctx.beginPath(); ctx.ellipse(cx, cy + size * 0.14, size * 0.035, vocalMouth * 0.5, 0, 0, Math.PI * 2); ctx.fill();
     }
   }
 
+  ctx.restore();
   ctx.restore();
 }
 
@@ -2191,6 +2336,8 @@ function playTrackAtIndex(idx) {
     $('#playlistSelect').value = track.type || 'custom';
 
     state.beatCount = 0;
+    state.beatAccumulator = 0.0;
+    lastMovementIdx = -1;
     state.isIntroPlaying = state.enableTitleIntro;
     state.introStartTime = Date.now();
 
@@ -2426,7 +2573,17 @@ $('#cropConfirm').addEventListener('click', () => {
   const srcX = (cropper.imgW - srcW) / 2 - (cropper.posX / cropper.scale);
   const srcY = (cropper.imgH - srcH) / 2 - (cropper.posY / cropper.scale);
 
-  fCtx.drawImage(cropper.img, srcX, srcY, srcW, srcH, 0, 0, 512, 512);
+  // 精准裁切为与立方体圆角（RoundedBox radius: 0.20）完美契合的圆角卡片
+  const pad = 512 * 0.04;
+  const cardSize = 512 - pad * 2;
+  const radius = cardSize * 0.24; // 严格匹配立方体倒角曲率与 liveAvatar 外边距
+
+  fCtx.save();
+  fCtx.beginPath();
+  fCtx.roundRect(pad, pad, cardSize, cardSize, radius);
+  fCtx.clip();
+  fCtx.drawImage(cropper.img, srcX, srcY, srcW, srcH, pad, pad, cardSize, cardSize);
+  fCtx.restore();
 
   const tex = new THREE.CanvasTexture(finalCanvas);
   tex.colorSpace = THREE.SRGBColorSpace;
@@ -2453,13 +2610,13 @@ onResize();
 // 13. 导演级全变量全景编排调度机 (全曲目数量/材质/底色流变)
 // -------------------------------------------------------------
 const CHOREOGRAPHY_MOVEMENTS = [
-  { mat: 'prism', color: '#82cfff', dist: 'all', cols: 4, rows: 4, layers: 1, isIntro: true },
-  { mat: 'shell', color: '#a855f7', dist: 'variety', cols: 5, rows: 5, layers: 1, isIntro: false },
-  { mat: 'alloy', color: '#f43f5e', dist: 'all', cols: 4, rows: 4, layers: 2, isIntro: false },
-  { mat: 'jade', color: '#10b981', dist: 'center', cols: 3, rows: 3, layers: 1, isIntro: false },
-  { mat: 'sand', color: '#f59e0b', dist: 'all', cols: 6, rows: 6, layers: 1, isIntro: false },
-  { mat: 'cloud', color: '#ffffff', dist: 'variety', cols: 4, rows: 4, layers: 1, isIntro: false },
-  { mat: 'crystal', color: '#82cfff', dist: 'all', cols: 4, rows: 4, layers: 1, isIntro: false }
+  { mat: 'prism', color: '#82cfff', dist: 'all', cols: 4, rows: 4, layers: 1, wave: 'ripple', fov: 'bass', isIntro: true },
+  { mat: 'shell', color: '#a855f7', dist: 'variety', cols: 5, rows: 5, layers: 1, wave: 'diagonal', fov: 'dolly', isIntro: false },
+  { mat: 'alloy', color: '#f43f5e', dist: 'all', cols: 4, rows: 4, layers: 2, wave: 'equalizer', fov: 'snap', isIntro: false },
+  { mat: 'jade', color: '#10b981', dist: 'center', cols: 3, rows: 3, layers: 1, wave: 'spiral', fov: 'sine', isIntro: false },
+  { mat: 'sand', color: '#f59e0b', dist: 'all', cols: 6, rows: 6, layers: 1, wave: 'heartbeat', fov: 'bass', isIntro: false },
+  { mat: 'cloud', color: '#ffffff', dist: 'variety', cols: 4, rows: 4, layers: 1, wave: 'glitch', fov: 'dolly', isIntro: false },
+  { mat: 'crystal', color: '#82cfff', dist: 'all', cols: 4, rows: 4, layers: 1, wave: 'ripple', fov: 'sine', isIntro: false }
 ];
 
 let lastMovementIdx = -1;
@@ -2486,6 +2643,15 @@ function updateMasterChoreography() {
 
     ui.material.value = mov.mat;
     ui.color.value = mov.color;
+
+    if (mov.wave) {
+      state.wavePattern = mov.wave;
+      $$('#wavePatternGroup .pill-btn').forEach(b => b.classList.toggle('active', b.dataset.wave === mov.wave));
+    }
+    if (mov.fov) {
+      state.fovMode = mov.fov;
+      $$('#fovModeGroup .pill-btn').forEach(b => b.classList.toggle('active', b.dataset.fmode === mov.fov));
+    }
 
     rebuildMatrix();
   }
@@ -2624,14 +2790,20 @@ function animate() {
     state.midEnergy = Math.max(rawMid, state.midEnergy * 0.88);
     state.trebleEnergy = Math.max(rawTreble, state.trebleEnergy * 0.88);
 
-    // 实时打击卡点检测
+    // 实时打击卡点与全曲目连续节拍驱动 (确保任何自定义音乐与默认音乐完全一致地推进大秀乐章！)
     const now = performance.now();
     const minBeatInterval = (60 / (180 * state.speedMultiplier)) * 1000;
-    if (state.bassEnergy > 0.40 && (state.bassEnergy - state.lastBassEnergy) > 0.07 && (now - state.lastBeatTime) > minBeatInterval) {
+    const isPeak = (rawBass > 0.32 && (rawBass - state.lastBassEnergy) > 0.04) ||
+                   (rawMid > 0.45 && (rawMid - state.midEnergy) > 0.05);
+
+    state.beatAccumulator = (state.beatAccumulator || 0) + (0.016 * state.speedMultiplier * 2.08);
+
+    if ((isPeak && (now - state.lastBeatTime) > minBeatInterval) || state.beatAccumulator >= 1.0) {
       state.beatCount++;
       state.lastBeatTime = now;
+      state.beatAccumulator = 0.0;
     }
-    state.lastBassEnergy = state.bassEnergy;
+    state.lastBassEnergy = rawBass;
 
     state.waveAccumulator += 0.016 * state.speedMultiplier * (1.0 + state.bassEnergy * 4.2);
 
@@ -2729,7 +2901,7 @@ function animate() {
     });
   }
 
-  // 活体动作
+  // 活体表情随音乐旋律、节奏与人声中频自主智能流变
   let isBlinking = false;
   if (state.enableBlink) {
     const blinkCycle = state.time % 3.6;
@@ -2741,21 +2913,32 @@ function animate() {
   let currentEmote = null;
   if (state.activeEmote && Date.now() < state.emoteEndTime) {
     currentEmote = state.activeEmote;
-  } else if (state.bassEnergy > 0.6) {
-    currentEmote = 'happy';
+  } else if (state.isPlayingMusic) {
+    const barIdx = Math.floor(state.beatCount / 4) % 8;
+    if (state.bassEnergy > 0.52) {
+      currentEmote = 'happy'; // 重低音大爆点：开怀雀跃欢笑
+    } else if (state.trebleEnergy > 0.40 && (barIdx === 2 || barIdx === 6)) {
+      currentEmote = 'wink'; // 高音清脆小节：调皮眨眼
+    } else if (state.midEnergy > 0.26) {
+      currentEmote = 'sing'; // 人声与旋律段：张嘴律动合唱
+    } else if (barIdx % 2 === 0) {
+      currentEmote = 'happy';
+    } else {
+      currentEmote = 'normal';
+    }
   }
 
   if (state.contentMode === 'avatar' && (!state.isPlayingMusic || !state.isIntroPlaying)) {
     AVATAR_KEYS.forEach(key => {
       const cvs = liveCanvasMap[key];
-      drawLiveAvatar(cvs, key, state.time, lookX, lookY, isBlinking, currentEmote, state.bassEnergy);
+      drawLiveAvatar(cvs, key, state.time, lookX, lookY, isBlinking, currentEmote, state.bassEnergy, state.midEnergy, state.trebleEnergy);
       liveTextureMap[key].needsUpdate = true;
     });
 
     const activeThumb = $(`#thumb_${state.selectedAvatar}`);
     if (activeThumb) {
       activeThumb.width = activeThumb.height = 88;
-      drawLiveAvatar(activeThumb, state.selectedAvatar, state.time, lookX, lookY, isBlinking, currentEmote, state.bassEnergy);
+      drawLiveAvatar(activeThumb, state.selectedAvatar, state.time, lookX, lookY, isBlinking, currentEmote, state.bassEnergy, state.midEnergy, state.trebleEnergy);
     }
   }
 
