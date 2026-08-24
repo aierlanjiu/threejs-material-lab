@@ -1253,9 +1253,90 @@ function createCloudVolumeNoiseTexture() {
   return t;
 }
 
+function createCashmereKnitNormal() {
+  const size = 512;
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#8080ff';
+  ctx.fillRect(0, 0, size, size);
+
+  // 细密平针双面交织针织循环 (V-Stitch Rib Loops)
+  const colW = 16;
+  const rowH = 22;
+
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const u = (x % colW) / colW;
+      const v = (y % rowH) / rowH;
+      const colIdx = Math.floor(x / colW);
+
+      // 交错列错位模拟编织下针
+      const stitchY = (v + (colIdx % 2 === 0 ? 0 : 0.5)) % 1.0;
+      const vShape = Math.abs(u - 0.5) * 2.0;
+
+      // 针织线圈法线倾角 (U 轴切线角)
+      const dx = (u - 0.5) * 110 * (1.0 - stitchY * 0.4);
+      // 线圈隆起法线 (V 轴弯曲度)
+      const dy = Math.cos(stitchY * Math.PI) * 90 * (1.0 - vShape * 0.5);
+      // 羊绒羊毛微纤维绒毛杂点 (Fiber Fuzz)
+      const fuzz = (Math.random() - 0.5) * 35;
+
+      const nx = Math.max(20, Math.min(235, 128 + dx + fuzz));
+      const ny = Math.max(20, Math.min(235, 128 + dy + fuzz));
+      const nz = Math.max(160, Math.min(255, 235 - Math.abs(dx) * 0.4));
+
+      ctx.fillStyle = `rgb(${nx | 0},${ny | 0},${nz | 0})`;
+      ctx.fillRect(x, y, 1, 1);
+    }
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(6, 6);
+  return t;
+}
+
+function createHairlineBrushedNormal() {
+  const size = 512;
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#8080ff';
+  ctx.fillRect(0, 0, size, size);
+
+  // 420 道高密度横向 CNC 机械微拉丝发丝线条
+  const numHairlines = 420;
+  for (let i = 0; i < numHairlines; i++) {
+    const y = Math.random() * size;
+    const h = 0.6 + Math.random() * 2.2;
+    const intensity = (Math.random() - 0.5) * 120;
+    const ny = Math.max(40, Math.min(215, 128 + intensity));
+
+    ctx.fillStyle = `rgb(128,${ny | 0},245)`;
+    ctx.fillRect(0, y, size, h);
+  }
+
+  // 叠加金属晶粒微噪点
+  const img = ctx.getImageData(0, 0, size, size);
+  for (let i = 0; i < img.data.length; i += 4) {
+    const grain = (Math.random() - 0.5) * 18;
+    img.data[i] = 128 + grain;
+    img.data[i + 1] = Math.max(30, Math.min(225, img.data[i + 1] + grain));
+    img.data[i + 2] = 255;
+    img.data[i + 3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(2, 6);
+  return t;
+}
+
 const weaveNormalTexture = createWeaveNormal();
 const noiseBumpTexture = createNoiseMap();
-const brushedMetalNormal = createBrushedMetalNormal();
+const brushedMetalNormal = createHairlineBrushedNormal();
+const cashmereKnitNormal = createCashmereKnitNormal();
 const sandDuneNormal = createSandDuneNormal();
 const jadeMarblingTexture = createJadeMarblingTexture();
 const cloudVolumeTexture = createCloudVolumeNoiseTexture();
@@ -1719,17 +1800,19 @@ function createMaterialPreset(type, colorHex) {
       });
 
     case 'wool':
-      // 细腻羊绒针织：超触感微绒毛散射与丰富凹凸
+      // 细腻羊绒针织：超触感平针双面交织凹凸、微表面丝光绒毛与哑光质地
       return new THREE.MeshPhysicalMaterial({
         color: color,
         metalness: 0.0,
-        roughness: 0.85,
+        roughness: 0.94,
         sheen: 1.0,
-        sheenColor: color.clone().lerp(new THREE.Color(0xffffff), 0.75),
-        sheenRoughness: 0.75,
+        sheenColor: color.clone().lerp(new THREE.Color(0xffffff), 0.85),
+        sheenRoughness: 0.60,
+        normalMap: cashmereKnitNormal,
+        normalScale: new THREE.Vector2(0.95, 0.95),
         bumpMap: noiseBumpTexture,
-        bumpScale: 0.055,
-        envMapIntensity: Math.min(1.8, envVal)
+        bumpScale: 0.04,
+        envMapIntensity: Math.min(1.5, envVal)
       });
 
     case 'cloud':
@@ -1787,16 +1870,18 @@ function createMaterialPreset(type, colorHex) {
       });
 
     case 'alloy':
-      // 航空拉丝合金：高密微拉丝阳极氧化与强镜面各向异性高光
+      // 航空拉丝合金：CNC发丝级定向微拉丝、各向异性高光与阳极氧化坚硬镀膜
       return new THREE.MeshPhysicalMaterial({
-        color: color.clone().lerp(new THREE.Color(0xd1d5db), 0.35),
+        color: color.clone().lerp(new THREE.Color(0xd1d5db), 0.30),
         metalness: 0.98,
-        roughness: 0.14,
+        roughness: 0.20,
         normalMap: brushedMetalNormal,
-        normalScale: new THREE.Vector2(0.70, 0.70),
-        clearcoat: 0.50,
-        clearcoatRoughness: 0.08,
-        envMapIntensity: Math.max(4.2, envVal * 1.3)
+        normalScale: new THREE.Vector2(1.15, 1.15),
+        clearcoat: 0.70,
+        clearcoatRoughness: 0.10,
+        anisotropy: 0.90,
+        anisotropyRotation: 0,
+        envMapIntensity: Math.max(4.6, envVal * 1.35)
       });
 
     case 'jade':
