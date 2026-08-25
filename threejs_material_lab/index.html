@@ -599,6 +599,15 @@
           音频声波矩阵：开
         </button>
       </div>
+
+      <!-- 视频导出格式选择 -->
+      <div style="margin-top: 6px;">
+        <label><span><svg class="svg-icon" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg> 视频导出通用格式</span></label>
+        <select id="videoFormatSelect">
+          <option value="mp4" selected>MP4 格式 (通用全兼容 H.264/AAC · 微信/剪映/播放器直出)</option>
+          <option value="webm">WebM 格式 (VP9 网页高清原生)</option>
+        </select>
+      </div>
     </div>
 
     <!-- 2. 音频声波矩阵 6 大动态形态选择 -->
@@ -1040,6 +1049,7 @@ const state = {
   emoteEndTime: 0,
 
   // 录制与音频分析
+  videoFormat: 'mp4', // mp4 | webm
   isRecording: false,
   mediaRecorder: null,
   recordedChunks: [],
@@ -2625,11 +2635,48 @@ function stopMusic() {
 }
 
 // -------------------------------------------------------------
-// 11. 60FPS 屏幕录制
+// 11. 60FPS 屏幕录制 (支持 MP4 通用格式直出与 WebM 高画质)
 // -------------------------------------------------------------
+let recordTimerInterval = null;
+
+function getOptimalMimeType(format) {
+  if (format === 'mp4') {
+    const mp4Mimes = [
+      'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
+      'video/mp4;codecs=avc1,mp4a.40.2',
+      'video/mp4;codecs=avc1',
+      'video/mp4;codecs=h264,aac',
+      'video/mp4;codecs=h264',
+      'video/mp4'
+    ];
+    for (const m of mp4Mimes) {
+      if (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported(m)) {
+        return { mimeType: m, ext: 'mp4', containerMime: 'video/mp4' };
+      }
+    }
+  }
+
+  // WebM 优质编码退化
+  const webmMimes = [
+    'video/webm;codecs=vp9,opus',
+    'video/webm;codecs=vp9',
+    'video/webm;codecs=vp8,opus',
+    'video/webm;codecs=vp8',
+    'video/webm'
+  ];
+  for (const m of webmMimes) {
+    if (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported(m)) {
+      return { mimeType: m, ext: format === 'mp4' ? 'mp4' : 'webm', containerMime: format === 'mp4' ? 'video/mp4' : 'video/webm' };
+    }
+  }
+
+  return { mimeType: '', ext: format === 'mp4' ? 'mp4' : 'webm', containerMime: format === 'mp4' ? 'video/mp4' : 'video/webm' };
+}
+
 function toggleScreenRecording() {
   if (!state.isRecording) {
     const canvas = stage.querySelector('canvas');
+    if (!canvas) return;
     const stream = canvas.captureStream(60);
 
     if (state.audioCtx) {
@@ -2639,32 +2686,70 @@ function toggleScreenRecording() {
       if (audioTracks.length > 0) stream.addTrack(audioTracks[0]);
     }
 
-    let mimeType = 'video/webm;codecs=vp9';
-    if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'video/webm';
+    const format = state.videoFormat || 'mp4';
+    const opt = getOptimalMimeType(format);
 
     state.recordedChunks = [];
-    state.mediaRecorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 8000000 });
-    state.mediaRecorder.ondataavailable = e => {
-      if (e.data.size > 0) state.recordedChunks.push(e.data);
+    const options = {
+      videoBitsPerSecond: 16000000, // 16Mbps 超高清 60FPS 母带级码率
+      audioBitsPerSecond: 192000
     };
-    state.mediaRecorder.onstop = () => {
-      const blob = new Blob(state.recordedChunks, { type: 'video/webm' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `Crystal_Diamond_Show_${Date.now()}.webm`;
-      a.click();
-      URL.revokeObjectURL(url);
+    if (opt.mimeType) options.mimeType = opt.mimeType;
+
+    try {
+      state.mediaRecorder = new MediaRecorder(stream, options);
+    } catch (e) {
+      console.warn('Fallback to basic MediaRecorder:', e);
+      state.mediaRecorder = new MediaRecorder(stream);
+    }
+
+    state.mediaRecorder.ondataavailable = e => {
+      if (e.data && e.data.size > 0) state.recordedChunks.push(e.data);
     };
 
-    state.mediaRecorder.start();
+    state.mediaRecorder.onstop = () => {
+      if (recordTimerInterval) clearInterval(recordTimerInterval);
+
+      const blob = new Blob(state.recordedChunks, { type: opt.containerMime });
+      const url = URL.createObjectURL(blob);
+      const now = new Date();
+      const timeStr = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}${String(now.getSeconds()).padStart(2,'0')}`;
+      const avatarName = (state.selectedAvatar || 'master').toUpperCase();
+      const fileName = `Crystal_Show_${avatarName}_${timeStr}.${opt.ext}`;
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+      statusText.textContent = `已成功导出 [${opt.ext.toUpperCase()}] 格式超清视频！`;
+    };
+
+    state.mediaRecorder.start(100); // 100ms 切片收集
     state.isRecording = true;
     state.recordStartTime = Date.now();
-    $('#recordToggle').textContent = '停止录制并导出视频';
+
+    $('#recordToggle').textContent = `停止录制并保存 [${opt.ext.toUpperCase()}]`;
     $('#recordToggle').classList.add('recording');
     statusDot.classList.add('recording');
-    statusText.textContent = 'REC 60FPS 正在高清录制中…';
+
+    recordTimerInterval = setInterval(() => {
+      if (!state.isRecording) {
+        clearInterval(recordTimerInterval);
+        return;
+      }
+      const durSec = Math.floor((Date.now() - state.recordStartTime) / 1000);
+      const mm = String(Math.floor(durSec / 60)).padStart(2, '0');
+      const ss = String(durSec % 60).padStart(2, '0');
+      statusText.textContent = `🔴 REC 60FPS [${opt.ext.toUpperCase()}] 正在录制 (${mm}:${ss})…`;
+      $('#recordToggle').textContent = `停止录制 (${mm}:${ss}) 并导出 ${opt.ext.toUpperCase()}`;
+    }, 500);
+
   } else {
+    if (recordTimerInterval) clearInterval(recordTimerInterval);
     state.mediaRecorder.stop();
     state.isRecording = false;
     $('#recordToggle').innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4" fill="currentColor"></circle></svg> 开始 60FPS 录制`;
@@ -3635,6 +3720,10 @@ $('#customImgUrl').addEventListener('change', e => {
 });
 
 $('#recordToggle').addEventListener('click', toggleScreenRecording);
+
+$('#videoFormatSelect').addEventListener('change', e => {
+  state.videoFormat = e.target.value;
+});
 
 // 模式切换
 $('#contentModeGroup').addEventListener('click', e => {
