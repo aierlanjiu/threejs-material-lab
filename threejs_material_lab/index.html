@@ -1168,19 +1168,42 @@
         <!-- 文字/歌词排版面板 -->
         <div id="textPanel" style="display: none;">
           <div class="section-title">
-            <span><svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg> 歌词/文字排版 (N×M×1 动态跟随)</span>
+            <span><svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg> 歌词/文字排版 (零代码智能时间轴同步)</span>
           </div>
           <div class="card-block">
-            <textarea id="text" placeholder="按行输入歌词或文字，每行将作为一句独立短语动态流变…">CRYSTAL
+            <div style="font-size: 11px; color: var(--muted); margin-bottom: 6px; line-height: 1.4;">
+              ✦ 支持直接粘贴标准 <code>[00:12.30]LRC歌词</code> 或纯文本歌词（系统自动按歌曲总时长智能计算时间轴）。
+            </div>
+
+            <div class="grid2" style="margin-bottom: 6px;">
+              <div class="file-upload-wrap">
+                <button class="btn" style="width: 100%;" title="导入本地 .lrc 歌词文件">
+                  <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+                  导入 .LRC 歌词
+                </button>
+                <input type="file" id="lrcUpload" accept=".lrc,.txt">
+              </div>
+              <button class="btn" id="searchLyricsBtn" title="联网自动检索当前歌曲歌词">
+                <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                联网匹配歌词
+              </button>
+            </div>
+
+            <textarea id="text" style="height: 110px; font-family: monospace; font-size: 11px;" placeholder="支持粘贴 [00:12.30]LRC 格式或普通歌词换行文本，实时毫秒对齐…">CRYSTAL
 DIAMOND
 SHINE
 FLOW
 LIGHT
 BEAT</textarea>
+
+            <div id="lyricsStatusBadge" style="font-size: 11px; color: var(--primary); margin-top: 4px; margin-bottom: 4px;">
+              ⚡ 智能自适应时间轴同步已就绪 (随音乐自动推进)
+            </div>
+
             <div style="margin-top: 6px;">
               <button class="btn active" id="enableLyricsToggle" style="width: 100%;">
                 <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-                动态歌词跟随流：开 (N×M×1 随歌词实时伸缩)
+                动态歌词跟随流：开 (N×M×1 毫秒级同步)
               </button>
             </div>
             <div style="margin-top: 6px;">
@@ -3568,22 +3591,121 @@ const SONG_LYRICS_MAP = {
   ]
 };
 
-// 获取与当前歌曲播放进度精确对齐的歌词
-function getSynchronizedLyricPhrase() {
-  const lyricsList = SONG_LYRICS_MAP[state.songTitle];
-  if (!lyricsList || lyricsList.length === 0) {
-    const rawCustomLyrics = ui.text.value.replace(/\r/g, '').split('\n').filter(s => s.trim().length > 0);
-    if (rawCustomLyrics.length === 0) return state.songTitle;
-    const interval = state.morphIntervalBeats || 16;
-    const lyricInterval = Math.max(4, Math.floor(interval / 2));
-    const idx = Math.floor(state.beatCount / lyricInterval) % rawCustomLyrics.length;
-    return rawCustomLyrics[idx];
+// -------------------------------------------------------------
+// 14. 零代码全自动通用歌词同步引擎 (LRC 解析 + 纯文本自适应时间轴 + 联网检索)
+// -------------------------------------------------------------
+
+// 通用标准 LRC 时间轴格式解析器 (支持 [mm:ss.xx] 与 [mm:ss:xx])
+function parseLrcString(lrcContent) {
+  if (!lrcContent) return [];
+  const lines = lrcContent.split('\n');
+  const result = [];
+  const timeRegex = /\[(\d{1,2}):(\d{2}(?:[.:]\d{1,3})?)\](.*)/;
+
+  for (let line of lines) {
+    line = line.trim();
+    if (!line) continue;
+    const match = timeRegex.exec(line);
+    if (match) {
+      const minutes = parseInt(match[1], 10);
+      const secStr = match[2].replace(':', '.');
+      const seconds = parseFloat(secStr);
+      const totalSec = minutes * 60 + seconds;
+      const text = match[3].trim();
+      // 过滤非歌词元数据标签
+      if (text && !text.startsWith('ti:') && !text.startsWith('ar:') && !text.startsWith('al:') && !text.startsWith('by:')) {
+        result.push({ time: parseFloat(totalSec.toFixed(2)), text: text });
+      }
+    }
   }
+
+  result.sort((a, b) => a.time - b.time);
+  return result;
+}
+
+// 纯文本智能自适应时间轴插值器 (针对任意无时间戳歌词，根据音频时长与字数自动分配时间轴)
+function generateAutoTimedLyrics(plainText, totalDuration = 180) {
+  const rawLines = plainText.replace(/\r/g, '').split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  if (rawLines.length === 0) return [{ time: 0, text: state.songTitle }];
+
+  // 自动将相邻短行组合为双行排版短语
+  const phrases = [];
+  for (let i = 0; i < rawLines.length; i += 2) {
+    if (rawLines[i + 1]) phrases.push(`${rawLines[i]}\n${rawLines[i + 1]}`);
+    else phrases.push(rawLines[i]);
+  }
+
+  const introTime = Math.min(5.0, totalDuration * 0.04);
+  const outroTime = Math.min(8.0, totalDuration * 0.05);
+  const effectiveDuration = Math.max(10.0, totalDuration - introTime - outroTime);
+
+  const totalChars = phrases.reduce((sum, p) => sum + p.replace(/\s+/g, '').length, 0);
+  let curCharCount = 0;
+
+  return phrases.map((phrase) => {
+    const time = introTime + (curCharCount / Math.max(1, totalChars)) * effectiveDuration;
+    curCharCount += phrase.replace(/\s+/g, '').length;
+    return { time: parseFloat(time.toFixed(2)), text: phrase };
+  });
+}
+
+// 联网自动检索匹配歌词 (支持公共开放 API)
+async function fetchOnlineLyrics(songTitle) {
+  try {
+    const cleanTitle = songTitle
+      .replace(/《|》|【.*?】|\(.*?\)|（.*?）|｜.*?$/g, '')
+      .replace(/\.mp3|\.wav|\.flac|\.m4a/gi, '')
+      .replace(/Hi-Res|无损音质|经典歌曲|完整版|合唱版/gi, '')
+      .trim();
+
+    if (!cleanTitle) return null;
+
+    const apiUrl = `https://api.lrc.cx/lyrics?title=${encodeURIComponent(cleanTitle)}`;
+    const res = await fetch(apiUrl, { mode: 'cors' });
+    if (res.ok) {
+      const text = await res.text();
+      const parsed = parseLrcString(text);
+      if (parsed.length > 0) return parsed;
+    }
+  } catch (err) {
+    console.log('Online lyrics search info:', err);
+  }
+  return null;
+}
+
+// 零代码全自动通用歌词获取函数 (3 级自动匹配与毫秒对齐)
+function getSynchronizedLyricPhrase() {
+  let lyricsList = null;
+
+  // 1. 检查当前音轨的独立歌词 (来自 .LRC 文件上传 / 联网匹配)
+  const curTrack = state.playlist[state.currentTrackIndex];
+  if (curTrack && curTrack.lyrics && curTrack.lyrics.length > 0) {
+    lyricsList = curTrack.lyrics;
+  } else if (state.customLoadedLyrics && state.customLoadedLyrics.length > 0) {
+    lyricsList = state.customLoadedLyrics;
+  } else if (SONG_LYRICS_MAP[state.songTitle]) {
+    lyricsList = SONG_LYRICS_MAP[state.songTitle];
+  } else {
+    // 2. 纯文本与动态 textarea 自适应解析
+    const textareaVal = ui.text.value.trim();
+    if (textareaVal) {
+      if (textareaVal.includes('[') && textareaVal.includes(']')) {
+        const parsed = parseLrcString(textareaVal);
+        if (parsed.length > 0) lyricsList = parsed;
+      }
+      if (!lyricsList) {
+        const dur = (curTrack?.buffer?.duration) || 180;
+        lyricsList = generateAutoTimedLyrics(textareaVal, dur);
+      }
+    }
+  }
+
+  if (!lyricsList || lyricsList.length === 0) return state.songTitle;
 
   let currentSec = 0;
   if (state.trackStartTime && state.currentAudioSource && state.audioCtx) {
     const elapsed = state.audioCtx.currentTime - state.trackStartTime;
-    const dur = (state.playlist[state.currentTrackIndex]?.buffer?.duration) || 240;
+    const dur = (curTrack?.buffer?.duration) || 240;
     currentSec = elapsed % dur;
   } else {
     currentSec = (state.beatCount * 0.5) % 120;
@@ -4606,21 +4728,43 @@ AVATAR_KEYS.forEach(key => {
   }
 });
 
-// 批量本地音频上传与歌单管理
+// 批量本地音频与歌词上传管理
 $('#audioUpload').addEventListener('change', e => {
   const files = Array.from(e.target.files);
   if (!files.length) return;
   initAudioEngine();
 
-  files.forEach((file, fIdx) => {
-    const cleanTitle = file.name.replace(/\.[^/.]+$/, '').toUpperCase();
+  const audioFiles = files.filter(f => !f.name.endsWith('.lrc') && !f.name.endsWith('.txt'));
+  const lrcFiles = files.filter(f => f.name.endsWith('.lrc') || f.name.endsWith('.txt'));
+
+  const lrcMap = {};
+  lrcFiles.forEach(lf => {
+    const baseName = lf.name.replace(/\.[^/.]+$/, '').toLowerCase();
     const reader = new FileReader();
     reader.onload = ev => {
-      state.audioCtx.decodeAudioData(ev.target.result, buffer => {
+      lrcMap[baseName] = parseLrcString(ev.target.result);
+    };
+    reader.readAsText(lf);
+  });
+
+  audioFiles.forEach((file, fIdx) => {
+    const cleanTitle = file.name.replace(/\.[^/.]+$/, '');
+    const reader = new FileReader();
+    reader.onload = ev => {
+      state.audioCtx.decodeAudioData(ev.target.result, async buffer => {
+        const baseName = cleanTitle.toLowerCase();
+        let lyrics = lrcMap[baseName] || null;
+
+        // 如果没有一同上传 .lrc 文件，自动异步联网尝试匹配
+        if (!lyrics) {
+          lyrics = await fetchOnlineLyrics(cleanTitle);
+        }
+
         const newTrack = {
           title: cleanTitle,
           isPreset: false,
           buffer: buffer,
+          lyrics: lyrics,
           type: `upload_${Date.now()}_${fIdx}`
         };
         state.playlist.push(newTrack);
@@ -4637,6 +4781,64 @@ $('#audioUpload').addEventListener('change', e => {
     };
     reader.readAsArrayBuffer(file);
   });
+});
+
+// 本地 .LRC 歌词文件导入
+$('#lrcUpload')?.addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const text = ev.target.result;
+    ui.text.value = text;
+    const parsed = parseLrcString(text);
+    if (parsed.length > 0) {
+      state.customLoadedLyrics = parsed;
+      $('#lyricsStatusBadge').textContent = `✅ 已加载本地 LRC 歌词 (${parsed.length} 句 · 毫秒级同步)`;
+    } else {
+      const dur = (state.playlist[state.currentTrackIndex]?.buffer?.duration) || 180;
+      state.customLoadedLyrics = generateAutoTimedLyrics(text, dur);
+      $('#lyricsStatusBadge').textContent = `⚡ 纯文本已自适应生成时间轴 (${state.customLoadedLyrics.length} 句)`;
+    }
+    state.currentLyricPhrase = '';
+    rebuildMatrix();
+  };
+  reader.readAsText(file);
+});
+
+// 联网检索歌词按钮
+$('#searchLyricsBtn')?.addEventListener('click', async () => {
+  $('#lyricsStatusBadge').textContent = `🔍 正在联网检索《${state.songTitle}》歌词…`;
+  const onlineLrc = await fetchOnlineLyrics(state.songTitle);
+  if (onlineLrc && onlineLrc.length > 0) {
+    state.customLoadedLyrics = onlineLrc;
+    ui.text.value = onlineLrc.map(item => `[${Math.floor(item.time/60).toString().padStart(2,'0')}:${(item.time%60).toFixed(2).padStart(5,'0')}] ${item.text}`).join('\n');
+    $('#lyricsStatusBadge').textContent = `✅ 联网匹配成功 (${onlineLrc.length} 句时间戳歌词)`;
+    state.currentLyricPhrase = '';
+    rebuildMatrix();
+  } else {
+    const dur = (state.playlist[state.currentTrackIndex]?.buffer?.duration) || 180;
+    state.customLoadedLyrics = generateAutoTimedLyrics(ui.text.value, dur);
+    $('#lyricsStatusBadge').textContent = `⚡ 未检索到在线LRC，已自动启用智能时间轴插值 (${state.customLoadedLyrics.length} 句)`;
+  }
+});
+
+// 歌词输入框实时检测 (识别 LRC 格式或纯文本自适应)
+ui.text?.addEventListener('input', () => {
+  const val = ui.text.value.trim();
+  if (val.includes('[') && val.includes(']')) {
+    const parsed = parseLrcString(val);
+    if (parsed.length > 0) {
+      state.customLoadedLyrics = parsed;
+      $('#lyricsStatusBadge').textContent = `✅ 标准 LRC 时间戳格式已识别 (${parsed.length} 句)`;
+      state.currentLyricPhrase = '';
+      return;
+    }
+  }
+  const dur = (state.playlist[state.currentTrackIndex]?.buffer?.duration) || 180;
+  state.customLoadedLyrics = generateAutoTimedLyrics(val, dur);
+  $('#lyricsStatusBadge').textContent = `⚡ 纯文本智能自适应时间轴 (${state.customLoadedLyrics.length} 句)`;
+  state.currentLyricPhrase = '';
 });
 
 // 本地图片/GIF 上传
