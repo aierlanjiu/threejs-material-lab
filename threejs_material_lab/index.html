@@ -1285,12 +1285,27 @@ BEAT</textarea>
         </div>
 
         <div class="section-title">
-          <span><svg class="svg-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> 导演编排展示开关</span>
+          <span><svg class="svg-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> 🎬 导演级声光全景编排中枢</span>
         </div>
         <div class="card-block">
+          <div style="font-size: 11px; color: var(--muted); margin-bottom: 8px; line-height: 1.4;">
+            ✦ 导演编排系统随乐章推进，全自动轮转 12 款材质、6 大声波形态与方阵数量，带来杂志级声光视觉变幻。
+          </div>
           <div class="grid2">
-            <button class="btn active" id="toggleTitleIntro">歌名序幕：开</button>
-            <button class="btn active" id="toggleLyricsDisplay">文字展示：开</button>
+            <button class="btn active" id="toggleAutoChoreoTab4" title="开启或暂停乐章流变">
+              <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+              乐章流变：开
+            </button>
+            <button class="btn active" id="toggleTitleIntro" title="切换歌曲开场大标题序幕">
+              <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg>
+              歌名序幕：开
+            </button>
+          </div>
+          <div style="margin-top: 6px;">
+            <button class="btn active" id="toggleLyricsDisplay" style="width: 100%;" title="切换歌词实时同步跟随流">
+              <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+              动态歌词跟随流：开 (N×M×1 毫秒级同步)
+            </button>
           </div>
         </div>
       </div>
@@ -3252,7 +3267,6 @@ function toggleScreenRecording() {
 
     state.mediaRecorder.onstop = () => {
       if (recordTimerInterval) clearInterval(recordTimerInterval);
-
       const blob = new Blob(state.recordedChunks, { type: opt.containerMime });
       const url = URL.createObjectURL(blob);
       const now = new Date();
@@ -3423,107 +3437,171 @@ const CHOREOGRAPHY_MOVEMENTS = [
 
 const SONG_LYRICS_MAP = {
   '《游京》- 星火社': [
-    '滔滔江水\n悠悠大运河旁',
-    '这京城欣欣向荣\n春心荡漾',
-    '我走在长街中\n听戏子唱京城',
-    '人杂乱戏小丑\n叶黄退入长秋',
-    '悠悠的古城中\n听美人奏琴声',
-    '朗朗夜色星空\n望孩童放花灯',
-    '盼郎君几撩纱\n夜泊借宿酒家',
-    '君载着黑骏马\n威风凛凛寻她',
-    '我本一醉天涯\n游走京惜繁华',
-    '不舍笑声离它',
-    '我闻着饼香\n来到了街中央',
-    '看街边都是货郎\n我寻一对吉祥',
-    '何处声韵\n我听琴声奏起',
-    '我寻声而去\n原来有人在唱戏'
+    { time: 0.0, text: '《游京》\n星火社' },
+    { time: 13.5, text: '悠悠的古城中\n听美人奏琴声' },
+    { time: 19.8, text: '朗朗夜色星空\n望孩童放花灯' },
+    { time: 26.2, text: '盼郎君几撩纱\n夜泊借宿酒家' },
+    { time: 32.5, text: '君载着黑骏马\n威风凛凛寻她' },
+    { time: 38.9, text: '我本一醉天涯\n游走京惜繁华' },
+    { time: 45.2, text: '不舍笑声离它' },
+    { time: 51.5, text: '悠长的街道上\n游走在故人巷' },
+    { time: 57.8, text: '长安的少年郎\n一幅姑娘模样' },
+    { time: 64.0, text: '怎知风花止在京城\n怎奈何缘浅相思长' },
+    { time: 70.5, text: '且听这游京人在唱' },
+    { time: 76.8, text: '我走在长街中\n听戏子唱京城' },
+    { time: 83.2, text: '人杂乱戏小丑\n叶黄退入长秋' },
+    { time: 89.5, text: '悠悠的古城中\n听美人奏琴声' },
+    { time: 95.8, text: '朗朗夜色星空\n望孩童放花灯' },
+    { time: 102.2, text: '盼郎君几撩纱\n夜泊借宿酒家' },
+    { time: 108.5, text: '君载着黑骏马\n威风凛凛寻她' },
+    { time: 114.8, text: '我本一醉天涯\n游走京惜繁华' },
+    { time: 121.2, text: '不舍笑声离它' }
   ],
   '《秋意浓》- 张学友': [
-    '秋意浓\n离人心上秋意浓',
-    '一杯酒\n情绪万种',
-    '离别多\n叶落的季节离别多',
-    '握住你的手\n放在心头',
-    '我要你记得\n无言的承诺',
-    '不怕相思苦\n只怕你伤痛',
-    '怨只怨人在风中\n聚散都不由我',
-    '不怕我孤独\n只怕你寂寞',
-    '无处说离愁',
-    '舞秋风\n漫天回忆舞秋风',
-    '叹一声\n黯然沉默',
-    '不能说\n惹泪的话都不能说',
-    '紧紧拥着你\n永远记得',
-    '你曾经为我\n这样的哭过'
+    { time: 0.0, text: '《秋意浓》\n张学友' },
+    { time: 35.5, text: '秋意浓\n离人心上秋意浓' },
+    { time: 46.4, text: '一杯酒\n情绪万种' },
+    { time: 52.2, text: '离别多\n叶落的季节离别多' },
+    { time: 63.2, text: '握住你的手\n放在心头' },
+    { time: 68.5, text: '我要你记得\n无言的承诺' },
+    { time: 74.6, text: '啊 不怕相思苦\n只怕你伤痛' },
+    { time: 82.4, text: '怨只怨人在风中\n聚散都不由我' },
+    { time: 90.3, text: '啊 不怕我孤独\n只怕你寂寞' },
+    { time: 98.1, text: '无处说离愁' },
+    { time: 103.0, text: '舞秋风\n漫天回忆舞秋风' },
+    { time: 113.9, text: '叹一声\n黯然沉默' },
+    { time: 124.9, text: '不能说\n惹泪的话都不能说' },
+    { time: 130.5, text: '紧紧拥着你\n永远记得' },
+    { time: 134.0, text: '你曾经为我\n这样的哭过' },
+    { time: 185.0, text: '啊 不怕相思苦\n只怕你伤痛' },
+    { time: 193.0, text: '怨只怨人在风中\n聚散都不由我' },
+    { time: 201.0, text: '啊 不怕我孤独\n只怕你寂寞' },
+    { time: 209.0, text: '无处说离愁' }
   ],
   '《烂泥》- 草东没有派对': [
-    '噢多么美丽\n的一颗心',
-    '怎么会\n变成了一滩烂泥',
-    '噢多么单纯\n的一首诗',
-    '怎么会\n都变成了讽刺',
-    '我想要说的\n前人们都说过了',
-    '我想要做的\n有钱人都做过了',
-    '我想要的公平\n都是不公们虚构的',
-    '噢多么干净\n的一幅画',
-    '怎么会\n充满了悲伤',
-    '噢多么天真\n的一句话',
-    '怎么会\n像噩梦一样'
+    { time: 0.0, text: '《烂泥》\n草东没有派对' },
+    { time: 0.8, text: '噢多么美丽\n的一颗心' },
+    { time: 9.0, text: '怎么会\n变成了一滩烂泥' },
+    { time: 17.4, text: '噢多么单纯\n的一首诗' },
+    { time: 25.6, text: '怎么会\n都变成了讽刺' },
+    { time: 33.7, text: '我想要说的\n前人们都说过了' },
+    { time: 37.8, text: '我想要做的\n有钱人都做过了' },
+    { time: 42.0, text: '我想要的公平\n都是不公们虚构的' },
+    { time: 48.3, text: '噢多么干净\n的一幅画' },
+    { time: 56.4, text: '怎么会\n充满了悲伤' },
+    { time: 64.8, text: '噢多么天真\n的一句话' },
+    { time: 72.7, text: '怎么会\n像噩梦一样' },
+    { time: 81.0, text: '我想要说的\n前人们都说过了' },
+    { time: 85.0, text: '我想要做的\n有钱人都做过了' },
+    { time: 89.2, text: '我想要的公平\n都是不公们虚构的' }
   ],
   '《鬼》- 草东没有派对': [
-    '从没想过\n要伤害谁',
-    '对一切\n也都感到抱歉',
-    '可是我的自卑\n胜过了一切爱我的',
-    '于是我把爱人们\n都杀死了',
-    '可是你的伤悲\n胜过了一切爱你的',
-    '于是你把我\n给杀死了',
-    '是为了什么\n而流着血',
-    '是为了谁\n而流眼泪',
-    '我躲在夜里\n取笑着黑',
-    '因为没有人\n能杀死鬼'
+    { time: 0.0, text: '《鬼》\n草东没有派对' },
+    { time: 13.7, text: '从没想过\n要伤害谁' },
+    { time: 21.0, text: '对一切\n也都感到抱歉' },
+    { time: 27.8, text: '可是我的自卑\n胜过了一切爱我的' },
+    { time: 34.5, text: '于是我把爱人们\n都杀死了' },
+    { time: 41.5, text: '可是你的伤悲\n胜过了一切爱你的' },
+    { time: 48.2, text: '于是你把我\n给杀死了' },
+    { time: 68.0, text: '是为了什么\n而流着血' },
+    { time: 74.8, text: '是为了谁\n而流眼泪' },
+    { time: 81.5, text: '我躲在夜里\n取笑着黑' },
+    { time: 88.2, text: '因为没有人\n能杀死鬼' }
   ],
   '《偏爱》- 张芸京': [
-    '把昨天都作废\n现在你在我眼前',
-    '我想爱\n请给我机会',
-    '如果我错了也承担\n认定你就是答案',
-    '我不怕谁\n嘲笑我极端',
-    '相信自己的直觉\n顽固的人不喊累',
-    '爱上你\n我不撤退',
-    '我说过我不闪躲\n我非要这么做',
-    '讲不听也偏要爱\n更努力爱让你明白',
-    '没有别条路能走\n你决定要不要陪我',
-    '讲不听偏爱\n靠我感觉爱',
-    '等你的依赖\n对你偏爱',
-    '痛也很愉快'
+    { time: 0.0, text: '《偏爱》\n张芸京' },
+    { time: 5.4, text: '把昨天都作废\n现在你在我眼前' },
+    { time: 10.9, text: '我想爱\n请给我机会' },
+    { time: 15.5, text: '如果我错了也承担\n认定你就是答案' },
+    { time: 21.0, text: '我不怕谁\n嘲笑我极端' },
+    { time: 25.1, text: '相信自己的直觉\n顽固的人不喊累' },
+    { time: 30.9, text: '爱上你\n我不撤退' },
+    { time: 35.3, text: '我说过我不闪躲\n我非要这么做' },
+    { time: 40.4, text: '讲不听也偏要爱\n更努力爱让你明白' },
+    { time: 46.3, text: '没有别条路能走\n你决定要不要陪我' },
+    { time: 51.3, text: '讲不听\n偏爱' },
+    { time: 54.6, text: '看我感觉爱\n等你的依赖' },
+    { time: 59.1, text: '对你偏爱\n痛也很愉快' },
+    { time: 64.2, text: '把昨天都作废\n现在你在我眼前' },
+    { time: 69.9, text: '我想爱\n请给我机会' },
+    { time: 74.6, text: '如果我错了也承担\n认定你就是答案' },
+    { time: 80.0, text: '我不怕谁\n嘲笑我极端' },
+    { time: 84.2, text: '相信自己的直觉\n顽固的人不喊累' },
+    { time: 90.0, text: '爱上你\n我不撤退' },
+    { time: 94.4, text: '我说过我不闪躲\n我非要这么做' },
+    { time: 99.5, text: '讲不听也偏要爱\n更努力爱让你明白' },
+    { time: 105.3, text: '没有别条路能走\n你决定要不要陪我' },
+    { time: 110.3, text: '讲不听\n偏爱' },
+    { time: 113.6, text: '看我感觉爱\n等你的依赖' },
+    { time: 118.3, text: '不后悔\n有把握' }
   ],
   '《海鸥》- 逃跑计划': [
-    '昨夜的潮汐\n今晨已褪去',
-    '归来的渔民叫卖着\n刚刚经历的风雨',
-    '教堂里举行着婚礼\n我路过感到甜蜜',
-    '也让我想到\n我和你',
-    '天真的孩子\n偷听了恋人的情话',
-    '羞红的脸像路人\n手中捧着的鲜花',
-    '熟悉的城市\n已经变了模样',
-    '不变的是依然\n没有你在身旁',
-    '我知道所有的伤痛\n都会过去',
-    '也明白有些遗憾\n会永远留在心里',
-    '但愿那海风再起\n海鸥落在那礁石',
-    '我终于对着大海\n放声喊出你的名字'
+    { time: 0.0, text: '《海鸥》\n逃跑计划' },
+    { time: 5.4, text: '昨夜的潮汐\n今晨已褪去' },
+    { time: 12.7, text: '归来的渔民\n叫卖着刚刚经历的风雨' },
+    { time: 20.3, text: '教堂里举行着婚礼\n我路过感到甜蜜' },
+    { time: 27.7, text: '也让我想到\n我和你' },
+    { time: 31.5, text: '天真的孩子\n偷听了恋人的情话' },
+    { time: 39.1, text: '羞红的脸像路人\n手中捧着的鲜花' },
+    { time: 46.5, text: '熟悉的城市\n已经变了模样' },
+    { time: 54.0, text: '不变的是依然\n没有你在身旁' },
+    { time: 61.5, text: '我知道所有的伤痛\n都会过去' },
+    { time: 69.0, text: '也明白有些遗憾\n会永远留在心里' },
+    { time: 76.5, text: '但愿那海风再起\n海鸥落在那礁石' },
+    { time: 84.0, text: '我终于对着大海\n放声喊出你的名字' }
   ],
   'CYBER CRYSTAL FLOW': [
-    'CYBER CRYSTAL\nFLOW WITH LIGHT',
-    'OPTICAL RESONANCE\nPURE FREQUENCY',
-    'SHINE IN MOTION\n3D CRYSTAL BEAT',
-    'LÜ AUDIO LAB\nDEEP HARMONICS'
+    { time: 0.0, text: 'CYBER CRYSTAL\nFLOW WITH LIGHT' },
+    { time: 6.0, text: 'OPTICAL RESONANCE\nPURE FREQUENCY' },
+    { time: 12.0, text: 'SHINE IN MOTION\n3D CRYSTAL BEAT' },
+    { time: 18.0, text: 'LÜ AUDIO LAB\nDEEP HARMONICS' }
   ],
   'NEO SYNTH WAVE 80S': [
-    'NEO SYNTH\nRETRO HORIZON',
-    'ELECTRIC PULSE\nANALOG DREAMS',
-    'NEON SUNSET\nSYNTHWAVE 80S'
+    { time: 0.0, text: 'NEO SYNTH\nRETRO HORIZON' },
+    { time: 6.0, text: 'ELECTRIC PULSE\nANALOG DREAMS' },
+    { time: 12.0, text: 'NEON SUNSET\nSYNTHWAVE 80S' }
   ],
   'DEEP SUB BASS 808': [
-    '808 SUB BASS\nHEARTBEAT IMPACT',
-    'DEEP FREQUENCY\nSHAKE THE STAGE',
-    'LOW END IMPACT\nPURE 808 RESONANCE'
+    { time: 0.0, text: '808 SUB BASS\nHEARTBEAT IMPACT' },
+    { time: 6.0, text: 'DEEP FREQUENCY\nSHAKE THE STAGE' },
+    { time: 12.0, text: 'LOW END IMPACT\nPURE 808 RESONANCE' }
   ]
 };
+
+// 获取与当前歌曲播放进度精确对齐的歌词
+function getSynchronizedLyricPhrase() {
+  const lyricsList = SONG_LYRICS_MAP[state.songTitle];
+  if (!lyricsList || lyricsList.length === 0) {
+    const rawCustomLyrics = ui.text.value.replace(/\r/g, '').split('\n').filter(s => s.trim().length > 0);
+    if (rawCustomLyrics.length === 0) return state.songTitle;
+    const interval = state.morphIntervalBeats || 16;
+    const lyricInterval = Math.max(4, Math.floor(interval / 2));
+    const idx = Math.floor(state.beatCount / lyricInterval) % rawCustomLyrics.length;
+    return rawCustomLyrics[idx];
+  }
+
+  let currentSec = 0;
+  if (state.trackStartTime && state.currentAudioSource && state.audioCtx) {
+    const elapsed = state.audioCtx.currentTime - state.trackStartTime;
+    const dur = (state.playlist[state.currentTrackIndex]?.buffer?.duration) || 240;
+    currentSec = elapsed % dur;
+  } else {
+    currentSec = (state.beatCount * 0.5) % 120;
+  }
+
+  let matchedText = typeof lyricsList[0] === 'object' ? lyricsList[0].text : lyricsList[0];
+  for (let i = 0; i < lyricsList.length; i++) {
+    const item = lyricsList[i];
+    const itemTime = typeof item === 'object' ? item.time : (i * 4.5);
+    const itemText = typeof item === 'object' ? item.text : item;
+    if (currentSec >= itemTime) {
+      matchedText = itemText;
+    } else {
+      break;
+    }
+  }
+  return matchedText;
+}
 
 const MATRIX_PROGRESSION_SEQUENCES = {
   standard: [
@@ -3580,41 +3658,24 @@ let lastMovementIdx = -1;
 function updateMasterChoreography() {
   if (!state.isPlayingMusic) return;
 
+  // 1. 序幕自动倒计时：歌曲开场展示 3.5 秒后自动收起并切入正文歌词/声波律动
+  if (state.isIntroPlaying && state.enableTitleIntro) {
+    if (Date.now() - state.introStartTime > 3500) {
+      state.isIntroPlaying = false;
+      rebuildMatrix();
+    }
+  }
+
   const interval = state.morphIntervalBeats || 16;
   const moveIdx = Math.floor(state.beatCount / interval) % CHOREOGRAPHY_MOVEMENTS.length;
   $('#movementBadge').textContent = `乐章 ${moveIdx + 1}/${CHOREOGRAPHY_MOVEMENTS.length}`;
 
-  // 1. 动态歌词跟随流处理 (多排单层 N x M x 1 随歌词实时伸缩与刷新)
+  // 2. 动态歌词跟随流处理 (多排单层 N x M x 1 随歌词实时精确时间轴同步)
   const isLyricsStreamActive = (state.matrixSequence === 'lyrics_stream') || (state.contentMode === 'text' && state.enableLyricsDisplay);
   if (isLyricsStreamActive) {
-    const rawCustomLyrics = ui.text.value.replace(/\r/g, '').split('\n').filter(s => s.trim().length > 0);
-    
-    let lyricsList = SONG_LYRICS_MAP[state.songTitle];
-    if (!lyricsList || lyricsList.length === 0) {
-      if (rawCustomLyrics.length > 0) {
-        lyricsList = [];
-        for (let i = 0; i < rawCustomLyrics.length; i += 2) {
-          if (rawCustomLyrics[i + 1]) lyricsList.push(`${rawCustomLyrics[i]}\n${rawCustomLyrics[i+1]}`);
-          else lyricsList.push(rawCustomLyrics[i]);
-        }
-      } else {
-        lyricsList = [state.songTitle];
-      }
-    }
+    const currentPhrase = getSynchronizedLyricPhrase();
 
-    // 根据真实歌曲播放时间戳或合成节拍精准对齐歌词句
-    let lyricIdx = 0;
-    if (state.trackStartTime && state.currentAudioSource && state.audioCtx) {
-      const elapsed = state.audioCtx.currentTime - state.trackStartTime;
-      lyricIdx = Math.floor(elapsed / 4.8) % lyricsList.length;
-    } else {
-      const lyricInterval = Math.max(4, Math.floor(interval / 2));
-      lyricIdx = Math.floor(state.beatCount / lyricInterval) % lyricsList.length;
-    }
-
-    const currentPhrase = lyricsList[lyricIdx] || state.songTitle;
-
-    if (currentPhrase !== state.currentLyricPhrase) {
+    if (currentPhrase && currentPhrase !== state.currentLyricPhrase) {
       state.currentLyricPhrase = currentPhrase;
       
       // 自动计算最佳多排单层架构 N x M x 1 (层数严格只有 1 层，排数随歌词分为 1~3 排)
@@ -4109,24 +4170,56 @@ $('#playlistSelect').addEventListener('change', e => {
   if (idx !== -1) playTrackAtIndex(idx);
 });
 
-// 开关：全变量流变总开关
-$('#toggleAutoChoreo').addEventListener('click', e => {
-  state.isChoreographyShow = !state.isChoreographyShow;
-  e.currentTarget.classList.toggle('active', state.isChoreographyShow);
-  e.currentTarget.textContent = `全变量流变：${state.isChoreographyShow ? '开' : '关'}`;
-});
+// 乐章流变总开关 (顶部 Header 与 Tab 4 保持双向同步)
+function setAutoChoreoState(enabled) {
+  state.isChoreographyShow = enabled;
+  const label = `流变：${enabled ? '开' : '关'}`;
+  const labelTab4 = `乐章流变：${enabled ? '开' : '关'}`;
+  if ($('#toggleAutoChoreo')) {
+    $('#toggleAutoChoreo').classList.toggle('active', enabled);
+    $('#toggleAutoChoreo').innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg> ${label}`;
+  }
+  if ($('#toggleAutoChoreoTab4')) {
+    $('#toggleAutoChoreoTab4').classList.toggle('active', enabled);
+    $('#toggleAutoChoreoTab4').innerHTML = `<svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg> ${labelTab4}`;
+  }
+  $('#statusDot')?.classList.toggle('choreographing', enabled);
+  $('#statusText').textContent = enabled ? '全变量声波电台演出中…' : '乐章流变已暂停 (固定当前状态)';
+}
 
-// 开关：开场歌名序幕
-$('#toggleTitleIntro').addEventListener('click', e => {
+$('#toggleAutoChoreo')?.addEventListener('click', () => setAutoChoreoState(!state.isChoreographyShow));
+$('#toggleAutoChoreoTab4')?.addEventListener('click', () => setAutoChoreoState(!state.isChoreographyShow));
+
+// 歌名序幕开关 (点击即刻提供 3D 悬浮预览)
+$('#toggleTitleIntro')?.addEventListener('click', e => {
   state.enableTitleIntro = !state.enableTitleIntro;
   e.currentTarget.classList.toggle('active', state.enableTitleIntro);
-  e.currentTarget.textContent = `歌名序幕：${state.enableTitleIntro ? '开' : '关'}`;
+  e.currentTarget.innerHTML = `<svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg> 歌名序幕：${state.enableTitleIntro ? '开' : '关'}`;
+  if (state.enableTitleIntro) {
+    state.isIntroPlaying = true;
+    state.introStartTime = Date.now();
+  } else {
+    state.isIntroPlaying = false;
+  }
   rebuildMatrix();
 });
 
-// 开关：歌词/文字展示
-const onLyricsDisplayChange = () => {
-  if (state.enableLyricsDisplay) {
+// 动态歌词跟随流开关 (Tab 3 与 Tab 4 双向同步)
+function setLyricsDisplayState(enabled) {
+  state.enableLyricsDisplay = enabled;
+  const labelTab4 = `动态歌词跟随流：${enabled ? '开 (N×M×1 毫秒级同步)' : '关'}`;
+  const labelTab3 = `动态歌词跟随流：${enabled ? '开 (N×M×1 随歌词实时伸缩)' : '关'}`;
+
+  if ($('#toggleLyricsDisplay')) {
+    $('#toggleLyricsDisplay').classList.toggle('active', enabled);
+    $('#toggleLyricsDisplay').innerHTML = `<svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg> ${labelTab4}`;
+  }
+  if ($('#enableLyricsToggle')) {
+    $('#enableLyricsToggle').classList.toggle('active', enabled);
+    $('#enableLyricsToggle').innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg> ${labelTab3}`;
+  }
+
+  if (enabled) {
     state.contentMode = 'text';
     state.matrixSequence = 'lyrics_stream';
     if ($('#matrixSequenceSelect')) $('#matrixSequenceSelect').value = 'lyrics_stream';
@@ -4137,33 +4230,10 @@ const onLyricsDisplayChange = () => {
     state.currentLyricPhrase = '';
   }
   rebuildMatrix();
-};
+}
 
-$('#toggleLyricsDisplay')?.addEventListener('click', e => {
-  state.enableLyricsDisplay = !state.enableLyricsDisplay;
-  e.currentTarget.classList.toggle('active', state.enableLyricsDisplay);
-  e.currentTarget.textContent = `文字展示：${state.enableLyricsDisplay ? '开' : '关'}`;
-  if ($('#enableLyricsToggle')) {
-    $('#enableLyricsToggle').classList.toggle('active', state.enableLyricsDisplay);
-    $('#enableLyricsToggle').innerHTML = state.enableLyricsDisplay
-      ? `<svg class="svg-icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg> 动态歌词跟随流：开 (N×M×1 随歌词实时伸缩)`
-      : `<svg class="svg-icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg> 动态歌词跟随流：关`;
-  }
-  onLyricsDisplayChange();
-});
-
-$('#enableLyricsToggle')?.addEventListener('click', e => {
-  state.enableLyricsDisplay = !state.enableLyricsDisplay;
-  e.currentTarget.classList.toggle('active', state.enableLyricsDisplay);
-  e.currentTarget.innerHTML = state.enableLyricsDisplay
-    ? `<svg class="svg-icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg> 动态歌词跟随流：开 (N×M×1 随歌词实时伸缩)`
-    : `<svg class="svg-icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg> 动态歌词跟随流：关`;
-  if ($('#toggleLyricsDisplay')) {
-    $('#toggleLyricsDisplay').classList.toggle('active', state.enableLyricsDisplay);
-    $('#toggleLyricsDisplay').textContent = `文字展示：${state.enableLyricsDisplay ? '开' : '关'}`;
-  }
-  onLyricsDisplayChange();
-});
+$('#toggleLyricsDisplay')?.addEventListener('click', () => setLyricsDisplayState(!state.enableLyricsDisplay));
+$('#enableLyricsToggle')?.addEventListener('click', () => setLyricsDisplayState(!state.enableLyricsDisplay));
 
 // -------------------------------------------------------------
 // 15. 光影与光学参数 1/2/3 挡自适应预设与动态增益引擎
