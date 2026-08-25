@@ -849,12 +849,12 @@ FLOW</textarea>
         <div class="range"><span>圆角半径</span><input id="bevelRadius" type="range" min="0.05" max="0.32" step="0.01" value="0.20"><output>0.20</output></div>
         <div class="range"><span>粗糙度</span><input id="roughness" type="range" min="0" max="1" step="0.01" value="0.00"><output>0.00</output></div>
         <div class="range"><span>折射率 IOR</span><input id="ior" type="range" min="1" max="2.4" step="0.01" value="1.52"><output>1.52</output></div>
-        <div class="range"><span>光学厚度</span><input id="thickness" type="range" min="0" max="2.5" step="0.05" value="1.20"><output>1.20</output></div>
+        <div class="range"><span>光学厚度</span><input id="thickness" type="range" min="0" max="3.0" step="0.05" value="1.20"><output>1.20</output></div>
         <div class="range"><span>透射比</span><input id="transmission" type="range" min="0" max="1" step="0.01" value="1.00"><output>1.00</output></div>
-        <div class="range"><span>彩虹色散</span><input id="dispersion" type="range" min="0" max="0.5" step="0.01" value="0.26"><output>0.26</output></div>
-        <div class="range"><span>呼吸微光晕</span><input id="bloom" type="range" min="0" max="0.25" step="0.01" value="0.08"><output>0.08</output></div>
-        <div class="range"><span>环境反射</span><input id="envIntensity" type="range" min="0" max="5" step="0.05" value="3.95"><output>3.95</output></div>
-        <div class="range"><span>影棚主光</span><input id="light" type="range" min="0" max="0.25" step="0.01" value="0.08"><output>0.08</output></div>
+        <div class="range"><span>彩虹色散</span><input id="dispersion" type="range" min="0" max="0.6" step="0.01" value="0.26"><output>0.26</output></div>
+        <div class="range"><span>呼吸微光晕</span><input id="bloom" type="range" min="0" max="0.35" step="0.01" value="0.08"><output>0.08</output></div>
+        <div class="range"><span>环境反射</span><input id="envIntensity" type="range" min="0" max="7.0" step="0.05" value="3.95"><output>3.95</output></div>
+        <div class="range"><span>影棚主光</span><input id="light" type="range" min="0" max="0.35" step="0.01" value="0.08"><output>0.08</output></div>
       </div>
     </div>
 
@@ -988,7 +988,18 @@ const state = {
 
   // 1/2/3 挡全局律动强度自适应增益
   intensityTier: 2, // 1 | 2 | 3
-  tierMultiplier: 1.0, // 0.5 | 1.0 | 2.0
+  tierMultiplier: 1.0, // 0.5 | 1.0 | 2.2
+
+  // 9 大核心光影与光学物理参数基准值 (由 1/2/3 档位或用户手动调节自适应定义)
+  baseBloom: 0.08,
+  baseLight: 0.08,
+  baseDispersion: 0.26,
+  baseEnv: 3.95,
+  baseRoughness: 0.00,
+  baseIor: 1.52,
+  baseThickness: 1.20,
+  baseTransmission: 1.00,
+  baseBevelRadius: 0.20,
 
   // 材质固定控制
   lockMaterial: false,
@@ -2590,6 +2601,20 @@ function pauseMusic() {
 
   $('#playPauseBtn').classList.remove('choreography-active');
   $('#playPauseBtn').innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> 暂停中：点击播放`;
+
+  // 恢复光影参数滑块至基准静止状态
+  if (state.baseBloom !== undefined) {
+    ui.bloom.value = state.baseBloom;
+    ui.light.value = state.baseLight;
+    ui.dispersion.value = state.baseDispersion;
+    ui.envIntensity.value = state.baseEnv;
+    ui.ior.value = state.baseIor;
+    ui.thickness.value = state.baseThickness;
+    ui.roughness.value = state.baseRoughness;
+    bloomPass.strength = state.baseBloom;
+    keyLight.intensity = state.baseLight;
+    syncSliderOutputs();
+  }
 }
 
 function stopMusic() {
@@ -2919,31 +2944,31 @@ function updateMasterChoreography() {
     controls.target.set(0, 0, 0);
   }
 
-  // 2. 9 大核心物理参数随音乐律动实时脉动 (由 1/2/3 挡位系数自适应增益)
-  const baseBloom = +ui.bloom.value;
-  const baseLight = +ui.light.value;
-  const baseDispersion = +ui.dispersion.value;
-  const baseEnv = +ui.envIntensity.value;
-  const baseRoughness = +ui.roughness.value;
-  const baseIor = +ui.ior.value;
-  const baseThickness = +ui.thickness.value;
+  // 2. 9 大核心光影与光学物理参数随音乐律动实时脉动 (由 1/2/3 挡位基准与自适应增益驱动)
+  const baseBloom = state.baseBloom !== undefined ? state.baseBloom : +ui.bloom.value;
+  const baseLight = state.baseLight !== undefined ? state.baseLight : +ui.light.value;
+  const baseDispersion = state.baseDispersion !== undefined ? state.baseDispersion : +ui.dispersion.value;
+  const baseEnv = state.baseEnv !== undefined ? state.baseEnv : +ui.envIntensity.value;
+  const baseRoughness = state.baseRoughness !== undefined ? state.baseRoughness : +ui.roughness.value;
+  const baseIor = state.baseIor !== undefined ? state.baseIor : +ui.ior.value;
+  const baseThickness = state.baseThickness !== undefined ? state.baseThickness : +ui.thickness.value;
 
-  // 呼吸微光晕 (自适应 1/2/3 挡)
-  const dynamicBloom = Math.min(0.25, baseBloom + (state.bassEnergy * 0.07 * tMul));
+  // 呼吸微光晕 (自适应 1/2/3 挡光影)
+  const dynamicBloom = Math.min(0.35, baseBloom + (state.bassEnergy * 0.08 * tMul));
   bloomPass.strength = dynamicBloom;
 
-  // 影棚主光
-  const dynamicKeyLight = Math.min(0.28, baseLight + (state.bassEnergy * 0.10 * tMul));
+  // 影棚主光 (自适应 1/2/3 挡光影)
+  const dynamicKeyLight = Math.min(0.35, baseLight + (state.bassEnergy * 0.12 * tMul));
   keyLight.intensity = dynamicKeyLight;
 
-  // 动态彩虹色散与环境反射
-  const dynamicDispersion = Math.min(0.50, baseDispersion + (state.bassEnergy * 0.24 + state.trebleEnergy * 0.10) * tMul);
-  const dynamicEnv = baseEnv + (state.midEnergy * 0.95 * tMul);
+  // 动态彩虹色散与环境反射 (随低音高音重击炸裂)
+  const dynamicDispersion = Math.min(0.60, baseDispersion + (state.bassEnergy * 0.26 + state.trebleEnergy * 0.12) * tMul);
+  const dynamicEnv = Math.min(7.0, baseEnv + (state.midEnergy * 1.10 * tMul));
 
   // 粗糙度、IOR与光学厚度动态共振
   const dynamicRoughness = Math.min(0.12, baseRoughness + (state.midEnergy * 0.04 * tMul));
-  const dynamicIor = baseIor + (state.bassEnergy * 0.18 * tMul);
-  const dynamicThickness = baseThickness + (state.bassEnergy * 0.45 * tMul);
+  const dynamicIor = Math.min(2.40, baseIor + (state.bassEnergy * 0.22 * tMul));
+  const dynamicThickness = Math.min(3.00, baseThickness + (state.bassEnergy * 0.55 * tMul));
 
   // 实时注入材质物理属性
   matrixGroup.children.forEach(unit => {
@@ -2961,14 +2986,27 @@ function updateMasterChoreography() {
     });
   });
 
-  // 实时将 9 大动态脉动数值映射到 UI 界面输出
+  // 实时将 9 大动态脉动数值映射到 UI 界面输出与滑块位置 (滑块圆点与进度条随音乐节拍自适应跳动)
   if (state.isPlayingMusic) {
+    ui.roughness.value = dynamicRoughness;
     ui.roughness.nextElementSibling.textContent = dynamicRoughness.toFixed(2);
+
+    ui.ior.value = dynamicIor;
     ui.ior.nextElementSibling.textContent = dynamicIor.toFixed(2);
+
+    ui.thickness.value = dynamicThickness;
     ui.thickness.nextElementSibling.textContent = dynamicThickness.toFixed(2);
+
+    ui.dispersion.value = dynamicDispersion;
     ui.dispersion.nextElementSibling.textContent = dynamicDispersion.toFixed(2);
+
+    ui.bloom.value = dynamicBloom;
     ui.bloom.nextElementSibling.textContent = dynamicBloom.toFixed(2);
+
+    ui.envIntensity.value = dynamicEnv;
     ui.envIntensity.nextElementSibling.textContent = dynamicEnv.toFixed(2);
+
+    ui.light.value = dynamicKeyLight;
     ui.light.nextElementSibling.textContent = dynamicKeyLight.toFixed(2);
   }
 }
@@ -3217,14 +3255,99 @@ $('#toggleLyricsDisplay').addEventListener('click', e => {
   rebuildMatrix();
 });
 
+// -------------------------------------------------------------
+// 15. 光影与光学参数 1/2/3 挡自适应预设与动态增益引擎
+// -------------------------------------------------------------
+const TIER_LIGHTING_CONFIGS = {
+  1: {
+    name: '1 挡 · 沉静微澜 (纯净低光影)',
+    multiplier: 0.5,
+    bloom: 0.04,
+    light: 0.05,
+    dispersion: 0.12,
+    envIntensity: 2.20,
+    ior: 1.45,
+    thickness: 0.90,
+    roughness: 0.00,
+    bevelRadius: 0.16
+  },
+  2: {
+    name: '2 挡 · 动感晶辉 (标准高奢影棚)',
+    multiplier: 1.0,
+    bloom: 0.08,
+    light: 0.08,
+    dispersion: 0.26,
+    envIntensity: 3.95,
+    ior: 1.52,
+    thickness: 1.20,
+    roughness: 0.00,
+    bevelRadius: 0.20
+  },
+  3: {
+    name: '3 挡 · 极致狂热 (超强光影极光炸裂)',
+    multiplier: 2.2,
+    bloom: 0.15,
+    light: 0.18,
+    dispersion: 0.42,
+    envIntensity: 5.20,
+    ior: 1.70,
+    thickness: 1.65,
+    roughness: 0.02,
+    bevelRadius: 0.22
+  }
+};
+
+function applyIntensityTier(tier) {
+  state.intensityTier = tier;
+  const cfg = TIER_LIGHTING_CONFIGS[tier] || TIER_LIGHTING_CONFIGS[2];
+  state.tierMultiplier = cfg.multiplier;
+
+  state.baseBloom = cfg.bloom;
+  state.baseLight = cfg.light;
+  state.baseDispersion = cfg.dispersion;
+  state.baseEnv = cfg.envIntensity;
+  state.baseIor = cfg.ior;
+  state.baseThickness = cfg.thickness;
+  state.baseRoughness = cfg.roughness;
+  state.baseBevelRadius = cfg.bevelRadius;
+
+  ui.bloom.value = cfg.bloom;
+  ui.light.value = cfg.light;
+  ui.dispersion.value = cfg.dispersion;
+  ui.envIntensity.value = cfg.envIntensity;
+  ui.ior.value = cfg.ior;
+  ui.thickness.value = cfg.thickness;
+  ui.roughness.value = cfg.roughness;
+  ui.bevelRadius.value = cfg.bevelRadius;
+
+  bloomPass.strength = cfg.bloom;
+  keyLight.intensity = cfg.light;
+
+  matrixGroup.children.forEach(unit => {
+    unit.traverse?.(child => {
+      if (child.isMesh && child.material && child.material.isMeshPhysicalMaterial) {
+        const m = child.material;
+        m.roughness = cfg.roughness;
+        m.envMapIntensity = cfg.envIntensity;
+        if (m.transmission > 0) {
+          m.ior = cfg.ior;
+          m.thickness = cfg.thickness;
+          m.dispersion = cfg.dispersion;
+        }
+      }
+    });
+  });
+
+  syncSliderOutputs();
+}
+
 // 全局 1/2/3 挡律动强度自适应调节
 $('#intensityTierGroup').addEventListener('click', e => {
   const btn = e.target.closest('.pill-btn');
   if (!btn) return;
   $$('#intensityTierGroup .pill-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  state.intensityTier = +btn.dataset.tier;
-  state.tierMultiplier = (state.intensityTier === 1 ? 0.5 : (state.intensityTier === 3 ? 2.0 : 1.0));
+  applyIntensityTier(+btn.dataset.tier);
 });
 
 // 乐章方阵数目变化序列选择
@@ -3547,17 +3670,30 @@ $('#avatarDistGroup').addEventListener('click', e => {
   rebuildMatrix();
 });
 
-// 滑块监听
+// 滑块监听 (用户手动拖动滑块时，实时记录该挡位基准值并重构材质)
 Object.values(ui).forEach(node => {
   if (node instanceof HTMLElement) {
     node.addEventListener('input', () => {
       syncSliderOutputs();
+      if (node === ui.bloom) {
+        state.baseBloom = +ui.bloom.value;
+        bloomPass.strength = +ui.bloom.value;
+      }
+      if (node === ui.light) {
+        state.baseLight = +ui.light.value;
+        keyLight.intensity = +ui.light.value;
+      }
+      if (node === ui.dispersion) state.baseDispersion = +ui.dispersion.value;
+      if (node === ui.envIntensity) state.baseEnv = +ui.envIntensity.value;
+      if (node === ui.roughness) state.baseRoughness = +ui.roughness.value;
+      if (node === ui.ior) state.baseIor = +ui.ior.value;
+      if (node === ui.thickness) state.baseThickness = +ui.thickness.value;
+      if (node === ui.transmission) state.baseTransmission = +ui.transmission.value;
       if (node === ui.bevelRadius) {
+        state.baseBevelRadius = +ui.bevelRadius.value;
         currentRoundedGeo.dispose();
         currentRoundedGeo = createRoundedSquircleGeometry(+ui.bevelRadius.value);
       }
-      if (node === ui.light) keyLight.intensity = +ui.light.value;
-      if (node === ui.bloom) bloomPass.strength = +ui.bloom.value;
       if (node === ui.fov) {
         camera.fov = +ui.fov.value;
         camera.updateProjectionMatrix();
