@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>『 律 』(LÜ) · 3D 物理材质与全变量声波共振工作台 · Master Audio-Visual Lab</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%233158A6%22/><text x=%2216%22 y=%2222%22 text-anchor=%22middle%22 font-size=%2218%22 fill=%22white%22>律</text></svg>" />
+  <title>『 律 』LÜ - 3D 物理材质与全变量声波共振工作台</title>
   <style>
     :root {
       color-scheme: light;
@@ -59,8 +60,8 @@
       gap: 12px;
       padding: 0 14px;
       background: var(--panel);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
+
+
       border: 1px solid var(--panel-border);
       border-radius: 14px;
       box-shadow: var(--panel-shadow);
@@ -77,7 +78,7 @@
       width: 34px;
       height: 34px;
       border-radius: 10px;
-      background: linear-gradient(135deg, #0284c7, #6366f1);
+      background: var(--bg-white);
       color: #fff;
       display: flex;
       align-items: center;
@@ -194,8 +195,8 @@
       font-size: 11px;
       font-weight: 600;
       color: var(--text);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+
+
       box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
       display: flex;
       align-items: center;
@@ -206,16 +207,16 @@
       height: 7px;
       border-radius: 50%;
       background: var(--emerald);
-      box-shadow: 0 0 6px var(--emerald);
+      box-shadow: none;
     }
     .badge .dot.recording {
       background: var(--danger);
-      box-shadow: 0 0 8px var(--danger);
+      box-shadow: none;
     }
     .badge .dot.choreographing {
       background: var(--magenta);
-      box-shadow: 0 0 8px var(--magenta);
-      animation: pulseShow 1.2s infinite;
+      box-shadow: none;
+
     }
 
     .stage-hud-right {
@@ -236,8 +237,8 @@
       font-size: 10.5px;
       font-weight: 600;
       color: var(--muted);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+
+
       display: flex;
       align-items: center;
       gap: 5px;
@@ -256,7 +257,7 @@
       background: var(--badge-bg);
       color: var(--text);
       cursor: pointer;
-      backdrop-filter: blur(10px);
+
       display: inline-flex;
       align-items: center;
       gap: 4px;
@@ -279,8 +280,8 @@
       gap: 12px;
       padding: 0 14px;
       background: var(--dock-bg);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
+
+
       border: 1px solid var(--panel-border);
       border-radius: 14px;
       box-shadow: var(--panel-shadow);
@@ -321,8 +322,8 @@
       width: 400px;
       max-width: 420px;
       background: var(--panel);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
+
+
       border: 1px solid var(--panel-border);
       border-radius: 16px;
       box-shadow: var(--panel-shadow);
@@ -447,7 +448,7 @@
     textarea { min-height: 64px; resize: vertical; }
     textarea:focus, input[type="text"]:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-glow);
+      box-shadow: none;
     }
     .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
@@ -577,15 +578,10 @@
       box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3);
     }
     button.btn.choreography-active {
-      background: linear-gradient(135deg, #0284c7, #8b5cf6);
+      background: var(--accent);
       color: #fff;
-      border-color: transparent;
-      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
-      animation: pulseShow 1.8s infinite;
-    }
-    @keyframes pulseShow {
-      0%, 100% { transform: scale(1); filter: brightness(1); }
-      50% { transform: scale(1.02); filter: brightness(1.1); }
+      border-color: var(--accent);
+      box-shadow: none;
     }
     button.btn.recording {
       background: var(--danger);
@@ -656,7 +652,7 @@
     .audio-bar {
       flex: 1;
       width: 3px;
-      background: linear-gradient(to top, var(--accent), var(--magenta));
+      background: var(--bg-white);
       border-radius: 2px;
       height: 4px;
       transition: height 0.06s ease;
@@ -667,7 +663,7 @@
       position: fixed;
       inset: 0;
       background: rgba(15, 23, 42, 0.45);
-      backdrop-filter: blur(12px);
+
       display: none;
       align-items: center;
       justify-content: center;
@@ -692,7 +688,7 @@
       margin: 0 auto;
       border-radius: 20%;
       border: 2px dashed var(--accent);
-      box-shadow: 0 0 20px rgba(2, 132, 199, 0.15), inset 0 0 15px rgba(0, 0, 0, 0.05);
+      box-shadow: none;
       overflow: hidden;
       position: relative;
       background: #f1f5f9;
@@ -706,28 +702,509 @@
       pointer-events: none;
     }
 
+    /* LÜ 3.0: pearl graphite instrument overrides */
+    :root {
+      --bg: #f4f5f7;
+      --bg-white: #fcfcfd;
+      --panel: #fcfcfd;
+      --panel-border: #d0d4db;
+      --panel-shadow: none;
+      --text: #181b20;
+      --text-graphite: #181b20;
+      --text-secondary: #454b55;
+      --muted: #626a76;
+      --line: #d0d4db;
+      --accent: #3158a6;
+      --accent-hover: #244783;
+      --accent-glow: transparent;
+      --accent-subtle: #e5eaf5;
+      --card-bg: #fcfcfd;
+      --card-border: #d0d4db;
+      --badge-bg: #fcfcfd;
+      --dock-bg: #fcfcfd;
+      --input-bg: #fcfcfd;
+    }
+
+    body {
+      min-height: 100dvh;
+      background: var(--bg);
+      font-family: "Geist", "SF Pro Display", -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    .app {
+      height: 100dvh;
+      grid-template-rows: 72px minmax(0, 1fr) 136px;
+      grid-template-columns: minmax(0, 1fr) 376px;
+      gap: 8px;
+      padding: 8px;
+    }
+    .master-deck-hud,
+    .bottom-dynamic-dock,
+    .modular-inspector,
+    .stageWrap {
+      border-radius: 12px;
+      border-color: var(--panel-border);
+      box-shadow: none;
+      background: var(--panel);
+    }
+    .master-deck-hud {
+      height: 72px;
+      padding: 0 12px;
+      gap: 10px;
+    }
+    .brand-section { flex: 0 0 230px; min-width: 0; }
+    .brand-text { min-width: 0; }
+    .brand-title { white-space: nowrap; }
+    .brand-sub { display: none; }
+    .brand-glyph-box {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      color: #fcfcfd;
+      background: var(--accent);
+      box-shadow: none;
+    }
+    .brand-title { font-size: 14px; }
+    .brand-tag,
+    .brand-sub,
+    .deck-title,
+    .deck-badge,
+    .badge,
+    .legend,
+    .dock-label,
+    .section-title,
+    .range,
+    output,
+    label,
+    select,
+    textarea,
+    input,
+    button,
+    .avatar-card,
+    .inspector-tab-btn {
+      font-size: 12px !important;
+      line-height: 18px;
+    }
+    [style*="font-size: 9px"],
+    [style*="font-size: 10px"],
+    [style*="font-size: 11px"] {
+      font-size: 12px !important;
+      line-height: 18px !important;
+    }
+    button,
+    select,
+    input[type="text"],
+    input[type="number"],
+    textarea {
+      min-height: 40px;
+      padding-left: 12px;
+      padding-right: 12px;
+    }
+    button.btn {
+      min-height: 40px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      box-shadow: none;
+      white-space: nowrap;
+    }
+    button.btn:hover {
+      color: var(--accent-hover);
+      background: #f5f7fb;
+      box-shadow: none;
+    }
+    button.btn:active,
+    .waveform-board:active,
+    .motion-card:active { transform: translateY(1px); }
+    button.btn:focus-visible,
+    .waveform-board:focus-visible,
+    .motion-card:focus-visible,
+    .inspector-tab-btn:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    .deck-player {
+      flex: 1 1 auto;
+      min-width: 0;
+      border-radius: 8px;
+      box-shadow: none;
+      overflow: hidden;
+    }
+    .deck-info { flex: 0 0 210px; min-width: 210px; max-width: 210px; }
+    .deck-title { min-width: 0; }
+    .audio-visualizer,
+    #stopTrackBtn { display: none; }
+    .deck-controls button {
+      width: 40px;
+      min-width: 40px;
+      height: 40px;
+      min-height: 40px;
+      padding: 0;
+      border-radius: 50%;
+    }
+    .deck-controls #playPauseBtn { width: auto; min-width: 76px; border-radius: 20px; padding: 0 12px; }
+    .time-rail-wrap {
+      display: grid;
+      grid-template-columns: 82px minmax(70px, 1fr);
+      align-items: center;
+      gap: 8px;
+      flex: 1 1 180px;
+      min-width: 160px;
+    }
+    .time-display {
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    #timeProgressSlider,
+    #waveAmpSlider { accent-color: var(--accent); min-height: 24px; padding: 0; }
+    .top-actions { flex: 0 0 auto; }
+    .file-upload-wrap { flex: 0 0 auto; }
+
+    .bottom-dynamic-dock {
+      height: 136px;
+      justify-content: flex-start;
+      align-items: stretch;
+      gap: 12px;
+      padding: 12px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: thin;
+      overscroll-behavior-inline: contain;
+    }
+    .bottom-dynamic-dock .dock-section {
+      flex: 0 0 auto;
+      min-width: 220px;
+      height: 110px;
+      padding-right: 12px;
+      border-right: 1px solid var(--line);
+      align-items: stretch;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 8px;
+    }
+    .bottom-dynamic-dock .dock-section:first-child { min-width: 390px; }
+    .bottom-dynamic-dock .dock-section:nth-child(2) { min-width: 430px; }
+    .bottom-dynamic-dock .dock-section:last-child { border-right: 0; }
+    .dock-label {
+      min-height: 18px;
+      color: var(--text-secondary);
+      letter-spacing: 0;
+      text-transform: none;
+    }
+    .waveform-boards {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(56px, 1fr));
+      gap: 6px;
+    }
+    .waveform-board,
+    .motion-card {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease, transform 120ms ease;
+    }
+    .waveform-board {
+      min-width: 56px;
+      min-height: 74px;
+      padding: 10px 8px;
+      display: grid;
+      place-items: center;
+      gap: 5px;
+    }
+    .waveform-board .svg-icon { width: 30px; height: 24px; color: var(--accent); }
+    .waveform-board span { font-weight: 700; white-space: nowrap; }
+    .waveform-board:hover,
+    .motion-card:hover { border-color: var(--accent); background: #f5f7fb; }
+    .waveform-board.active {
+      border-color: var(--accent);
+      background: var(--accent-subtle);
+    }
+    .motion-cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(128px, 1fr));
+      gap: 6px;
+    }
+    .motion-card {
+      min-height: 74px;
+      padding: 10px 12px;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 3px;
+    }
+    .motion-card-title { font-weight: 750; white-space: nowrap; }
+    .motion-card-desc { color: var(--muted); line-height: 17px; }
+    .motion-card.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fcfcfd;
+    }
+    .motion-card.active .motion-card-desc { color: #eef2fb; }
+    .beat-knob-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .beat-dial-graphic {
+      width: 58px;
+      height: 58px;
+      flex: 0 0 58px;
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: #f1f3f6;
+    }
+    .beat-dial-graphic::after {
+      content: attr(data-label);
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 750;
+    }
+    .beat-dial-indicator {
+      position: absolute;
+      left: 27px;
+      top: 5px;
+      width: 3px;
+      height: 13px;
+      border-radius: 2px;
+      background: var(--accent);
+      transform-origin: 1.5px 24px;
+      transform: rotate(90deg);
+      z-index: 1;
+    }
+    .beat-knob-wrap .pill-group {
+      width: 126px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: transparent;
+      border: 0;
+      padding: 0;
+    }
+    .beat-knob-wrap .pill-btn { min-height: 34px; border: 1px solid var(--line); border-radius: 6px; }
+    .amp-rail-group { display: flex; align-items: center; gap: 8px; }
+
+    .modular-inspector {
+      width: 376px;
+      max-width: 376px;
+      background: var(--panel);
+    }
+    .inspector-tabs {
+      background: var(--panel);
+      padding: 0 8px;
+      gap: 0;
+    }
+    .inspector-tab-btn {
+      min-height: 44px;
+      padding: 8px 6px;
+      border: 0;
+      border-bottom: 2px solid transparent;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      white-space: nowrap;
+    }
+    .inspector-tab-btn:hover { background: #f5f7fb; }
+    .inspector-tab-btn.active {
+      color: var(--accent);
+      background: transparent;
+      border-color: var(--accent);
+      box-shadow: none;
+    }
+    .inspector-body { padding: 16px; }
+    .card-block { background: var(--panel); border-radius: 8px; padding: 12px; }
+    .mini-grid-btn {
+      min-width: 94px;
+      min-height: 68px;
+      flex-direction: column;
+      white-space: nowrap;
+    }
+    .mini-grid-thumb {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      gap: 2px;
+      grid-auto-rows: 1fr;
+    }
+    .mini-grid-thumb span { min-width: 3px; min-height: 3px; background: #8e96a3; border-radius: 1px; }
+    .mini-grid-btn.active .mini-grid-thumb span { background: var(--accent); }
+    .badge .dot { box-shadow: none; }
+    .audio-bar { background: var(--accent); }
+
     @media (max-width: 1100px) {
       .app {
-        grid-template-columns: 1fr;
-        grid-template-rows: 56px 1fr 66px;
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: 72px minmax(0, 1fr) 136px;
       }
+      .brand-section { flex-basis: 150px; }
+      .brand-tag,
+      .brand-sub,
+      .file-upload-wrap,
+      #playlistSelect { display: none; }
+      .top-actions .btn { width: 44px; min-width: 44px; padding: 0; overflow: hidden; font-size: 0 !important; }
+      .top-actions .svg-icon { flex: 0 0 auto; }
       .modular-inspector {
         position: fixed;
-        right: 10px;
-        top: 66px;
-        bottom: 76px;
-        width: 360px;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        right: 8px;
+        top: 80px;
+        bottom: 152px;
+        width: min(376px, calc(100vw - 16px));
+        max-width: calc(100vw - 16px);
+        z-index: 40;
       }
     }
-  </style>
+
+    @media (max-width: 640px) {
+      .app {
+        grid-template-rows: 134px minmax(0, 1fr) 188px;
+        gap: 6px;
+        padding: 6px;
+      }
+      .master-deck-hud {
+        height: 134px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-rows: 44px 72px;
+        grid-template-areas: "brand actions" "player player";
+        padding: 6px 8px;
+        gap: 6px 8px;
+      }
+      .brand-section { grid-area: brand; min-width: 0; gap: 8px; }
+      .brand-glyph-box { width: 34px; height: 34px; }
+      .brand-sub,
+      .brand-tag { display: none; }
+      .top-actions { grid-area: actions; gap: 4px; }
+      .top-actions .btn {
+        width: 44px;
+        min-width: 44px;
+        height: 44px;
+        min-height: 44px;
+        padding: 0;
+        overflow: hidden;
+        font-size: 0 !important;
+      }
+      .top-actions .svg-icon { width: 16px; height: 16px; flex: 0 0 auto; }
+      .deck-player {
+        grid-area: player;
+        width: 100%;
+        height: 72px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-rows: 26px 34px;
+        padding: 4px 6px;
+        gap: 4px 6px;
+      }
+      .deck-info { grid-column: 1; grid-row: 1; min-width: 0; max-width: none; }
+      .deck-badge,
+      .audio-visualizer,
+      .deck-player > .file-upload-wrap,
+      #playlistSelect { display: none; }
+      .time-rail-wrap {
+        grid-column: 1;
+        grid-row: 2;
+        grid-template-columns: 78px minmax(0, 1fr);
+        min-width: 0;
+      }
+      .deck-controls {
+        grid-column: 2;
+        grid-row: 1 / 3;
+        gap: 3px;
+      }
+      .deck-controls button,
+      .deck-controls #playPauseBtn {
+        width: 44px !important;
+        min-width: 44px !important;
+        height: 44px;
+        min-height: 44px;
+        padding: 0;
+        border-radius: 50%;
+        overflow: hidden;
+        font-size: 0 !important;
+      }
+      #stopTrackBtn { display: none; }
+      .stageWrap { grid-row: 2; min-width: 0; }
+      .stage-hud-right { right: 8px; top: 8px; }
+      .legend { display: none; }
+      .preset-cam-btn { min-height: 44px; padding: 8px 10px; }
+      .bottom-dynamic-dock {
+        grid-row: 3;
+        height: 188px;
+        padding: 10px;
+        gap: 10px;
+        scroll-snap-type: x mandatory;
+      }
+      .bottom-dynamic-dock .dock-section {
+        height: 166px;
+        min-width: 300px !important;
+        padding-right: 10px;
+        scroll-snap-align: start;
+      }
+      .bottom-dynamic-dock .dock-section:first-child { min-width: 352px !important; }
+      .bottom-dynamic-dock .dock-section:nth-child(2) { min-width: 352px !important; }
+      .waveform-boards { grid-template-columns: repeat(6, 52px); overflow-x: auto; padding-bottom: 3px; }
+      .waveform-board { min-width: 52px; min-height: 92px; padding: 10px 6px; }
+      .motion-cards { grid-template-columns: repeat(3, 108px); overflow-x: auto; padding-bottom: 3px; }
+      .motion-card { min-height: 104px; padding: 10px; }
+      .motion-card-title { white-space: normal; }
+      .modular-inspector {
+        top: auto;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 100vw;
+        max-width: 100vw;
+        height: min(56dvh, 520px);
+        border-radius: 12px 12px 0 0;
+        background: var(--panel);
+        transform: translateY(0);
+        opacity: 1;
+        transition: transform 220ms cubic-bezier(.2,.8,.2,1);
+      }
+      .modular-inspector.collapsed {
+        width: 100vw;
+        max-width: 100vw;
+        margin-left: 0;
+        border: 1px solid var(--panel-border);
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(calc(100% - 46px));
+      }
+      .inspector-tabs { overflow: hidden; flex: 0 0 46px; }
+      .inspector-tab-btn { flex: 1 1 20%; min-width: 0; min-height: 46px; }
+      .inspector-body { padding: 14px 16px calc(18px + env(safe-area-inset-bottom)); }
+      .grid2,
+      .grid3,
+      .grid4 { grid-template-columns: 1fr; }
+      button,
+      select,
+      input[type="text"],
+      input[type="number"] { min-height: 44px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, ::before, ::after {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+      }
+    }
+    </style>
 </head>
 <body>
 <div class="app">
 
   <!-- 顶部 Master Deck HUD -->
   <header class="master-deck-hud">
-    <!-- 品牌标志 -->
     <div class="brand-section">
       <div class="brand-glyph-box">律</div>
       <div class="brand-text">
@@ -735,14 +1212,14 @@
           <span>『 律 』LÜ</span>
           <span class="brand-tag">3D RESONANCE</span>
         </div>
-        <div class="brand-sub">物理材质 · 声波矩阵 · 动效母带工作台</div>
+        <div class="brand-sub">物理材质 / 声波矩阵 / 动效母带工作台</div>
       </div>
     </div>
 
     <!-- 中央母带播放中枢 -->
     <div class="deck-player">
       <div class="deck-info">
-        <span class="deck-title" id="nowPlayingText">当前：CYBER CRYSTAL FLOW</span>
+        <span class="deck-title" id="nowPlayingText">当前：《游京》- 星火社</span>
         <span class="deck-badge" id="movementBadge">乐章 1/7</span>
       </div>
 
@@ -758,9 +1235,9 @@
         <button class="btn" id="prevTrackBtn" title="上一首">
           <svg class="svg-icon" viewBox="0 0 24 24"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5"></line></svg>
         </button>
-        <button class="btn choreography-active" id="playPauseBtn" style="min-width: 100px; font-weight: 700;">
-          <svg class="svg-icon" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
-          播放中
+        <button class="btn" id="playPauseBtn" style="min-width: 110px; font-weight: 700;" aria-label="播放">
+          <svg class="svg-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          播放
         </button>
         <button class="btn" id="nextTrackBtn" title="下一首">
           <svg class="svg-icon" viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19"></line></svg>
@@ -770,8 +1247,14 @@
         </button>
       </div>
 
+      <!-- 统一顶部时间显示与可拖动进度轨 -->
+      <div class="time-rail-wrap">
+        <span class="time-display" id="timeDisplay">00:00 / 00:00</span>
+        <input type="range" id="timeProgressSlider" min="0" max="100" value="0" step="0.1" title="拖动跳转播放进度">
+      </div>
+
       <!-- 快捷导入与播放下拉 -->
-      <select id="playlistSelect" style="width: auto; min-width: 140px; max-width: 200px; font-size: 11px;">
+      <select id="playlistSelect" style="width: auto; min-width: 140px; max-width: 200px;">
         <option value="track_0">1: 《游京》- 星火社 (Hi-Res)</option>
         <option value="track_1">2: 《秋意浓》- 张学友 (经典无损)</option>
         <option value="track_2">3: 《烂泥》- 草东没有派对 (无损)</option>
@@ -786,7 +1269,7 @@
       <div class="file-upload-wrap" style="width: auto;">
         <button class="btn" title="批量导入本地音乐">
           <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-          导入音频
+          导入
         </button>
         <input type="file" id="audioUpload" accept="audio/*" multiple>
       </div>
@@ -796,17 +1279,17 @@
     <div class="top-actions">
       <button class="btn" id="recordToggle" style="font-weight: 700;">
         <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4" fill="currentColor"></circle></svg>
-        60FPS 录制
+        录制
       </button>
 
       <button class="btn active" id="toggleAutoChoreo" title="全变量乐章编排流变总开关">
         <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-        流变：开
+        流变
       </button>
 
-      <button class="btn" id="inspectorToggleBtn" title="切换右侧检查器面板">
+      <button class="btn" id="inspectorToggleBtn" title="切换检查器面板">
         <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="15" y1="3" x2="15" y2="21"></line></svg>
-        参数面板
+        参数
       </button>
     </div>
   </header>
@@ -825,7 +1308,7 @@
     <div class="stage-hud-right">
       <div class="legend">
         <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-        通透水晶 · 6大声波形态 · 物理色散 · 影棚柔光
+        通透水晶 / 6大声波形态 / 物理色散 / 影棚柔光
       </div>
       <div class="preset-cam-group">
         <button class="preset-cam-btn" data-cam="front">
@@ -841,107 +1324,133 @@
     </div>
   </section>
 
-  <!-- 底部 Dynamic Flow Dock (声波与律动控制) -->
+  <!-- 底部 Dynamic Flow Dock (改版: 六个波形样本板、三张运动样本卡、节拍旋钮视觉、振幅精度轨) -->
   <nav class="bottom-dynamic-dock">
-    <!-- 6 大声波形态胶囊 -->
+    <!-- 六个波形样本板 -->
     <div class="dock-section">
       <div class="dock-label">
         <svg class="svg-icon" viewBox="0 0 24 24"><path d="M2 12c2.5-4 5.5-4 8 0s5.5 4 8 0 5.5-4 8 0"></path></svg>
-        声波形态
+        波形样本板
       </div>
-      <div class="pill-group" id="wavePatternGroup">
-        <button class="pill-btn active" data-pattern="ripple" title="同心圆环水波">
-          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4"></circle></svg> 水波
+      <div class="waveform-boards" id="wavePatternGroup">
+        <button type="button" class="waveform-board active" data-pattern="ripple" aria-pressed="true" title="同心圆环水波">
+          <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4"></circle></svg>
+          <span>水波</span>
         </button>
-        <button class="pill-btn" data-pattern="diagonal" title="对角翻滚巨浪">
-          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M2 17c3-3 6-3 9 0s6 3 9 0M2 12c3-3 6-3 9 0s6 3 9 0"></path></svg> 巨浪
+        <button type="button" class="waveform-board" data-pattern="diagonal" aria-pressed="false" title="对角翻滚巨浪">
+          <svg class="svg-icon" viewBox="0 0 24 24"><path d="M2 17c3-3 6-3 9 0s6 3 9 0M2 12c3-3 6-3 9 0s6 3 9 0"></path></svg>
+          <span>巨浪</span>
         </button>
-        <button class="pill-btn" data-pattern="equalizer" title="声学均衡针雕">
-          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><line x1="6" y1="20" x2="6" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="18" y1="20" x2="18" y2="14"></line></svg> 针雕
+        <button type="button" class="waveform-board" data-pattern="equalizer" aria-pressed="false" title="声学均衡针雕">
+          <svg class="svg-icon" viewBox="0 0 24 24"><line x1="6" y1="20" x2="6" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="18" y1="20" x2="18" y2="14"></line></svg>
+          <span>针雕</span>
         </button>
-        <button class="pill-btn" data-pattern="spiral" title="极速螺旋涡流">
-          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 1 10 10 7.5 7.5 0 0 1-7.5 7.5A5 5 0 0 1 9.5 14.5 2.5 2.5 0 0 1 12 12"></path></svg> 涡流
+        <button type="button" class="waveform-board" data-pattern="spiral" aria-pressed="false" title="极速螺旋涡流">
+          <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 1 10 10 7.5 7.5 0 0 1-7.5 7.5A5 5 0 0 1 9.5 14.5 2.5 2.5 0 0 1 12 12"></path></svg>
+          <span>涡流</span>
         </button>
-        <button class="pill-btn" data-pattern="heartbeat" title="重低音心跳共振">
-          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><polyline points="2 12 6 12 9 4 13 20 17 10 20 12 22 12"></polyline></svg> 心跳
+        <button type="button" class="waveform-board" data-pattern="heartbeat" aria-pressed="false" title="重低音心跳共振">
+          <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="2 12 6 12 9 4 13 20 17 10 20 12 22 12"></polyline></svg>
+          <span>心跳</span>
         </button>
-        <button class="pill-btn" data-pattern="glitch" title="赛博随机脉冲">
-          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><polyline points="3 4 8 4 8 12 13 12 13 8 18 8 18 20 21 20"></polyline></svg> 脉冲
+        <button type="button" class="waveform-board" data-pattern="glitch" aria-pressed="false" title="棋盘错拍脉冲">
+          <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="3 4 8 4 8 12 13 12 13 8 18 8 18 20 21 20"></polyline></svg>
+          <span>脉冲</span>
         </button>
       </div>
     </div>
 
-    <!-- 律动强度挡位 -->
+    <!-- 三张运动样本卡 (1挡沉静, 2挡律动, 3挡冲击) -->
     <div class="dock-section">
       <div class="dock-label">
         <svg class="svg-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-        律动强度
+        运动样本卡
       </div>
-      <div class="pill-group" id="intensityTierGroup">
-        <button class="pill-btn" data-tier="1">1挡 (0.5x)</button>
-        <button class="pill-btn active" data-tier="2">2挡 (1.0x)</button>
-        <button class="pill-btn" data-tier="3">3挡 (2.0x)</button>
+      <div class="motion-cards" id="intensityTierGroup">
+        <button type="button" class="motion-card" data-tier="1" aria-pressed="false">
+          <div class="motion-card-title">1档 · 沉静</div>
+          <div class="motion-card-desc">慢速 / 窄幅 / 长回落</div>
+        </button>
+        <button type="button" class="motion-card active" data-tier="2" aria-pressed="true">
+          <div class="motion-card-title">2档 · 律动</div>
+          <div class="motion-card-desc">大范围 / 错拍 / 中高速</div>
+        </button>
+        <button type="button" class="motion-card" data-tier="3" aria-pressed="false">
+          <div class="motion-card-title">3档 · 冲击</div>
+          <div class="motion-card-desc">最大范围 / 爆发 / 微停</div>
+        </button>
       </div>
     </div>
 
-    <!-- 乐章流变切换频率 -->
+    <!-- 节拍旋钮视觉 -->
     <div class="dock-section">
       <div class="dock-label">
         <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-        流变节拍
+        节拍旋钮
       </div>
-      <div class="pill-group" id="morphFreqGroup">
-        <button class="pill-btn" data-freq="4">4拍</button>
-        <button class="pill-btn" data-freq="8">8拍</button>
-        <button class="pill-btn active" data-freq="16">16拍</button>
-        <button class="pill-btn" data-freq="32">32拍</button>
+      <div class="beat-knob-wrap">
+        <div class="beat-dial-graphic" id="beatDialGraphic" data-label="16拍">
+          <div class="beat-dial-indicator" id="beatDialIndicator"></div>
+        </div>
+        <div class="pill-group" id="morphFreqGroup">
+          <button class="pill-btn" data-freq="4">4拍</button>
+          <button class="pill-btn" data-freq="8">8拍</button>
+          <button class="pill-btn active" data-freq="16">16拍</button>
+          <button class="pill-btn" data-freq="32">32拍</button>
+        </div>
       </div>
     </div>
 
-    <!-- 波浪幅度与矩阵声波开关 -->
+    <!-- 振幅精度轨 -->
     <div class="dock-section">
-      <div class="range" style="grid-template-columns: 56px 90px 32px; margin:0;">
-        <span>幅度</span>
-        <input id="waveAmpSlider" type="range" min="0.2" max="2.4" step="0.1" value="1.0">
-        <output>1.0x</output>
+      <div class="dock-label">
+        <svg class="svg-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line></svg>
+        振幅精度轨
       </div>
-      <button class="btn active" id="waveMotionToggle" title="音频声波矩阵总开关">
-        <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M2 12c2.5-4 5.5-4 8 0s5.5 4 8 0 5.5-4 8 0"></path></svg>
-        声波：开
-      </button>
+      <div class="amp-rail-group">
+        <div class="range" style="grid-template-columns: 36px 100px 36px; margin:0;">
+          <span>振幅</span>
+          <input id="waveAmpSlider" type="range" min="0.2" max="2.4" step="0.1" value="1.0">
+          <output>1.0x</output>
+        </div>
+        <button class="btn active" id="waveMotionToggle" title="音频声波矩阵总开关">
+          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M2 12c2.5-4 5.5-4 8 0s5.5 4 8 0 5.5-4 8 0"></path></svg>
+          声波：开
+        </button>
+      </div>
     </div>
   </nav>
 
-  <!-- 右侧模块化检查器 (Right Modular Inspector - 5 大 Tab) -->
+  <!-- 右侧/移动端模块化检查器 (Tab 下划线, 矩阵预设微缩网格) -->
   <aside class="modular-inspector" id="inspectorPanel">
-    <!-- Tab 导航栏 -->
+    <!-- Tab 导航栏 (下划线风格) -->
     <div class="inspector-tabs">
-      <button class="inspector-tab-btn active" data-tab="tab-optics">
+      <button class="inspector-tab-btn active" data-tab="tab-optics" title="材质与光学">
         <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
-        材质光学
+        材质
       </button>
-      <button class="inspector-tab-btn" data-tab="tab-matrix">
+      <button class="inspector-tab-btn" data-tab="tab-matrix" title="矩阵与空间">
         <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-        矩阵空间
+        矩阵
       </button>
-      <button class="inspector-tab-btn" data-tab="tab-content">
+      <button class="inspector-tab-btn" data-tab="tab-content" title="活体与内容">
         <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
-        活体内容
+        内容
       </button>
-      <button class="inspector-tab-btn" data-tab="tab-camera">
+      <button class="inspector-tab-btn" data-tab="tab-camera" title="运镜与导演">
         <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-        运镜导演
+        运镜
       </button>
-      <button class="inspector-tab-btn" data-tab="tab-export">
+      <button class="inspector-tab-btn" data-tab="tab-export" title="母带与导出">
         <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line></svg>
-        母带导出
+        导出
       </button>
     </div>
 
     <!-- Tab 页面主体 -->
     <div class="inspector-body">
 
-      <!-- TAB 1: 材质与光学 (Optics & PBR) -->
+      <!-- TAB 1: 材质与光学 -->
       <div class="inspector-tab-pane active" id="tab-optics">
         <div class="section-title">
           <span><svg class="svg-icon" viewBox="0 0 24 24"><polygon points="6 3 18 3 22 9 12 22 2 9 6 3"></polygon></svg> 12 款纯净触感物理材质</span>
@@ -964,11 +1473,11 @@
                 <option value="jade">冰种飘花翡翠 (透润油脂)</option>
               </select>
             </label>
-            <label><span>基底色泽</span><input id="color" type="color" value="#82cfff"></label>
+            <label><span>基底色泽</span><input id="color" type="color" value="#8ea9c4"></label>
           </div>
 
           <div class="swatches">
-            <button class="swatch active" title="天青浅蓝" style="--c:#82cfff" data-c="#82cfff"></button>
+            <button class="swatch active" title="雾钴蓝" style="--c:#8ea9c4" data-c="#8ea9c4"></button>
             <button class="swatch" title="极地冰白" style="--c:#ffffff" data-c="#ffffff"></button>
             <button class="swatch" title="皇家钴蓝" style="--c:#2563eb" data-c="#2563eb"></button>
             <button class="swatch" title="幻彩罗兰" style="--c:#a855f7" data-c="#a855f7"></button>
@@ -978,7 +1487,7 @@
             <button class="swatch" title="黑曜深灰" style="--c:#334155" data-c="#334155"></button>
           </div>
 
-          <button class="btn" id="lockMaterialToggle" style="width: 100%; margin-top: 4px;">
+          <button class="btn" id="lockMaterialToggle" style="width: 100%; margin-top: 8px;">
             <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
             乐章材质流变：自动轮转 (点击锁定当前材质)
           </button>
@@ -1000,24 +1509,48 @@
         </div>
       </div>
 
-      <!-- TAB 2: 矩阵与空间 (Matrix & Geometry) -->
+      <!-- TAB 2: 矩阵与空间 (微缩网格视觉) -->
       <div class="inspector-tab-pane" id="tab-matrix">
         <div class="section-title">
-          <span><svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line></svg> 矩阵规格 (1×1 到 10×10 · 3排阵列)</span>
+          <span><svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line></svg> 矩阵规格与微缩网格视觉</span>
         </div>
         <div class="card-block">
-          <div class="pill-group" id="gridPresetGroup">
-            <button class="pill-btn" data-size="1x1">1×1 单体</button>
-            <button class="pill-btn" data-size="3x3">3×3 方阵</button>
-            <button class="pill-btn active" data-size="4x4">4×4 方阵</button>
-            <button class="pill-btn" data-size="5x5">5×5 方阵</button>
-            <button class="pill-btn" data-size="8x8">8×8 巨阵</button>
-            <button class="pill-btn" data-size="3d_2l">双层立体</button>
-            <button class="pill-btn" data-size="3d_3l">3×3×3 魔方</button>
-            <button class="pill-btn" data-size="4x4x3">4×4×3 三层</button>
+          <div class="pill-group" id="gridPresetGroup" style="flex-wrap: wrap;">
+            <button class="pill-btn mini-grid-btn" data-size="1x1">
+              <div class="mini-grid-thumb" style="grid-template-columns: 1fr;"><span></span></div>
+              1×1 单体
+            </button>
+            <button class="pill-btn mini-grid-btn" data-size="3x3">
+              <div class="mini-grid-thumb" style="grid-template-columns: repeat(3, 1fr);"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+              3×3 方阵
+            </button>
+            <button class="pill-btn mini-grid-btn active" data-size="4x4">
+              <div class="mini-grid-thumb" style="grid-template-columns: repeat(4, 1fr);"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+              4×4 方阵
+            </button>
+            <button class="pill-btn mini-grid-btn" data-size="5x5">
+              <div class="mini-grid-thumb" style="grid-template-columns: repeat(5, 1fr);"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+              5×5 方阵
+            </button>
+            <button class="pill-btn mini-grid-btn" data-size="8x8">
+              <div class="mini-grid-thumb" style="grid-template-columns: repeat(6, 1fr);"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+              8×8 巨阵
+            </button>
+            <button class="pill-btn mini-grid-btn" data-size="3d_2l">
+              <div class="mini-grid-thumb" style="grid-template-columns: repeat(3, 1fr);"><span></span><span></span><span></span></div>
+              双层立体
+            </button>
+            <button class="pill-btn mini-grid-btn" data-size="3d_3l">
+              <div class="mini-grid-thumb" style="grid-template-columns: repeat(3, 1fr);"><span></span><span></span><span></span></div>
+              3×3×3 魔方
+            </button>
+            <button class="pill-btn mini-grid-btn" data-size="4x4x3">
+              <div class="mini-grid-thumb" style="grid-template-columns: repeat(4, 1fr);"><span></span><span></span><span></span><span></span></div>
+              4×4×3 三层
+            </button>
           </div>
 
-          <div style="margin-top: 6px;">
+          <div style="margin-top: 8px;">
             <div class="range"><span>矩阵列数 (Cols)</span><input id="gridCols" type="range" min="1" max="10" step="1" value="4"><output>4</output></div>
             <div class="range"><span>矩阵行数 (Rows)</span><input id="gridRows" type="range" min="1" max="10" step="1" value="4"><output>4</output></div>
             <div class="range"><span>立体层数 (Layers)</span><input id="gridLayers" type="range" min="1" max="4" step="1" value="1"><output>1</output></div>
@@ -1045,7 +1578,7 @@
         <div class="card-block">
           <div class="grid2">
             <label><span>背景基底色</span><input id="bgColorPicker" type="color" value="#f8fafc"></label>
-            <button class="btn" id="resetBgBtn" style="margin-top:18px;">重置钛白背景</button>
+            <button class="btn" id="resetBgBtn" style="margin-top:18px;">重置背景</button>
           </div>
 
           <div class="swatches">
@@ -1056,8 +1589,8 @@
             <button class="swatch" title="暗夜香槟金" style="--c:#1c1917" data-bg="#1c1917"></button>
           </div>
 
-          <div style="margin-top: 6px;">
-            <label><span>项目内置高清背景环境 (默认相对路径)</span></label>
+          <div style="margin-top: 8px;">
+            <label><span>项目内置高清背景环境</span></label>
             <select id="presetBgSelect">
               <option value="">-- 选择项目内置背景图 --</option>
               <option value="images/ocean_waves.jpg">1: 深邃海洋 (Ocean Waves)</option>
@@ -1071,17 +1604,17 @@
             </select>
           </div>
 
-          <div style="margin-top: 6px;">
+          <div style="margin-top: 8px;">
             <label><span>自定义背景图片</span></label>
-            <div class="file-upload-wrap">
-              <button class="btn" style="width: 100%; border-style: dashed;">选择本地全景背景上传</button>
+            <div class="file-upload-wrap" style="width: 100%;">
+              <button class="btn" style="width: 100%;">选择本地全景背景上传</button>
               <input type="file" id="bgImgUpload" accept="image/*">
             </div>
           </div>
         </div>
       </div>
 
-      <!-- TAB 3: 活体与内容 (Avatars & Typography) -->
+      <!-- TAB 3: 活体与内容 (含 lyricOffsetMs 步进器) -->
       <div class="inspector-tab-pane" id="tab-content">
         <div class="section-title">
           <span><svg class="svg-icon" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline></svg> 内容呈现模式</span>
@@ -1093,7 +1626,7 @@
             <button class="pill-btn" data-mode="image">自定义图片/GIF</button>
           </div>
 
-          <div style="margin-top: 6px;">
+          <div style="margin-top: 8px;">
             <label><span>内容呈现层级</span></label>
             <div class="pill-group" id="layerModeGroup">
               <button class="pill-btn active" data-layer="surface">外表面双面贴合</button>
@@ -1102,12 +1635,12 @@
             </div>
           </div>
 
-          <div style="margin-top: 6px;">
-            <label><span>3D 晶体多维融合工艺 (多角度消除纸片感)</span></label>
+          <div style="margin-top: 8px;">
+            <label><span>3D 晶体多维融合工艺</span></label>
             <div class="pill-group" id="adhesionCraftGroup">
-              <button class="pill-btn active" data-craft="conformal" title="曲面清漆共模 · 与晶体倒角同构">微晶清漆共模</button>
-              <button class="pill-btn" data-craft="emboss" title="微晶沉金浮雕 · 真实微厚度与高光">沉金微浮雕</button>
-              <button class="pill-btn" data-craft="hologram" title="全息激光体核 · 景深折射与色散视差">激光全息体核</button>
+              <button class="pill-btn active" data-craft="conformal" title="曲面清漆共模">微晶清漆共模</button>
+              <button class="pill-btn" data-craft="emboss" title="微晶沉金浮雕">沉金微浮雕</button>
+              <button class="pill-btn" data-craft="hologram" title="全息激光体核">激光全息体核</button>
             </div>
           </div>
         </div>
@@ -1129,7 +1662,7 @@
               <div class="avatar-card" data-avatar="bun"><canvas class="avatar-icon-canvas" id="thumb_bun"></canvas>闪亮小包</div>
             </div>
 
-            <div style="margin-top: 6px;">
+            <div style="margin-top: 8px;">
               <label><span>头像排布方式</span></label>
               <div class="pill-group" id="avatarDistGroup">
                 <button class="pill-btn active" data-dist="all">全方阵群像</button>
@@ -1139,7 +1672,7 @@
               </div>
             </div>
 
-            <div style="margin-top: 6px;">
+            <div style="margin-top: 8px;">
               <label><span>活体表情与注视控件</span></label>
               <div class="grid2">
                 <button class="btn" id="emoteHappyBtn">
@@ -1154,28 +1687,28 @@
               <div class="grid2" style="margin-top: 6px;">
                 <button class="btn active" id="gazeFollowToggle">
                   <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
-                  眼神注视：开
+                  注视：开
                 </button>
                 <button class="btn active" id="autoBlinkToggle">
                   <svg class="svg-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  呼吸眨眼：开
+                  眨眼：开
                 </button>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- 文字/歌词排版面板 -->
+        <!-- 文字/歌词排版面板 (带 - / 数值 / + 歌词偏移步进器) -->
         <div id="textPanel" style="display: none;">
           <div class="section-title">
-            <span><svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg> 歌词/文字排版 (零代码智能时间轴同步)</span>
+            <span><svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg> 歌词/文字排版与时钟同步</span>
           </div>
           <div class="card-block">
-            <div style="font-size: 11px; color: var(--muted); margin-bottom: 6px; line-height: 1.4;">
-              ✦ 支持直接粘贴标准 <code>[00:12.30]LRC歌词</code> 或纯文本歌词（系统自动按歌曲总时长智能计算时间轴）。
+            <div style="font-size: 12px; color: var(--muted); margin-bottom: 8px; line-height: 1.4;">
+              ✦ 支持标准 <code>[00:12.30]LRC歌词</code> (含 <code>[offset:ms]</code> 与多时间戳)，同一份自定义歌词绑定当前曲目。
             </div>
 
-            <div class="grid2" style="margin-bottom: 6px;">
+            <div class="grid2" style="margin-bottom: 8px;">
               <div class="file-upload-wrap">
                 <button class="btn" style="width: 100%;" title="导入本地 .lrc 歌词文件">
                   <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
@@ -1189,24 +1722,35 @@
               </button>
             </div>
 
-            <textarea id="text" style="height: 110px; font-family: monospace; font-size: 11px;" placeholder="支持粘贴 [00:12.30]LRC 格式或普通歌词换行文本，实时毫秒对齐…">CRYSTAL
+            <textarea id="text" style="height: 110px; font-family: monospace; font-size: 12px; width: 100%;" placeholder="支持粘贴 [00:12.30]LRC 格式或普通歌词换行文本...">CRYSTAL
 DIAMOND
 SHINE
 FLOW
 LIGHT
 BEAT</textarea>
 
-            <div id="lyricsStatusBadge" style="font-size: 11px; color: var(--primary); margin-top: 4px; margin-bottom: 4px;">
-              ⚡ 智能自适应时间轴同步已就绪 (随音乐自动推进)
+            <div id="lyricsStatusBadge" style="font-size: 12px; color: var(--accent-cobalt); margin: 6px 0;">
+              ⚡ 智能自适应时间轴同步已就绪
             </div>
 
-            <div style="margin-top: 6px;">
+            <!-- 新增 - / 数值 / + 的 lyricOffsetMs 步进器，默认 -180ms -->
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px; background: var(--bg-white); border: 1px solid var(--text-graphite); padding: 6px 12px; border-radius: 4px;">
+              <span style="font-size: 12px; font-weight: 700;">歌词时钟偏移 (lyricOffsetMs):</span>
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <button class="btn" id="lyricOffsetDecBtn" style="padding: 0; min-width: 36px; min-height: 36px; font-weight: 800;">-</button>
+                <input type="number" id="lyricOffsetInput" value="-180" step="10" style="width: 70px; text-align: center; font-size: 12px; min-height: 36px; padding: 0 4px;">
+                <span style="font-size: 12px;">ms</span>
+                <button class="btn" id="lyricOffsetIncBtn" style="padding: 0; min-width: 36px; min-height: 36px; font-weight: 800;">+</button>
+              </div>
+            </div>
+
+            <div style="margin-top: 8px;">
               <button class="btn active" id="enableLyricsToggle" style="width: 100%;">
                 <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-                动态歌词跟随流：开 (N×M×1 毫秒级同步)
+                动态歌词跟随流：开
               </button>
             </div>
-            <div style="margin-top: 6px;">
+            <div style="margin-top: 8px;">
               <label><span>文字对比度与浮雕</span></label>
               <div class="pill-group" id="textColorModeGroup">
                 <button class="pill-btn active" data-tcolor="auto">智能自动</button>
@@ -1224,8 +1768,9 @@ BEAT</textarea>
           <div class="section-title">
             <span><svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg> 自定义图片/GIF</span>
           </div>
-            <div style="margin-bottom: 6px;">
-              <label><span>项目内置高清素材图 (默认相对路径)</span></label>
+          <div class="card-block">
+            <div style="margin-bottom: 8px;">
+              <label><span>项目内置高清素材图</span></label>
               <select id="presetImageSelect">
                 <option value="">-- 选择项目内置素材图片 --</option>
                 <option value="images/ocean_waves.jpg">1: 深邃海洋 (Ocean Waves)</option>
@@ -1238,17 +1783,17 @@ BEAT</textarea>
                 <option value="images/minimal_white.jpg">8: 极简流光 (Minimal White)</option>
               </select>
             </div>
-            <div class="file-upload-wrap">
+            <div class="file-upload-wrap" style="width: 100%;">
               <button class="btn" style="width: 100%; border-style: dashed;">
                 <svg class="svg-icon" viewBox="0 0 24 24"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path><path d="M12 12v9"></path><path d="m16 16-4-4-4 4"></path></svg>
-                或选择本地图片 / GIF 动图
+                选择本地图片 / GIF 动图
               </button>
               <input type="file" id="customImgUpload" accept="image/*">
             </div>
-            <div style="margin-top: 6px;">
-              <input type="text" id="customImgUrl" placeholder="或粘贴网络图片 / GIF URL…">
+            <div style="margin-top: 8px;">
+              <input type="text" id="customImgUrl" style="width: 100%;" placeholder="或粘贴网络图片 / GIF URL…">
             </div>
-            <div style="margin-top: 6px;">
+            <div style="margin-top: 8px;">
               <label><span>图像拼贴方式</span></label>
               <div class="pill-group" id="imageDistGroup">
                 <button class="pill-btn active" data-idist="mosaic">巨幅无缝拼图 (Mosaic)</button>
@@ -1259,7 +1804,7 @@ BEAT</textarea>
         </div>
       </div>
 
-      <!-- TAB 4: 运镜与导演 (Cinematography & Director) -->
+      <!-- TAB 4: 运镜与导演 -->
       <div class="inspector-tab-pane" id="tab-camera">
         <div class="section-title">
           <span><svg class="svg-icon" viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg> FOV 动态呼吸变焦</span>
@@ -1267,7 +1812,7 @@ BEAT</textarea>
         <div class="card-block">
           <div class="range"><span>基础 FOV 视角</span><input id="fov" type="range" min="20" max="60" step="1" value="30"><output>30</output></div>
 
-          <div style="margin-top: 6px;">
+          <div style="margin-top: 8px;">
             <label><span>变焦律动形态</span></label>
             <div class="pill-group" id="fovModeGroup">
               <button class="pill-btn active" data-fmode="bass">重低音冲击</button>
@@ -1277,9 +1822,9 @@ BEAT</textarea>
             </div>
           </div>
 
-          <div class="grid2" style="margin-top: 6px;">
+          <div class="grid2" style="margin-top: 8px;">
             <button class="btn active" id="dynamicFovToggle">FOV 变焦：开</button>
-            <div class="range" style="margin:0; grid-template-columns: 56px 1fr 30px;"><span>幅度</span><input id="fovAmpSlider" type="range" min="4" max="26" step="1" value="14"><output>14°</output></div>
+            <div class="range" style="margin:0; grid-template-columns: 36px 1fr 30px;"><span>幅度</span><input id="fovAmpSlider" type="range" min="4" max="26" step="1" value="14"><output>14°</output></div>
           </div>
         </div>
 
@@ -1293,7 +1838,7 @@ BEAT</textarea>
             <button class="pill-btn" data-cam-mode="off">关闭 (锁定视角)</button>
           </div>
 
-          <div style="margin-top: 6px;">
+          <div style="margin-top: 8px;">
             <label><span>旋转轨迹范围</span></label>
             <div class="pill-group" id="orbitModeGroup">
               <button class="pill-btn active" data-orbit="arc">黄金扇形钟摆 (±45°)</button>
@@ -1301,7 +1846,7 @@ BEAT</textarea>
             </div>
           </div>
 
-          <button class="btn" id="resetCam" style="width: 100%; margin-top: 6px;">
+          <button class="btn" id="resetCam" style="width: 100%; margin-top: 8px;">
             <svg class="svg-icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
             重置视角中心
           </button>
@@ -1311,8 +1856,8 @@ BEAT</textarea>
           <span><svg class="svg-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> 🎬 导演级声光全景编排中枢</span>
         </div>
         <div class="card-block">
-          <div style="font-size: 11px; color: var(--muted); margin-bottom: 8px; line-height: 1.4;">
-            ✦ 导演编排系统随乐章推进，全自动轮转 12 款材质、6 大声波形态与方阵数量，带来杂志级声光视觉变幻。
+          <div style="font-size: 12px; color: var(--muted); margin-bottom: 8px; line-height: 1.4;">
+            ✦ 导演编排系统随乐章推进，全自动轮转 12 款材质、6 大声波形态与方阵数量。
           </div>
           <div class="grid2">
             <button class="btn active" id="toggleAutoChoreoTab4" title="开启或暂停乐章流变">
@@ -1324,28 +1869,28 @@ BEAT</textarea>
               歌名序幕：开
             </button>
           </div>
-          <div style="margin-top: 6px;">
+          <div style="margin-top: 8px;">
             <button class="btn active" id="toggleLyricsDisplay" style="width: 100%;" title="切换歌词实时同步跟随流">
               <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-              动态歌词跟随流：开 (N×M×1 毫秒级同步)
+              动态歌词跟随流：开
             </button>
           </div>
         </div>
       </div>
 
-      <!-- TAB 5: 母带导出 (Master Export) -->
+      <!-- TAB 5: 母带导出 -->
       <div class="inspector-tab-pane" id="tab-export">
         <div class="section-title">
           <span><svg class="svg-icon" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line></svg> 视频母带直出配置</span>
         </div>
         <div class="card-block">
           <label><span>导出通用格式</span></label>
-          <select id="videoFormatSelect">
-            <option value="mp4" selected>MP4 格式 (通用全兼容 H.264/AAC · 微信/剪映直出)</option>
+          <select id="videoFormatSelect" style="width: 100%; margin-top: 4px;">
+            <option value="mp4" selected>MP4 格式 (通用全兼容 H.264/AAC)</option>
             <option value="webm">WebM 格式 (VP9 网页高清原生)</option>
           </select>
 
-          <div style="font-size: 11px; color: var(--muted); line-height: 1.5; margin-top: 4px;">
+          <div style="font-size: 12px; color: var(--muted); line-height: 1.5; margin-top: 8px;">
             ✦ 采样率: 60 FPS 母带级无损渲染<br>
             ✦ 编码器: WebCodecs + MP4 Muxer (16Mbps)<br>
             ✦ 音画同步: Web Audio API 毫秒级直连
@@ -1376,13 +1921,12 @@ BEAT</textarea>
       <input type="range" id="cropZoom" min="0.5" max="3" step="0.05" value="1">
       <output id="cropZoomOut">1.0x</output>
     </div>
-    <div class="actions" style="justify-content:flex-end; margin-top:4px;">
+    <div class="actions" style="display:flex; justify-content:flex-end; gap:8px; margin-top:8px;">
       <button class="btn" id="cropCancel">取消</button>
       <button class="btn active" id="cropConfirm">确认应用到水晶方阵</button>
     </div>
   </div>
 </div>
-
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.166.1/+esm';
 import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/controls/OrbitControls.js/+esm';
@@ -1392,6 +1936,68 @@ import { EffectComposer } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examp
 import { RenderPass } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/postprocessing/RenderPass.js/+esm';
 import { UnrealBloomPass } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/postprocessing/UnrealBloomPass.js/+esm';
 import { OutputPass } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/postprocessing/OutputPass.js/+esm';
+
+
+// 3 档物理形态控制参数配置表 (沉静 / 律动 / 冲击)
+const TIER_CONFIGS = {
+  1: { // 1档 沉静: 慢速、窄幅、长回落
+    timeScale: 0.65,
+    motionRange: 0.55,
+    response: 0.08,
+    phaseSpread: 0.4,
+    burst: 0.0,
+    sequenceCadence: 16,
+    matrixScaleRange: [0.9, 1.1],
+    microPause: 0.0,
+    matrixSequence: [
+      { cols: 4, rows: 4, layers: 1 },
+      { cols: 4, rows: 4, layers: 1 },
+      { cols: 5, rows: 5, layers: 1 },
+      { cols: 4, rows: 4, layers: 1 },
+      { cols: 3, rows: 3, layers: 1 },
+      { cols: 4, rows: 4, layers: 1 },
+      { cols: 5, rows: 5, layers: 1 }
+    ]
+  },
+  2: { // 2档 律动: 更大范围、错拍波前、中高速
+    timeScale: 1.0,
+    motionRange: 1.0,
+    response: 0.18,
+    phaseSpread: 1.0,
+    burst: 0.3,
+    sequenceCadence: 8,
+    matrixScaleRange: [0.75, 1.3],
+    microPause: 0.0,
+    matrixSequence: [
+      { cols: 4, rows: 4, layers: 1 },
+      { cols: 5, rows: 5, layers: 1 },
+      { cols: 4, rows: 4, layers: 2 },
+      { cols: 3, rows: 3, layers: 1 },
+      { cols: 6, rows: 6, layers: 1 },
+      { cols: 4, rows: 4, layers: 1 },
+      { cols: 5, rows: 5, layers: 1 }
+    ]
+  },
+  3: { // 3档 冲击: 最大范围、最快响应、爆发环震和短促微停
+    timeScale: 1.45,
+    motionRange: 1.65,
+    response: 0.38,
+    phaseSpread: 1.8,
+    burst: 0.9,
+    sequenceCadence: 4, // 档位越高切换越快
+    matrixScaleRange: [0.5, 1.6], // 尺寸变化范围最大
+    microPause: 0.08,
+    matrixSequence: [
+      { cols: 2, rows: 2, layers: 1 },
+      { cols: 6, rows: 6, layers: 1 },
+      { cols: 3, rows: 3, layers: 2 },
+      { cols: 8, rows: 8, layers: 1 },
+      { cols: 4, rows: 4, layers: 3 },
+      { cols: 7, rows: 7, layers: 1 },
+      { cols: 3, rows: 3, layers: 1 }
+    ]
+  }
+};
 
 const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
@@ -1414,7 +2020,7 @@ const state = {
   mosaicLock: true, // 巨像整联共振锁：开启时锁定面孔相对构型，防律动撕裂
   currentLyricPhrase: '',
   lastLyricIdx: -1,
-  
+
   // 矩阵规格 (1x1 ~ 10x10 · 1~4层)
   gridCols: 4,
   gridRows: 4,
@@ -1446,9 +2052,13 @@ const state = {
   waveAmpMultiplier: 1.0,
   enableTitleIntro: true,
   enableLyricsDisplay: true,
-  
+
   // 音乐与播放列表
   isPlayingMusic: false,
+  playbackOffset: 0.0,
+  playbackStartTime: 0.0,
+  lyricOffsetMs: -180,
+  trackCustomLyricsMap: {},
   currentTrackIndex: 0,
   playlist: [
     { title: '《游京》- 星火社', src: 'audio/youjing.mp3', type: 'track_0', isPreset: false },
@@ -1496,6 +2106,8 @@ const state = {
   beatCount: 0,
   lastBassEnergy: 0,
   lastBeatTime: 0,
+  beatPulse: 0,
+  motionHoldUntil: 0,
 
   // 动态 FOV 呼吸变焦律动
   enableDynamicFov: true,
@@ -2370,22 +2982,26 @@ function getSmartContrastTextColor(baseColorHex, userPreference = 'auto') {
   }
 
   const c = new THREE.Color(baseColorHex);
-  const luminance = 0.299 * c.r + 0.587 * c.g + 0.114 * c.b;
+  const dark = new THREE.Color('#181b20');
+  const luminance = 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b;
+  const darkLuminance = 0.2126 * dark.r + 0.7152 * dark.g + 0.0722 * dark.b;
+  const darkContrast = (luminance + 0.05) / (darkLuminance + 0.05);
+  const lightContrast = 1.05 / (luminance + 0.05);
 
-  if (luminance > 0.52) {
+  if (darkContrast >= lightContrast) {
     return {
-      fill: '#090d16',
-      shadow: 'rgba(255,255,255,0.55)',
-      blur: 10,
-      stroke: 'rgba(255,255,255,0.3)',
+      fill: '#181b20',
+      shadow: 'rgba(255,255,255,0.42)',
+      blur: 7,
+      stroke: 'rgba(255,255,255,0.24)',
       strokeWidth: 2
     };
   } else {
     return {
-      fill: '#ffffff',
-      shadow: 'rgba(0,0,0,0.88)',
-      blur: 18,
-      stroke: 'rgba(0,0,0,0.4)',
+      fill: '#fcfcfd',
+      shadow: 'rgba(24,27,32,0.78)',
+      blur: 14,
+      stroke: 'rgba(24,27,32,0.38)',
       strokeWidth: 3
     };
   }
@@ -2952,7 +3568,7 @@ function rebuildMatrix() {
         };
 
         const material = createMaterialPreset(matType, colorVal);
-        
+
         // 关键透视保障：仅对透射折射类材质在内雕/后底模式下关闭前表面深度写入，绝不破坏不透明材质的金属与微表面质感
         if ((state.layerMode === 'inside' || state.layerMode === 'back') && material.transmission > 0) {
           material.depthWrite = false;
@@ -2996,7 +3612,7 @@ function rebuildMatrix() {
 
           const isAvatar = (!isShowingIntro && state.contentMode === 'avatar');
           const labelScale = isAvatar ? (state.layerMode === 'inside' ? 0.88 : (isMosaic ? 1.06 : 0.94)) : 0.88;
-          
+
           // 构建与倒角曲率严丝合缝同构的贴片几何体
           const decalGeo = createConformalDecalGeometry(labelScale, labelScale, cornerRad, isMosaic, u0, u1, v0, v1);
           const decalMat = createDimensionalDecalMaterial(texture, state.adhesionCraft, state.layerMode);
@@ -3029,13 +3645,55 @@ function rebuildMatrix() {
   const matName = ui.material.options[ui.material.selectedIndex].text;
   const specText = layers > 1 ? `${cols}×${rows}×${layers} ${layers}层` : `${cols}×${rows} 方阵`;
   const phaseLabel = isShowingIntro ? `【序幕歌名：${state.songTitle}】` : (isMosaic ? `【巨幅全景拼图共振】` : `【活体智能体演进】`);
-  statusText.textContent = `${phaseLabel} ${specText} · ${placedCount} 项呈现 · ${matName}`;
+  const fullStatus = `${phaseLabel} ${specText} / ${placedCount} 项呈现 / ${matName}`;
+  const compactPhase = isShowingIntro ? '序幕' : (isMosaic ? '拼图' : '演进');
+  statusText.textContent = window.matchMedia('(max-width: 640px)').matches
+    ? `${compactPhase} · ${specText} · ${placedCount}项`
+    : fullStatus;
+  statusText.title = fullStatus;
 }
 
 // -------------------------------------------------------------
 // 10. 全功能多曲目播放器 & 实时节拍打击检测器
 // -------------------------------------------------------------
 let synthInterval = null;
+
+function getPlaybackTime() {
+  const curTrack = state.playlist[state.currentTrackIndex];
+  const dur = (curTrack && curTrack.buffer && curTrack.buffer.duration) ? curTrack.buffer.duration : 180;
+  let t = state.playbackOffset;
+  if (state.isPlayingMusic && state.playbackStartTime && state.audioCtx) {
+    t += (state.audioCtx.currentTime - state.playbackStartTime);
+  }
+  if (dur > 0) t = t % dur;
+  return Math.max(0, t);
+}
+
+function formatTime(sec) {
+  if (isNaN(sec) || sec < 0) sec = 0;
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+}
+
+let isDraggingProgressSlider = false;
+let lastProgressUiUpdate = 0;
+function updateProgressUI(force = false) {
+  const now = performance.now();
+  if (!force && now - lastProgressUiUpdate < 100) return;
+  lastProgressUiUpdate = now;
+  const curTrack = state.playlist[state.currentTrackIndex];
+  const dur = (curTrack && curTrack.buffer && curTrack.buffer.duration) ? curTrack.buffer.duration : 180;
+  const curTime = getPlaybackTime();
+  if ($('#timeDisplay')) {
+    $('#timeDisplay').textContent = `${formatTime(curTime)} / ${formatTime(dur)}`;
+  }
+  if ($('#timeProgressSlider') && !isDraggingProgressSlider) {
+    const pct = dur > 0 ? (curTime / dur) * 100 : 0;
+    $('#timeProgressSlider').value = pct.toFixed(1);
+  }
+}
+
 function initAudioEngine() {
   if (state.audioCtx) return;
   const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -3046,7 +3704,7 @@ function initAudioEngine() {
   state.audioDataArray = new Uint8Array(state.analyser.frequencyBinCount);
 }
 
-function startBufferPlayback(track) {
+function startBufferPlayback(track, startPos = 0) {
   if (state.currentAudioSource) {
     try { state.currentAudioSource.stop(); } catch(e){}
     state.currentAudioSource = null;
@@ -3056,32 +3714,44 @@ function startBufferPlayback(track) {
   source.loop = true;
   source.connect(state.analyser);
   state.analyser.connect(state.audioCtx.destination);
-  source.start(0);
+
+  const dur = track.buffer.duration || 180;
+  const offset = startPos % dur;
+  source.start(0, offset);
   state.currentAudioSource = source;
-  state.trackStartTime = state.audioCtx.currentTime;
+  state.playbackStartTime = state.audioCtx.currentTime;
+  state.playbackOffset = offset;
   $('#nowPlayingText').textContent = `当前：${track.title}`;
 }
 
-function playTrackAtIndex(idx) {
+function playTrackAtIndex(idx, resumeFromOffset = false) {
   try {
     initAudioEngine();
     if (state.audioCtx && state.audioCtx.state === 'suspended') {
       state.audioCtx.resume().catch(() => {});
     }
 
-    state.currentTrackIndex = (idx + state.playlist.length) % state.playlist.length;
+    const normalizedIndex = (idx + state.playlist.length) % state.playlist.length;
+    if (normalizedIndex !== state.currentTrackIndex) {
+      state.playbackOffset = 0;
+      state.playbackStartTime = 0;
+    }
+
+    state.currentTrackIndex = normalizedIndex;
     const track = state.playlist[state.currentTrackIndex];
 
     state.songTitle = track.title;
     $('#nowPlayingText').textContent = `当前：${track.title}`;
     $('#playlistSelect').value = track.type || 'custom';
 
-    state.beatCount = 0;
-    state.beatAccumulator = 0.0;
-    lastMovementIdx = -1;
-    state.isIntroPlaying = state.enableTitleIntro;
-    state.introStartTime = Date.now();
-    state.currentLyricPhrase = '';
+    if (!resumeFromOffset) {
+      state.beatCount = 0;
+      state.beatAccumulator = 0.0;
+      lastMovementIdx = -1;
+      state.isIntroPlaying = state.enableTitleIntro;
+      state.introStartTime = Date.now();
+      state.currentLyricPhrase = '';
+    }
 
     if (state.currentAudioSource) {
       try { state.currentAudioSource.stop(); } catch(e){}
@@ -3091,10 +3761,11 @@ function playTrackAtIndex(idx) {
 
     state.isPlayingMusic = true;
     $('#playPauseBtn').classList.add('choreography-active');
-    $('#playPauseBtn').innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg> 播放中：点击暂停`;
+    $('#playPauseBtn').setAttribute('aria-label', '暂停');
+    $('#playPauseBtn').innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg> 暂停`;
 
     if (track.buffer) {
-      startBufferPlayback(track);
+      startBufferPlayback(track, state.playbackOffset);
     } else if (track.src) {
       $('#nowPlayingText').textContent = `加载中：${track.title}...`;
       fetch(track.src)
@@ -3102,8 +3773,8 @@ function playTrackAtIndex(idx) {
         .then(ab => state.audioCtx.decodeAudioData(ab))
         .then(buf => {
           track.buffer = buf;
-          if (state.currentTrackIndex === idx && state.isPlayingMusic) {
-            startBufferPlayback(track);
+          if (state.currentTrackIndex === normalizedIndex && state.isPlayingMusic) {
+            startBufferPlayback(track, state.playbackOffset);
           }
         })
         .catch(err => {
@@ -3183,7 +3854,12 @@ function startProceduralElectronicBeat() {
 }
 
 function pauseMusic() {
-  state.isPlayingMusic = false;
+  if (state.isPlayingMusic) {
+    state.playbackOffset = getPlaybackTime();
+    state.isPlayingMusic = false;
+  }
+  state.playbackStartTime = 0;
+
   if (state.currentAudioSource) {
     try { state.currentAudioSource.stop(); } catch(e){}
     state.currentAudioSource = null;
@@ -3191,9 +3867,9 @@ function pauseMusic() {
   if (synthInterval) clearInterval(synthInterval);
 
   $('#playPauseBtn').classList.remove('choreography-active');
-  $('#playPauseBtn').innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> 暂停中：点击播放`;
+  $('#playPauseBtn').setAttribute('aria-label', '播放');
+  $('#playPauseBtn').innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> 播放`;
 
-  // 恢复光影参数滑块至基准静止状态
   if (state.baseBloom !== undefined) {
     ui.bloom.value = state.baseBloom;
     ui.light.value = state.baseLight;
@@ -3210,15 +3886,13 @@ function pauseMusic() {
 
 function stopMusic() {
   pauseMusic();
+  state.playbackOffset = 0;
+  state.playbackStartTime = 0;
   state.beatCount = 0;
   state.isIntroPlaying = false;
+  updateProgressUI(true);
   rebuildMatrix();
 }
-
-// -------------------------------------------------------------
-// 11. 60FPS 屏幕录制 (支持 MP4 通用格式直出与 WebM 高画质)
-// -------------------------------------------------------------
-let recordTimerInterval = null;
 
 function getOptimalMimeType(format) {
   if (format === 'mp4') {
@@ -3312,7 +3986,8 @@ function toggleScreenRecording() {
     state.isRecording = true;
     state.recordStartTime = Date.now();
 
-    $('#recordToggle').textContent = `停止录制并保存 [${opt.ext.toUpperCase()}]`;
+    $('#recordToggle').textContent = '录制中';
+    $('#recordToggle').title = `停止录制并保存 ${opt.ext.toUpperCase()}`;
     $('#recordToggle').classList.add('recording');
     statusDot.classList.add('recording');
 
@@ -3325,14 +4000,15 @@ function toggleScreenRecording() {
       const mm = String(Math.floor(durSec / 60)).padStart(2, '0');
       const ss = String(durSec % 60).padStart(2, '0');
       statusText.textContent = `🔴 REC 60FPS [${opt.ext.toUpperCase()}] 正在录制 (${mm}:${ss})…`;
-      $('#recordToggle').textContent = `停止录制 (${mm}:${ss}) 并导出 ${opt.ext.toUpperCase()}`;
+      $('#recordToggle').textContent = `录制中 ${mm}:${ss}`;
     }, 500);
 
   } else {
     if (recordTimerInterval) clearInterval(recordTimerInterval);
     state.mediaRecorder.stop();
     state.isRecording = false;
-    $('#recordToggle').innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4" fill="currentColor"></circle></svg> 开始 60FPS 录制`;
+    $('#recordToggle').innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4" fill="currentColor"></circle></svg> 录制`;
+    $('#recordToggle').title = '开始 60FPS 录制';
     $('#recordToggle').classList.remove('recording');
     statusDot.classList.remove('recording');
     rebuildMatrix();
@@ -3449,13 +4125,13 @@ onResize();
 // 13. 导演级全变量全景编排调度机 (全曲目数量/材质/底色流变)
 // -------------------------------------------------------------
 const CHOREOGRAPHY_MOVEMENTS = [
-  { mat: 'prism', color: '#82cfff', dist: 'all', cols: 4, rows: 4, layers: 1, wave: 'ripple', fov: 'bass', isIntro: true },
+  { mat: 'prism', color: '#8ea9c4', dist: 'all', cols: 4, rows: 4, layers: 1, wave: 'ripple', fov: 'bass', isIntro: true },
   { mat: 'shell', color: '#a855f7', dist: 'variety', cols: 5, rows: 5, layers: 1, wave: 'diagonal', fov: 'dolly', isIntro: false },
   { mat: 'alloy', color: '#f43f5e', dist: 'all', cols: 4, rows: 4, layers: 2, wave: 'equalizer', fov: 'snap', isIntro: false },
   { mat: 'jade', color: '#10b981', dist: 'center', cols: 3, rows: 3, layers: 1, wave: 'spiral', fov: 'sine', isIntro: false },
   { mat: 'sand', color: '#f59e0b', dist: 'all', cols: 6, rows: 6, layers: 1, wave: 'heartbeat', fov: 'bass', isIntro: false },
   { mat: 'cloud', color: '#ffffff', dist: 'variety', cols: 4, rows: 4, layers: 1, wave: 'glitch', fov: 'dolly', isIntro: false },
-  { mat: 'crystal', color: '#82cfff', dist: 'all', cols: 4, rows: 4, layers: 1, wave: 'ripple', fov: 'sine', isIntro: false }
+  { mat: 'crystal', color: '#8ea9c4', dist: 'all', cols: 4, rows: 4, layers: 1, wave: 'ripple', fov: 'sine', isIntro: false }
 ];
 
 const SONG_LYRICS_MAP = {
@@ -3600,21 +4276,38 @@ function parseLrcString(lrcContent) {
   if (!lrcContent) return [];
   const lines = lrcContent.split('\n');
   const result = [];
-  const timeRegex = /\[(\d{1,2}):(\d{2}(?:[.:]\d{1,3})?)\](.*)/;
+
+  let fileOffsetMs = 0;
+  const fileOffsetMatch = /\[offset:\s*([+-]?\d+)\]/i.exec(lrcContent);
+  if (fileOffsetMatch) {
+    fileOffsetMs = parseInt(fileOffsetMatch[1], 10) || 0;
+  }
+
+  const timeRegex = /\[(\d{1,2}):(\d{2}(?:[.:]\d{1,3})?)\]/g;
 
   for (let line of lines) {
     line = line.trim();
     if (!line) continue;
-    const match = timeRegex.exec(line);
-    if (match) {
+    if (/^\[(ti|ar|al|by|re|ve):/i.test(line)) continue;
+
+    const timestamps = [];
+    let match;
+    timeRegex.lastIndex = 0;
+    while ((match = timeRegex.exec(line)) !== null) {
       const minutes = parseInt(match[1], 10);
       const secStr = match[2].replace(':', '.');
       const seconds = parseFloat(secStr);
       const totalSec = minutes * 60 + seconds;
-      const text = match[3].trim();
-      // 过滤非歌词元数据标签
-      if (text && !text.startsWith('ti:') && !text.startsWith('ar:') && !text.startsWith('al:') && !text.startsWith('by:')) {
-        result.push({ time: parseFloat(totalSec.toFixed(2)), text: text });
+      timestamps.push(totalSec);
+    }
+
+    if (timestamps.length > 0) {
+      const text = line.replace(/\[\d{1,2}:\d{2}(?:[.:]\d{1,3})?\]/g, '').trim();
+      if (text) {
+        for (const tSec of timestamps) {
+          const adjustedSec = tSec + (fileOffsetMs / 1000.0);
+          result.push({ time: parseFloat(adjustedSec.toFixed(2)), text: text });
+        }
       }
     }
   }
@@ -3623,12 +4316,10 @@ function parseLrcString(lrcContent) {
   return result;
 }
 
-// 纯文本智能自适应时间轴插值器 (针对任意无时间戳歌词，根据音频时长与字数自动分配时间轴)
 function generateAutoTimedLyrics(plainText, totalDuration = 180) {
   const rawLines = plainText.replace(/\r/g, '').split('\n').map(l => l.trim()).filter(l => l.length > 0);
   if (rawLines.length === 0) return [{ time: 0, text: state.songTitle }];
 
-  // 自动将相邻短行组合为双行排版短语
   const phrases = [];
   for (let i = 0; i < rawLines.length; i += 2) {
     if (rawLines[i + 1]) phrases.push(`${rawLines[i]}\n${rawLines[i + 1]}`);
@@ -3649,7 +4340,6 @@ function generateAutoTimedLyrics(plainText, totalDuration = 180) {
   });
 }
 
-// 联网自动检索匹配歌词 (支持公共开放 API)
 async function fetchOnlineLyrics(songTitle) {
   try {
     const cleanTitle = songTitle
@@ -3673,50 +4363,58 @@ async function fetchOnlineLyrics(songTitle) {
   return null;
 }
 
-// 零代码全自动通用歌词获取函数 (3 级自动匹配与毫秒对齐)
+function setCurrentTrackLyrics(lyricsList) {
+  const curTrack = state.playlist[state.currentTrackIndex];
+  const normalized = Array.isArray(lyricsList) ? lyricsList : [];
+  state.customLoadedLyrics = normalized;
+  if (curTrack?.title) state.trackCustomLyricsMap[curTrack.title] = normalized;
+  return normalized;
+}
+
 function getSynchronizedLyricPhrase() {
   let lyricsList = null;
-
-  // 1. 检查当前音轨的独立歌词 (来自 .LRC 文件上传 / 联网匹配)
   const curTrack = state.playlist[state.currentTrackIndex];
-  if (curTrack && curTrack.lyrics && curTrack.lyrics.length > 0) {
+
+  if (curTrack && curTrack.title && state.trackCustomLyricsMap[curTrack.title]) {
+    lyricsList = state.trackCustomLyricsMap[curTrack.title];
+  } else if (curTrack && curTrack.lyrics && curTrack.lyrics.length > 0) {
     lyricsList = curTrack.lyrics;
-  } else if (state.customLoadedLyrics && state.customLoadedLyrics.length > 0) {
-    lyricsList = state.customLoadedLyrics;
   } else if (SONG_LYRICS_MAP[state.songTitle]) {
     lyricsList = SONG_LYRICS_MAP[state.songTitle];
   } else {
-    // 2. 纯文本与动态 textarea 自适应解析
     const textareaVal = ui.text.value.trim();
     if (textareaVal) {
       if (textareaVal.includes('[') && textareaVal.includes(']')) {
         const parsed = parseLrcString(textareaVal);
-        if (parsed.length > 0) lyricsList = parsed;
+        if (parsed.length > 0) {
+          lyricsList = parsed;
+          if (curTrack && curTrack.title) {
+            state.trackCustomLyricsMap[curTrack.title] = parsed;
+          }
+        }
       }
       if (!lyricsList) {
         const dur = (curTrack?.buffer?.duration) || 180;
         lyricsList = generateAutoTimedLyrics(textareaVal, dur);
+        if (curTrack && curTrack.title) {
+          state.trackCustomLyricsMap[curTrack.title] = lyricsList;
+        }
       }
     }
   }
 
   if (!lyricsList || lyricsList.length === 0) return state.songTitle;
 
-  let currentSec = 0;
-  if (state.trackStartTime && state.currentAudioSource && state.audioCtx) {
-    const elapsed = state.audioCtx.currentTime - state.trackStartTime;
-    const dur = (curTrack?.buffer?.duration) || 240;
-    currentSec = elapsed % dur;
-  } else {
-    currentSec = (state.beatCount * 0.5) % 120;
-  }
+  const currentPlaybackSec = getPlaybackTime();
+  // Negative offset advances the lyric, matching standard LRC offset semantics.
+  const lyricClockTime = currentPlaybackSec - (state.lyricOffsetMs / 1000.0);
 
   let matchedText = typeof lyricsList[0] === 'object' ? lyricsList[0].text : lyricsList[0];
   for (let i = 0; i < lyricsList.length; i++) {
     const item = lyricsList[i];
     const itemTime = typeof item === 'object' ? item.time : (i * 4.5);
     const itemText = typeof item === 'object' ? item.text : item;
-    if (currentSec >= itemTime) {
+    if (lyricClockTime >= itemTime) {
       matchedText = itemText;
     } else {
       break;
@@ -3788,7 +4486,8 @@ function updateMasterChoreography() {
     }
   }
 
-  const interval = state.morphIntervalBeats || 16;
+  const tierCfg = TIER_CONFIGS[state.intensityTier] || TIER_CONFIGS[2];
+  const interval = Math.max(2, Math.round((state.morphIntervalBeats || 16) * (tierCfg.sequenceCadence / 8)));
   const moveIdx = Math.floor(state.beatCount / interval) % CHOREOGRAPHY_MOVEMENTS.length;
   $('#movementBadge').textContent = `乐章 ${moveIdx + 1}/${CHOREOGRAPHY_MOVEMENTS.length}`;
 
@@ -3799,17 +4498,17 @@ function updateMasterChoreography() {
 
     if (currentPhrase && currentPhrase !== state.currentLyricPhrase) {
       state.currentLyricPhrase = currentPhrase;
-      
+
       // 自动计算最佳多排单层架构 N x M x 1 (层数严格只有 1 层，排数随歌词分为 1~3 排)
       const lines = currentPhrase.split('\n').map(l => l.trim()).filter(l => l.length > 0);
       const rows = Math.min(4, Math.max(1, lines.length));
       const maxLineLen = Math.max(...lines.map(l => Array.from(l).length));
       const cols = Math.min(10, Math.max(1, maxLineLen));
-      
+
       state.gridCols = cols;
       state.gridRows = rows; // 多排单层架构 (N x M x 1)
       state.gridLayers = 1;  // 层数严格只有 1 层
-      
+
       ui.gridCols.value = cols;
       ui.gridRows.value = rows;
       ui.gridLayers.value = 1;
@@ -3831,7 +4530,10 @@ function updateMasterChoreography() {
 
     // 方阵数目变化序列映射 (非动态歌词流模式下执行常规矩阵序列)
     if (!isLyricsStreamActive) {
-      const seq = MATRIX_PROGRESSION_SEQUENCES[state.matrixSequence || 'standard'];
+      const selectedSequence = state.matrixSequence || 'standard';
+      const seq = selectedSequence === 'standard'
+        ? tierCfg.matrixSequence
+        : MATRIX_PROGRESSION_SEQUENCES[selectedSequence];
       if (seq) {
         const dim = seq[moveIdx % seq.length];
         state.gridCols = dim.cols;
@@ -3851,7 +4553,11 @@ function updateMasterChoreography() {
 
     if (mov.wave) {
       state.wavePattern = mov.wave;
-      $$('#wavePatternGroup .pill-btn').forEach(b => b.classList.toggle('active', b.dataset.wave === mov.wave));
+      $$('#wavePatternGroup [data-pattern]').forEach(b => {
+        const active = b.dataset.pattern === mov.wave;
+        b.classList.toggle('active', active);
+        b.setAttribute('aria-pressed', String(active));
+      });
     }
     if (mov.fov) {
       state.fovMode = mov.fov;
@@ -3902,7 +4608,7 @@ function updateMasterChoreography() {
 
   if (shouldMoveCam) {
     const camDist = baseCamDist + Math.sin(state.time * 0.4) * 1.8 - (state.bassEnergy * 0.8 * tMul);
-    
+
     if (state.orbitMode === 'arc') {
       const camAngle = Math.sin(state.time * 0.45) * 0.72; // ±41.2°
       camera.position.x = Math.sin(camAngle) * camDist;
@@ -3987,14 +4693,27 @@ function updateMasterChoreography() {
 // -------------------------------------------------------------
 // 14. 主渲染循环 (6 大声波形态与全曲目 Beat 卡点)
 // -------------------------------------------------------------
-function animate() {
-  state.time += 0.016 * state.speedMultiplier * (state.intensityTier === 1 ? 0.75 : (state.intensityTier === 3 ? 1.35 : 1.0));
-  controls.update();
+let lastFrameTimestamp = 0;
 
-  // 音频 FFT 能量分析 & 实时 Beat 打击检测 (为上传音乐和合成器精准推进乐章)
+function animate(nowTimestamp) {
+  const frameNow = Number.isFinite(nowTimestamp) ? nowTimestamp : performance.now();
+  if (!lastFrameTimestamp) lastFrameTimestamp = frameNow - (1000 / 60);
+  const rawDt = (frameNow - lastFrameTimestamp) / 1000.0;
+  lastFrameTimestamp = frameNow;
+  const dt = Math.max(0.001, Math.min(rawDt, 0.1));
+
+  const tierCfg = TIER_CONFIGS[state.intensityTier] || TIER_CONFIGS[2];
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const motionFactor = prefersReduced ? 0.2 : 1.0;
+  const motionDt = frameNow < state.motionHoldUntil ? 0 : dt;
+
+  state.time += motionDt * state.speedMultiplier * tierCfg.timeScale * motionFactor;
+  controls.update();
+  updateProgressUI();
+
   if (state.analyser && state.audioDataArray && state.isPlayingMusic) {
     state.analyser.getByteFrequencyData(state.audioDataArray);
-    
+
     let bassSum = 0, midSum = 0, trebleSum = 0;
     for (let i = 0; i < 4; i++) bassSum += state.audioDataArray[i];
     for (let i = 4; i < 20; i++) midSum += state.audioDataArray[i];
@@ -4004,27 +4723,29 @@ function animate() {
     const rawMid = midSum / 16 / 255;
     const rawTreble = trebleSum / 28 / 255;
 
-    // 动态包络平滑跟随
     state.bassEnergy = Math.max(rawBass, state.bassEnergy * 0.88);
     state.midEnergy = Math.max(rawMid, state.midEnergy * 0.88);
     state.trebleEnergy = Math.max(rawTreble, state.trebleEnergy * 0.88);
 
-    // 实时打击卡点与全曲目连续节拍驱动 (确保任何自定义音乐与默认音乐完全一致地推进大秀乐章！)
     const now = performance.now();
     const minBeatInterval = (60 / (180 * state.speedMultiplier)) * 1000;
     const isPeak = (rawBass > 0.32 && (rawBass - state.lastBassEnergy) > 0.04) ||
                    (rawMid > 0.45 && (rawMid - state.midEnergy) > 0.05);
 
-    state.beatAccumulator = (state.beatAccumulator || 0) + (0.016 * state.speedMultiplier * 2.08);
+    state.beatAccumulator = (state.beatAccumulator || 0) + (dt * state.speedMultiplier * 2.08 * tierCfg.timeScale);
 
     if ((isPeak && (now - state.lastBeatTime) > minBeatInterval) || state.beatAccumulator >= 1.0) {
       state.beatCount++;
       state.lastBeatTime = now;
       state.beatAccumulator = 0.0;
+      state.beatPulse = 1;
+      if (tierCfg.microPause > 0 && state.beatCount % 4 === 0) {
+        state.motionHoldUntil = now + tierCfg.microPause * 1000;
+      }
     }
     state.lastBassEnergy = rawBass;
 
-    state.waveAccumulator += 0.016 * state.speedMultiplier * (1.0 + state.bassEnergy * 4.2);
+    state.waveAccumulator += motionDt * state.speedMultiplier * (1.0 + state.bassEnergy * 4.2) * tierCfg.timeScale;
 
     const bars = $$('#audioVisualizer .audio-bar');
     if (bars.length >= 5) {
@@ -4039,9 +4760,9 @@ function animate() {
     state.midEnergy *= 0.9;
     state.trebleEnergy *= 0.9;
   }
+  state.beatPulse *= Math.exp(-dt * (2.5 + tierCfg.response * 18));
 
-  // 非音乐状态下的常开运镜判断
-  if (!state.isPlayingMusic && state.camMotionMode === 'on') {
+  if (!state.isPlayingMusic && state.camMotionMode === 'on' && !prefersReduced) {
     const maxDim = Math.max(state.gridCols, state.gridRows, state.gridLayers);
     const camDist = 4.2 + maxDim * 2.2;
     if (state.orbitMode === 'arc') {
@@ -4057,9 +4778,8 @@ function animate() {
 
   updateMasterChoreography();
 
-  // 6 大声波物理矩阵动态形态计算 (舞蹈演员级多自由度物理编排 & 3D 纵深层叠)
   if (state.waveMotion && matrixGroup.children.length) {
-    const amp = state.waveAmpMultiplier * (state.tierMultiplier || 1.0);
+    const amp = state.waveAmpMultiplier * tierCfg.motionRange * motionFactor;
     const bass = state.bassEnergy;
     const mid = state.midEnergy;
     const treble = state.trebleEnergy;
@@ -4091,16 +4811,13 @@ function animate() {
 
       if (state.isPlayingMusic && (bass > 0.015 || mid > 0.02)) {
         if (isMosaic && state.mosaicLock) {
-          // 巨像整联共振锁：整块巨幕作为统一有机曲面呼吸与柔和倾角律动，绝对保证面孔完整无撕裂！
           const globalPhase = state.waveAccumulator * 3.8;
           const unifiedLift = Math.sin(globalPhase) * (bass * 0.40 + mid * 0.18) * amp;
           const unifiedRotX = -Math.cos(globalPhase) * 0.07 * amp;
           const unifiedRotZ = Math.sin(globalPhase * 0.5) * 0.05 * amp;
           const unifiedRotY = Math.sin(state.time * 0.8) * 0.03 * amp;
-          
-          // 微景深视差 (<= 0.025)，保留方块间晶体物理质感，且大面孔严丝合缝
           const microParallax = Math.sin(globalPhase - (r * 0.15 + c * 0.15)) * 0.025 * amp;
-          
+
           m.targetY = uData.baseY + unifiedLift + microParallax;
           m.targetRotX = unifiedRotX;
           m.targetRotY = unifiedRotY;
@@ -4108,11 +4825,11 @@ function animate() {
           m.targetScaleY = 1.0 + Math.sin(globalPhase) * 0.06 * amp;
           m.targetScaleX = m.targetScaleZ = 1.0 - Math.sin(globalPhase) * 0.02 * amp;
         } else if (state.wavePattern === 'ripple') {
-          // 1. 同心圆环水波天鹅湖 (径向衰减切线俯仰 + 浮标漂浮倾角 + 柔和呼吸)
-          const phase = state.waveAccumulator * 4.2 - (d * 1.65) + (l * 0.75);
+          const phase = state.waveAccumulator * 4.2 - (d * 1.65 * tierCfg.phaseSpread) + (l * 0.75);
           const decay = Math.exp(-0.06 * d);
-          const waveHeight = Math.sin(phase) * (bass * 0.65 + mid * 0.28) * amp * decay;
-          
+          const burstOffset = tierCfg.burst * (state.beatPulse + Math.pow(bass, 2.0)) * Math.sin(phase);
+          const waveHeight = (Math.sin(phase) + burstOffset) * (bass * 0.65 + mid * 0.28) * amp * decay;
+
           m.targetY = uData.baseY + waveHeight;
           const nx = uData.baseX / (d + 0.001);
           const nz = uData.baseZ / (d + 0.001);
@@ -4123,11 +4840,10 @@ function animate() {
           m.targetScaleX = 1.0 - Math.sin(phase) * 0.03 * amp;
           m.targetScaleZ = m.targetScaleX;
         } else if (state.wavePattern === 'diagonal') {
-          // 2. 对角惊涛巨浪狂飙 (45° 冲浪俯冲 + 阶梯排山倒海 + 3D 层叠浪涌)
           const diagCoord = (r + c + l * 1.25);
-          const phase = state.waveAccumulator * 4.8 - (diagCoord * 0.82);
-          const waveHeight = Math.sin(phase) * (bass * 0.75 + mid * 0.32) * amp;
-          
+          const phase = state.waveAccumulator * 4.8 - (diagCoord * 0.82 * tierCfg.phaseSpread);
+          const waveHeight = (Math.sin(phase) + state.beatPulse * tierCfg.burst * 0.55) * (bass * 0.75 + mid * 0.32) * amp;
+
           m.targetY = uData.baseY + waveHeight;
           m.targetRotX = Math.sin(phase) * 0.22 * amp;
           m.targetRotZ = Math.sin(phase) * 0.22 * amp;
@@ -4135,12 +4851,11 @@ function animate() {
           m.targetScaleY = 1.0 + Math.sin(phase) * 0.12 * amp;
           m.targetScaleX = m.targetScaleZ = 1.0 - Math.sin(phase) * 0.04 * amp;
         } else if (state.wavePattern === 'equalizer') {
-          // 3. 声学针雕阵列 (Fast Attack, Spring Decay + 机械卡点 Popping)
           const maxDim = Math.max(state.gridCols, 1);
           const colRatio = (c + l * 0.5) / (maxDim + (state.gridLayers - 1) * 0.5);
           const freqEnergy = colRatio < 0.35 ? bass : (colRatio < 0.70 ? mid : treble);
           const lift = Math.pow(freqEnergy, 1.25) * 1.35 * amp;
-          
+
           m.targetY = uData.baseY + lift;
           m.targetRotX = 0;
           m.targetRotY = Math.sin(state.time * 4.0 + c) * 0.12 * freqEnergy * amp;
@@ -4148,10 +4863,9 @@ function animate() {
           m.targetScaleY = 1.0 + lift * 0.20;
           m.targetScaleX = m.targetScaleZ = 1.0 - lift * 0.05;
         } else if (state.wavePattern === 'spiral') {
-          // 4. 极速螺旋华尔兹 (银河极坐标涡流 + 局部自转公转耦合 + 螺旋高度)
           const angle = Math.atan2(uData.baseY, uData.baseX);
-          const phase = state.waveAccumulator * 5.2 + angle * 2.2 - (d * 1.3) + (l * 0.8);
-          
+          const phase = state.waveAccumulator * 5.2 + angle * 2.2 - (d * 1.3 * tierCfg.phaseSpread) + (l * 0.8);
+
           m.targetY = uData.baseY + Math.sin(phase) * (bass * 0.60 * amp);
           m.targetRotY = (state.time * 1.8 + phase * 0.5) * amp;
           m.targetRotX = Math.cos(phase) * 0.12 * amp;
@@ -4159,12 +4873,11 @@ function animate() {
           m.targetScaleY = 1.0 + Math.sin(phase) * 0.10 * amp;
           m.targetScaleX = m.targetScaleZ = 1.0;
         } else if (state.wavePattern === 'heartbeat') {
-          // 5. 心跳重低音核爆 (Jelly Squash & Stretch 果冻弹性 + 环形冲击震荡波)
-          const shockDelay = d * 0.32;
+          const shockDelay = d * 0.32 * tierCfg.phaseSpread;
           const shockPhase = state.waveAccumulator * 10.0 - shockDelay;
-          const blast = Math.pow(bass, 2.0) * amp;
+          const blast = (Math.pow(bass, 2.0) + state.beatPulse * tierCfg.burst) * amp * (1.0 + tierCfg.burst);
           const squash = Math.sin(shockPhase) * blast;
-          
+
           m.targetY = uData.baseY + Math.max(0, squash * 0.85) + (d * 0.12 * blast);
           m.targetScaleY = 1.0 + squash * 0.32;
           m.targetScaleX = m.targetScaleZ = 1.0 - squash * 0.10;
@@ -4172,11 +4885,10 @@ function animate() {
           m.targetRotZ = Math.cos(shockPhase) * 0.08 * blast;
           m.targetRotY = 0;
         } else if (state.wavePattern === 'glitch') {
-          // 6. 赛博锁舞脉冲 (棋盘格奇偶交错 + 爵士切分音 Breakdance Locking)
           const isEven = (r + c + l) % 2 === 0;
-          const stepBeat = Math.floor(state.time * 2.8 + m.randSeed * 1.5);
+          const stepBeat = Math.floor(state.time * 2.8 + m.randSeed * 1.5 * tierCfg.phaseSpread);
           const lockAngle = ((stepBeat % 4) * (Math.PI / 4)) * (isEven ? 1 : -1);
-          
+
           m.targetY = uData.baseY + (isEven ? bass : mid) * 0.75 * amp;
           m.targetRotY = lockAngle;
           m.targetRotX = isEven ? (bass * 0.25 * amp) : (-bass * 0.25 * amp);
@@ -4185,7 +4897,6 @@ function animate() {
           m.targetScaleX = m.targetScaleZ = 1.0;
         }
       } else {
-        // 待机平滑回弹到基准位置
         m.targetY = uData.baseY;
         m.targetRotX = 0;
         m.targetRotY = 0;
@@ -4195,8 +4906,7 @@ function animate() {
         m.targetScaleZ = 1.0;
       }
 
-      // 弹簧阻尼丝滑插值 (Lerp Physics)
-      const lerpFactor = 0.16;
+      const lerpFactor = Math.min(1.0, 1.0 - Math.exp(-tierCfg.response * 60.0 * dt));
       unit.position.y += (m.targetY - unit.position.y) * lerpFactor;
       unit.rotation.x += (m.targetRotX - unit.rotation.x) * lerpFactor;
       unit.rotation.y += (m.targetRotY - unit.rotation.y) * lerpFactor;
@@ -4207,7 +4917,6 @@ function animate() {
     });
   }
 
-  // 活体表情随音乐旋律、节奏与人声中频自主智能流变
   let isBlinking = false;
   if (state.enableBlink) {
     const blinkCycle = state.time % 3.6;
@@ -4222,11 +4931,11 @@ function animate() {
   } else if (state.isPlayingMusic) {
     const barIdx = Math.floor(state.beatCount / 4) % 8;
     if (state.bassEnergy > 0.52) {
-      currentEmote = 'happy'; // 重低音大爆点：开怀雀跃欢笑
+      currentEmote = 'happy';
     } else if (state.trebleEnergy > 0.40 && (barIdx === 2 || barIdx === 6)) {
-      currentEmote = 'wink'; // 高音清脆小节：调皮眨眼
+      currentEmote = 'wink';
     } else if (state.midEnergy > 0.26) {
-      currentEmote = 'sing'; // 人声与旋律段：张嘴律动合唱
+      currentEmote = 'sing';
     } else if (barIdx % 2 === 0) {
       currentEmote = 'happy';
     } else {
@@ -4259,6 +4968,51 @@ function animate() {
 }
 
 // 15. UI 事件监听
+
+  // 顶部进度轨与时钟拖动绑定
+  const progressSlider = $('#timeProgressSlider');
+  if (progressSlider) {
+    progressSlider.addEventListener('input', (e) => {
+      isDraggingProgressSlider = true;
+      const pct = parseFloat(e.target.value);
+      const curTrack = state.playlist[state.currentTrackIndex];
+      const dur = (curTrack && curTrack.buffer && curTrack.buffer.duration) ? curTrack.buffer.duration : 180;
+      const targetSec = (pct / 100) * dur;
+      if ($('#timeDisplay')) {
+        $('#timeDisplay').textContent = `${formatTime(targetSec)} / ${formatTime(dur)}`;
+      }
+    });
+
+    progressSlider.addEventListener('change', (e) => {
+      isDraggingProgressSlider = false;
+      const pct = parseFloat(e.target.value);
+      const curTrack = state.playlist[state.currentTrackIndex];
+      const dur = (curTrack && curTrack.buffer && curTrack.buffer.duration) ? curTrack.buffer.duration : 180;
+      const targetSec = (pct / 100) * dur;
+      state.playbackOffset = targetSec;
+      state.playbackStartTime = state.audioCtx ? state.audioCtx.currentTime : 0;
+      if (state.isPlayingMusic && curTrack && curTrack.buffer) {
+        startBufferPlayback(curTrack, targetSec);
+      }
+    });
+  }
+
+  // 歌词偏移量步进器 (- / 数值 / +)
+  $('#lyricOffsetDecBtn')?.addEventListener('click', () => {
+    state.lyricOffsetMs -= 10;
+    if ($('#lyricOffsetInput')) $('#lyricOffsetInput').value = state.lyricOffsetMs;
+  });
+
+  $('#lyricOffsetIncBtn')?.addEventListener('click', () => {
+    state.lyricOffsetMs += 10;
+    if ($('#lyricOffsetInput')) $('#lyricOffsetInput').value = state.lyricOffsetMs;
+  });
+
+  $('#lyricOffsetInput')?.addEventListener('change', (e) => {
+    const nextValue = parseInt(e.target.value, 10);
+    state.lyricOffsetMs = Number.isFinite(nextValue) ? Math.max(-5000, Math.min(5000, nextValue)) : -180;
+    e.target.value = state.lyricOffsetMs;
+  });
 function syncSliderOutputs() {
   if (state.isPlayingMusic) return; // 播放时保留实时律动脉动数值呈现
   $$('.range').forEach(row => {
@@ -4273,7 +5027,7 @@ syncSliderOutputs();
 // 播放控制按钮监听
 $('#playPauseBtn').addEventListener('click', () => {
   if (state.isPlayingMusic) pauseMusic();
-  else playTrackAtIndex(state.currentTrackIndex);
+  else playTrackAtIndex(state.currentTrackIndex, state.playbackOffset > 0);
 });
 
 $('#prevTrackBtn').addEventListener('click', () => {
@@ -4295,10 +5049,12 @@ $('#playlistSelect').addEventListener('change', e => {
 // 乐章流变总开关 (顶部 Header 与 Tab 4 保持双向同步)
 function setAutoChoreoState(enabled) {
   state.isChoreographyShow = enabled;
-  const label = `流变：${enabled ? '开' : '关'}`;
+  const label = enabled ? '流变' : '已停';
   const labelTab4 = `乐章流变：${enabled ? '开' : '关'}`;
   if ($('#toggleAutoChoreo')) {
     $('#toggleAutoChoreo').classList.toggle('active', enabled);
+    $('#toggleAutoChoreo').setAttribute('aria-pressed', String(enabled));
+    $('#toggleAutoChoreo').title = enabled ? '暂停全变量乐章编排' : '恢复全变量乐章编排';
     $('#toggleAutoChoreo').innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg> ${label}`;
   }
   if ($('#toggleAutoChoreoTab4')) {
@@ -4445,10 +5201,14 @@ function applyIntensityTier(tier) {
 
 // 全局 1/2/3 挡律动强度自适应调节
 $('#intensityTierGroup').addEventListener('click', e => {
-  const btn = e.target.closest('.pill-btn');
+  const btn = e.target.closest('[data-tier]');
   if (!btn) return;
-  $$('#intensityTierGroup .pill-btn').forEach(b => b.classList.remove('active'));
+  $$('#intensityTierGroup [data-tier]').forEach(b => {
+    b.classList.remove('active');
+    b.setAttribute('aria-pressed', 'false');
+  });
   btn.classList.add('active');
+  btn.setAttribute('aria-pressed', 'true');
   applyIntensityTier(+btn.dataset.tier);
 });
 
@@ -4492,14 +5252,25 @@ $('#morphFreqGroup').addEventListener('click', e => {
   $$('#morphFreqGroup .pill-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   state.morphIntervalBeats = +btn.dataset.freq;
+  const dial = $('#beatDialGraphic');
+  if (dial) dial.dataset.label = `${state.morphIntervalBeats}拍`;
+  const indicator = $('#beatDialIndicator');
+  if (indicator) {
+    const rotationMap = { 4: -110, 8: -40, 16: 40, 32: 110 };
+    indicator.style.transform = `rotate(${rotationMap[state.morphIntervalBeats] ?? 40}deg)`;
+  }
 });
 
 // 6 大声波动态形态切换
 $('#wavePatternGroup').addEventListener('click', e => {
-  const btn = e.target.closest('.pill-btn');
+  const btn = e.target.closest('[data-pattern]');
   if (!btn) return;
-  $$('#wavePatternGroup .pill-btn').forEach(b => b.classList.remove('active'));
+  $$('#wavePatternGroup [data-pattern]').forEach(b => {
+    b.classList.remove('active');
+    b.setAttribute('aria-pressed', 'false');
+  });
   btn.classList.add('active');
+  btn.setAttribute('aria-pressed', 'true');
   state.wavePattern = btn.dataset.pattern;
 });
 
@@ -4793,12 +5564,12 @@ $('#lrcUpload')?.addEventListener('change', e => {
     ui.text.value = text;
     const parsed = parseLrcString(text);
     if (parsed.length > 0) {
-      state.customLoadedLyrics = parsed;
+      setCurrentTrackLyrics(parsed);
       $('#lyricsStatusBadge').textContent = `✅ 已加载本地 LRC 歌词 (${parsed.length} 句 · 毫秒级同步)`;
     } else {
       const dur = (state.playlist[state.currentTrackIndex]?.buffer?.duration) || 180;
-      state.customLoadedLyrics = generateAutoTimedLyrics(text, dur);
-      $('#lyricsStatusBadge').textContent = `⚡ 纯文本已自适应生成时间轴 (${state.customLoadedLyrics.length} 句)`;
+      const generated = setCurrentTrackLyrics(generateAutoTimedLyrics(text, dur));
+      $('#lyricsStatusBadge').textContent = `⚡ 纯文本已自适应生成时间轴 (${generated.length} 句)`;
     }
     state.currentLyricPhrase = '';
     rebuildMatrix();
@@ -4811,15 +5582,15 @@ $('#searchLyricsBtn')?.addEventListener('click', async () => {
   $('#lyricsStatusBadge').textContent = `🔍 正在联网检索《${state.songTitle}》歌词…`;
   const onlineLrc = await fetchOnlineLyrics(state.songTitle);
   if (onlineLrc && onlineLrc.length > 0) {
-    state.customLoadedLyrics = onlineLrc;
+    setCurrentTrackLyrics(onlineLrc);
     ui.text.value = onlineLrc.map(item => `[${Math.floor(item.time/60).toString().padStart(2,'0')}:${(item.time%60).toFixed(2).padStart(5,'0')}] ${item.text}`).join('\n');
     $('#lyricsStatusBadge').textContent = `✅ 联网匹配成功 (${onlineLrc.length} 句时间戳歌词)`;
     state.currentLyricPhrase = '';
     rebuildMatrix();
   } else {
     const dur = (state.playlist[state.currentTrackIndex]?.buffer?.duration) || 180;
-    state.customLoadedLyrics = generateAutoTimedLyrics(ui.text.value, dur);
-    $('#lyricsStatusBadge').textContent = `⚡ 未检索到在线LRC，已自动启用智能时间轴插值 (${state.customLoadedLyrics.length} 句)`;
+    const generated = setCurrentTrackLyrics(generateAutoTimedLyrics(ui.text.value, dur));
+    $('#lyricsStatusBadge').textContent = `⚡ 未检索到在线LRC，已自动启用智能时间轴插值 (${generated.length} 句)`;
   }
 });
 
@@ -4829,15 +5600,15 @@ ui.text?.addEventListener('input', () => {
   if (val.includes('[') && val.includes(']')) {
     const parsed = parseLrcString(val);
     if (parsed.length > 0) {
-      state.customLoadedLyrics = parsed;
+      setCurrentTrackLyrics(parsed);
       $('#lyricsStatusBadge').textContent = `✅ 标准 LRC 时间戳格式已识别 (${parsed.length} 句)`;
       state.currentLyricPhrase = '';
       return;
     }
   }
   const dur = (state.playlist[state.currentTrackIndex]?.buffer?.duration) || 180;
-  state.customLoadedLyrics = generateAutoTimedLyrics(val, dur);
-  $('#lyricsStatusBadge').textContent = `⚡ 纯文本智能自适应时间轴 (${state.customLoadedLyrics.length} 句)`;
+  const generated = setCurrentTrackLyrics(generateAutoTimedLyrics(val, dur));
+  $('#lyricsStatusBadge').textContent = `⚡ 纯文本智能自适应时间轴 (${generated.length} 句)`;
   state.currentLyricPhrase = '';
 });
 
@@ -5019,11 +5790,16 @@ window.state = state;
 window.rebuildMatrix = rebuildMatrix;
 window.playTrackAtIndex = playTrackAtIndex;
 window.updateMasterChoreography = updateMasterChoreography;
+window.getPlaybackTime = getPlaybackTime;
+window.parseLrcString = parseLrcString;
 
 // 初始化启动
 rebuildMatrix();
-animate();
-playTrackAtIndex(0);
+if (window.matchMedia('(max-width: 640px)').matches) {
+  $('#inspectorPanel')?.classList.add('collapsed');
+}
+updateProgressUI(true);
+requestAnimationFrame(animate);
 </script>
 </body>
 </html>
