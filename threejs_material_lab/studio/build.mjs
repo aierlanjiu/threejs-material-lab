@@ -1,0 +1,10 @@
+import {build} from 'esbuild';
+import {cp,mkdir} from 'node:fs/promises';
+import {fileURLToPath} from 'node:url';
+import path from 'node:path';
+const root=path.dirname(fileURLToPath(import.meta.url));
+const reactRoot=path.dirname(fileURLToPath(import.meta.resolve('@oneworks/avatar-react/package.json')));
+await build({entryPoints:[path.join(root,'oneworks-entry.js')],bundle:true,format:'esm',minify:true,outfile:path.join(root,'vendor/oneworks.js')});
+await mkdir(path.join(root,'vendor'),{recursive:true});
+await cp(path.join(reactRoot,'dist/assets'),path.join(root,'vendor/assets'),{recursive:true});
+await cp(path.join(reactRoot,'dist/style.css'),path.join(root,'vendor/oneworks.css'));

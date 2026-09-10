@@ -174,7 +174,7 @@
       background: transparent;
       border: 1px solid var(--panel-border);
       box-shadow: var(--panel-shadow);
-      transition: all 0.3s ease;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
     #stage { position: absolute; inset: 0; }
     canvas { display: block; width: 100%; height: 100%; }
@@ -261,7 +261,7 @@
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      transition: all 0.15s;
+      transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
       box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
     }
     .preset-cam-btn:hover {
@@ -331,11 +331,14 @@
       flex-direction: column;
       overflow: hidden;
       z-index: 30;
-      transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
+      opacity: 1;
+      transform: translateX(0);
+      transition: opacity 200ms ease, transform 200ms ease;
     }
     .modular-inspector.collapsed {
       width: 0;
       opacity: 0;
+      transform: translateX(12px);
       margin-left: -10px;
       pointer-events: none;
       border: none;
@@ -362,7 +365,7 @@
       align-items: center;
       justify-content: center;
       gap: 4px;
-      transition: all 0.15s ease;
+      transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
     }
     .inspector-tab-btn:hover {
       color: var(--text);
@@ -491,7 +494,7 @@
       border-radius: 6px;
       cursor: pointer;
       text-align: center;
-      transition: all 0.15s ease;
+      transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
       min-height: 26px;
       display: flex;
       align-items: center;
@@ -541,7 +544,10 @@
       box-shadow: inset 0 1px 2px rgba(255,255,255,0.6), 0 1px 3px rgba(0,0,0,0.08);
       transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
-    .swatch:hover { transform: scale(1.15); }
+    @media (hover: hover) and (pointer: fine) {
+      .swatch:hover { transform: scale(1.15); }
+      .avatar-card:hover { transform: translateY(-2px); }
+    }
     .swatch.active {
       outline: 2px solid var(--accent);
       outline-offset: 2px;
@@ -551,7 +557,7 @@
     button.btn {
       min-height: 32px;
       padding: 6px 10px;
-      border: 1px solid var(--line);
+      border: 1px solid rgba(208, 212, 219, 0.7);
       background: #ffffff;
       color: var(--text);
       border-radius: 8px;
@@ -562,20 +568,20 @@
       align-items: center;
       justify-content: center;
       gap: 5px;
-      transition: all 0.15s ease;
-      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+      transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+      box-shadow: none;
     }
     button.btn:hover {
       border-color: var(--accent);
       color: var(--accent);
       background: #ffffff;
-      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.12);
+      box-shadow: none;
     }
     button.btn.active {
       background: var(--accent);
       color: #fff;
       border-color: var(--accent);
-      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3);
+      box-shadow: none;
     }
     button.btn.choreography-active {
       background: var(--accent);
@@ -596,13 +602,13 @@
     }
 
     .avatar-card {
-      border: 1px solid var(--line);
+      border: 1px solid rgba(208, 212, 219, 0.7);
       background: var(--input-bg);
       border-radius: 10px;
       padding: 6px 3px;
       text-align: center;
       cursor: pointer;
-      transition: all 0.18s;
+      transition: color 0.18s ease, background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
       font-size: 10px;
       font-weight: 600;
       color: var(--text-secondary);
@@ -610,14 +616,13 @@
     .avatar-card:hover {
       border-color: var(--accent);
       color: var(--accent);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.06);
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
     }
     .avatar-card.active {
       border-color: var(--accent);
-      background: rgba(2, 132, 199, 0.08);
+      background: rgba(49, 88, 166, 0.08);
       color: var(--accent);
-      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.18);
+      box-shadow: none;
     }
     .avatar-icon-canvas {
       width: 40px;
@@ -625,7 +630,8 @@
       margin: 0 auto 3px;
       display: block;
       border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      box-shadow: none;
+      background: transparent;
     }
 
     .file-upload-wrap {
@@ -802,6 +808,7 @@
     button.btn {
       min-height: 40px;
       padding: 8px 12px;
+      border: 1px solid rgba(208, 212, 219, 0.7);
       border-radius: 8px;
       box-shadow: none;
       white-space: nowrap;
@@ -814,10 +821,13 @@
     button.btn:active,
     .waveform-board:active,
     .motion-card:active { transform: translateY(1px); }
+    button:focus-visible,
     button.btn:focus-visible,
     .waveform-board:focus-visible,
     .motion-card:focus-visible,
     .inspector-tab-btn:focus-visible,
+    .pill-btn:focus-visible,
+    .preset-cam-btn:focus-visible,
     input:focus-visible,
     select:focus-visible,
     textarea:focus-visible {
@@ -1198,6 +1208,164 @@
         scroll-behavior: auto !important;
       }
     }
+    /* Studio layout: stage first; one accent, quiet surfaces and compact instrument controls. */
+    .app { grid-template-columns: minmax(0, 1fr) 344px; grid-template-rows: 76px minmax(0, 1fr) 144px; gap: 12px; padding: 12px; }
+    .master-deck-hud { height: 76px; border: 0; padding: 0 8px; background: transparent; }
+    .brand-section { flex-basis: 100px; }
+    .brand-glyph-box { background: #273546; border-radius: 50%; }
+    .brand-tag { display: none; }
+    .deck-player { border: 0; padding: 8px 12px; background: #fcfcfd; gap: 10px; }
+    .deck-info { flex: 0 1 158px; min-width: 100px; max-width: 158px; }
+    .deck-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .deck-controls #playPauseBtn { min-width: 76px !important; background: #273546; color: #fff; border-color: #273546; }
+    #stopTrackBtn { display: inline-flex; }
+    #playlistSelect { display: block; min-width: 100px !important; max-width: 135px !important; flex: 0 1 135px; }
+    .deck-player > .file-upload-wrap { display: block; }
+    .deck-player > .file-upload-wrap .btn { width: 40px; padding: 0; font-size: 0 !important; }
+    .top-actions .btn { width: 40px; min-width: 40px; padding: 0; font-size: 0 !important; }
+    .top-actions { gap: 6px; }
+    .time-rail-wrap { min-width: 110px; grid-template-columns: 1fr; gap: 0; }
+    .time-display { font-size: 11px !important; }
+    .stageWrap { border: 1px solid #dce1e7; border-radius: 20px; }
+    .legend { max-width: 42%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #606b78; }
+    .modular-inspector { width: 100%; min-width: 0; background: #f8f9fb; border: 1px solid #e0e4ea; border-radius: 16px; }
+    .inspector-body { padding: 18px 14px; }
+    .card-block { background: transparent; border: 0; padding: 10px 0 18px; border-radius: 0; box-shadow: none; }
+    .section-title { color: #273546; font-weight: 650; margin-bottom: 12px; }
+    .range { grid-template-columns: 86px minmax(0, 1fr) 40px; gap: 8px; }
+    .range > span, label, .grid2 > * { min-width: 0; }
+    select { width: 100%; max-width: 100%; text-overflow: ellipsis; }
+    button { background-image: none !important; }
+    .pill-group { gap: 4px; flex-wrap: wrap; }
+    .pill-btn { min-width: 0; }
+    #gridPresetGroup { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; border: 0; background: transparent; padding: 0; }
+    #gridPresetGroup .mini-grid-btn { min-width: 0; min-height: 74px; padding: 8px 3px; white-space: normal; background: #edf0f4; }
+    #gridPresetGroup .mini-grid-btn.active { background: #e1e8f5; }
+    #avatarDistGroup { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    #contentModeGroup, #layerModeGroup, #adhesionCraftGroup { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    #contentModeGroup { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .pill-btn { border-color: transparent; background: #edf0f4; box-shadow: none; }
+    .pill-btn.active { color: #244783; background: #e1e8f5; border-color: transparent; box-shadow: none; }
+    .material-samples { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; margin-bottom: 16px; }
+    .material-samples button { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 12px 8px; background: #eef1f5; border: 1px solid transparent; border-radius: 12px; color: #273546; cursor: pointer; }
+    .material-samples button[aria-pressed="true"] { background: #e5ebf6; border-color: #3158a6; }
+    .material-samples strong { font-size: 12px; white-space: nowrap; }
+    .material-samples small { font-size: 11px; color: #5e6875; white-space: nowrap; }
+    .sample-mark { width: 34px; height: 34px; border-radius: 9px; margin-bottom: 8px; transform: rotate(-8deg); }
+    .sample-glass { background: #d5e1ee; border: 2px solid #fcfcfd; box-shadow: inset 3px 2px 0 #aabdd1, 3px 4px 0 #b7c6d8; }
+    .sample-frost { background: #c4ced9; border: 2px solid #dde4eb; box-shadow: inset 2px 2px 8px #eef1f6, 3px 4px 0 #abb9c9; }
+    .sample-metal { background: #687789; border: 2px solid #aebcca; box-shadow: inset 4px 0 0 #d8e0e8, 3px 4px 0 #435368; }
+    .bottom-dynamic-dock { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1.2fr) minmax(0, .8fr) minmax(0, .75fr); height: 144px; gap: 20px; padding: 14px 18px; overflow: visible; border: 0; background: #fcfcfd; }
+    .bottom-dynamic-dock .dock-section,
+    .bottom-dynamic-dock .dock-section:first-child,
+    .bottom-dynamic-dock .dock-section:nth-child(2) { min-width: 0 !important; height: auto; padding: 0; border: 0; gap: 8px; }
+    .dock-label { color: #606b78; letter-spacing: 0; }
+    .waveform-boards { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; overflow: visible; }
+    .waveform-board { min-width: 0; min-height: 68px; padding: 8px 2px; border: 0; background: #f0f3f7; border-radius: 10px; box-shadow: none; }
+    .waveform-board.active { background: #e1e8f5; color: #244783; box-shadow: inset 0 -2px #3158a6; }
+    .motion-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; padding: 3px; border-radius: 12px; background: #edf0f4; overflow: visible; }
+    .motion-card { min-width: 0; min-height: 62px; padding: 8px 4px; border: 0; background: transparent; border-radius: 9px; box-shadow: none; }
+    .motion-card.active { background: #273546; color: #fff; box-shadow: 0 2px 5px #27354620; }
+    .motion-card-title { font-size: 12px !important; white-space: nowrap; }
+    .motion-card-desc { display: none; }
+    .beat-dial-graphic { display: none; }
+    .beat-knob-wrap { display: block; }
+    #morphFreqGroup { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }
+    #morphFreqGroup .pill-btn { min-width: 0; min-height: 32px; padding: 2px 4px; }
+    .amp-rail-group { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; }
+    .amp-rail-group .range { grid-template-columns: minmax(0, 1fr) 34px !important; }
+    .amp-rail-group .range > span { display: none; }
+    #waveMotionToggle { min-height: 26px; padding: 1px 8px; border-radius: 6px; }
+    #waveMotionToggle .svg-icon { display: none; }
+    .amp-rail-group > span { display: none; }
+    .amp-rail-group input { min-width: 0; width: 100%; }
+    .amp-rail-group output { min-width: 0; padding: 0; }
+    #morphFreqGroup { width: 100%; }
+    .deck-badge, .badge .dot { color: #3158a6; background-color: #e1e8f5; }
+    .badge .dot.choreographing { background: #3158a6; box-shadow: none; animation: none; }
+    .badge .dot.recording { background: #c74242; }
+    .stage-hud-right .legend { display: none; }
+    .stage-hud-right { display: flex; flex-direction: row; align-items: center; gap: 6px; }
+    #immersiveToggle { background: #273546; color: #f5f7fa; border-color: #536174; min-height: 40px; padding: 6px 12px; border-radius: 9px; }
+    body.immersive .master-deck-hud, body.immersive .bottom-dynamic-dock, body.immersive .modular-inspector { display: none; }
+    body.immersive .app { padding: 0; display: block; height: 100dvh; }
+    body.immersive .stageWrap { width: 100%; height: 100dvh; border: 0; border-radius: 0; }
+    body.immersive .preset-cam-group { display: none; }
+    @media (max-width: 1200px) {
+      .app { grid-template-columns: minmax(0, 1fr); }
+      .modular-inspector { position: fixed; top: 100px; bottom: 170px; right: 12px; width: 344px; z-index: 40; }
+      .deck-info { flex-basis: 120px; }
+      .bottom-dynamic-dock { gap: 12px; padding: 12px; }
+    }
+    @media (max-width: 760px) {
+      .app { padding: 6px 6px 50px; gap: 6px; grid-template-rows: 174px minmax(120px, 1fr) 226px; }
+      .master-deck-hud { height: 174px; display: grid; grid-template-columns: 1fr auto; grid-template-rows: 38px 120px; grid-template-areas: 'brand actions' 'player player'; padding: 4px 6px; gap: 4px; }
+      .brand-section { grid-area: brand; }
+      .brand-glyph-box { width: 30px; height: 30px; }
+      .top-actions { grid-area: actions; }
+      .deck-player { grid-area: player; width: 100%; height: 120px; display: grid; grid-template-columns: minmax(0,1fr) 42px; grid-template-rows: 24px 40px 36px; gap: 3px 6px; padding: 6px 8px; }
+      .deck-info { grid-row: 1; grid-column: 1 / -1; max-width: none; min-width: 0; }
+      .deck-badge { display: none; }
+      .deck-controls { grid-row: 2; grid-column: 1 / -1; justify-content: flex-start; gap: 6px; }
+      .deck-controls button, .deck-controls #playPauseBtn { width: 36px !important; min-width: 36px !important; height: 36px; min-height: 36px; padding: 0; font-size: 0 !important; border-radius: 50%; }
+      #stopTrackBtn { display: inline-flex; }
+      .time-rail-wrap { grid-row: 2; grid-column: 1 / -1; margin-left: 174px; min-width: 0; width: auto; grid-template-columns: 1fr; pointer-events: auto; }
+      #playlistSelect { display: block; grid-row: 3; grid-column: 1; width: 100%; max-width: none !important; min-height: 34px; }
+      .deck-player > .file-upload-wrap { display: block; grid-row: 3; grid-column: 2; }
+      .deck-player > .file-upload-wrap .btn { width: 36px; min-height: 34px; height: 34px; }
+      .stageWrap { grid-row: 2; }
+      .stage-hud-right { top: 8px; right: 8px; }
+      .legend { display: none; }
+      .bottom-dynamic-dock { grid-row: 3; height: 226px; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); grid-template-rows: 88px 102px; gap: 10px; padding: 10px; }
+      .bottom-dynamic-dock .dock-section:nth-child(2) { grid-row: 1; grid-column: 1; }
+      .bottom-dynamic-dock .dock-section:nth-child(4) { grid-row: 1; grid-column: 2; }
+      .bottom-dynamic-dock .dock-section:nth-child(1) { grid-row: 2; grid-column: 1; }
+      .bottom-dynamic-dock .dock-section:nth-child(3) { grid-row: 2; grid-column: 2; }
+      .motion-card { min-height: 54px; padding: 6px 1px; }
+      .motion-card-title { font-size: 11px !important; }
+      .waveform-boards { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; padding: 0; }
+      .waveform-board { min-height: 32px; flex-direction: row; gap: 2px; padding: 2px; border-radius: 6px; }
+      .waveform-board .svg-icon { display: none; }
+      .modular-inspector { top: auto; right: 0; left: 0; bottom: 0; width: 100%; max-width: 100%; height: min(56dvh, 520px); border-radius: 16px 16px 0 0; }
+      .modular-inspector.collapsed { width: 100%; max-width: 100%; margin-left: 0; opacity: 1; pointer-events: auto; transform: translateY(calc(100% - 46px)); }
+      .inspector-tabs { flex: 0 0 46px; }
+      .inspector-body { padding: 14px 16px; }
+    }
+/* Material atelier: one library, one tone row, quiet controls. */
+:root{--atelier-gap:16px;--atelier-radius:8px;--atelier-ink:#2c3036;--atelier-line:#dce0e4;--atelier-accent:#3457a0;}
+#tab-optics .material-heading,.tone-heading,.material-lock,.studio-lighting{display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--atelier-ink);font-size:13px;min-height:40px;}
+#tab-optics .material-heading{font-weight:600;margin-bottom:8px;font-size:15px;}
+#materialName{font-size:12px;font-weight:400;color:#616b78;}
+.material-families{display:flex;gap:4px;justify-content:space-between;margin-bottom:12px;}
+.material-families button,.studio-lighting button{border:0;background:transparent;color:#606875;font:inherit;font-size:12px;min-height:40px;padding:0 8px;border-radius:6px;cursor:pointer;}
+.material-families button[aria-pressed="true"],.studio-lighting button[aria-pressed="true"]{color:var(--atelier-accent);background:#e8edf6;}
+#tab-optics .material-samples{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 0 16px;}
+#tab-optics .material-samples button{border:1px solid transparent;background:transparent;box-shadow:none;border-radius:var(--atelier-radius);padding:3px;display:flex;flex-direction:column;align-items:center;gap:0;min-width:0;font-size:11px;color:#414952;cursor:pointer;}
+#tab-optics .material-samples button[hidden]{display:none;}
+#tab-optics .material-samples button[aria-pressed="true"]{border-color:var(--atelier-accent);background:#edf1f7;}
+#tab-optics .material-samples canvas{width:100%;height:auto;aspect-ratio:1;display:block;}
+#material[hidden]{display:none;}
+.tone-heading{padding-top:12px;border-top:1px solid var(--atelier-line);}
+.custom-tone{display:flex;align-items:center;gap:8px;font-size:11px;color:#626b75;}
+#tab-optics #color{width:32px;height:30px;padding:0;border:0;background:none;}
+#materialTones{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;margin:4px 0 12px;}
+#materialTones .swatch{width:100%;height:auto;aspect-ratio:1;background:none!important;box-shadow:none;border:1px solid transparent;border-radius:6px;padding:0;}
+#materialTones .swatch.active{border-color:var(--atelier-accent);}
+#materialTones canvas{display:block;width:100%;height:100%;}
+#lockMaterialToggle{min-width:40px;min-height:24px;width:40px;height:24px;border:0;border-radius:20px;background:#cbd0d6;font-size:0;padding:0;position:relative;cursor:pointer;}
+#lockMaterialToggle:after{content:'';position:absolute;left:3px;top:3px;width:18px;height:18px;background:white;border-radius:50%;transition:transform 160ms ease-out;}
+#lockMaterialToggle[aria-checked="true"]{background:#526887;}
+#lockMaterialToggle[aria-checked="true"]:after{transform:translateX(16px);}
+.material-details{border-top:1px solid var(--atelier-line);margin-top:12px;}
+.material-details summary{padding:16px 0;font-size:12px;color:#5c6672;cursor:pointer;}
+.material-details .section-title{display:none;}
+#tab-optics .card-block{padding:0;background:transparent;border:0;box-shadow:none;}
+.studio-lighting{margin-top:4px;}
+.official-avatar-tools{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;margin-bottom:12px;}
+.official-avatar-tools a{color:#3457a0;text-decoration:none;min-height:40px;display:flex;align-items:center;}
+#officialAvatarStatus{color:#67717d;font-size:11px;}
+@media(hover:hover){#materialSamples button:hover{background:#eceff3;}.material-families button:hover{color:#263348;}}
+@media(prefers-reduced-motion:reduce){#lockMaterialToggle:after{transition:none;}}
     </style>
 </head>
 <body>
@@ -1306,6 +1474,7 @@
     </div>
 
     <div class="stage-hud-right">
+      <button type="button" id="immersiveToggle" aria-pressed="false" title="沉浸模式 (F)，Esc 返回">沉浸</button>
       <div class="legend">
         <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
         通透水晶 / 6大声波形态 / 物理色散 / 影棚柔光
@@ -1452,46 +1621,17 @@
 
       <!-- TAB 1: 材质与光学 -->
       <div class="inspector-tab-pane active" id="tab-optics">
-        <div class="section-title">
-          <span><svg class="svg-icon" viewBox="0 0 24 24"><polygon points="6 3 18 3 22 9 12 22 2 9 6 3"></polygon></svg> 12 款纯净触感物理材质</span>
+        <div class="material-heading"><span>材质</span><span id="materialName">水晶</span></div>
+        <div class="material-families" role="group" aria-label="材质分类">
+          <button data-family="all" aria-pressed="true">全部</button><button data-family="clear" aria-pressed="false">通透</button><button data-family="metal" aria-pressed="false">金属</button><button data-family="soft" aria-pressed="false">织物</button><button data-family="mineral" aria-pressed="false">矿物</button>
         </div>
-        <div class="card-block">
-          <div class="grid2">
-            <label><span>材质类型</span>
-              <select id="material">
-                <option value="prism" selected>极光光谱棱镜 (高色散)</option>
-                <option value="crystal">高透天然水晶 (纯净清透)</option>
-                <option value="ice">北极天然冰晶 (微折射)</option>
-                <option value="frosted">天鹅绒透光磨砂 (柔雾)</option>
-                <option value="smoke">黑曜石 / 琥珀烟晶 (深邃)</option>
-                <option value="silk">重磅各向异性真丝 (丝光)</option>
-                <option value="wool">细腻羊绒针织 (微绒毛)</option>
-                <option value="cloud">真实蓬松流云 (棉花糖)</option>
-                <option value="sand">细密金耀流沙 (金砂)</option>
-                <option value="shell">炫彩珍珠母贝 (双折射)</option>
-                <option value="alloy">航空拉丝合金 (阳极氧化)</option>
-                <option value="jade">冰种飘花翡翠 (透润油脂)</option>
-              </select>
-            </label>
-            <label><span>基底色泽</span><input id="color" type="color" value="#8ea9c4"></label>
-          </div>
-
-          <div class="swatches">
-            <button class="swatch active" title="雾钴蓝" style="--c:#8ea9c4" data-c="#8ea9c4"></button>
-            <button class="swatch" title="极地冰白" style="--c:#ffffff" data-c="#ffffff"></button>
-            <button class="swatch" title="皇家钴蓝" style="--c:#2563eb" data-c="#2563eb"></button>
-            <button class="swatch" title="幻彩罗兰" style="--c:#a855f7" data-c="#a855f7"></button>
-            <button class="swatch" title="晨曦蜜桃" style="--c:#f43f5e" data-c="#f43f5e"></button>
-            <button class="swatch" title="琥珀金黄" style="--c:#f59e0b" data-c="#f59e0b"></button>
-            <button class="swatch" title="翡翠碧绿" style="--c:#10b981" data-c="#10b981"></button>
-            <button class="swatch" title="黑曜深灰" style="--c:#334155" data-c="#334155"></button>
-          </div>
-
-          <button class="btn" id="lockMaterialToggle" style="width: 100%; margin-top: 8px;">
-            <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-            乐章材质流变：自动轮转 (点击锁定当前材质)
-          </button>
-        </div>
+        <div class="material-samples" id="materialSamples" aria-label="材质样本库"><button type="button" data-material="prism" aria-pressed="false"><canvas width="112" height="112" aria-hidden="true"></canvas><span>棱镜</span></button><button type="button" data-material="crystal" aria-pressed="true"><canvas width="112" height="112" aria-hidden="true"></canvas><span>水晶</span></button><button type="button" data-material="ice" aria-pressed="false"><canvas width="112" height="112" aria-hidden="true"></canvas><span>冰晶</span></button><button type="button" data-material="frosted" aria-pressed="false"><canvas width="112" height="112" aria-hidden="true"></canvas><span>磨砂</span></button><button type="button" data-material="smoke" aria-pressed="false"><canvas width="112" height="112" aria-hidden="true"></canvas><span>烟晶</span></button><button type="button" data-material="silk" aria-pressed="false"><canvas width="112" height="112" aria-hidden="true"></canvas><span>真丝</span></button><button type="button" data-material="wool" aria-pressed="false"><canvas width="112" height="112" aria-hidden="true"></canvas><span>羊绒</span></button><button type="button" data-material="cloud" aria-pressed="false"><canvas width="112" height="112" aria-hidden="true"></canvas><span>云绒</span></button><button type="button" data-material="sand" aria-pressed="false"><canvas width="112" height="112" aria-hidden="true"></canvas><span>流沙</span></button><button type="button" data-material="shell" aria-pressed="false"><canvas width="112" height="112" aria-hidden="true"></canvas><span>母贝</span></button><button type="button" data-material="alloy" aria-pressed="false"><canvas width="112" height="112" aria-hidden="true"></canvas><span>合金</span></button><button type="button" data-material="jade" aria-pressed="false"><canvas width="112" height="112" aria-hidden="true"></canvas><span>翡翠</span></button></div>
+        <select id="material" aria-label="材质类型" hidden><option value="prism" >棱镜</option><option value="crystal" selected>水晶</option><option value="ice" >冰晶</option><option value="frosted" >磨砂</option><option value="smoke" >烟晶</option><option value="silk" >真丝</option><option value="wool" >羊绒</option><option value="cloud" >云绒</option><option value="sand" >流沙</option><option value="shell" >母贝</option><option value="alloy" >合金</option><option value="jade" >翡翠</option></select>
+        <div class="tone-heading"><span>色调</span><label class="custom-tone" title="自定义色调"><span>自定义</span><input id="color" aria-label="自定义色调" type="color" value="#c94f64"></label></div>
+        <div class="swatches" id="materialTones"><button class="swatch" title="无色" aria-label="无色" style="--c:#e7ebee" data-c="#e7ebee"><canvas width="80" height="80" aria-hidden="true"></canvas></button><button class="swatch" title="冰蓝" aria-label="冰蓝" style="--c:#7e9fb9" data-c="#7e9fb9"><canvas width="80" height="80" aria-hidden="true"></canvas></button><button class="swatch" title="钴蓝" aria-label="钴蓝" style="--c:#405677" data-c="#405677"><canvas width="80" height="80" aria-hidden="true"></canvas></button><button class="swatch" title="石榴" aria-label="石榴" style="--c:#b94250" data-c="#b94250"><canvas width="80" height="80" aria-hidden="true"></canvas></button><button class="swatch" title="琥珀" aria-label="琥珀" style="--c:#b68a50" data-c="#b68a50"><canvas width="80" height="80" aria-hidden="true"></canvas></button><button class="swatch" title="苔绿" aria-label="苔绿" style="--c:#768d80" data-c="#768d80"><canvas width="80" height="80" aria-hidden="true"></canvas></button><button class="swatch" title="烟灰" aria-label="烟灰" style="--c:#424752" data-c="#424752"><canvas width="80" height="80" aria-hidden="true"></canvas></button></div>
+        <div class="material-lock"><span>固定材质</span><button type="button" id="lockMaterialToggle" role="switch" aria-checked="true" aria-label="固定材质"></button></div>
+        <div class="studio-lighting"><span>影棚</span><div role="group" aria-label="影棚背景"><button data-studio="soft" aria-pressed="true">柔光</button><button data-studio="light" aria-pressed="false">珍珠白</button><button data-studio="dark" aria-pressed="false">石墨黑</button></div></div>
+        <details class="material-details"><summary>精细调整</summary>
 
         <div class="section-title">
           <span><svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> 9 大光学与物理渲染参数</span>
@@ -1507,10 +1647,20 @@
           <div class="range"><span>环境反射</span><input id="envIntensity" type="range" min="0" max="7.0" step="0.05" value="3.95"><output>3.95</output></div>
           <div class="range"><span>影棚主光</span><input id="light" type="range" min="0" max="0.35" step="0.01" value="0.08"><output>0.08</output></div>
         </div>
+        </details>
       </div>
 
       <!-- TAB 2: 矩阵与空间 (微缩网格视觉) -->
       <div class="inspector-tab-pane" id="tab-matrix">
+        <div class="section-title">空间编排</div>
+        <div class="card-block">
+          <label><span>队形样本</span><select id="formationSelect">
+            <option value="auto">自动编排 · 七种队形</option><option value="grid">阵列</option>
+            <option value="helix">双螺旋</option><option value="ring">圆环</option><option value="fan">折扇</option>
+            <option value="orbit">轨道</option><option value="terrace">阶梯</option><option value="sphere">球面</option>
+          </select></label>
+          <p style="color:var(--muted); font-size:12px; line-height:1.6; margin:8px 0 0;">队形决定空间路径，波形决定拍内动作。歌词与巨像保持可读，不参与聚散。</p>
+        </div>
         <div class="section-title">
           <span><svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line></svg> 矩阵规格与微缩网格视觉</span>
         </div>
@@ -1577,12 +1727,13 @@
         </div>
         <div class="card-block">
           <div class="grid2">
-            <label><span>背景基底色</span><input id="bgColorPicker" type="color" value="#f8fafc"></label>
+            <label><span>背景基底色</span><input id="bgColorPicker" type="color" value="#727b88"></label>
             <button class="btn" id="resetBgBtn" style="margin-top:18px;">重置背景</button>
           </div>
 
           <div class="swatches">
-            <button class="swatch active" title="影棚钛白" style="--c:#f8fafc" data-bg="#f8fafc"></button>
+            <button class="swatch active" title="石墨影棚" style="--c:#202a38" data-bg="#202a38"></button>
+            <button class="swatch" title="影棚钛白" style="--c:#f8fafc" data-bg="#f8fafc"></button>
             <button class="swatch" title="纯净明白" style="--c:#ffffff" data-bg="#ffffff"></button>
             <button class="swatch" title="冷调浅灰" style="--c:#f1f5f9" data-bg="#f1f5f9"></button>
             <button class="swatch" title="深邃虚空黑" style="--c:#05070a" data-bg="#05070a"></button>
@@ -1592,6 +1743,7 @@
           <div style="margin-top: 8px;">
             <label><span>项目内置高清背景环境</span></label>
             <select id="presetBgSelect">
+              <option value="studio/alpine-light-background-v1.png" selected>山湖晨光 · 风景壁纸</option>
               <option value="">-- 选择项目内置背景图 --</option>
               <option value="images/ocean_waves.jpg">1: 深邃海洋 (Ocean Waves)</option>
               <option value="images/zen_stones.jpg">2: 禅宗叠石 (Zen Stones)</option>
@@ -1621,34 +1773,36 @@
         </div>
         <div class="card-block">
           <div class="pill-group" id="contentModeGroup">
-            <button class="pill-btn active" data-mode="avatar">OneWorks 活体头像</button>
-            <button class="pill-btn" data-mode="text">文字/歌词排版</button>
-            <button class="pill-btn" data-mode="image">自定义图片/GIF</button>
+            <button class="pill-btn active" data-mode="material">纯材质</button>
+            <button class="pill-btn" data-mode="avatar" title="OneWorks 官方场景与活体表情">角色</button>
+            <button class="pill-btn" data-mode="text" title="文字与歌词排版">歌词</button>
+            <button class="pill-btn" data-mode="image" title="自定义图片与 GIF">图片</button>
           </div>
 
           <div style="margin-top: 8px;">
             <label><span>内容呈现层级</span></label>
             <div class="pill-group" id="layerModeGroup">
-              <button class="pill-btn active" data-layer="surface">外表面双面贴合</button>
-              <button class="pill-btn" data-layer="inside">内部悬浮内雕</button>
-              <button class="pill-btn" data-layer="back">后背衬底透射</button>
+              <button class="pill-btn active" data-layer="surface" title="外表面双面贴合">表面</button>
+              <button class="pill-btn" data-layer="inside" title="内部悬浮内雕">内雕</button>
+              <button class="pill-btn" data-layer="back" title="后背衬底透射">背衬</button>
             </div>
           </div>
 
           <div style="margin-top: 8px;">
             <label><span>3D 晶体多维融合工艺</span></label>
             <div class="pill-group" id="adhesionCraftGroup">
-              <button class="pill-btn active" data-craft="conformal" title="曲面清漆共模">微晶清漆共模</button>
-              <button class="pill-btn" data-craft="emboss" title="微晶沉金浮雕">沉金微浮雕</button>
-              <button class="pill-btn" data-craft="hologram" title="全息激光体核">激光全息体核</button>
+              <button class="pill-btn active" data-craft="conformal" title="曲面清漆共模">清漆</button>
+              <button class="pill-btn" data-craft="emboss" title="微晶沉金浮雕">浮雕</button>
+              <button class="pill-btn" data-craft="hologram" title="全息激光体核">全息</button>
             </div>
           </div>
         </div>
 
         <!-- OneWorks 8 大活体头像卡片 -->
-        <div id="avatarPanel">
+        <div id="avatarPanel" style="display: none;">
+          <div class="official-avatar-tools"><span id="officialAvatarStatus">OneWorks · 官方角色组件</span><a id="officialAvatarEdit" href="./studio/avatar-editor.html?slot=cloud">进入角色工作室 →</a></div>
           <div class="section-title">
-            <span><svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg> OneWorks 8 款官方形象</span>
+            <span><svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg> 8 款角色 · OneWorks</span>
           </div>
           <div class="card-block">
             <div class="grid4" id="avatarPresetGrid">
@@ -1657,7 +1811,7 @@
               <div class="avatar-card" data-avatar="sun"><canvas class="avatar-icon-canvas" id="thumb_sun"></canvas>太阳之子</div>
               <div class="avatar-card" data-avatar="bear"><canvas class="avatar-icon-canvas" id="thumb_bear"></canvas>治愈小熊</div>
               <div class="avatar-card" data-avatar="dog"><canvas class="avatar-icon-canvas" id="thumb_dog"></canvas>忠诚小狗</div>
-              <div class="avatar-card" data-avatar="agent"><canvas class="avatar-icon-canvas" id="thumb_agent"></canvas>智能球体</div>
+              <div class="avatar-card" data-avatar="agent"><canvas class="avatar-icon-canvas" id="thumb_agent"></canvas>小狐狸</div>
               <div class="avatar-card" data-avatar="cat"><canvas class="avatar-icon-canvas" id="thumb_cat"></canvas>灵动喵喵</div>
               <div class="avatar-card" data-avatar="bun"><canvas class="avatar-icon-canvas" id="thumb_bun"></canvas>闪亮小包</div>
             </div>
@@ -1666,7 +1820,7 @@
               <label><span>头像排布方式</span></label>
               <div class="pill-group" id="avatarDistGroup">
                 <button class="pill-btn active" data-dist="all">全方阵群像</button>
-                <button class="pill-btn" data-dist="mosaic">巨型活体拼合 (Mega)</button>
+                <button class="pill-btn" data-dist="mosaic" title="巨型活体拼合 (Mega)">巨像拼合</button>
                 <button class="pill-btn" data-dist="center">中心单体</button>
                 <button class="pill-btn" data-dist="variety">盲盒群星</button>
               </div>
@@ -1824,7 +1978,7 @@ BEAT</textarea>
 
           <div class="grid2" style="margin-top: 8px;">
             <button class="btn active" id="dynamicFovToggle">FOV 变焦：开</button>
-            <div class="range" style="margin:0; grid-template-columns: 36px 1fr 30px;"><span>幅度</span><input id="fovAmpSlider" type="range" min="4" max="26" step="1" value="14"><output>14°</output></div>
+            <div class="range" style="margin:0; grid-template-columns: 36px 1fr 30px;"><span>幅度</span><input id="fovAmpSlider" type="range" min="0" max="26" step="1" value="3"><output>3°</output></div>
           </div>
         </div>
 
@@ -2006,7 +2160,7 @@ const statusText = $('#statusText');
 const statusDot = $('#statusDot');
 
 const state = {
-  contentMode: 'avatar',
+  contentMode: 'material',
   layerMode: 'surface', // surface | inside | back
   orbitMode: 'arc',    // arc | full
   camMotionMode: 'auto', // auto | on | off
@@ -2026,6 +2180,8 @@ const state = {
   gridRows: 4,
   gridLayers: 1,
   matrixSequence: 'standard', // standard | lyrics_stream | expansion | volumetric | snap | compact | locked
+  formationMode: 'auto',
+  activeFormation: 'grid',
 
   // 1/2/3 挡全局律动强度自适应增益
   intensityTier: 2, // 1 | 2 | 3
@@ -2043,18 +2199,26 @@ const state = {
   baseBevelRadius: 0.20,
 
   // 材质固定控制
-  lockMaterial: false,
+  lockMaterial: true,
 
   // 乐章流变与动态控制
   isChoreographyShow: true,
   morphIntervalBeats: 16, // 4 | 8 | 16 | 32
   wavePattern: 'ripple',   // ripple | diagonal | equalizer | spiral | heartbeat | glitch
+  waveMotion: true,
   waveAmpMultiplier: 1.0,
   enableTitleIntro: true,
   enableLyricsDisplay: true,
 
   // 音乐与播放列表
   isPlayingMusic: false,
+  audioReady: false,
+  beatPhase: 0,
+  beatPeriod: 60 / 124,
+  beatOrigin: 0,
+  nextBeatTime: 0,
+  onsetTimes: [],
+  audioRequestId: 0,
   playbackOffset: 0.0,
   playbackStartTime: 0.0,
   lyricOffsetMs: -180,
@@ -2079,7 +2243,7 @@ const state = {
 
   customImageTexture: null,
   bgImageTexture: null,
-  backgroundColor: '#f8fafc',
+  backgroundColor: '#727b88',
   time: 0,
   waveAccumulator: 0,
 
@@ -2102,6 +2266,7 @@ const state = {
   audioDataArray: null,
   bassEnergy: 0,
   midEnergy: 0,
+  lastMidEnergy: 0,
   trebleEnergy: 0,
   beatCount: 0,
   lastBassEnergy: 0,
@@ -2112,7 +2277,7 @@ const state = {
   // 动态 FOV 呼吸变焦律动
   enableDynamicFov: true,
   fovMode: 'bass', // bass | dolly | sine | snap
-  fovPulseAmp: 14.0, // degrees
+  fovPulseAmp: 3.0, // degrees: lens breathing stays secondary to the sculpture
   currentFov: 30.0
 };
 
@@ -2146,13 +2311,14 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.15;
+renderer.toneMappingExposure = 1.0;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 stage.appendChild(renderer.domElement);
 
 // 2. 场景与相机
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(state.backgroundColor);
+scene.fog = new THREE.FogExp2(state.backgroundColor, 0.008);
 
 const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 150);
 camera.position.set(7.5, 5.5, 12.0);
@@ -2184,11 +2350,11 @@ composer.addPass(outputPass);
 const pmrem = new THREE.PMREMGenerator(renderer);
 pmrem.compileEquirectangularShader();
 const neutralEnvScene = new THREE.Scene();
-neutralEnvScene.background = new THREE.Color(0xf8fafc);
+neutralEnvScene.background = new THREE.Color(0x181c23);
 
 // 顶部主柔光箱 (Top Key Softbox)
 const topBoxGeo = new THREE.PlaneGeometry(16, 16);
-const topBoxMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+const topBoxMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(3, 3, 3) });
 const topBox = new THREE.Mesh(topBoxGeo, topBoxMat);
 topBox.position.set(0, 10, 0);
 topBox.rotation.x = Math.PI / 2;
@@ -2196,7 +2362,7 @@ neutralEnvScene.add(topBox);
 
 // 左侧银色垂直长条光带 (Left Studio Rim Strip)
 const leftStripGeo = new THREE.PlaneGeometry(3, 18);
-const leftStripMat = new THREE.MeshBasicMaterial({ color: 0xe0f2fe });
+const leftStripMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(2, 2.1, 2.2) });
 const leftStrip = new THREE.Mesh(leftStripGeo, leftStripMat);
 leftStrip.position.set(-10, 2, 2);
 leftStrip.rotation.y = Math.PI / 2;
@@ -2204,7 +2370,7 @@ neutralEnvScene.add(leftStrip);
 
 // 右侧温润暖白反光板 (Right Fill Strip)
 const rightStripGeo = new THREE.PlaneGeometry(4, 18);
-const rightStripMat = new THREE.MeshBasicMaterial({ color: 0xfff1f2 });
+const rightStripMat = new THREE.MeshBasicMaterial({ color: 0xbac1c8 });
 const rightStrip = new THREE.Mesh(rightStripGeo, rightStripMat);
 rightStrip.position.set(10, 2, -2);
 rightStrip.rotation.y = -Math.PI / 2;
@@ -2212,41 +2378,82 @@ neutralEnvScene.add(rightStrip);
 
 // 后方天际冷调轮廓光 (Back Accent Rim)
 const backStripGeo = new THREE.PlaneGeometry(20, 4);
-const backStripMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+const backStripMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(1.4, 1.5, 1.6) });
 const backStrip = new THREE.Mesh(backStripGeo, backStripMat);
 backStrip.position.set(0, -2, -12);
 neutralEnvScene.add(backStrip);
+
+// Offset front fill: a readable reflection on frontal metal/glass faces, with dark negative fill beside it.
+const frontFill = new THREE.Mesh(new THREE.PlaneGeometry(7, 11),
+  new THREE.MeshBasicMaterial({ color: new THREE.Color(1.2, 1.3, 1.4) }));
+frontFill.position.set(-6, 1, 11);
+frontFill.rotation.y = Math.PI;
+neutralEnvScene.add(frontFill);
 
 const envRT = pmrem.fromScene(neutralEnvScene, 0.04);
 scene.environment = envRT.texture;
 pmrem.dispose();
 
 // 5. 5 层专业高奢悬浮布光 (纯净银白钻石光，彻底移除随机绿光)
-const hemiLight = new THREE.HemisphereLight(0xffffff, 0x0f172a, 0.6);
+const hemiLight = new THREE.HemisphereLight(0xffffff, 0x303841, 0.35);
 scene.add(hemiLight);
 
-const keyLight = new THREE.DirectionalLight(0xffffff, 0.08);
+const keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
 keyLight.position.set(-6, 10, 8);
 keyLight.castShadow = true;
 keyLight.shadow.mapSize.set(2048, 2048);
 keyLight.shadow.bias = -0.0001;
 scene.add(keyLight);
 
-const rimLight = new THREE.PointLight(0x60a5fa, 20, 30, 1.8);
+const rimLight = new THREE.PointLight(0xdce8f6, 9, 30, 1.8);
 rimLight.position.set(8, 6, 5);
 scene.add(rimLight);
 
-const warmLight = new THREE.PointLight(0xf472b6, 16, 26, 1.8);
+const warmLight = new THREE.PointLight(0xf5f0e9, 5, 26, 1.8);
 warmLight.position.set(-7, 3, 3);
 scene.add(warmLight);
 
-const topSparkle = new THREE.PointLight(0xffffff, 18, 20, 1.8);
+const topSparkle = new THREE.PointLight(0xffffff, 8, 20, 1.8);
 topSparkle.position.set(0, 9, -2);
 scene.add(topSparkle);
 
 // 6. 主雕塑网格容器
 const matrixGroup = new THREE.Group();
 scene.add(matrixGroup);
+
+// A neutral receiving surface gives transparent objects a depth reference and opaque ones a soft shadow.
+const studioFloor = new THREE.Mesh(new THREE.PlaneGeometry(160, 160),
+  new THREE.MeshStandardMaterial({ color: 0x727b88, roughness: 0.68, metalness: 0 }));
+studioFloor.rotation.x = -Math.PI / 2;
+studioFloor.position.y = -3.5;
+studioFloor.receiveShadow = true;
+scene.add(studioFloor);
+
+// Lightweight soft contact cues. These are not ray-traced caustics.
+const contactCanvas=document.createElement('canvas');contactCanvas.width=contactCanvas.height=128;
+const contactContext=contactCanvas.getContext('2d');
+const contactGradient=contactContext.createRadialGradient(64,64,4,64,64,64);
+contactGradient.addColorStop(0,'rgba(0,0,0,.32)');contactGradient.addColorStop(.4,'rgba(0,0,0,.16)');contactGradient.addColorStop(1,'rgba(0,0,0,0)');
+contactContext.fillStyle=contactGradient;contactContext.fillRect(0,0,128,128);
+const contactTexture=new THREE.CanvasTexture(contactCanvas);
+const contactShadows=new THREE.InstancedMesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({map:contactTexture,transparent:true,opacity:.42,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-1}),1000);
+contactShadows.frustumCulled=false;contactShadows.count=0;scene.add(contactShadows);
+const contactTransform=new THREE.Object3D(),contactPosition=new THREE.Vector3();
+function updateContactShadows(){
+  contactShadows.visible=studioFloor.visible;
+  if(!contactShadows.visible)return;
+  matrixGroup.updateWorldMatrix(true,false);
+  contactShadows.count=Math.min(1000,matrixGroup.children.length);
+  for(let i=0;i<contactShadows.count;i++){
+    const unit=matrixGroup.children[i];contactPosition.copy(unit.position).applyMatrix4(matrixGroup.matrixWorld);
+    const height=Math.max(0,contactPosition.y-studioFloor.position.y);
+    const spread=1.1+height*.26;
+    contactTransform.position.set(contactPosition.x+.16*height,studioFloor.position.y+.008+i*.00001,contactPosition.z-.10*height);
+    contactTransform.rotation.set(-Math.PI/2,0,0);contactTransform.scale.set(spread,spread,1);contactTransform.updateMatrix();
+    contactShadows.setMatrixAt(i,contactTransform.matrix);
+  }
+  contactShadows.instanceMatrix.needsUpdate=true;
+}
 
 function createRoundedSquircleGeometry(radius = 0.20) {
   return new RoundedBoxGeometry(1, 1, 1, 8, radius);
@@ -2559,6 +2766,31 @@ function createCloudVolumeNoiseTexture() {
   return t;
 }
 
+// Fine tactile detail with restrained low-frequency variation; mipmaps prevent distant aliasing.
+function createReadableSurface(type) {
+  const size=512, tau=Math.PI*2;
+  const height=(u,v)=>{
+    if(type==='silk') return .045*Math.sin(tau*(u*3+v+.10*Math.sin(tau*v)))+.012*Math.sin(tau*u*56)*Math.sin(tau*v*56);
+    if(type==='wool') return .075*Math.cos(tau*(u*22+.28*Math.sin(tau*v*18)))+.04*Math.cos(tau*v*18)+.006*Math.sin(tau*(u*97+v*83));
+    if(type==='alloy') return .006*Math.sin(tau*v*9)+.004*Math.sin(tau*v*23)+.006*Math.sin(tau*(v*123+u));
+    return .035*Math.sin(tau*(v*9+.25*Math.sin(tau*u*2)))+.009*Math.sin(tau*(u*71+v*67));
+  };
+  const canvases=Array.from({length:3},()=>{const c=document.createElement('canvas');c.width=c.height=size;return c;});
+  const images=canvases.map(c=>c.getContext('2d').createImageData(size,size));
+  for(let y=0;y<size;y++)for(let x=0;x<size;x++){
+    const u=x/size,v=y/size,h=height(u,v),d=1/size;
+    const nx=-(height(u+d,v)-height(u-d,v))*15,ny=-(height(u,v+d)-height(u,v-d))*15;
+    const length=Math.hypot(nx,ny,1),i=(y*size+x)*4;
+    images[0].data.set([(nx/length*.5+.5)*255,(ny/length*.5+.5)*255,(1/length*.5+.5)*255,255],i);
+    const rough=Math.max(.52,Math.min(1,.80+h*.40))*255;
+    const tone=Math.max(.84,Math.min(1,.96+h*(type==='wool'?.24:type==='sand'?.20:.10)))*255;
+    images[1].data.set([rough,rough,rough,255],i);images[2].data.set([tone,tone,tone,255],i);
+  }
+  const textures=canvases.map((c,i)=>{c.getContext('2d').putImageData(images[i],0,0);const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());t.minFilter=THREE.LinearMipmapLinearFilter;return t;});
+  textures[2].colorSpace=THREE.SRGBColorSpace;
+  return {normal:textures[0],roughness:textures[1],color:textures[2]};
+}
+const readableSurfaces=Object.fromEntries(['silk','wool','alloy','sand'].map(type=>[type,createReadableSurface(type)]));
 const weaveNormalTexture = createWeaveNormal();
 const noiseBumpTexture = createNoiseMap();
 const brushedMetalNormal = createHairlineBrushedNormal();
@@ -2585,364 +2817,54 @@ const ONEWORKS_AVATAR_CONFIGS = {
 };
 
 const AVATAR_KEYS = Object.keys(ONEWORKS_AVATAR_CONFIGS);
-const liveCanvasMap = {};
 const liveTextureMap = {};
-
-AVATAR_KEYS.forEach(key => {
-  const c = document.createElement('canvas');
-  c.width = c.height = 512;
-  liveCanvasMap[key] = c;
-  const tex = new THREE.CanvasTexture(c);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  tex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-  liveTextureMap[key] = tex;
+const avatarCanvases = {};
+const avatarPending = new Set();
+const avatarFailed = new Set();
+let avatarBridge;
+function renderAvatarRig(key,time,lookX=0,lookY=0,emote='normal') {
+  if(avatarPending.has(key)||avatarFailed.has(key))return;
+  avatarPending.add(key);
+  (avatarBridge??=import('./studio/avatar-bridge.js?v=20260911-motion')).then(api=>api.renderOfficialAvatar(key,avatarCanvases[key],time,emote,prefersReducedMotion||!state.enableBlink))
+    .then(changed=>{if(changed){liveTextureMap[key].needsUpdate=true;updateAvatarThumbnail(key);}})
+    .catch(error=>{avatarFailed.add(key);const status=$('#officialAvatarStatus');if(status)status.textContent='角色加载失败，请刷新或打开编辑器';console.warn('OneWorks avatar:',error.message);})
+    .finally(()=>avatarPending.delete(key));
+}
+function updateAvatarThumbnail(key){
+  const canvas=$('#thumb_'+key);if(!canvas)return;
+  canvas.width=canvas.height=88;const ctx=canvas.getContext('2d');ctx.clearRect(0,0,88,88);ctx.drawImage(avatarCanvases[key],0,0,88,88);
+}
+AVATAR_KEYS.forEach(key=>{
+  const canvas=document.createElement('canvas');canvas.width=canvas.height=256;avatarCanvases[key]=canvas;
+  liveTextureMap[key]=new THREE.CanvasTexture(canvas);liveTextureMap[key].colorSpace=THREE.SRGBColorSpace;
 });
 
-function drawLiveAvatar(canvas, avatarKey, time, lookX, lookY, isBlinking, emote, bassEnergy = 0, midEnergy = 0, trebleEnergy = 0) {
-  const ctx = canvas.getContext('2d');
-  const size = canvas.width;
-  ctx.clearRect(0, 0, size, size);
-
-  const item = ONEWORKS_AVATAR_CONFIGS[avatarKey] || ONEWORKS_AVATAR_CONFIGS.cloud;
-  const pad = size * 0.04;
-  const cardSize = size - pad * 2;
-  const radius = cardSize * 0.28;
-
-  ctx.save();
-  ctx.beginPath();
-  ctx.roundRect(pad, pad, cardSize, cardSize, radius);
-  ctx.clip();
-  ctx.fillStyle = item.bg;
-  ctx.fillRect(pad, pad, cardSize, cardSize);
-
-  // 随音乐节拍律动起伏与头部微晃
-  const headBob = Math.sin(time * 3.5) * (size * 0.012) - (bassEnergy * size * 0.038);
-  const headTilt = Math.sin(time * 2.6) * 0.04 * (1.0 + bassEnergy * 0.8);
-  const breathScale = 1.0 + (Math.cos(time * 3) * 0.01) + (bassEnergy * 0.05);
-  const cx = size / 2;
-  const cy = size * 0.62 + headBob;
-
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.rotate(headTilt);
-  ctx.translate(-cx, -cy);
-
-  const eyeGazeX = lookX * (size * 0.035);
-  const eyeGazeY = lookY * (size * 0.025);
-
-  let eyeHeightFactor = isBlinking ? 0.08 : 1.0;
-  if (emote === 'wink') eyeHeightFactor = 0.08;
-
-  // 歌唱律动张嘴幅度 (随中频人声和低音跳动)
-  const vocalMouth = (emote === 'sing' || midEnergy > 0.25) ? (midEnergy * size * 0.09 + bassEnergy * size * 0.04) : 0;
-  const isHappy = (emote === 'happy' || emote === 'sing' || bassEnergy > 0.50);
-
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.16)';
-  ctx.shadowBlur = 12;
-  ctx.shadowOffsetY = 6;
-  ctx.fillStyle = item.bodyColor;
-
-  if (item.type === 'cloud') {
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.scale(breathScale, breathScale);
-    ctx.translate(-cx, -cy);
-    ctx.beginPath();
-    ctx.moveTo(pad - 10, size);
-    ctx.lineTo(pad - 10, cy + size * 0.1);
-    ctx.quadraticCurveTo(cx - size * 0.35, cy - size * 0.15, cx - size * 0.18, cy - size * 0.12);
-    ctx.quadraticCurveTo(cx, cy - size * 0.42, cx + size * 0.28, cy - size * 0.18);
-    ctx.quadraticCurveTo(size + 10, cy - size * 0.1, size + 10, size);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
-
-    // 绘制可爱腮红
-    if (isHappy || emote === 'wink') {
-      ctx.fillStyle = 'rgba(244, 63, 94, 0.45)';
-      ctx.beginPath(); ctx.arc(cx - size * 0.22, cy + size * 0.08, size * 0.045, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(cx + size * 0.22, cy + size * 0.08, size * 0.045, 0, Math.PI * 2); ctx.fill();
-    }
-
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = '#050608';
-    const eyeW = size * 0.07;
-    const baseEyeH = size * 0.14;
-    const eyeH = baseEyeH * (isHappy ? 0.15 : eyeHeightFactor);
-    const eyeRx = eyeW / 2;
-    const eyeLeftX = cx + size * 0.02 + eyeGazeX;
-    const eyeRightX = cx + size * 0.16 + eyeGazeX;
-    const eyeY = cy - size * 0.02 + eyeGazeY + (baseEyeH - eyeH) / 2;
-
-    if (isHappy) {
-      ctx.lineWidth = size * 0.025;
-      ctx.strokeStyle = '#050608';
-      ctx.lineCap = 'round';
-      ctx.beginPath(); ctx.arc(eyeLeftX + eyeW/2, eyeY + eyeH, eyeW, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
-      ctx.beginPath(); ctx.arc(eyeRightX + eyeW/2, eyeY + eyeH, eyeW, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
-    } else {
-      ctx.beginPath(); ctx.roundRect(eyeLeftX, eyeY, eyeW, eyeH, eyeRx); ctx.fill();
-      ctx.beginPath(); ctx.roundRect(eyeRightX, eyeY, eyeW, (emote === 'wink' ? baseEyeH : eyeH), eyeRx); ctx.fill();
-    }
-
-    // 律动张嘴唱响
-    if (vocalMouth > 2) {
-      ctx.fillStyle = '#050608';
-      ctx.beginPath(); ctx.ellipse(cx + size * 0.09, cy + size * 0.14, size * 0.035, vocalMouth * 0.45, 0, 0, Math.PI * 2); ctx.fill();
-    }
-  } else if (item.type === 'rabbit') {
-    const earBounce = Math.sin(time * 4) * 0.05 + (bassEnergy * 0.12);
-    ctx.save();
-    ctx.translate(cx - size * 0.18, cy - size * 0.28);
-    ctx.rotate(-0.15 + earBounce);
-    ctx.beginPath(); ctx.ellipse(0, 0, size * 0.09, size * 0.24, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.restore();
-
-    ctx.save();
-    ctx.translate(cx + size * 0.14, cy - size * 0.26);
-    ctx.rotate(0.18 - earBounce);
-    ctx.beginPath(); ctx.ellipse(0, 0, size * 0.09, size * 0.24, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.restore();
-
-    ctx.beginPath();
-    ctx.ellipse(cx + size * 0.05, cy + size * 0.15, size * 0.36 * breathScale, size * 0.36 * breathScale, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    if (isHappy || emote === 'wink') {
-      ctx.fillStyle = 'rgba(244, 63, 94, 0.45)';
-      ctx.beginPath(); ctx.arc(cx - size * 0.12, cy + size * 0.18, size * 0.045, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(cx + size * 0.24, cy + size * 0.18, size * 0.045, 0, Math.PI * 2); ctx.fill();
-    }
-
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = '#1e293b';
-    const eyeW = size * 0.065;
-    const eyeH = size * 0.13 * (isHappy ? 0.18 : eyeHeightFactor);
-    ctx.save();
-    ctx.translate(cx + size * 0.02 + eyeGazeX, cy + size * 0.08 + eyeGazeY);
-    ctx.rotate(-0.1);
-    if (isHappy) {
-      ctx.lineWidth = size * 0.022; ctx.strokeStyle = '#1e293b'; ctx.lineCap = 'round';
-      ctx.beginPath(); ctx.arc(0, 0, eyeW, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
-    } else {
-      ctx.beginPath(); ctx.roundRect(-eyeW / 2, -eyeH / 2, eyeW, eyeH, eyeW / 2); ctx.fill();
-    }
-    ctx.restore();
-
-    ctx.save();
-    ctx.translate(cx + size * 0.18 + eyeGazeX, cy + size * 0.1 + eyeGazeY);
-    ctx.rotate(0.1);
-    if (isHappy) {
-      ctx.lineWidth = size * 0.022; ctx.strokeStyle = '#1e293b'; ctx.lineCap = 'round';
-      ctx.beginPath(); ctx.arc(0, 0, eyeW, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
-    } else {
-      ctx.beginPath(); ctx.roundRect(-eyeW / 2, -eyeH / 2, eyeW, (emote === 'wink' ? size * 0.13 : eyeH), eyeW / 2); ctx.fill();
-    }
-    ctx.restore();
-
-    if (vocalMouth > 2) {
-      ctx.fillStyle = '#f43f5e';
-      ctx.beginPath(); ctx.ellipse(cx + size * 0.10, cy + size * 0.22, size * 0.03, vocalMouth * 0.4, 0, 0, Math.PI * 2); ctx.fill();
-    }
-  } else if (item.type === 'sun') {
-    const rotSpeed = time * 0.5 + (bassEnergy * 0.6);
-    for (let a = 0; a < 6; a++) {
-      const angle = (a * Math.PI) / 3 + rotSpeed;
-      const rx = cx + Math.cos(angle) * size * 0.32;
-      const ry = cy + Math.sin(angle) * size * 0.32;
-      ctx.save();
-      ctx.translate(rx, ry);
-      ctx.rotate(angle);
-      ctx.beginPath(); ctx.roundRect(-size * 0.06, -size * 0.06, size * 0.12, size * 0.12, size * 0.035); ctx.fill();
-      ctx.restore();
-    }
-
-    ctx.beginPath();
-    ctx.arc(cx, cy, size * 0.28 * breathScale, 0, Math.PI * 2);
-    ctx.fill();
-
-    if (isHappy || emote === 'wink') {
-      ctx.fillStyle = 'rgba(239, 68, 68, 0.45)';
-      ctx.beginPath(); ctx.arc(cx - size * 0.18, cy + size * 0.02, size * 0.04, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(cx + size * 0.18, cy + size * 0.02, size * 0.04, 0, Math.PI * 2); ctx.fill();
-    }
-
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = '#33272b';
-    const eyeW = size * 0.06;
-    const eyeH = size * 0.11 * (isHappy ? 0.18 : eyeHeightFactor);
-    if (isHappy) {
-      ctx.lineWidth = size * 0.022; ctx.strokeStyle = '#33272b'; ctx.lineCap = 'round';
-      ctx.beginPath(); ctx.arc(cx - size * 0.09 + eyeGazeX, cy - size * 0.06 + eyeGazeY, eyeW, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
-      ctx.beginPath(); ctx.arc(cx + size * 0.09 + eyeGazeX, cy - size * 0.06 + eyeGazeY, eyeW, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
-    } else {
-      ctx.beginPath(); ctx.roundRect(cx - size * 0.12 + eyeGazeX, cy - size * 0.06 + eyeGazeY, eyeW, eyeH, eyeW / 2); ctx.fill();
-      ctx.beginPath(); ctx.roundRect(cx + size * 0.06 + eyeGazeX, cy - size * 0.06 + eyeGazeY, eyeW, (emote === 'wink' ? size * 0.11 : eyeH), eyeW / 2); ctx.fill();
-    }
-
-    ctx.strokeStyle = ctx.fillStyle; ctx.lineWidth = size * 0.024; ctx.lineCap = 'round';
-    const mouthW = size * (0.09 + bassEnergy * 0.04);
-    if (vocalMouth > 2) {
-      ctx.fillStyle = '#ef4444';
-      ctx.beginPath(); ctx.ellipse(cx, cy + size * 0.06, size * 0.04, vocalMouth * 0.5, 0, 0, Math.PI * 2); ctx.fill();
-    } else {
-      ctx.beginPath(); ctx.arc(cx, cy + size * 0.04, mouthW, 0.18 * Math.PI, 0.82 * Math.PI); ctx.stroke();
-    }
-  } else if (item.type === 'bear') {
-    const earWiggle = Math.sin(time * 5) * 0.07 + (bassEnergy * 0.12);
-    ctx.beginPath(); ctx.arc(cx - size * 0.22, cy - size * 0.22 + earWiggle * 10, size * 0.12, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(cx + size * 0.22, cy - size * 0.22 - earWiggle * 10, size * 0.12, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#dbb58f';
-    ctx.beginPath(); ctx.arc(cx - size * 0.22, cy - size * 0.22 + earWiggle * 10, size * 0.06, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(cx + size * 0.22, cy - size * 0.22 - earWiggle * 10, size * 0.06, 0, Math.PI * 2); ctx.fill();
-
-    ctx.fillStyle = item.bodyColor;
-    ctx.beginPath(); ctx.arc(cx, cy + size * 0.05, size * 0.32 * breathScale, 0, Math.PI * 2); ctx.fill();
-
-    if (isHappy || emote === 'wink') {
-      ctx.fillStyle = 'rgba(244, 63, 94, 0.40)';
-      ctx.beginPath(); ctx.arc(cx - size * 0.18, cy + size * 0.06, size * 0.04, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(cx + size * 0.18, cy + size * 0.06, size * 0.04, 0, Math.PI * 2); ctx.fill();
-    }
-
-    ctx.shadowBlur = 0; ctx.fillStyle = '#2b1d18';
-    const eyeW = size * 0.055, eyeH = size * 0.10 * (isHappy ? 0.18 : eyeHeightFactor);
-    if (isHappy) {
-      ctx.lineWidth = size * 0.02; ctx.strokeStyle = '#2b1d18'; ctx.lineCap = 'round';
-      ctx.beginPath(); ctx.arc(cx - size * 0.09 + eyeGazeX, cy - size * 0.02 + eyeGazeY, eyeW, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
-      ctx.beginPath(); ctx.arc(cx + size * 0.09 + eyeGazeX, cy - size * 0.02 + eyeGazeY, eyeW, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
-    } else {
-      ctx.beginPath(); ctx.roundRect(cx - size * 0.12 + eyeGazeX, cy - size * 0.02 + eyeGazeY, eyeW, eyeH, eyeW / 2); ctx.fill();
-      ctx.beginPath(); ctx.roundRect(cx + size * 0.08 + eyeGazeX, cy - size * 0.02 + eyeGazeY, eyeW, (emote === 'wink' ? size * 0.10 : eyeH), eyeW / 2); ctx.fill();
-    }
-    ctx.beginPath(); ctx.arc(cx - size * 0.02, cy + size * 0.08, size * 0.025, 0, Math.PI * 2); ctx.fill();
-
-    if (vocalMouth > 2) {
-      ctx.fillStyle = '#f43f5e';
-      ctx.beginPath(); ctx.ellipse(cx - size * 0.02, cy + size * 0.14, size * 0.03, vocalMouth * 0.45, 0, 0, Math.PI * 2); ctx.fill();
-    }
-  } else if (item.type === 'dog') {
-    const earSwing = Math.sin(time * 3.5) * 0.08 + (bassEnergy * 0.12);
-    ctx.fillStyle = '#64748b';
-    ctx.beginPath(); ctx.ellipse(cx - size * 0.26, cy - size * 0.08, size * 0.08, size * 0.18, 0.25 + earSwing, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(cx + size * 0.24, cy - size * 0.05, size * 0.08, size * 0.18, -0.22 - earSwing, 0, Math.PI * 2); ctx.fill();
-
-    ctx.fillStyle = item.bodyColor;
-    ctx.beginPath(); ctx.arc(cx, cy + size * 0.08, size * 0.32 * breathScale, 0, Math.PI * 2); ctx.fill();
-
-    if (isHappy || emote === 'wink') {
-      ctx.fillStyle = 'rgba(244, 63, 94, 0.40)';
-      ctx.beginPath(); ctx.arc(cx - size * 0.18, cy + size * 0.10, size * 0.04, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(cx + size * 0.18, cy + size * 0.10, size * 0.04, 0, Math.PI * 2); ctx.fill();
-    }
-
-    ctx.shadowBlur = 0; ctx.fillStyle = '#1e293b';
-    const eyeW = size * 0.055, eyeH = size * 0.10 * (isHappy ? 0.18 : eyeHeightFactor);
-    if (isHappy) {
-      ctx.lineWidth = size * 0.02; ctx.strokeStyle = '#1e293b'; ctx.lineCap = 'round';
-      ctx.beginPath(); ctx.arc(cx - size * 0.09 + eyeGazeX, cy + size * 0.02 + eyeGazeY, eyeW, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
-      ctx.beginPath(); ctx.arc(cx + size * 0.09 + eyeGazeX, cy + size * 0.02 + eyeGazeY, eyeW, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
-    } else {
-      ctx.beginPath(); ctx.roundRect(cx - size * 0.11 + eyeGazeX, cy + size * 0.02 + eyeGazeY, eyeW, eyeH, eyeW / 2); ctx.fill();
-      ctx.beginPath(); ctx.roundRect(cx + size * 0.07 + eyeGazeX, cy + size * 0.02 + eyeGazeY, eyeW, (emote === 'wink' ? size * 0.10 : eyeH), eyeW / 2); ctx.fill();
-    }
-    ctx.beginPath(); ctx.moveTo(cx - size * 0.025, cy + size * 0.13); ctx.lineTo(cx + size * 0.025, cy + size * 0.13); ctx.lineTo(cx, cy + size * 0.16); ctx.fill();
-
-    if (vocalMouth > 2) {
-      ctx.fillStyle = '#f43f5e';
-      ctx.beginPath(); ctx.ellipse(cx, cy + size * 0.20, size * 0.035, vocalMouth * 0.45, 0, 0, Math.PI * 2); ctx.fill();
-    }
-  } else if (item.type === 'agent') {
-    ctx.beginPath(); ctx.arc(cx, cy, size * 0.32 * breathScale, 0, Math.PI * 2); ctx.fill();
-    ctx.shadowBlur = 0; ctx.fillStyle = '#ffffff';
-    const eyeW = size * 0.065, eyeH = size * 0.13 * (isHappy ? 0.18 : eyeHeightFactor);
-    if (isHappy) {
-      ctx.lineWidth = size * 0.022; ctx.strokeStyle = '#ffffff'; ctx.lineCap = 'round';
-      ctx.beginPath(); ctx.arc(cx - size * 0.09 + eyeGazeX, cy - size * 0.06 + eyeGazeY, eyeW, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
-      ctx.beginPath(); ctx.arc(cx + size * 0.09 + eyeGazeX, cy - size * 0.06 + eyeGazeY, eyeW, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
-    } else {
-      ctx.beginPath(); ctx.roundRect(cx - size * 0.12 + eyeGazeX, cy - size * 0.06 + eyeGazeY, eyeW, eyeH, eyeW / 2); ctx.fill();
-      ctx.beginPath(); ctx.roundRect(cx + size * 0.06 + eyeGazeX, cy - size * 0.06 + eyeGazeY, eyeW, (emote === 'wink' ? size * 0.13 : eyeH), eyeW / 2); ctx.fill();
-    }
-    ctx.strokeStyle = ctx.fillStyle; ctx.lineWidth = size * 0.024; ctx.lineCap = 'round';
-    if (vocalMouth > 2) {
-      ctx.fillStyle = '#38bdf8';
-      ctx.beginPath(); ctx.ellipse(cx, cy + size * 0.10, size * 0.04, vocalMouth * 0.5, 0, 0, Math.PI * 2); ctx.fill();
-    } else {
-      ctx.beginPath(); ctx.arc(cx, cy + size * 0.06, size * 0.08, 0.15 * Math.PI, 0.85 * Math.PI); ctx.stroke();
-    }
-  } else if (item.type === 'cat') {
-    const earTwitch = Math.sin(time * 6) * 0.06 + (bassEnergy * 0.1);
-    ctx.beginPath(); ctx.moveTo(cx - size * 0.28, cy - size * 0.1 + earTwitch * 8); ctx.lineTo(cx - size * 0.2, cy - size * 0.32); ctx.lineTo(cx - size * 0.06, cy - size * 0.16); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(cx + size * 0.28, cy - size * 0.1 - earTwitch * 8); ctx.lineTo(cx + size * 0.2, cy - size * 0.32); ctx.lineTo(cx + size * 0.06, cy - size * 0.16); ctx.fill();
-    ctx.beginPath(); ctx.arc(cx, cy + size * 0.04, size * 0.32 * breathScale, 0, Math.PI * 2); ctx.fill();
-
-    if (isHappy || emote === 'wink') {
-      ctx.fillStyle = 'rgba(244, 63, 94, 0.40)';
-      ctx.beginPath(); ctx.arc(cx - size * 0.18, cy + size * 0.06, size * 0.04, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(cx + size * 0.18, cy + size * 0.06, size * 0.04, 0, Math.PI * 2); ctx.fill();
-    }
-
-    ctx.shadowBlur = 0; ctx.fillStyle = '#050608';
-    const eyeW = size * 0.06, eyeH = size * 0.11 * (isHappy ? 0.18 : eyeHeightFactor);
-    if (isHappy) {
-      ctx.lineWidth = size * 0.02; ctx.strokeStyle = '#050608'; ctx.lineCap = 'round';
-      ctx.beginPath(); ctx.arc(cx - size * 0.09 + eyeGazeX, cy - size * 0.02 + eyeGazeY, eyeW, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
-      ctx.beginPath(); ctx.arc(cx + size * 0.09 + eyeGazeX, cy - size * 0.02 + eyeGazeY, eyeW, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
-    } else {
-      ctx.beginPath(); ctx.roundRect(cx - size * 0.12 + eyeGazeX, cy - size * 0.02 + eyeGazeY, eyeW, eyeH, eyeW / 2); ctx.fill();
-      ctx.beginPath(); ctx.roundRect(cx + size * 0.06 + eyeGazeX, cy - size * 0.02 + eyeGazeY, eyeW, (emote === 'wink' ? size * 0.11 : eyeH), eyeW / 2); ctx.fill();
-    }
-    ctx.strokeStyle = ctx.fillStyle; ctx.lineWidth = size * 0.02;
-    ctx.beginPath(); ctx.arc(cx - size * 0.04, cy + size * 0.1, size * 0.04, 0, Math.PI); ctx.stroke();
-    ctx.beginPath(); ctx.arc(cx + size * 0.04, cy + size * 0.1, size * 0.04, 0, Math.PI); ctx.stroke();
-
-    if (vocalMouth > 2) {
-      ctx.fillStyle = '#f43f5e';
-      ctx.beginPath(); ctx.ellipse(cx, cy + size * 0.16, size * 0.03, vocalMouth * 0.45, 0, 0, Math.PI * 2); ctx.fill();
-    }
-  } else {
-    // bun
-    ctx.beginPath(); ctx.ellipse(cx, cy + size * 0.06, size * 0.34 * breathScale, size * 0.28 * breathScale, 0, 0, Math.PI * 2); ctx.fill();
-
-    if (isHappy || emote === 'wink') {
-      ctx.fillStyle = 'rgba(244, 63, 94, 0.45)';
-      ctx.beginPath(); ctx.arc(cx - size * 0.18, cy + size * 0.08, size * 0.045, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(cx + size * 0.18, cy + size * 0.08, size * 0.045, 0, Math.PI * 2); ctx.fill();
-    }
-
-    ctx.shadowBlur = 0; ctx.fillStyle = '#1e293b';
-    const eyeR = size * 0.06 * (isHappy ? 0.20 : eyeHeightFactor);
-    if (isHappy) {
-      ctx.lineWidth = size * 0.022; ctx.strokeStyle = '#1e293b'; ctx.lineCap = 'round';
-      ctx.beginPath(); ctx.arc(cx - size * 0.12 + eyeGazeX, cy - size * 0.02 + eyeGazeY, eyeR * 2.5, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
-      ctx.beginPath(); ctx.arc(cx + size * 0.12 + eyeGazeX, cy - size * 0.02 + eyeGazeY, eyeR * 2.5, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
-    } else {
-      ctx.beginPath(); ctx.arc(cx - size * 0.12 + eyeGazeX, cy - size * 0.02 + eyeGazeY, eyeR, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(cx + size * 0.12 + eyeGazeX, cy - size * 0.02 + eyeGazeY, (emote === 'wink' ? size * 0.06 : eyeR), 0, Math.PI * 2); ctx.fill();
-      if (!isBlinking && eyeHeightFactor > 0.5) {
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath(); ctx.arc(cx - size * 0.14 + eyeGazeX, cy - size * 0.04 + eyeGazeY, eyeR * 0.45, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.arc(cx + size * 0.10 + eyeGazeX, cy - size * 0.04 + eyeGazeY, eyeR * 0.45, 0, Math.PI * 2); ctx.fill();
-      }
-    }
-
-    if (vocalMouth > 2) {
-      ctx.fillStyle = '#f43f5e';
-      ctx.beginPath(); ctx.ellipse(cx, cy + size * 0.14, size * 0.035, vocalMouth * 0.5, 0, 0, Math.PI * 2); ctx.fill();
-    }
+// 缓存 prefers-reduced-motion 媒体查询并响应动态变化
+const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+let prefersReducedMotion = reducedMotionQuery.matches;
+const onReducedMotionChange = (e) => {
+  prefersReducedMotion = !!e.matches;
+  if (prefersReducedMotion && typeof state !== 'undefined' && ui?.fov) {
+    state.currentFov = +ui.fov.value;
+    camera.fov = state.currentFov;
+    camera.updateProjectionMatrix();
   }
-
-  ctx.restore();
-  ctx.restore();
+};
+if (typeof reducedMotionQuery.addEventListener === 'function') {
+  reducedMotionQuery.addEventListener('change', onReducedMotionChange);
+} else if (typeof reducedMotionQuery.addListener === 'function') {
+  reducedMotionQuery.addListener(onReducedMotionChange);
 }
 
-window.addEventListener('mousemove', e => {
-  state.mouseNormX = (e.clientX / window.innerWidth) * 2 - 1;
-  state.mouseNormY = (e.clientY / window.innerHeight) * 2 - 1;
-});
+// 场景实际引用的 liveTextureMap key 集合与节流记录
+let activeLiveTextureKeys = [];
+let lastAvatarRenderTime = 0;
+let isFirstCameraInit = true;
+let lastMatrixShape = '';
+let pendingFrameDistance = null;
+const framingDirection = new THREE.Vector3();
+controls.addEventListener('start', () => { pendingFrameDistance = null; });
 
-// 智能高对比文字色彩决策计算
 function getSmartContrastTextColor(baseColorHex, userPreference = 'auto') {
   if (userPreference === 'dark') {
     return {
@@ -2982,6 +2904,10 @@ function getSmartContrastTextColor(baseColorHex, userPreference = 'auto') {
   }
 
   const c = new THREE.Color(baseColorHex);
+  if (['prism','crystal','ice','frosted','smoke','cloud','jade','shell'].includes(ui.material.value)) {
+    const backdrop = scene.background?.isColor ? scene.background : new THREE.Color(0x455368);
+    c.lerp(backdrop, 0.75); // Transparent glyph backing includes the studio, not just the tint swatch.
+  }
   const dark = new THREE.Color('#181b20');
   const luminance = 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b;
   const darkLuminance = 0.2126 * dark.r + 0.7152 * dark.g + 0.0722 * dark.b;
@@ -3043,6 +2969,45 @@ function createTypographyTexture(char, craftType, baseColorHex) {
 // 8. 12 款纯净通透物理材质 (彻底消除泛绿与浑浊衰减，正对视角纯净通透)
 // -------------------------------------------------------------
 function createMaterialPreset(type, colorHex) {
+  const material = buildMaterialPreset(type, colorHex);
+  const envByFamily = { prism: 1.15, crystal: 1.25, ice: 1.0, frosted: 0.85, smoke: 1.2,
+    silk: 0.8, wool: 0.65, cloud: 0.7, sand: 0.9, shell: 1.0, alloy: 1.55, jade: 1.0 };
+  material.envMapIntensity = (envByFamily[type] || 1) * (+ui.envIntensity.value / 3.95);
+  material.side = THREE.FrontSide;
+  if (material.normalMap && !['silk','wool','alloy','sand'].includes(type)) material.normalScale.multiplyScalar(0.28);
+  if (readableSurfaces[type]) {
+    const surface=readableSurfaces[type];
+    material.normalMap=surface.normal;
+    material.roughnessMap=surface.roughness;
+    material.map=surface.color;
+    material.normalScale.setScalar(type==='wool'?0.52:type==='silk'?0.25:type==='alloy'?0.28:0.38);
+  }
+  if (type === 'frosted') { material.roughness = Math.max(0.38, material.roughness); material.clearcoat = 0.12; }
+  if (type === 'alloy') { material.roughness = Math.max(0.38, +ui.roughness.value); material.clearcoat = 0.06; material.anisotropy=0.55; }
+  if (type === 'silk') { material.clearcoat = 0.03; material.sheenRoughness=0.38; material.anisotropy=0.5; }
+  if (type === 'sand') { material.clearcoat=0.10; material.sheen=0.35; material.metalness=0.30; }
+  if (material.transmission > 0) {
+    material.transparent = true;
+    if (['prism', 'crystal', 'ice'].includes(type)) {
+      material.transmission = Math.min(0.96, material.transmission);
+      material.side = THREE.DoubleSide;
+      material.opacity = 0.86;
+      material.roughness = Math.max(0.025, material.roughness);
+    }
+    if (type === 'prism' || type === 'crystal') {
+      // Tint the transmitted light, not both the surface and the transmission twice.
+      material.color.set(0xffffff);
+      material.attenuationColor.set(colorHex).lerp(new THREE.Color(0xffffff),0.18);
+      material.attenuationDistance = 1.2;
+      material.dispersion = Math.min(0.18, material.dispersion);
+    }
+  }
+  material.userData.family = type;
+  material.userData.restEnv = material.envMapIntensity;
+  return material;
+}
+
+function buildMaterialPreset(type, colorHex) {
   const color = new THREE.Color(colorHex);
   const roughnessVal = +ui.roughness.value;
   const envVal = +ui.envIntensity.value;
@@ -3304,13 +3269,15 @@ function clearMatrixGroup() {
       if (child.material) {
         const mats = Array.isArray(child.material) ? child.material : [child.material];
         mats.forEach(m => {
-          if (m.map && !Object.values(liveTextureMap).includes(m.map) && m.map !== state.customImageTexture && m.map !== jadeMarblingTexture && m.map !== cloudVolumeTexture) {
+          if (m.map && !Object.values(readableSurfaces).some(s=>s.color===m.map) && !Object.values(liveTextureMap).includes(m.map) && m.map !== state.customImageTexture && m.map !== jadeMarblingTexture && m.map !== cloudVolumeTexture) {
             m.map.dispose();
           }
           if (m.alphaMap && m.alphaMap !== woolFiberFuzzTexture) {
             m.alphaMap.dispose();
           }
           m.dispose();
+          const ink=m.userData.surfaceTexture;
+          if (ink && !Object.values(liveTextureMap).includes(ink) && ink!==state.customImageTexture) ink.dispose();
         });
       }
       if (child.geometry && child.geometry !== currentRoundedGeo) {
@@ -3363,6 +3330,45 @@ function createConformalDecalGeometry(w, h, cornerRadius, isMosaic, u0, u1, v0, 
 }
 
 // 3D 晶体多维融合材质 (具备物理光照响应、清漆微高光、沉金微浮雕与全息激光体核视差)
+function applySurfaceContent(material, texture, craft, scale, bounds) {
+  // Content is shaded on the actual cube: shared silhouette, normals, lighting and depth.
+  material.userData.surfaceTexture=texture;
+  material.customProgramCacheKey=()=>`lu-surface-v1-${craft}`;
+  material.onBeforeCompile=shader=>{
+    shader.uniforms.luInkMap={value:texture};
+    shader.uniforms.luInkScale={value:scale};
+    shader.uniforms.luInkBounds={value:new THREE.Vector4(...bounds)};
+    shader.vertexShader=shader.vertexShader.replace('#include <common>',`#include <common>
+      varying vec3 vLuPosition; varying vec3 vLuNormal;`)
+      .replace('#include <begin_vertex>',`#include <begin_vertex>
+      vLuPosition=position; vLuNormal=normal;`);
+    shader.fragmentShader=shader.fragmentShader.replace('#include <common>',`#include <common>
+      uniform sampler2D luInkMap; uniform float luInkScale; uniform vec4 luInkBounds;
+      varying vec3 vLuPosition; varying vec3 vLuNormal;`)
+      .replace('#include <map_fragment>',`#include <map_fragment>
+      vec2 inkUV=vLuPosition.xy/luInkScale+0.5;
+      if(vLuNormal.z<0.0) inkUV.x=1.0-inkUV.x;
+      float inkMask=step(0.0,inkUV.x)*step(inkUV.x,1.0)*step(0.0,inkUV.y)*step(inkUV.y,1.0);
+      inkUV=mix(luInkBounds.xz,luInkBounds.yw,inkUV);
+      vec4 ink=texture2D(luInkMap,inkUV);
+      float inkCoverage=ink.a*inkMask*smoothstep(0.75,0.98,vLuNormal.z);
+      diffuseColor.rgb=mix(diffuseColor.rgb,ink.rgb,inkCoverage);
+      diffuseColor.a=mix(diffuseColor.a,1.0,inkCoverage);`)
+      .replace('#include <emissivemap_fragment>',`#include <emissivemap_fragment>
+      totalEmissiveRadiance+=ink.rgb*inkCoverage*0.12;`)
+      .replace('#include <roughnessmap_fragment>',`#include <roughnessmap_fragment>
+      roughnessFactor=mix(roughnessFactor,${craft==='emboss'?'0.48':'0.24'},inkCoverage);`)
+      .replace('#include <metalnessmap_fragment>',`#include <metalnessmap_fragment>
+      metalnessFactor*=1.0-inkCoverage*0.92;`)
+      .replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
+      ${craft==='emboss'?'normal=normalize(normal-vec3(dFdx(inkCoverage),dFdy(inkCoverage),0.0)*0.12);':''}`)
+      .replace('#include <transmission_fragment>',THREE.ShaderChunk.transmission_fragment.replace(
+        'material.transmission = transmission;',
+        'material.transmission = transmission * (1.0 - inkCoverage * 0.96);'));
+  };
+  material.needsUpdate=true;
+}
+
 function createDimensionalDecalMaterial(texture, craft, layerMode) {
   if (layerMode === 'inside') {
     // 3D 激光内雕 / 全息晶体核：
@@ -3371,13 +3377,13 @@ function createDimensionalDecalMaterial(texture, craft, layerMode) {
       map: texture,
       emissiveMap: texture,
       emissive: new THREE.Color(0xffffff),
-      emissiveIntensity: craft === 'hologram' ? 0.95 : 0.55,
+      emissiveIntensity: craft === 'hologram' ? 0.18 : 0.08,
       roughness: 0.12,
       metalness: 0.05,
-      transparent: true,
-      opacity: 0.96,
-      depthTest: false,
-      depthWrite: false,
+      transparent: false,
+      alphaTest: 0.025,
+      depthTest: true,
+      depthWrite: true,
       side: THREE.DoubleSide
     });
   } else if (layerMode === 'back') {
@@ -3386,10 +3392,10 @@ function createDimensionalDecalMaterial(texture, craft, layerMode) {
       map: texture,
       roughness: 0.38,
       metalness: 0.05,
-      transparent: true,
-      opacity: 0.92,
-      depthTest: false,
-      depthWrite: false,
+      transparent: false,
+      alphaTest: 0.025,
+      depthTest: true,
+      depthWrite: true,
       side: THREE.FrontSide
     });
   } else {
@@ -3411,8 +3417,35 @@ function createDimensionalDecalMaterial(texture, craft, layerMode) {
   }
 }
 
-function rebuildMatrix() {
-  clearMatrixGroup();
+let matrixDirty = false;
+let matrixBuildKey = '';
+let spareUnits = [];
+let activePhysicalMaterials = [];
+
+// Event handlers only invalidate; lyrics, transport and phrase changes commit once per frame.
+function rebuildMatrix() { matrixDirty = true; }
+
+function commitMatrixRebuild() {
+  matrixDirty = false;
+  const previous = matrixGroup.children.map(unit => ({
+    position: unit.position.clone(), rotation: unit.rotation.clone(), scale: unit.scale.clone()
+  }));
+  const pureMaterial = state.contentMode === 'material' && state.matrixSequence !== 'lyrics_stream';
+  const reusableContent = pureMaterial || (state.contentMode === 'avatar' && ['all','variety'].includes(state.avatarDist)
+    && !(state.isPlayingMusic && state.isIntroPlaying));
+  const buildKey = JSON.stringify([state.contentMode, state.selectedAvatar, state.avatarDist, state.adhesionCraft, ui.material.value, ui.color.value,
+    ui.roughness.value, ui.envIntensity.value, ui.ior.value, ui.thickness.value,
+    ui.transmission.value, ui.dispersion.value, ui.bevelRadius.value, state.layerMode]);
+  const reusable = reusableContent && buildKey === matrixBuildKey
+    ? matrixGroup.children.concat(spareUnits) : [];
+  if (reusable.length) {
+    matrixGroup.clear();
+  } else {
+    spareUnits.forEach(unit => matrixGroup.add(unit));
+    clearMatrixGroup();
+  }
+  spareUnits = [];
+  matrixBuildKey = reusableContent ? buildKey : '';
 
   const matType = ui.material.value;
   const colorVal = ui.color.value;
@@ -3421,15 +3454,20 @@ function rebuildMatrix() {
   let cols = state.gridCols;
   let rows = state.gridRows;
   let layers = state.gridLayers;
+  studioFloor.position.y = -(rows * 1.22) / 2 - 1.0;
+  const shadowExtent = Math.max(cols,rows,layers)*1.5;
+  Object.assign(keyLight.shadow.camera,{left:-shadowExtent,right:shadowExtent,top:shadowExtent,bottom:-shadowExtent,far:70});
+  keyLight.shadow.camera.updateProjectionMatrix();
 
-  const isShowingIntro = state.isPlayingMusic && state.isIntroPlaying && state.enableTitleIntro;
+  const isShowingIntro = !pureMaterial && state.isPlayingMusic && state.isIntroPlaying && state.enableTitleIntro;
 
-  // 摄像机自适应视距
+  // 摄像机自适应视距（仅在首次初始化时设定机位，移除无效 controls.state 判断以保留用户手动视角与镜头预设）
   const maxDim = Math.max(cols, rows, layers);
   const targetCamDist = 4.2 + maxDim * 2.2;
-  if (!controls.state || controls.state === -1) {
+  if (isFirstCameraInit) {
     camera.position.set(targetCamDist * 0.55, targetCamDist * 0.42, targetCamDist * 0.88);
     controls.target.set(0, 0, 0);
+    isFirstCameraInit = false;
   }
 
   // 判定是否为巨幅拼图合成模式 (巨型活体表情 / 巨型图片拼图)
@@ -3559,10 +3597,30 @@ function rebuildMatrix() {
         const y = (rows - 1 - r) * spacingY - ((rows - 1) * spacingY) / 2;
         const z = (l - (layers - 1) / 2) * spacingZ;
 
+        const reused = reusable[slotIdx];
+        if (reused) {
+          placedCount += reused.userData.contentCount || 0;
+          Object.assign(reused.userData, { baseX: x, baseY: y, baseZ: z,
+            distFromCenter: Math.hypot(x, y, z), gridR: r, gridC: c, gridL: l });
+          matrixGroup.add(reused);
+          continue;
+        }
+
         const unitGroup = new THREE.Group();
-        unitGroup.position.set(x, y, z);
+        const oldPose = previous[slotIdx];
+        if (!prefersReducedMotion && oldPose) {
+          unitGroup.position.copy(oldPose.position);
+          unitGroup.rotation.copy(oldPose.rotation);
+          unitGroup.scale.copy(oldPose.scale);
+        } else if (!prefersReducedMotion && previous.length) {
+          unitGroup.position.set(x * 0.35, y * 0.35, z * 0.35);
+          unitGroup.scale.setScalar(0.15);
+        } else {
+          unitGroup.position.set(x, y, z);
+        }
         unitGroup.userData = {
           baseX: x, baseY: y, baseZ: z,
+          contentCount: shouldRenderContent && texture ? 1 : 0,
           distFromCenter: Math.sqrt(x * x + y * y + z * z),
           gridR: r, gridC: c, gridL: l
         };
@@ -3572,10 +3630,12 @@ function rebuildMatrix() {
         // 关键透视保障：仅对透射折射类材质在内雕/后底模式下关闭前表面深度写入，绝不破坏不透明材质的金属与微表面质感
         if ((state.layerMode === 'inside' || state.layerMode === 'back') && material.transmission > 0) {
           material.depthWrite = false;
+          // Refraction already composites the interior; alpha blending would duplicate it.
+          material.opacity = 1;
         }
 
         const blockMesh = new THREE.Mesh(currentRoundedGeo, material);
-        blockMesh.castShadow = true;
+        blockMesh.castShadow = material.transmission < 0.5;
         blockMesh.receiveShadow = true;
         blockMesh.renderOrder = 5;
         unitGroup.add(blockMesh);
@@ -3613,25 +3673,16 @@ function rebuildMatrix() {
           const isAvatar = (!isShowingIntro && state.contentMode === 'avatar');
           const labelScale = isAvatar ? (state.layerMode === 'inside' ? 0.88 : (isMosaic ? 1.06 : 0.94)) : 0.88;
 
-          // 构建与倒角曲率严丝合缝同构的贴片几何体
-          const decalGeo = createConformalDecalGeometry(labelScale, labelScale, cornerRad, isMosaic, u0, u1, v0, v1);
-          const decalMat = createDimensionalDecalMaterial(texture, state.adhesionCraft, state.layerMode);
-          decalMat.renderOrder = decalRenderOrder;
-
-          // 正面贴片
-          const frontMesh = new THREE.Mesh(decalGeo, decalMat);
-          frontMesh.position.set(0, 0, localFrontZ);
-          unitGroup.add(frontMesh);
-
-          // 外表面模式额外挂载背面贴片 (朝后 180° 正向)
           if (state.layerMode === 'surface') {
-            const backMat = createDimensionalDecalMaterial(texture, state.adhesionCraft, state.layerMode);
-            backMat.renderOrder = decalRenderOrder;
-
-            const backMesh = new THREE.Mesh(decalGeo, backMat);
-            backMesh.position.set(0, 0, localBackZ);
-            backMesh.rotation.y = Math.PI;
-            unitGroup.add(backMesh);
+            applySurfaceContent(material, texture, state.adhesionCraft, labelScale,
+              isMosaic ? [u0,u1,v0,v1] : [0,1,0,1]);
+          } else {
+            const decalGeo = createConformalDecalGeometry(labelScale, labelScale, cornerRad, isMosaic, u0, u1, v0, v1);
+            const decalMat = createDimensionalDecalMaterial(texture, state.adhesionCraft, state.layerMode);
+            const contentMesh = new THREE.Mesh(decalGeo, decalMat);
+            contentMesh.position.set(0, 0, localFrontZ);
+            contentMesh.renderOrder = 1;
+            unitGroup.add(contentMesh);
           }
         }
 
@@ -3640,29 +3691,87 @@ function rebuildMatrix() {
     }
   }
 
-  controls.target.set(0, 0, 0);
+  spareUnits = reusable.slice(totalBlocks);
+  activePhysicalMaterials = [];
+  matrixGroup.traverse(obj => {
+    if (obj.material?.isMeshPhysicalMaterial) {
+      const material = obj.material;
+      material.userData.restEnv ??= material.envMapIntensity;
+      activePhysicalMaterials.push(material);
+    }
+  });
+  $$('#materialSamples [data-material]').forEach(btn => {
+    btn.setAttribute('aria-pressed', String(btn.dataset.material === matType));
+  });
+
+  // 收集场景实际引用的 liveTextureMap key (保留 variety/mosaic/center 等共享与独立贴图映射)
+  const referencedKeys = new Set();
+  matrixGroup.traverse(obj => {
+    if (obj.material) {
+      const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+      for (let i = 0; i < mats.length; i++) {
+        const m = mats[i];
+        if (m && (m.map || m.userData.surfaceTexture)) {
+          for (let k = 0; k < AVATAR_KEYS.length; k++) {
+            const key = AVATAR_KEYS[k];
+            if (m.map === liveTextureMap[key] || m.userData.surfaceTexture === liveTextureMap[key]) {
+              referencedKeys.add(key);
+              break;
+            }
+          }
+        }
+      }
+    }
+  });
+  activeLiveTextureKeys = Array.from(referencedKeys);
+
+  // 仅尺寸变化时补足取景空间；材质重建不改用户角度或缩放。
+  const matrixShape = `${cols}:${rows}:${layers}:${state.activeFormation}`;
+  if (lastMatrixShape && matrixShape !== lastMatrixShape) {
+    const sphere = new THREE.Sphere(new THREE.Vector3(), Math.hypot(cols * spacingX, rows * spacingY, layers * spacingZ) * 0.5);
+    if (state.activeFormation === 'fan' || state.activeFormation === 'orbit') sphere.radius = Math.max(sphere.radius,rows*1.0+1.5);
+    const verticalHalf = THREE.MathUtils.degToRad(camera.fov * 0.5);
+    const horizontalHalf = Math.atan(Math.tan(verticalHalf) * camera.aspect);
+    const radius = sphere.radius + sphere.center.distanceTo(controls.target);
+    const fitDistance = radius * 1.08 / Math.sin(Math.min(verticalHalf, horizontalHalf));
+    pendingFrameDistance = Math.max(camera.position.distanceTo(controls.target), fitDistance);
+    controls.maxDistance = Math.max(controls.maxDistance, fitDistance * 1.1);
+  }
+  lastMatrixShape = matrixShape;
 
   const matName = ui.material.options[ui.material.selectedIndex].text;
   const specText = layers > 1 ? `${cols}×${rows}×${layers} ${layers}层` : `${cols}×${rows} 方阵`;
-  const phaseLabel = isShowingIntro ? `【序幕歌名：${state.songTitle}】` : (isMosaic ? `【巨幅全景拼图共振】` : `【活体智能体演进】`);
+  const phaseLabel = pureMaterial ? '材质研究' : (isShowingIntro ? `序幕：${state.songTitle}` : (isMosaic ? '巨像拼合' : '内容编排'));
   const fullStatus = `${phaseLabel} ${specText} / ${placedCount} 项呈现 / ${matName}`;
-  const compactPhase = isShowingIntro ? '序幕' : (isMosaic ? '拼图' : '演进');
+  const compactPhase = pureMaterial ? '材质' : (isShowingIntro ? '序幕' : (isMosaic ? '拼图' : '演进'));
   statusText.textContent = window.matchMedia('(max-width: 640px)').matches
     ? `${compactPhase} · ${specText} · ${placedCount}项`
     : fullStatus;
   statusText.title = fullStatus;
+  $('#movementBadge').textContent = `${FORMATION_LABELS[state.activeFormation]} · ${state.beatCount % 4 + 1}/4`;
 }
 
 // -------------------------------------------------------------
 // 10. 全功能多曲目播放器 & 实时节拍打击检测器
 // -------------------------------------------------------------
 let synthInterval = null;
+let audioLoadController = null;
+
+function resetBeatClock() {
+  const time = state.playbackOffset;
+  state.beatCount = Math.floor(time / state.beatPeriod);
+  state.beatOrigin = state.beatCount * state.beatPeriod;
+  state.nextBeatTime = state.beatOrigin + state.beatPeriod;
+  state.onsetTimes = [];
+  state.lastBassEnergy = state.lastMidEnergy = 0;
+  state.bassEnergy = state.midEnergy = state.trebleEnergy = state.beatPulse = 0;
+}
 
 function getPlaybackTime() {
   const curTrack = state.playlist[state.currentTrackIndex];
   const dur = (curTrack && curTrack.buffer && curTrack.buffer.duration) ? curTrack.buffer.duration : 180;
   let t = state.playbackOffset;
-  if (state.isPlayingMusic && state.playbackStartTime && state.audioCtx) {
+  if (state.isPlayingMusic && state.audioReady && state.audioCtx) {
     t += (state.audioCtx.currentTime - state.playbackStartTime);
   }
   if (dur > 0) t = t % dur;
@@ -3701,6 +3810,7 @@ function initAudioEngine() {
   state.analyser = state.audioCtx.createAnalyser();
   state.analyser.fftSize = 128;
   state.analyser.smoothingTimeConstant = 0.75;
+  state.analyser.connect(state.audioCtx.destination);
   state.audioDataArray = new Uint8Array(state.analyser.frequencyBinCount);
 }
 
@@ -3713,7 +3823,6 @@ function startBufferPlayback(track, startPos = 0) {
   source.buffer = track.buffer;
   source.loop = true;
   source.connect(state.analyser);
-  state.analyser.connect(state.audioCtx.destination);
 
   const dur = track.buffer.duration || 180;
   const offset = startPos % dur;
@@ -3721,11 +3830,17 @@ function startBufferPlayback(track, startPos = 0) {
   state.currentAudioSource = source;
   state.playbackStartTime = state.audioCtx.currentTime;
   state.playbackOffset = offset;
+  state.audioReady = true;
+  resetBeatClock();
   $('#nowPlayingText').textContent = `当前：${track.title}`;
 }
 
 function playTrackAtIndex(idx, resumeFromOffset = false) {
   try {
+    const requestId = ++state.audioRequestId;
+    audioLoadController?.abort();
+    audioLoadController = new AbortController();
+    state.audioReady = false;
     initAudioEngine();
     if (state.audioCtx && state.audioCtx.state === 'suspended') {
       state.audioCtx.resume().catch(() => {});
@@ -3745,11 +3860,13 @@ function playTrackAtIndex(idx, resumeFromOffset = false) {
     $('#playlistSelect').value = track.type || 'custom';
 
     if (!resumeFromOffset) {
+      state.playbackOffset = 0;
+      state.beatPeriod = 60 / 124; // Initial estimate; detected onsets refine it after audio starts.
       state.beatCount = 0;
       state.beatAccumulator = 0.0;
       lastMovementIdx = -1;
       state.isIntroPlaying = state.enableTitleIntro;
-      state.introStartTime = Date.now();
+      state.introStartTime = 0;
       state.currentLyricPhrase = '';
     }
 
@@ -3768,18 +3885,20 @@ function playTrackAtIndex(idx, resumeFromOffset = false) {
       startBufferPlayback(track, state.playbackOffset);
     } else if (track.src) {
       $('#nowPlayingText').textContent = `加载中：${track.title}...`;
-      fetch(track.src)
-        .then(res => res.arrayBuffer())
+      fetch(track.src, { signal: audioLoadController.signal })
+        .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.arrayBuffer(); })
         .then(ab => state.audioCtx.decodeAudioData(ab))
         .then(buf => {
           track.buffer = buf;
-          if (state.currentTrackIndex === normalizedIndex && state.isPlayingMusic) {
+          if (state.audioRequestId === requestId && state.currentTrackIndex === normalizedIndex && state.isPlayingMusic) {
             startBufferPlayback(track, state.playbackOffset);
           }
         })
         .catch(err => {
+          if (state.audioRequestId !== requestId || err.name === 'AbortError') return;
           console.warn('Failed to load audio track:', err);
-          startProceduralElectronicBeat();
+          pauseMusic();
+          $('#nowPlayingText').textContent = '音频加载失败，请重试或导入本地音乐';
         });
     } else {
       startProceduralElectronicBeat();
@@ -3793,11 +3912,17 @@ function playTrackAtIndex(idx, resumeFromOffset = false) {
 
 function startProceduralElectronicBeat() {
   if (synthInterval) clearInterval(synthInterval);
+  state.playbackStartTime = state.audioCtx.currentTime;
+  state.audioReady = true;
+  resetBeatClock();
 
   let step = 0;
   const baseBpm = 124;
-  const bpm = baseBpm * state.speedMultiplier;
+  const bpm = baseBpm;
   const stepTime = (60 / bpm) / 4 * 1000;
+  state.beatPeriod = 60 / bpm;
+  state.beatOrigin = state.playbackOffset + stepTime / 1000;
+  state.nextBeatTime = state.beatOrigin;
 
   synthInterval = setInterval(() => {
     if (!state.isPlayingMusic) return;
@@ -3812,10 +3937,8 @@ function startProceduralElectronicBeat() {
       gain.gain.exponentialRampToValueAtTime(0.01, now + 0.16);
       osc.connect(gain);
       gain.connect(state.analyser);
-      gain.connect(state.audioCtx.destination);
       osc.start(now);
       osc.stop(now + 0.16);
-      state.beatCount++;
     }
 
     if (step % 8 === 4) {
@@ -3829,7 +3952,6 @@ function startProceduralElectronicBeat() {
       gain.gain.exponentialRampToValueAtTime(0.01, now + 0.13);
       noise.connect(gain);
       gain.connect(state.analyser);
-      gain.connect(state.audioCtx.destination);
       noise.start(now);
       noise.stop(now + 0.14);
     }
@@ -3844,7 +3966,6 @@ function startProceduralElectronicBeat() {
       gain.gain.exponentialRampToValueAtTime(0.01, now + 0.09);
       osc.connect(gain);
       gain.connect(state.analyser);
-      gain.connect(state.audioCtx.destination);
       osc.start(now);
       osc.stop(now + 0.10);
     }
@@ -3854,11 +3975,15 @@ function startProceduralElectronicBeat() {
 }
 
 function pauseMusic() {
+  const wasLoading = state.isPlayingMusic && !state.audioReady;
+  ++state.audioRequestId;
+  audioLoadController?.abort();
   if (state.isPlayingMusic) {
     state.playbackOffset = getPlaybackTime();
     state.isPlayingMusic = false;
   }
   state.playbackStartTime = 0;
+  state.audioReady = false;
 
   if (state.currentAudioSource) {
     try { state.currentAudioSource.stop(); } catch(e){}
@@ -3867,6 +3992,7 @@ function pauseMusic() {
   if (synthInterval) clearInterval(synthInterval);
 
   $('#playPauseBtn').classList.remove('choreography-active');
+  if (wasLoading) $('#nowPlayingText').textContent = `已暂停：${state.songTitle}`;
   $('#playPauseBtn').setAttribute('aria-label', '播放');
   $('#playPauseBtn').innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> 播放`;
 
@@ -3879,7 +4005,8 @@ function pauseMusic() {
     ui.thickness.value = state.baseThickness;
     ui.roughness.value = state.baseRoughness;
     bloomPass.strength = state.baseBloom;
-    keyLight.intensity = state.baseLight;
+    keyLight.intensity = state.baseLight * 15;
+    activePhysicalMaterials.forEach(material => { material.envMapIntensity = material.userData.restEnv; });
     syncSliderOutputs();
   }
 }
@@ -4116,6 +4243,7 @@ function onResize() {
   composer.setSize(width, height);
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
+  if(scene.background?.isTexture)fitBackgroundTexture(scene.background);
 }
 new ResizeObserver(onResize).observe(stage);
 window.addEventListener('resize', onResize);
@@ -4474,13 +4602,45 @@ const MATRIX_PROGRESSION_SEQUENCES = {
 };
 
 let lastMovementIdx = -1;
+const FORMATION_SEQUENCE = ['grid', 'helix', 'ring', 'fan', 'orbit', 'terrace', 'sphere'];
+const FORMATION_LABELS = { grid: '阵列', helix: '双螺旋', ring: '圆环', fan: '折扇', orbit: '轨道', terrace: '阶梯', sphere: '球面' };
 
-function updateMasterChoreography() {
-  if (!state.isPlayingMusic) return;
+function formationPosition(data, mode) {
+  const {gridR:r, gridC:c, gridL:l, baseX:x, baseY:y, baseZ:z}=data;
+  const cols=state.gridCols, rows=state.gridRows, count=cols*rows*state.gridLayers;
+  const index=l*cols*rows+r*cols+c;
+  const extent=Math.max(cols,rows)*.62;
+  const phase=index/Math.max(1,count)*Math.PI*2;
+  if (mode==='ring') return [Math.cos(phase)*extent, Math.sin(phase)*extent, (index%2-.5)*.55];
+  if (mode==='helix') {
+    const angle=r/Math.max(1,rows-1)*Math.PI*1.5+c*Math.PI*2/cols;
+    return [Math.cos(angle)*extent*.72, y, Math.sin(angle)*extent*.72+z];
+  }
+  if (mode==='fan') {
+    const angle=(c/Math.max(1,cols-1)-.5)*Math.PI*.9;
+    const radius=1.5+r*.95;
+    return [Math.sin(angle)*radius,Math.cos(angle)*radius-rows*.48, z];
+  }
+  if (mode==='orbit') {
+    const angle=c/cols*Math.PI*2+r*.35;
+    return [Math.cos(angle)*(1.1+r*.85),Math.sin(angle)*(1.1+r*.85)*.55, (r-(rows-1)/2)*.75+z];
+  }
+  if (mode==='terrace') return [x,y+Math.sin(c/Math.max(1,cols-1)*Math.PI)*1.1,z+(c-(cols-1)/2)*.55];
+  if (mode==='sphere') {
+    const latitude=1-2*(index+.5)/count;
+    const angle=index*Math.PI*(3-Math.sqrt(5));
+    const ring=Math.sqrt(1-latitude*latitude)*extent;
+    return [Math.cos(angle)*ring,latitude*extent,Math.sin(angle)*ring];
+  }
+  return [x,y,z];
+}
+
+function updateMasterChoreography(dt = 0.016) {
+  if (!state.isPlayingMusic || !state.audioReady) return;
 
   // 1. 序幕自动倒计时：歌曲开场展示 3.5 秒后自动收起并切入正文歌词/声波律动
   if (state.isIntroPlaying && state.enableTitleIntro) {
-    if (Date.now() - state.introStartTime > 3500) {
+    if (getPlaybackTime() - state.introStartTime > 3.5) {
       state.isIntroPlaying = false;
       rebuildMatrix();
     }
@@ -4489,7 +4649,8 @@ function updateMasterChoreography() {
   const tierCfg = TIER_CONFIGS[state.intensityTier] || TIER_CONFIGS[2];
   const interval = Math.max(2, Math.round((state.morphIntervalBeats || 16) * (tierCfg.sequenceCadence / 8)));
   const moveIdx = Math.floor(state.beatCount / interval) % CHOREOGRAPHY_MOVEMENTS.length;
-  $('#movementBadge').textContent = `乐章 ${moveIdx + 1}/${CHOREOGRAPHY_MOVEMENTS.length}`;
+  $('#movementBadge').textContent = `${FORMATION_LABELS[state.activeFormation]} · ${state.beatCount % 4 + 1}/4`;
+  $('#movementBadge').title = `音频起音估计：${Math.round(60/state.beatPeriod)} BPM；不代表人工标定拍点`;
 
   // 2. 动态歌词跟随流处理 (多排单层 N x M x 1 随歌词实时精确时间轴同步)
   const isLyricsStreamActive = (state.matrixSequence === 'lyrics_stream') || (state.contentMode === 'text' && state.enableLyricsDisplay);
@@ -4517,11 +4678,12 @@ function updateMasterChoreography() {
     }
   }
 
-  if (state.isChoreographyShow && moveIdx !== lastMovementIdx) {
+  if (state.isChoreographyShow && !prefersReducedMotion && moveIdx !== lastMovementIdx) {
     lastMovementIdx = moveIdx;
     const mov = CHOREOGRAPHY_MOVEMENTS[moveIdx];
+    state.activeFormation = state.formationMode === 'auto' ? FORMATION_SEQUENCE[moveIdx] : state.formationMode;
 
-    state.isIntroPlaying = mov.isIntro && state.enableTitleIntro;
+    // The title belongs to playback time, not to every repeated movement cycle.
 
     // 逻辑锁：若用户选择了巨型活体拼合 (avatarDist === 'mosaic')，则维持巨像形态，不被乐章自动打乱成单一或盲盒！
     if (state.avatarDist !== 'mosaic') {
@@ -4549,7 +4711,7 @@ function updateMasterChoreography() {
     if (!state.lockMaterial) {
       ui.material.value = mov.mat;
     }
-    ui.color.value = mov.color;
+    if (!state.lockMaterial) ui.color.value = mov.color;
 
     if (mov.wave) {
       state.wavePattern = mov.wave;
@@ -4559,23 +4721,19 @@ function updateMasterChoreography() {
         b.setAttribute('aria-pressed', String(active));
       });
     }
-    if (mov.fov) {
-      state.fovMode = mov.fov;
-      $$('#fovModeGroup .pill-btn').forEach(b => b.classList.toggle('active', b.dataset.fmode === mov.fov));
-    }
 
     rebuildMatrix();
   }
 
-  // 1. 旋转视角运镜 (开/关/自动) 与 FOV 忽大忽小动态呼吸
-  const shouldMoveCam = (state.camMotionMode === 'on') || (state.camMotionMode === 'auto' && state.isPlayingMusic);
+  // 1. 旋转视角运镜 (开/关/自动) 与 FOV 动态呼吸 (减少动效时禁止自动相机和动态 FOV)
+  const shouldMoveCam = !prefersReducedMotion && ((state.camMotionMode === 'on') || (state.camMotionMode === 'auto' && state.isPlayingMusic));
   const maxDim = Math.max(state.gridCols, state.gridRows, state.gridLayers);
-  let baseCamDist = 4.2 + maxDim * 2.2;
+  let baseCamDist = (4.2 + maxDim * 2.2) * (state.activeFormation === 'grid' ? 1 : 1.18);
   const baseFov = +ui.fov.value;
   let targetFov = baseFov;
   const tMul = state.tierMultiplier || 1.0;
 
-  if (state.enableDynamicFov) {
+  if (state.enableDynamicFov && !prefersReducedMotion) {
     if (state.fovMode === 'bass') {
       // 重低音爆发冲击：踩点瞬间 FOV 骤紧特写，随后弹性回弹广角
       const kickImpulse = Math.pow(state.bassEnergy, 1.3) * state.fovPulseAmp * tMul;
@@ -4601,93 +4759,55 @@ function updateMasterChoreography() {
     }
   }
 
-  // 平滑过度 FOV
-  state.currentFov += (targetFov - state.currentFov) * 0.18;
-  camera.fov = Math.max(15, Math.min(75, state.currentFov));
-  camera.updateProjectionMatrix();
+  // 平滑过渡 FOV (固定 0.18 插值改基于 dt 的指数平滑；减少动效时严格锁定基准 FOV)
+  if (prefersReducedMotion) {
+    state.currentFov = baseFov;
+  } else {
+    const fovLerp = Math.min(1.0, 1.0 - Math.exp(-12.0 * dt));
+    state.currentFov += (targetFov - state.currentFov) * fovLerp;
+  }
+  const clampedFov = Math.max(15, Math.min(75, state.currentFov));
+  if (Math.abs(camera.fov - clampedFov) > 0.001) {
+    camera.fov = clampedFov;
+    camera.updateProjectionMatrix();
+  }
 
   if (shouldMoveCam) {
     const camDist = baseCamDist + Math.sin(state.time * 0.4) * 1.8 - (state.bassEnergy * 0.8 * tMul);
+    let targetCamX = 0;
+    let targetCamZ = camDist;
 
     if (state.orbitMode === 'arc') {
       const camAngle = Math.sin(state.time * 0.45) * 0.72; // ±41.2°
-      camera.position.x = Math.sin(camAngle) * camDist;
-      camera.position.z = Math.cos(camAngle) * camDist;
+      targetCamX = Math.sin(camAngle) * camDist;
+      targetCamZ = Math.cos(camAngle) * camDist;
     } else {
       const camAngle = state.time * 0.28;
-      camera.position.x = Math.sin(camAngle) * camDist;
-      camera.position.z = Math.cos(camAngle) * camDist;
+      targetCamX = Math.sin(camAngle) * camDist;
+      targetCamZ = Math.cos(camAngle) * camDist;
     }
 
-    camera.position.y = (maxDim * 0.8) + Math.sin(state.time * 0.3) * 1.6;
-    controls.target.set(0, 0, 0);
+    const targetCamY = (maxDim * 0.8) + Math.sin(state.time * 0.3) * 1.6;
+
+    // 自动运镜平滑追目标机位与中心焦点
+    const camLerp = Math.min(1.0, 1.0 - Math.exp(-4.5 * dt));
+    camera.position.x += (targetCamX - camera.position.x) * camLerp;
+    camera.position.y += (targetCamY - camera.position.y) * camLerp;
+    camera.position.z += (targetCamZ - camera.position.z) * camLerp;
+
+    const targetLerp = Math.min(1.0, 1.0 - Math.exp(-6.0 * dt));
+    controls.target.x += (0 - controls.target.x) * targetLerp;
+    controls.target.y += (0 - controls.target.y) * targetLerp;
+    controls.target.z += (0 - controls.target.z) * targetLerp;
   }
 
-  // 2. 9 大核心光影与光学物理参数随音乐律动实时脉动 (由 1/2/3 挡位基准与自适应增益驱动)
-  const baseBloom = state.baseBloom !== undefined ? state.baseBloom : +ui.bloom.value;
-  const baseLight = state.baseLight !== undefined ? state.baseLight : +ui.light.value;
-  const baseDispersion = state.baseDispersion !== undefined ? state.baseDispersion : +ui.dispersion.value;
-  const baseEnv = state.baseEnv !== undefined ? state.baseEnv : +ui.envIntensity.value;
-  const baseRoughness = state.baseRoughness !== undefined ? state.baseRoughness : +ui.roughness.value;
-  const baseIor = state.baseIor !== undefined ? state.baseIor : +ui.ior.value;
-  const baseThickness = state.baseThickness !== undefined ? state.baseThickness : +ui.thickness.value;
-
-  // 呼吸微光晕 (自适应 1/2/3 挡光影)
-  const dynamicBloom = Math.min(0.35, baseBloom + (state.bassEnergy * 0.08 * tMul));
-  bloomPass.strength = dynamicBloom;
-
-  // 影棚主光 (自适应 1/2/3 挡光影)
-  const dynamicKeyLight = Math.min(0.35, baseLight + (state.bassEnergy * 0.12 * tMul));
-  keyLight.intensity = dynamicKeyLight;
-
-  // 动态彩虹色散与环境反射 (随低音高音重击炸裂)
-  const dynamicDispersion = Math.min(0.60, baseDispersion + (state.bassEnergy * 0.26 + state.trebleEnergy * 0.12) * tMul);
-  const dynamicEnv = Math.min(7.0, baseEnv + (state.midEnergy * 1.10 * tMul));
-
-  // 粗糙度、IOR与光学厚度动态共振
-  const dynamicRoughness = Math.min(0.12, baseRoughness + (state.midEnergy * 0.04 * tMul));
-  const dynamicIor = Math.min(2.40, baseIor + (state.bassEnergy * 0.22 * tMul));
-  const dynamicThickness = Math.min(3.00, baseThickness + (state.bassEnergy * 0.55 * tMul));
-
-  // 实时注入材质物理属性
-  matrixGroup.children.forEach(unit => {
-    unit.traverse?.(child => {
-      if (child.isMesh && child.material && child.material.isMeshPhysicalMaterial) {
-        const m = child.material;
-        m.roughness = dynamicRoughness;
-        m.envMapIntensity = dynamicEnv;
-        if (m.transmission > 0) {
-          m.ior = dynamicIor;
-          m.thickness = dynamicThickness;
-          m.dispersion = dynamicDispersion;
-        }
-      }
-    });
+  // Music modulates illumination, never the material's physical identity or user sliders.
+  const accent = state.beatPulse * (0.035 + tierCfg.burst * 0.065);
+  bloomPass.strength = Math.min(0.22, state.baseBloom + accent * 0.35);
+  keyLight.intensity = state.baseLight * 15 * (1 + accent * 1.4);
+  activePhysicalMaterials.forEach(material => {
+    material.envMapIntensity = material.userData.restEnv * (1 + accent);
   });
-
-  // 实时将 9 大动态脉动数值映射到 UI 界面输出与滑块位置 (滑块圆点与进度条随音乐节拍自适应跳动)
-  if (state.isPlayingMusic) {
-    ui.roughness.value = dynamicRoughness;
-    ui.roughness.nextElementSibling.textContent = dynamicRoughness.toFixed(2);
-
-    ui.ior.value = dynamicIor;
-    ui.ior.nextElementSibling.textContent = dynamicIor.toFixed(2);
-
-    ui.thickness.value = dynamicThickness;
-    ui.thickness.nextElementSibling.textContent = dynamicThickness.toFixed(2);
-
-    ui.dispersion.value = dynamicDispersion;
-    ui.dispersion.nextElementSibling.textContent = dynamicDispersion.toFixed(2);
-
-    ui.bloom.value = dynamicBloom;
-    ui.bloom.nextElementSibling.textContent = dynamicBloom.toFixed(2);
-
-    ui.envIntensity.value = dynamicEnv;
-    ui.envIntensity.nextElementSibling.textContent = dynamicEnv.toFixed(2);
-
-    ui.light.value = dynamicKeyLight;
-    ui.light.nextElementSibling.textContent = dynamicKeyLight.toFixed(2);
-  }
 }
 
 // -------------------------------------------------------------
@@ -4703,15 +4823,14 @@ function animate(nowTimestamp) {
   const dt = Math.max(0.001, Math.min(rawDt, 0.1));
 
   const tierCfg = TIER_CONFIGS[state.intensityTier] || TIER_CONFIGS[2];
-  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const motionFactor = prefersReduced ? 0.2 : 1.0;
-  const motionDt = frameNow < state.motionHoldUntil ? 0 : dt;
+  const motionFactor = prefersReducedMotion ? 0.2 : 1.0;
+  const motionDt = dt;
 
   state.time += motionDt * state.speedMultiplier * tierCfg.timeScale * motionFactor;
   controls.update();
   updateProgressUI();
 
-  if (state.analyser && state.audioDataArray && state.isPlayingMusic) {
+  if (state.analyser && state.audioDataArray && state.isPlayingMusic && state.audioReady) {
     state.analyser.getByteFrequencyData(state.audioDataArray);
 
     let bassSum = 0, midSum = 0, trebleSum = 0;
@@ -4723,29 +4842,44 @@ function animate(nowTimestamp) {
     const rawMid = midSum / 16 / 255;
     const rawTreble = trebleSum / 28 / 255;
 
-    state.bassEnergy = Math.max(rawBass, state.bassEnergy * 0.88);
-    state.midEnergy = Math.max(rawMid, state.midEnergy * 0.88);
-    state.trebleEnergy = Math.max(rawTreble, state.trebleEnergy * 0.88);
+    // 能量衰减改 dt 无关 (指数衰减)
+    const decayFactor = Math.exp(-7.67 * dt);
+    state.bassEnergy = Math.max(rawBass, state.bassEnergy * decayFactor);
+    state.midEnergy = Math.max(rawMid, state.midEnergy * decayFactor);
+    state.trebleEnergy = Math.max(rawTreble, state.trebleEnergy * decayFactor);
 
-    const now = performance.now();
-    const minBeatInterval = (60 / (180 * state.speedMultiplier)) * 1000;
-    const isPeak = (rawBass > 0.32 && (rawBass - state.lastBassEnergy) > 0.04) ||
-                   (rawMid > 0.45 && (rawMid - state.midEnergy) > 0.05);
-
-    state.beatAccumulator = (state.beatAccumulator || 0) + (dt * state.speedMultiplier * 2.08 * tierCfg.timeScale);
-
-    if ((isPeak && (now - state.lastBeatTime) > minBeatInterval) || state.beatAccumulator >= 1.0) {
-      state.beatCount++;
-      state.lastBeatTime = now;
-      state.beatAccumulator = 0.0;
-      state.beatPulse = 1;
-      if (tierCfg.microPause > 0 && state.beatCount % 4 === 0) {
-        state.motionHoldUntil = now + tierCfg.microPause * 1000;
-      }
+    // Audio time is the clock. Onsets refine tempo/phase; tier changes never invent beats.
+    const audioTime = state.playbackOffset + state.audioCtx.currentTime - state.playbackStartTime;
+    const isPeak = (rawBass > 0.28 && rawBass - state.lastBassEnergy > 0.045) ||
+      (rawMid > 0.38 && rawMid - state.lastMidEnergy > 0.065);
+    const lastOnset = state.onsetTimes.at(-1);
+    if (isPeak && (lastOnset === undefined || audioTime - lastOnset > 0.26)) {
+      const spacing = audioTime - lastOnset;
+      if (spacing >= 0.32 && spacing <= 0.9) {
+        state.onsetTimes.push(audioTime);
+        if (state.onsetTimes.length > 9) state.onsetTimes.shift();
+        const intervals = state.onsetTimes.slice(1).map((t, i) => t - state.onsetTimes[i]).sort((a,b) => a-b);
+        if (intervals.length >= 3) {
+          const median = intervals[Math.floor(intervals.length / 2)];
+          state.beatPeriod += (median - state.beatPeriod) * 0.15;
+        }
+      } else { state.onsetTimes = [audioTime]; }
+      const error = audioTime - state.nextBeatTime;
+      if (Math.abs(error) < state.beatPeriod * 0.28) state.nextBeatTime += error * 0.35;
+      state.beatPulse = Math.max(state.beatPulse, Math.min(1, rawBass + rawMid * 0.45));
     }
+    if (audioTime >= state.nextBeatTime) {
+      const elapsedBeats = 1 + Math.floor((audioTime - state.nextBeatTime) / state.beatPeriod);
+      state.beatCount += elapsedBeats;
+      state.beatOrigin = state.nextBeatTime + (elapsedBeats - 1) * state.beatPeriod;
+      state.nextBeatTime += elapsedBeats * state.beatPeriod;
+      state.beatPulse = Math.max(state.beatPulse, Math.min(1, rawBass * 1.4 + rawMid * 0.4));
+    }
+    state.beatPhase = THREE.MathUtils.clamp((audioTime - state.beatOrigin) / state.beatPeriod, 0, 1);
     state.lastBassEnergy = rawBass;
-
-    state.waveAccumulator += motionDt * state.speedMultiplier * (1.0 + state.bassEnergy * 4.2) * tierCfg.timeScale;
+    state.lastMidEnergy = rawMid;
+    // One travelling wave cycle per musical beat; higher tiers add subdivisions below.
+    state.waveAccumulator = (state.beatCount + state.beatPhase) * Math.PI / 2.1;
 
     const bars = $$('#audioVisualizer .audio-bar');
     if (bars.length >= 5) {
@@ -4756,13 +4890,15 @@ function animate(nowTimestamp) {
       bars[4].style.height = `${Math.max(3, state.trebleEnergy * 22)}px`;
     }
   } else {
-    state.bassEnergy *= 0.9;
-    state.midEnergy *= 0.9;
-    state.trebleEnergy *= 0.9;
+    // 能量衰减改 dt 无关 (待机静止指数衰减)
+    const idleDecayFactor = Math.exp(-6.32 * dt);
+    state.bassEnergy *= idleDecayFactor;
+    state.midEnergy *= idleDecayFactor;
+    state.trebleEnergy *= idleDecayFactor;
   }
   state.beatPulse *= Math.exp(-dt * (2.5 + tierCfg.response * 18));
 
-  if (!state.isPlayingMusic && state.camMotionMode === 'on' && !prefersReduced) {
+  if (!state.isPlayingMusic && state.camMotionMode === 'on' && !prefersReducedMotion) {
     const maxDim = Math.max(state.gridCols, state.gridRows, state.gridLayers);
     const camDist = 4.2 + maxDim * 2.2;
     if (state.orbitMode === 'arc') {
@@ -4772,14 +4908,31 @@ function animate(nowTimestamp) {
       camera.position.y = maxDim * 0.8;
       controls.target.set(0, 0, 0);
     } else {
-      matrixGroup.rotation.y += 0.0032 * state.speedMultiplier;
+      matrixGroup.rotation.y += 0.192 * dt * state.speedMultiplier;
     }
   }
 
-  updateMasterChoreography();
+  updateMasterChoreography(dt);
+  if (matrixDirty) commitMatrixRebuild();
 
-  if (state.waveMotion && matrixGroup.children.length) {
-    const amp = state.waveAmpMultiplier * tierCfg.motionRange * motionFactor;
+  if (pendingFrameDistance !== null) {
+    const autoCamera = !prefersReducedMotion && (state.camMotionMode === 'on' ||
+      (state.camMotionMode === 'auto' && state.isPlayingMusic));
+    if (autoCamera) {
+      pendingFrameDistance = null;
+    } else {
+      framingDirection.copy(camera.position).sub(controls.target);
+      const currentDistance = framingDirection.length();
+      const blend = prefersReducedMotion ? 1 : 1 - Math.exp(-12 * dt);
+      const nextDistance = currentDistance + (pendingFrameDistance - currentDistance) * blend;
+      camera.position.copy(controls.target).add(framingDirection.setLength(nextDistance));
+      camera.lookAt(controls.target);
+      if (Math.abs(nextDistance - pendingFrameDistance) < 0.01) pendingFrameDistance = null;
+    }
+  }
+
+  if (matrixGroup.children.length) {
+    const amp = state.waveAmpMultiplier * tierCfg.motionRange * motionFactor * 0.42;
     const bass = state.bassEnergy;
     const mid = state.midEnergy;
     const treble = state.trebleEnergy;
@@ -4809,7 +4962,7 @@ function animate(nowTimestamp) {
       const isMosaic = (!isShowingIntro && state.contentMode === 'avatar' && state.avatarDist === 'mosaic') ||
                        (!isShowingIntro && state.contentMode === 'image' && state.imageDist === 'mosaic');
 
-      if (state.isPlayingMusic && (bass > 0.015 || mid > 0.02)) {
+      if (state.waveMotion && state.isPlayingMusic && state.audioReady && !prefersReducedMotion && (bass > 0.015 || mid > 0.02)) {
         if (isMosaic && state.mosaicLock) {
           const globalPhase = state.waveAccumulator * 3.8;
           const unifiedLift = Math.sin(globalPhase) * (bass * 0.40 + mid * 0.18) * amp;
@@ -4867,7 +5020,7 @@ function animate(nowTimestamp) {
           const phase = state.waveAccumulator * 5.2 + angle * 2.2 - (d * 1.3 * tierCfg.phaseSpread) + (l * 0.8);
 
           m.targetY = uData.baseY + Math.sin(phase) * (bass * 0.60 * amp);
-          m.targetRotY = (state.time * 1.8 + phase * 0.5) * amp;
+          m.targetRotY = Math.sin(phase * 0.5) * 0.5 * amp;
           m.targetRotX = Math.cos(phase) * 0.12 * amp;
           m.targetRotZ = Math.sin(phase) * 0.12 * amp;
           m.targetScaleY = 1.0 + Math.sin(phase) * 0.10 * amp;
@@ -4886,7 +5039,7 @@ function animate(nowTimestamp) {
           m.targetRotY = 0;
         } else if (state.wavePattern === 'glitch') {
           const isEven = (r + c + l) % 2 === 0;
-          const stepBeat = Math.floor(state.time * 2.8 + m.randSeed * 1.5 * tierCfg.phaseSpread);
+          const stepBeat = state.beatCount + Math.floor(state.beatPhase * (state.intensityTier === 3 ? 2 : 1));
           const lockAngle = ((stepBeat % 4) * (Math.PI / 4)) * (isEven ? 1 : -1);
 
           m.targetY = uData.baseY + (isEven ? bass : mid) * 0.75 * amp;
@@ -4906,8 +5059,36 @@ function animate(nowTimestamp) {
         m.targetScaleZ = 1.0;
       }
 
-      const lerpFactor = Math.min(1.0, 1.0 - Math.exp(-tierCfg.response * 60.0 * dt));
-      unit.position.y += (m.targetY - unit.position.y) * lerpFactor;
+      let targetX = uData.baseX;
+      let targetZ = uData.baseZ;
+      if (!(isMosaic && state.mosaicLock) && state.contentMode !== 'text' && state.matrixSequence !== 'lyrics_stream') {
+        const pose=formationPosition(uData,state.activeFormation);
+        targetX=pose[0]; targetZ=pose[2]; m.targetY += pose[1]-uData.baseY;
+      }
+      const dancing = state.waveMotion && state.isPlayingMusic && state.audioReady && !prefersReducedMotion;
+      if (dancing && !(isMosaic && state.mosaicLock) && state.contentMode !== 'text' && state.matrixSequence !== 'lyrics_stream') {
+        const phase = state.beatPhase;
+        const energy = Math.min(1, bass * 1.3 + mid * 0.3);
+        const groupSign = (r + c + l) % 2 ? 1 : -1;
+        const release = Math.exp(-phase * (state.intensityTier === 3 ? 10 : 5));
+        const anticipation = Math.pow(Math.max(0, (phase - 0.72) / 0.28), 2);
+        const spread = state.intensityTier === 1 ? Math.sin(phase * Math.PI * 2) * 0.035 :
+          state.intensityTier === 2 ? Math.sin(phase * Math.PI * 2 + groupSign * 0.65) * 0.13 :
+          release * 0.38 - anticipation * 0.13;
+        targetX += uData.baseX * spread * energy * state.waveAmpMultiplier;
+        targetZ += (state.intensityTier === 1 ? 0 : groupSign * release * tierCfg.burst * 1.1) * energy;
+        m.targetY += uData.baseY * spread * energy * 0.5;
+        const [low, high] = tierCfg.matrixScaleRange;
+        const size = 1 + ((high - 1) * release - (1 - low) * anticipation) * energy;
+        m.targetScaleX = THREE.MathUtils.clamp(m.targetScaleX * size, low, high);
+        m.targetScaleY = THREE.MathUtils.clamp(m.targetScaleY * size, low, high);
+        m.targetScaleZ = THREE.MathUtils.clamp(m.targetScaleZ * size, low, high);
+      }
+      const lerpFactor = prefersReducedMotion ? 1 : Math.min(1.0, 1.0 - Math.exp(-tierCfg.response * 60.0 * dt));
+      const spatialBlend = prefersReducedMotion ? 1 : 1-Math.exp(-[0,2.4,4.5,7][state.intensityTier]*dt);
+      unit.position.x += (targetX - unit.position.x) * spatialBlend;
+      unit.position.z += (targetZ - unit.position.z) * spatialBlend;
+      unit.position.y += (m.targetY - unit.position.y) * spatialBlend;
       unit.rotation.x += (m.targetRotX - unit.rotation.x) * lerpFactor;
       unit.rotation.y += (m.targetRotY - unit.rotation.y) * lerpFactor;
       unit.rotation.z += (m.targetRotZ - unit.rotation.z) * lerpFactor;
@@ -4944,16 +5125,12 @@ function animate(nowTimestamp) {
   }
 
   if (state.contentMode === 'avatar' && (!state.isPlayingMusic || !state.isIntroPlaying)) {
-    AVATAR_KEYS.forEach(key => {
-      const cvs = liveCanvasMap[key];
-      drawLiveAvatar(cvs, key, state.time, lookX, lookY, isBlinking, currentEmote, state.bassEnergy, state.midEnergy, state.trebleEnergy);
-      liveTextureMap[key].needsUpdate = true;
-    });
-
-    const activeThumb = $(`#thumb_${state.selectedAvatar}`);
-    if (activeThumb) {
-      activeThumb.width = activeThumb.height = 88;
-      drawLiveAvatar(activeThumb, state.selectedAvatar, state.time, lookX, lookY, isBlinking, currentEmote, state.bassEnergy, state.midEnergy, state.trebleEnergy);
+    const is30FpsFrame = (frameNow - lastAvatarRenderTime >= 33.3);
+    if (is30FpsFrame) {
+      lastAvatarRenderTime = frameNow;
+      activeLiveTextureKeys.forEach(key => {
+        renderAvatarRig(key, frameNow / 1000, lookX, lookY, currentEmote, state.bassEnergy, state.midEnergy);
+      });
     }
   }
 
@@ -4962,7 +5139,7 @@ function animate(nowTimestamp) {
     cloudVolumeTexture.offset.y = (state.time * 0.01) % 1;
   }
 
-  syncSliderOutputs();
+  updateContactShadows();
   composer.render();
   requestAnimationFrame(animate);
 }
@@ -5075,7 +5252,7 @@ $('#toggleTitleIntro')?.addEventListener('click', e => {
   e.currentTarget.innerHTML = `<svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg> 歌名序幕：${state.enableTitleIntro ? '开' : '关'}`;
   if (state.enableTitleIntro) {
     state.isIntroPlaying = true;
-    state.introStartTime = Date.now();
+    state.introStartTime = getPlaybackTime();
   } else {
     state.isIntroPlaying = false;
   }
@@ -5116,87 +5293,10 @@ $('#enableLyricsToggle')?.addEventListener('click', () => setLyricsDisplayState(
 // -------------------------------------------------------------
 // 15. 光影与光学参数 1/2/3 挡自适应预设与动态增益引擎
 // -------------------------------------------------------------
-const TIER_LIGHTING_CONFIGS = {
-  1: {
-    name: '1 挡 · 沉静微澜 (纯净低光影)',
-    multiplier: 0.5,
-    bloom: 0.04,
-    light: 0.05,
-    dispersion: 0.12,
-    envIntensity: 2.20,
-    ior: 1.45,
-    thickness: 0.90,
-    roughness: 0.00,
-    bevelRadius: 0.16
-  },
-  2: {
-    name: '2 挡 · 动感晶辉 (标准高奢影棚)',
-    multiplier: 1.0,
-    bloom: 0.08,
-    light: 0.08,
-    dispersion: 0.26,
-    envIntensity: 3.95,
-    ior: 1.52,
-    thickness: 1.20,
-    roughness: 0.00,
-    bevelRadius: 0.20
-  },
-  3: {
-    name: '3 挡 · 极致狂热 (超强光影极光炸裂)',
-    multiplier: 2.2,
-    bloom: 0.15,
-    light: 0.18,
-    dispersion: 0.42,
-    envIntensity: 5.20,
-    ior: 1.70,
-    thickness: 1.65,
-    roughness: 0.02,
-    bevelRadius: 0.22
-  }
-};
-
 function applyIntensityTier(tier) {
-  state.intensityTier = tier;
-  const cfg = TIER_LIGHTING_CONFIGS[tier] || TIER_LIGHTING_CONFIGS[2];
-  state.tierMultiplier = cfg.multiplier;
-
-  state.baseBloom = cfg.bloom;
-  state.baseLight = cfg.light;
-  state.baseDispersion = cfg.dispersion;
-  state.baseEnv = cfg.envIntensity;
-  state.baseIor = cfg.ior;
-  state.baseThickness = cfg.thickness;
-  state.baseRoughness = cfg.roughness;
-  state.baseBevelRadius = cfg.bevelRadius;
-
-  ui.bloom.value = cfg.bloom;
-  ui.light.value = cfg.light;
-  ui.dispersion.value = cfg.dispersion;
-  ui.envIntensity.value = cfg.envIntensity;
-  ui.ior.value = cfg.ior;
-  ui.thickness.value = cfg.thickness;
-  ui.roughness.value = cfg.roughness;
-  ui.bevelRadius.value = cfg.bevelRadius;
-
-  bloomPass.strength = cfg.bloom;
-  keyLight.intensity = cfg.light;
-
-  matrixGroup.children.forEach(unit => {
-    unit.traverse?.(child => {
-      if (child.isMesh && child.material && child.material.isMeshPhysicalMaterial) {
-        const m = child.material;
-        m.roughness = cfg.roughness;
-        m.envMapIntensity = cfg.envIntensity;
-        if (m.transmission > 0) {
-          m.ior = cfg.ior;
-          m.thickness = cfg.thickness;
-          m.dispersion = cfg.dispersion;
-        }
-      }
-    });
-  });
-
-  syncSliderOutputs();
+  state.intensityTier = Math.max(1, Math.min(3, tier));
+  state.tierMultiplier = [0, 0.55, 1, 1.6][state.intensityTier];
+  // A performance tier changes choreography, not glass IOR, surface roughness or music BPM.
 }
 
 // 全局 1/2/3 挡律动强度自适应调节
@@ -5229,21 +5329,14 @@ $('#matrixSequenceSelect').addEventListener('change', e => {
 });
 
 // 乐章材质锁定切换
-$('#lockMaterialToggle').addEventListener('click', e => {
-  state.lockMaterial = !state.lockMaterial;
-  e.currentTarget.classList.toggle('active', state.lockMaterial);
-  const selectedText = ui.material.options[ui.material.selectedIndex]?.text?.split(' ')?.[0] || '当前材质';
-  e.currentTarget.innerHTML = state.lockMaterial
-    ? `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> 乐章材质流变：🔒 已锁定【${selectedText}】`
-    : `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> 乐章材质流变：自动轮转 (点击锁定当前材质)`;
-});
-
-ui.material.addEventListener('change', () => {
-  if (state.lockMaterial) {
-    const selectedText = ui.material.options[ui.material.selectedIndex]?.text?.split(' ')?.[0] || '当前材质';
-    $('#lockMaterialToggle').innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> 乐章材质流变：🔒 已锁定【${selectedText}】`;
-  }
-});
+function syncMaterialControls(){
+  $('#lockMaterialToggle').setAttribute('aria-checked',String(state.lockMaterial));
+  $('#lockMaterialToggle').textContent='';
+  $('#materialName').textContent=ui.material.options[ui.material.selectedIndex]?.text||'';
+  $$('#materialSamples button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.material===ui.material.value)));
+}
+$('#lockMaterialToggle').addEventListener('click',()=>{state.lockMaterial=!state.lockMaterial;syncMaterialControls();});
+ui.material.addEventListener('change',()=>{syncMaterialControls();scheduleMaterialSamples();});
 
 // 乐章流变频率调节 (4 / 8 / 16 / 32)
 $('#morphFreqGroup').addEventListener('click', e => {
@@ -5336,9 +5429,16 @@ $('#imageDistGroup')?.addEventListener('click', e => {
 
 // 背景颜色与图片控制
 function setBackgroundColor(hex) {
+  backgroundRequest++;
+  $('#presetBgSelect').value='';
+  keyLight.color.set(0xffffff);hemiLight.color.set(0xffffff);
   state.backgroundColor = hex;
   scene.background = new THREE.Color(hex);
+  scene.fog = new THREE.FogExp2(hex, 0.008);
+  studioFloor.visible = true;
+  studioFloor.material.color.set(hex).lerp(new THREE.Color(0x566479), 0.12);
   $('#bgColorPicker').value = hex;
+  if (state.contentMode === 'text' || state.isIntroPlaying) rebuildMatrix();
 }
 
 $('#bgColorPicker').addEventListener('input', e => setBackgroundColor(e.target.value));
@@ -5352,26 +5452,39 @@ $$('.swatch[data-bg]').forEach(btn => {
 });
 
 $('#resetBgBtn').addEventListener('click', () => {
-  setBackgroundColor('#f8fafc');
+  setBackgroundColor('#727b88');
   $$('.swatch[data-bg]').forEach(x => x.classList.remove('active'));
   $$('.swatch[data-bg]')[0]?.classList.add('active');
   if ($('#presetBgSelect')) $('#presetBgSelect').value = '';
 });
 
 // 项目内置背景图选择
+let backgroundRequest=0;
+function fitBackgroundTexture(tex) {
+  const aspect=stage.clientWidth/Math.max(1,stage.clientHeight),imageAspect=tex.image.width/tex.image.height;
+  tex.repeat.set(Math.min(1,aspect/imageAspect),Math.min(1,imageAspect/aspect));
+  tex.offset.set((1-tex.repeat.x)/2,(1-tex.repeat.y)/2);
+}
+function loadLandscapeBackground(url) {
+  const request=++backgroundRequest;
+  new THREE.TextureLoader().load(url,tex=>{
+    if(request!==backgroundRequest){tex.dispose();return;}
+    tex.colorSpace=THREE.SRGBColorSpace;fitBackgroundTexture(tex);
+    state.bgImageTexture=tex;scene.background=tex;scene.fog=null;studioFloor.visible=false;
+    keyLight.color.set(0xffe1b4);hemiLight.color.set(0xc8def1);
+    $$('[data-studio]').forEach(b=>b.setAttribute('aria-pressed','false'));
+  },undefined,()=>{if(request===backgroundRequest){setBackgroundColor('#727b88');$('#presetBgSelect').value='';}});
+}
+window.addEventListener('resize',()=>{if(scene.background?.isTexture)fitBackgroundTexture(scene.background);});
 $('#presetBgSelect')?.addEventListener('change', e => {
   const url = e.target.value;
   if (!url) {
     setBackgroundColor(state.backgroundColor || '#f8fafc');
     return;
   }
-  new THREE.TextureLoader().load(url, tex => {
-    tex.colorSpace = THREE.SRGBColorSpace;
-    state.bgImageTexture = tex;
-    scene.background = tex;
-    render();
-  });
+  loadLandscapeBackground(url);
 });
+loadLandscapeBackground('studio/alpine-light-background-v1.png');
 
 $('#bgImgUpload').addEventListener('change', e => {
   const file = e.target.files[0];
@@ -5381,6 +5494,8 @@ $('#bgImgUpload').addEventListener('change', e => {
     new THREE.TextureLoader().load(ev.target.result, tex => {
       tex.colorSpace = THREE.SRGBColorSpace;
       scene.background = tex;
+      scene.fog = null;
+      studioFloor.visible = false;
       state.bgImageTexture = tex;
     });
   };
@@ -5436,7 +5551,7 @@ $('#camMotionGroup').addEventListener('click', e => {
 $('#waveMotionToggle').addEventListener('click', e => {
   state.waveMotion = !state.waveMotion;
   e.currentTarget.classList.toggle('active', state.waveMotion);
-  e.currentTarget.textContent = `音频声波矩阵：${state.waveMotion ? '开' : '关'}`;
+  e.currentTarget.textContent = `声波：${state.waveMotion ? '开' : '关'}`;
   if (!state.waveMotion) {
     matrixGroup.children.forEach(unit => {
       const uData = unit.userData;
@@ -5490,14 +5605,8 @@ $('#autoBlinkToggle').addEventListener('click', e => {
   e.currentTarget.textContent = `✨ 动态呼吸眨眼：${state.enableBlink ? '开' : '关'}`;
 });
 
-// 初始缩略图
-AVATAR_KEYS.forEach(key => {
-  const cvs = $(`#thumb_${key}`);
-  if (cvs) {
-    cvs.width = cvs.height = 88;
-    drawLiveAvatar(cvs, key, 0, 0, 0, false, null, 0);
-  }
-});
+// Load the official SDK only when the role panel is requested, not on material-only visits.
+$('#avatarPanel').addEventListener('pointerenter',()=>AVATAR_KEYS.forEach(key=>renderAvatarRig(key,0)),{once:true});
 
 // 批量本地音频与歌词上传管理
 $('#audioUpload').addEventListener('change', e => {
@@ -5663,8 +5772,13 @@ $('#contentModeGroup').addEventListener('click', e => {
   $$('#contentModeGroup .pill-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   state.contentMode = btn.dataset.mode;
+  if (state.contentMode !== 'text' && state.matrixSequence === 'lyrics_stream') {
+    state.matrixSequence = 'standard';
+    $('#matrixSequenceSelect').value = 'standard';
+  }
 
   $('#avatarPanel').style.display = state.contentMode === 'avatar' ? 'block' : 'none';
+  if(state.contentMode==='avatar')AVATAR_KEYS.forEach((key,index)=>setTimeout(()=>renderAvatarRig(key,performance.now()/1000),index*150));
   $('#textPanel').style.display = state.contentMode === 'text' ? 'block' : 'none';
   $('#imagePanel').style.display = state.contentMode === 'image' ? 'block' : 'none';
 
@@ -5678,12 +5792,21 @@ $('#contentModeGroup').addEventListener('click', e => {
 });
 
 // Avatar 选择
+$('#officialAvatarEdit').addEventListener('click',()=>{
+  try{sessionStorage.setItem('lu-editor-stage-context',JSON.stringify({
+    controls:Object.fromEntries(Object.entries(ui).filter(([key])=>key!=='text').map(([key,input])=>[key,input.value])),
+    layer:state.layerMode,dist:state.avatarDist,lock:state.lockMaterial,
+    background:state.backgroundColor,preset:$('#presetBgSelect').value,
+    camera:camera.position.toArray(),target:controls.target.toArray()
+  }));}catch{}
+});
 $('#avatarPresetGrid').addEventListener('click', e => {
   const card = e.target.closest('.avatar-card');
   if (!card) return;
   $$('#avatarPresetGrid .avatar-card').forEach(c => c.classList.remove('active'));
   card.classList.add('active');
   state.selectedAvatar = card.dataset.avatar;
+  $('#officialAvatarEdit').href='./studio/avatar-editor.html?slot='+state.selectedAvatar;
   rebuildMatrix();
 });
 
@@ -5702,6 +5825,7 @@ $('#avatarDistGroup').addEventListener('click', e => {
 Object.values(ui).forEach(node => {
   if (node instanceof HTMLElement) {
     node.addEventListener('input', () => {
+      if ([ui.gridCols, ui.gridRows, ui.gridLayers].includes(node)) return;
       syncSliderOutputs();
       if (node === ui.bloom) {
         state.baseBloom = +ui.bloom.value;
@@ -5709,7 +5833,7 @@ Object.values(ui).forEach(node => {
       }
       if (node === ui.light) {
         state.baseLight = +ui.light.value;
-        keyLight.intensity = +ui.light.value;
+        keyLight.intensity = +ui.light.value * 15;
       }
       if (node === ui.dispersion) state.baseDispersion = +ui.dispersion.value;
       if (node === ui.envIntensity) state.baseEnv = +ui.envIntensity.value;
@@ -5723,10 +5847,11 @@ Object.values(ui).forEach(node => {
         currentRoundedGeo = createRoundedSquircleGeometry(+ui.bevelRadius.value);
       }
       if (node === ui.fov) {
+        state.currentFov = +ui.fov.value;
         camera.fov = +ui.fov.value;
         camera.updateProjectionMatrix();
       }
-      rebuildMatrix();
+      if (![ui.fov, ui.bloom, ui.light].includes(node)) rebuildMatrix();
     });
   }
 });
@@ -5741,6 +5866,7 @@ $$('.swatch[data-c]').forEach(btn => {
 });
 
 $('#resetCam').addEventListener('click', () => {
+  pendingFrameDistance = null;
   const maxDim = Math.max(state.gridCols, state.gridRows, state.gridLayers);
   const targetCamDist = 4.2 + maxDim * 2.2;
   camera.position.set(targetCamDist * 0.55, targetCamDist * 0.42, targetCamDist * 0.88);
@@ -5754,6 +5880,7 @@ $('#resetCam').addEventListener('click', () => {
 
 $$('.preset-cam-btn').forEach(btn => {
   btn.addEventListener('click', () => {
+    pendingFrameDistance = null;
     const type = btn.dataset.cam;
     const maxDim = Math.max(state.gridCols, state.gridRows, state.gridLayers);
     const targetCamDist = 4.2 + maxDim * 2.2;
@@ -5785,6 +5912,95 @@ $('#inspectorToggleBtn')?.addEventListener('click', () => {
   $('#inspectorPanel')?.classList.toggle('collapsed');
 });
 
+$('#materialSamples').addEventListener('click', event => {
+  const sample = event.target.closest('[data-material]');
+  if (!sample) return;
+  ui.material.value = sample.dataset.material;
+  state.lockMaterial = true;
+  syncMaterialControls();
+  scheduleMaterialSamples();
+  rebuildMatrix();
+});
+$('#formationSelect').addEventListener('change', event => {
+  state.formationMode = event.target.value;
+  state.activeFormation = state.formationMode === 'auto' ? FORMATION_SEQUENCE[Math.max(0,lastMovementIdx)] : state.formationMode;
+  rebuildMatrix();
+});
+syncMaterialControls();
+$('#inspectorToggleBtn').setAttribute('aria-controls', 'inspectorPanel');
+function syncInspectorAccessibility() {
+  $('#inspectorToggleBtn').setAttribute('aria-expanded', String(!$('#inspectorPanel').classList.contains('collapsed')));
+  $$('.inspector-tab-btn').forEach(button => {
+    button.setAttribute('aria-pressed', String(button.classList.contains('active')));
+    button.setAttribute('aria-controls', button.dataset.tab);
+  });
+}
+
+const materialFamilies={clear:['prism','crystal','ice','frosted','smoke'],metal:['alloy','sand'],soft:['silk','wool','cloud'],mineral:['shell','jade']};
+const materialPalette={prism:'#b4a3da',crystal:'#c94f64',ice:'#79bed0',frosted:'#a5b4cc',smoke:'#a2783e',silk:'#b97868',wool:'#d5bd98',cloud:'#e5e5e0',sand:'#b99449',shell:'#e2bab4',alloy:'#a0aab9',jade:'#3d977a'};
+const authoredMaterialColors={};
+ui.color.addEventListener('input',()=>authoredMaterialColors[ui.material.value]=ui.color.value);
+$('#materialTones').addEventListener('click',()=>authoredMaterialColors[ui.material.value]=ui.color.value);
+function applyMaterialPalette(){ui.color.value=authoredMaterialColors[ui.material.value]||materialPalette[ui.material.value];}
+ui.material.addEventListener('change',applyMaterialPalette);
+$('#materialSamples').addEventListener('click',event=>{if(event.target.closest('[data-material]'))applyMaterialPalette();});
+$$('.material-families button').forEach(button=>button.addEventListener('click',()=>{
+  $$('.material-families button').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
+  $$('#materialSamples button').forEach(b=>b.hidden=button.dataset.family!=='all'&&!materialFamilies[button.dataset.family].includes(b.dataset.material));
+}));
+$$('[data-studio]').forEach(button=>button.addEventListener('click',()=>{
+  setBackgroundColor(button.dataset.studio==='light'?'#f1f0ed':button.dataset.studio==='dark'?'#202a38':'#727b88');
+  $$('[data-studio]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
+  scheduleMaterialSamples();
+}));
+let sampleTimer, sampleGeneration=0;
+function scheduleMaterialSamples(){clearTimeout(sampleTimer);sampleTimer=setTimeout(renderMaterialSamples,160);}
+async function renderMaterialSamples(){
+  const generation=++sampleGeneration;
+  const preview=new THREE.Scene();preview.background=new THREE.Color('#f1f0ed');preview.environment=scene.environment;
+  preview.add(new THREE.HemisphereLight(0xffffff,0x707782,.6));
+  const light=new THREE.DirectionalLight(0xfff5e8,1.8);light.position.set(-3,5,4);light.castShadow=true;
+  light.shadow.mapSize.set(1024,1024);Object.assign(light.shadow.camera,{left:-2,right:2,top:2,bottom:-2,near:.1,far:15});light.shadow.bias=-.0005;light.shadow.normalBias=.015;preview.add(light);
+  const cam=new THREE.PerspectiveCamera(30,1,.1,20);cam.position.set(2,1.5,2.8);cam.lookAt(0,0,0);
+  const geo=createRoundedSquircleGeometry(.12);const mesh=new THREE.Mesh(geo);mesh.castShadow=true;mesh.receiveShadow=true;preview.add(mesh);
+  const floor=new THREE.Mesh(new THREE.PlaneGeometry(200,200),new THREE.MeshStandardMaterial({color:'#f1f0ed',roughness:.9}));floor.rotation.x=-Math.PI/2;floor.position.y=-.52;floor.receiveShadow=true;preview.add(floor);
+  const size=336,rt=new THREE.WebGLRenderTarget(size,size,{samples:4});rt.texture.colorSpace=THREE.SRGBColorSpace;
+  const pixels=new Uint8Array(size*size*4),source=document.createElement('canvas');source.width=source.height=size;
+  const tasks=[...$$('#materialSamples button')].map(b=>({canvas:b.querySelector('canvas'),material:b.dataset.material,color:authoredMaterialColors[b.dataset.material]||materialPalette[b.dataset.material]}));
+  tasks.push(...[...$$('#materialTones button')].map(b=>({canvas:b.querySelector('canvas'),material:ui.material.value,color:b.dataset.c})));
+  for(const task of tasks){
+    await new Promise(r=>requestAnimationFrame(r));if(generation!==sampleGeneration)break;
+    const material=createMaterialPreset(task.material,task.color);mesh.material=material;
+    const previous=renderer.getRenderTarget();renderer.setRenderTarget(rt);renderer.render(preview,cam);renderer.readRenderTargetPixels(rt,0,0,size,size,pixels);renderer.setRenderTarget(previous);
+    source.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(pixels),size,size),0,0);
+    const ctx=task.canvas.getContext('2d');ctx.save();ctx.clearRect(0,0,task.canvas.width,task.canvas.height);ctx.translate(0,task.canvas.height);ctx.scale(1,-1);ctx.drawImage(source,0,0,task.canvas.width,task.canvas.height);ctx.restore();material.dispose();
+  }
+  rt.dispose();geo.dispose();floor.geometry.dispose();floor.material.dispose();light.shadow.map?.dispose();
+}
+ui.color.addEventListener('input',scheduleMaterialSamples);
+$('#tab-optics').addEventListener('input',e=>{if(e.target.matches('input[type=range]'))scheduleMaterialSamples();});
+$('#materialTones').addEventListener('click',scheduleMaterialSamples);
+scheduleMaterialSamples();
+$('#inspectorToggleBtn').addEventListener('click', syncInspectorAccessibility);
+$$('.inspector-tab-btn').forEach(button => button.addEventListener('click', () => {
+  if (window.innerWidth <= 760) $('#inspectorPanel').classList.remove('collapsed');
+  syncInspectorAccessibility();
+}));
+
+function setImmersive(enabled) {
+  document.body.classList.toggle('immersive', enabled);
+  $('#immersiveToggle').textContent = enabled ? '返回工作台' : '沉浸';
+  $('#immersiveToggle').setAttribute('aria-pressed', String(enabled));
+  window.dispatchEvent(new Event('resize'));
+}
+$('#immersiveToggle').addEventListener('click', () => setImmersive(!document.body.classList.contains('immersive')));
+document.addEventListener('keydown', event => {
+  if (event.target.closest('input, textarea, select, [contenteditable="true"]')) return;
+  if (event.key === 'Escape') setImmersive(false);
+  else if (event.key.toLowerCase() === 'f') { event.preventDefault(); setImmersive(!document.body.classList.contains('immersive')); }
+  else if (event.code === 'Space' && document.body.classList.contains('immersive')) { event.preventDefault(); $('#playPauseBtn').click(); }
+});
+
 // 暴露全局引用
 window.state = state;
 window.rebuildMatrix = rebuildMatrix;
@@ -5795,10 +6011,30 @@ window.parseLrcString = parseLrcString;
 
 // 初始化启动
 rebuildMatrix();
-if (window.matchMedia('(max-width: 640px)').matches) {
+if (window.matchMedia('(max-width: 1200px)').matches) {
   $('#inspectorPanel')?.classList.add('collapsed');
 }
 updateProgressUI(true);
+syncInspectorAccessibility();
+// Same-tab editor return restores the stage without transferring data to the official website.
+const editorReturn=new URLSearchParams(location.search);
+if(editorReturn.get('from')==='editor'&&AVATAR_KEYS.includes(editorReturn.get('avatar'))){
+  try{
+    const saved=JSON.parse(sessionStorage.getItem('lu-editor-stage-context')||'null');
+    if(saved){
+      for(const [key,value] of Object.entries(saved.controls||{})){if(!ui[key]||key==='text')continue;ui[key].value=value;ui[key].dispatchEvent(new Event(key==='material'?'change':'input',{bubbles:true}));}
+      state.lockMaterial=!!saved.lock;syncMaterialControls();
+      if(saved.preset){$('#presetBgSelect').value=saved.preset;$('#presetBgSelect').dispatchEvent(new Event('change'));}else setBackgroundColor(saved.background||'#727b88');
+      if(Array.isArray(saved.camera)&&saved.camera.length===3)camera.position.fromArray(saved.camera);
+      if(Array.isArray(saved.target)&&saved.target.length===3)controls.target.fromArray(saved.target);
+      document.querySelector(`[data-layer="${saved.layer}"]`)?.click();
+      document.querySelector(`[data-dist="${saved.dist}"]`)?.click();
+    }
+  }catch{ /* A broken optional stage snapshot must not prevent the saved avatar loading. */ }
+  $('[data-tab=tab-content]').click();$('[data-mode=avatar]').click();
+  document.querySelector(`[data-avatar="${editorReturn.get('avatar')}"]`).click();
+  $('#officialAvatarStatus').textContent='工作室角色已载入 · 材质设置已保留';
+}
 requestAnimationFrame(animate);
 </script>
 </body>

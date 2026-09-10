@@ -1,0 +1,8 @@
+{
+  "name":"lu-avatar-adapter",
+  "private":true,
+  "type":"module",
+  "scripts":{"build":"node build.mjs"},
+  "dependencies":{"@oneworks/avatar":"1.0.0-rc.9","@oneworks/avatar-web":"1.0.0-rc.9"},
+  "devDependencies":{"esbuild":"0.28.2"}
+}

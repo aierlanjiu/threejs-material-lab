@@ -1,0 +1,25 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LÜ · OneWorks 角色工作室</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="vendor/oneworks.css">
+<style>body{margin:0;background:#f6f6f4;font:14px -apple-system,'PingFang SC',sans-serif;color:#252a30}header{display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:12px 20px}a{color:inherit}button{padding:10px 14px;background:#263348;color:white;border:0;border-radius:6px;cursor:pointer}button:disabled{opacity:.5}#editor{height:calc(100dvh - 112px);min-height:500px}#status{margin-left:auto;font-size:12px}aside{font-size:12px;color:#647080;padding:0 20px 12px;line-height:1.6}.secondary{background:transparent;color:#263348;border:1px solid #d2d5d8}</style>
+<header><a id="return" href="../index.html">返回方块舞台</a><strong>OneWorks 角色工作室</strong><span id="status" role="status">正在加载</span><button class="secondary" id="export" disabled>导出角色</button><button class="secondary" id="import">导入角色</button><input id="definitionFile" type="file" accept=".json,application/json" hidden><button id="save" disabled>保存并返回舞台</button></header><aside>使用 OneWorks 官方编辑器组件 · 角色保存于当前浏览器，舞台使用透明底。<a href="https://oneworks.cloud/avatar/" target="_blank" rel="noopener">访问官网 ↗</a>（官网作品不会自动同步，可使用本页的角色文件迁移。）</aside><main id="editor"></main>
+<script type="module">
+import {createAvatarEditor,createDefaultAvatarDefinition,parseAvatarDefinition} from './vendor/oneworks.js';
+const presets=await fetch('./avatar-presets.json').then(r=>r.json());
+const requested=new URLSearchParams(location.search).get('slot');
+const slot=Object.hasOwn(presets,requested)?requested:'cat';
+const key='lu-oneworks-definition-v1-'+slot;
+const returnUrl='../index.html?avatar='+encodeURIComponent(slot)+'&from=editor';
+document.querySelector('#return').href=returnUrl;
+let definition=presets[slot];
+try {const saved=localStorage.getItem(key);if(saved)definition=parseAvatarDefinition(JSON.parse(saved));}catch{}
+const editor=createAvatarEditor(document.querySelector('#editor'),{definition,locale:'zh-Hans',theme:'light'});
+await editor.ready;
+document.querySelector('#status').textContent='编辑中 · 尚未应用';document.querySelector('#save').disabled=false;document.querySelector('#export').disabled=false;
+document.querySelector('#save').onclick=()=>{try{const value=parseAvatarDefinition(editor.getDefinition());value.scene.camera.background='transparent';value.scene.camera.frame='square';value.scene.camera.showFrameShadow=false;localStorage.setItem(key,JSON.stringify(value));location.href=returnUrl;}catch{document.querySelector('#status').textContent='保存失败，请检查浏览器存储空间';}};
+document.querySelector('#export').onclick=()=>{const blob=new Blob([JSON.stringify(editor.getDefinition(),null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='lu-'+slot+'.avatar.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+document.querySelector('#import').onclick=()=>document.querySelector('#definitionFile').click();
+document.querySelector('#definitionFile').onchange=async e=>{try{const file=e.target.files[0];if(!file)return;if(file.size>2e6)throw Error('too large');await editor.setDefinition(parseAvatarDefinition(JSON.parse(await file.text())));document.querySelector('#status').textContent='已导入 · 保存后应用';}catch{document.querySelector('#status').textContent='无法导入，请选择有效的 OneWorks 角色 JSON';}};
+window.luAvatarEditor=editor;
+</script></html>
