@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>「幻 / HUAN」荔枝吉祥物 (Mascot) 与 CMF 材质设计稿</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --border: #30363d;
+      --text: #c9d1d9;
+      --text-bright: #f0f6fc;
+      --text-dim: #8b949e;
+      --accent: #ff7b72;
+      --accent-glow: rgba(255, 123, 114, 0.15);
+      --green: #3fb950;
+      --gold: #d29922;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 36px 24px;
+    }
+    .header {
+      max-width: 1400px;
+      margin: 0 auto 36px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 28px;
+    }
+    .tag {
+      display: inline-block;
+      padding: 5px 14px;
+      background: var(--accent-glow);
+      color: var(--accent);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      margin-bottom: 14px;
+      border: 1px solid rgba(255,123,114,0.3);
+    }
+    h1 {
+      font-size: 34px;
+      font-weight: 700;
+      color: var(--text-bright);
+      margin-bottom: 12px;
+    }
+    .desc {
+      color: var(--text-dim);
+      font-size: 15px;
+      max-width: 850px;
+      margin: 0 auto;
+    }
+    .section-title {
+      max-width: 1400px;
+      margin: 40px auto 20px;
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text-bright);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-title::before {
+      content: "";
+      width: 4px;
+      height: 20px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+    .grid {
+      max-width: 1400px;
+      margin: 0 auto 40px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 36px;
+    }
+    .sheet-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.45);
+      transition: border-color 0.2s ease;
+    }
+    .sheet-card:hover {
+      border-color: rgba(255, 123, 114, 0.5);
+    }
+    .sheet-header {
+      padding: 18px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.02);
+      border-bottom: 1px solid var(--border);
+    }
+    .sheet-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-bright);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .badge {
+      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: 6px;
+      background: var(--green);
+      color: #fff;
+      font-weight: 600;
+    }
+    .badge.gold {
+      background: var(--gold);
+    }
+    .badge.pending {
+      background: #8b949e;
+    }
+    .sheet-meta {
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+    .img-wrap {
+      width: 100%;
+      background: #f7f5f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 400px;
+    }
+    .img-wrap img {
+      width: 100%;
+      height: auto;
+      display: block;
+      cursor: zoom-in;
+    }
+    .empty-state {
+      color: #6e7681;
+      font-size: 14px;
+      text-align: center;
+      padding: 80px 20px;
+    }
+    .sheet-footer {
+      padding: 18px 24px;
+      font-size: 14px;
+      color: var(--text-dim);
+      background: rgba(0,0,0,0.15);
+      border-top: 1px solid rgba(255,255,255,0.03);
+    }
+    .sheet-footer strong {
+      color: var(--text-bright);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="tag">IP MASCOT &amp; CMF DESIGN MATRIX</div>
+    <h1>「幻 / HUAN」荔枝吉祥物与材质设计稿</h1>
+    <p class="desc">
+      针对 <strong>“果肉占比过多、缺少果皮设计感、打造荔枝吉祥物”</strong> 的优化反馈，全新确立 <strong>5:5 果壳果肉黄金分割</strong>，将荔枝标志性龟裂鳞斑红壳重构为「连帽斗篷」与「摇篮果苞」，打造高辨识度、可爱治愈的荔枝潮玩吉祥物。
+    </p>
+  </div>
+
+  <!-- Mascot Redesign Section -->
+  <div class="section-title">🌟 吉祥物形态重构：果皮与果肉 5:5 黄金平衡设计</div>
+  <div class="grid">
+    <!-- Concept A -->
+    <div class="sheet-card">
+      <div class="sheet-header">
+        <div class="sheet-title">
+          <span>HUAN · MASCOT / 方案 A: 连帽斗篷款 (Peel Hood &amp; Cape)</span>
+          <span class="badge gold">推荐方案 · 已落盘 (7.3MB)</span>
+        </div>
+        <div class="sheet-meta">50% 标志性胭脂红果壳兜帽 · 50% 晶莹白嫩果肉脸身 · 拟人萌宠五官</div>
+      </div>
+      <div class="img-wrap">
+        <img src="mascot_concept_a.png" alt="HUAN · LYCHEE MASCOT / CONCEPT A" onclick="window.open(this.src)">
+      </div>
+      <div class="sheet-footer">
+        <strong>设计解析：</strong> 
+        将荔枝最富特征的龟裂鳞斑果壳设计为可爱的“连帽小披风”，头顶自然挺立天然小树枝与青翠荔枝叶；脸庞、小肚肚与小肉手均为晶莹饱满的白嫩果肉，粉扑扑的腮红与黑曜石萌眼相映成趣。
+        底排包含 <strong>JOY</strong>（欢呼跳跃）、<strong>CURIOUS</strong>（歪头思索）、<strong>SPEAK</strong>（挥手打招呼）、<strong>SLEEP</strong>（蜷在果壳兜帽里甜睡）四种完整吉祥物动作！
+      </div>
+    </div>
+
+    <!-- Concept B -->
+    <div class="sheet-card" id="card-mascot-b">
+      <div class="sheet-header">
+        <div class="sheet-title">
+          <span>HUAN · MASCOT / 方案 B: 半开果苞立领款 (Peel Cradle &amp; Collar)</span>
+          <span class="badge gold">已落盘 (7.3MB)</span>
+        </div>
+        <div class="sheet-meta">55% 果壳保护摇篮 · 45% 探出身姿的果肉萌宠 · 自然舒展花瓣式裂片</div>
+      </div>
+      <div class="img-wrap">
+        <img src="mascot_concept_b.png" id="img-mascot-b" alt="HUAN · LYCHEE MASCOT / CONCEPT B" onclick="window.open(this.src)">
+      </div>
+      <div class="sheet-footer">
+        <strong>设计解析：</strong> 荔枝果壳像开花的花苞一样自然开裂形成立领式小摇篮，晶莹圆润的果肉小精灵探出身子，兼具自然果实的生动感与陪伴治愈感。
+      </div>
+    </div>
+  </div>
+
+  <!-- CMF Exploration Section -->
+  <div class="section-title">💎 拟态果肉 CMF 材质六大探索版 (已落盘归档)</div>
+  <div class="grid">
+    <!-- Edition 01 -->
+    <div class="sheet-card">
+      <div class="sheet-header">
+        <div class="sheet-title">
+          <span>HUAN / 01 · WHITE JADE (羊脂白玉版)</span>
+          <span class="badge">已落盘 (5.3MB)</span>
+        </div>
+        <div class="sheet-meta">羊脂白玉温润微透 · 微粉气血 · 柔和油脂光泽</div>
+      </div>
+      <div class="img-wrap">
+        <img src="01_white_jade.png" alt="HUAN / 01 · WHITE JADE" onclick="window.open(this.src)">
+      </div>
+    </div>
+
+    <!-- Edition 02 -->
+    <div class="sheet-card">
+      <div class="sheet-header">
+        <div class="sheet-title">
+          <span>HUAN / 02 · CHAMPAGNE GOLD (香槟金版)</span>
+          <span class="badge">已落盘 (7.2MB)</span>
+        </div>
+        <div class="sheet-meta">浅香槟金金属果肉 · 柔和缎面拉丝 · 抛光棱线</div>
+      </div>
+      <div class="img-wrap">
+        <img src="02_champagne_gold.png" alt="HUAN / 02 · CHAMPAGNE GOLD" onclick="window.open(this.src)">
+      </div>
+    </div>
+
+    <!-- Edition 03 -->
+    <div class="sheet-card">
+      <div class="sheet-header">
+        <div class="sheet-title">
+          <span>HUAN / 03 · WOOL &amp; FELT (羊毛绒版)</span>
+          <span class="badge">已落盘 (6.9MB)</span>
+        </div>
+        <div class="sheet-meta">细腻短羊毛毡 · 开司米羊绒 · 蓬松治愈体量</div>
+      </div>
+      <div class="img-wrap">
+        <img src="03_wool_felt.png" alt="HUAN / 03 · WOOL &amp; FELT" onclick="window.open(this.src)">
+      </div>
+    </div>
+
+    <!-- Edition 04 -->
+    <div class="sheet-card">
+      <div class="sheet-header">
+        <div class="sheet-title">
+          <span>HUAN / 04 · MULBERRY SILK (柔滑真丝版)</span>
+          <span class="badge">已落盘 (7.5MB)</span>
+        </div>
+        <div class="sheet-meta">流光桑蚕丝绸 · 珠光微褶 · 刺绣点缀</div>
+      </div>
+      <div class="img-wrap">
+        <img src="04_mulberry_silk.png" alt="HUAN / 04 · MULBERRY SILK" onclick="window.open(this.src)">
+      </div>
+    </div>
+
+    <!-- Edition 05 -->
+    <div class="sheet-card">
+      <div class="sheet-header">
+        <div class="sheet-title">
+          <span>HUAN / 05 · FROSTED GLASS (磨砂玻璃版)</span>
+          <span class="badge">已落盘 (1.95MB)</span>
+        </div>
+        <div class="sheet-meta">雾面磨砂半透 · 内部漫反射暖光 · 冰镇荔枝感</div>
+      </div>
+      <div class="img-wrap">
+        <img src="05_frosted_glass.png" alt="HUAN / 05 · FROSTED GLASS" onclick="window.open(this.src)">
+      </div>
+    </div>
+
+    <!-- Edition 06 -->
+    <div class="sheet-card">
+      <div class="sheet-header">
+        <div class="sheet-title">
+          <span>HUAN / 06 · OPTIC CRYSTAL (光学水晶版)</span>
+          <span class="badge">已落盘 (2.15MB)</span>
+        </div>
+        <div class="sheet-meta">高透纯净水晶 · 露珠水润折射 · 精密棱镜火彩</div>
+      </div>
+      <div class="img-wrap">
+        <img src="06_optic_crystal.png" alt="HUAN / 06 · OPTIC CRYSTAL" onclick="window.open(this.src)">
+      </div>
+    </div>
+  </div>
+</body>
+</html>

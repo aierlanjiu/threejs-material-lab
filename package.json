@@ -1,0 +1,24 @@
+{
+  "name": "lu-xiangqi",
+  "version": "1.0.0",
+  "description": "LÜ 3.0 Three.js 3D Chinese Chess with Dual AI (Wukong & Pikafish)",
+  "type": "module",
+  "scripts": {
+    "test": "node test/xiangqi/rules.test.js && node test/xiangqi/ai.test.js",
+    "check": "node --check js/xiangqi/rules.js && node --check js/xiangqi/audio.js && node --check js/xiangqi/ai-wukong.js && node --check js/xiangqi/ai-pikafish.js && node --check js/xiangqi/ai-manager.js && node --check js/xiangqi/board3d.js && node --check js/xiangqi/app.js && npm test",
+    "test:e2e": "node test/xiangqi/e2e.test.js",
+    "start": "python3 server.py"
+  },
+  "keywords": [
+    "xiangqi",
+    "threejs",
+    "wukong",
+    "pikafish",
+    "chess"
+  ],
+  "author": "zedpapa + codex",
+  "license": "GPL-3.0-only",
+  "dependencies": {
+    "playwright": "^1.62.1"
+  }
+}

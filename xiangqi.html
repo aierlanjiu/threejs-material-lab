@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#e9e1d2" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%2338584c%22/><text x=%2216%22 y=%2222%22 text-anchor=%22middle%22 font-size=%2218%22 fill=%22white%22>弈</text></svg>" />
+  <title>弈界 · 双世界 3D 中国象棋</title>
+  <link rel="stylesheet" href="css/xiangqi.css" />
+  <script src="assets/xiangqi/vendor/wukong/wukong.js"></script>
+</head>
+<body data-board-theme="living">
+  <a class="skip-link" href="#main-content">跳到棋局</a>
+  <div class="xiangqi-app">
+    <header class="master-hud" aria-label="对局主控">
+      <div class="brand-section">
+        <div class="brand-logo" aria-hidden="true">弈</div>
+        <div class="brand-info">
+          <div class="brand-title">弈界</div>
+          <div class="brand-sub">双世界 3D 中国象棋</div>
+        </div>
+      </div>
+      <div class="world-switcher">
+        <span class="world-label">棋局世界</span>
+        <select id="themeSelect" class="hud-select world-select" aria-label="选择棋局世界">
+          <option value="living">玉衡 · 东方藏品局</option>
+          <option value="epic">先锋 · 英雄战术局</option>
+        </select>
+      </div>
+      <nav class="hud-actions" aria-label="常用对局操作">
+        <button id="newGameBtn" class="btn btn-primary">新局</button>
+        <button id="undoBtn" class="btn">悔棋</button>
+        <button id="hintBtn" class="btn">提示</button>
+        <button id="toggleAnalysisBtn" class="btn" aria-expanded="false">分析</button>
+        <button id="fenModalBtn" class="btn">棋谱</button>
+        <button id="settingsBtn" class="btn">设置</button>
+      </nav>
+    </header>
+
+    <main id="main-content" class="game-shell" tabindex="-1">
+      <aside class="tactical-rail" aria-label="对局设定与战果">
+        <section class="rail-section match-setup">
+          <div class="section-heading"><span>对局设定</span><span id="matchPhase" class="section-note">开局</span></div>
+          <label class="control-field"><span>模式</span><select id="modeSelect" class="hud-select" aria-label="选择对弈模式"><option value="pve">玩家对 AI</option><option value="pvp">本地双人</option><option value="eve">AI 自弈</option></select></label>
+          <label class="control-field"><span>阵营</span><select id="sideSelect" class="hud-select" aria-label="选择执棋阵营"><option value="red">执红 · 先行</option><option value="black">执黑 · 后手</option></select></label>
+          <label class="control-field"><span>对手</span><select id="levelSelect" class="hud-select" aria-label="选择 AI 难度"><option value="1">入门 · Wukong L1</option><option value="2">进阶 · Wukong L2</option><option value="3">专业 · Pikafish L3</option><option value="4">大师 · Pikafish L4</option><option value="5" selected>宗师 · Pikafish L5</option></select></label>
+        </section>
+        <section class="rail-section engine-section">
+          <div class="section-heading"><span>引擎</span></div>
+          <div id="engineStatusBadge" class="engine-badge" title="AI 引擎运行状态"><span id="statusDot" class="status-dot"></span><span id="statusText">AI 尚未初始化</span></div>
+        </section>
+        <section class="rail-section score-section" aria-label="战果积分">
+          <div class="section-heading"><span>战果</span><span class="section-note">吃子积分</span></div>
+          <div class="score-row score-black"><span class="score-emblem">玄</span><span class="score-name">黑方</span><strong id="blackScore">0</strong><small id="blackCaptures">0 枚</small></div>
+          <div class="score-row score-red"><span class="score-emblem">朱</span><span class="score-name">红方</span><strong id="redScore">0</strong><small id="redCaptures">0 枚</small></div>
+        </section>
+      </aside>
+
+      <section class="arena-column" aria-label="棋局舞台">
+        <div class="player-strip player-black">
+          <div class="player-identity"><span class="player-mark">玄</span><span><strong>北境</strong><small>黑方阵营</small></span></div>
+          <div class="player-state"><span class="turn-light"></span><span id="blackState">等待行棋</span></div>
+        </div>
+        <section class="stage-container">
+          <div id="stage3d" aria-label="可交互 3D 中国象棋棋盘"></div>
+          <div class="stage-hud-top"><div id="turnIndicator" class="turn-indicator red-turn" aria-live="polite">红方行棋</div></div>
+          <div id="aiThinkingSignal" class="ai-thinking-signal" aria-hidden="true"><span></span><span></span><span></span></div>
+          <div id="battleEvent" class="battle-event" role="status" aria-live="assertive">
+            <img id="battleEventPortrait" alt="" width="220" height="220" />
+            <div class="battle-event-copy"><span id="battleEventKicker" class="battle-event-kicker">战果</span><strong id="battleEventTitle">击破</strong><span id="battleEventDetail">+4</span></div>
+          </div>
+        </section>
+        <div class="player-strip player-red">
+          <div class="player-identity"><span class="player-mark">朱</span><span><strong>南庭</strong><small>红方阵营</small></span></div>
+          <div class="player-state"><span class="turn-light"></span><span id="redState">正在行棋</span></div>
+        </div>
+        <footer class="bottom-bar" aria-label="对局状态与复盘控制">
+          <div id="gameStatusText">就绪 · 红方先行</div>
+          <div class="replay-controls" aria-label="复盘控制">
+            <button id="replayFirstBtn" class="btn btn-icon" aria-label="跳至开局">首</button><button id="replayPrevBtn" class="btn btn-icon" aria-label="上一步">前</button><span id="stepCounter">0 / 0</span><button id="replayNextBtn" class="btn btn-icon" aria-label="下一步">后</button><button id="replayLastBtn" class="btn btn-icon" aria-label="跳至最新">末</button>
+          </div>
+        </footer>
+      </section>
+
+      <aside class="intel-rail" aria-label="棋谱与引擎战报">
+        <section id="analysisDrawer" class="analysis-drawer hidden" aria-label="引擎实时分析">
+          <div class="drawer-header"><span>引擎战报</span><span id="evalEngineName">Pikafish WASM</span></div>
+          <div class="eval-bar-container" title="局势优劣对比"><div id="evalBarRed" class="eval-bar-red" style="width: 50%;"></div></div>
+          <div class="analysis-grid"><div class="analysis-item"><label>评分</label><span id="evalScore">+0.00</span></div><div class="analysis-item"><label>深度</label><span id="evalDepth">-</span></div><div class="analysis-item"><label>节点</label><span id="evalNodes">0</span></div><div class="analysis-item"><label>NPS</label><span id="evalNps">0</span></div></div>
+          <div class="pv-line" id="evalPv">变例：-</div>
+        </section>
+        <section class="rail-section move-ledger-section">
+          <div class="section-heading"><span>行棋记录</span><span class="section-note">ICCS</span></div>
+          <ol id="moveList" class="move-list" aria-label="行棋记录"><li class="empty-move">尚未落子</li></ol>
+        </section>
+        <section class="rail-section quick-tools">
+          <div class="section-heading"><span>棋局工具</span></div>
+          <div class="tool-grid"><button class="btn" id="railNewGameBtn">重开</button><button class="btn" id="railUndoBtn">悔棋</button><button class="btn" id="railHintBtn">求解</button><button class="btn" id="railFenBtn">数据</button></div>
+        </section>
+      </aside>
+    </main>
+
+    <div id="fenModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="fenModalTitle">
+      <div class="modal-card">
+        <div class="modal-title" id="fenModalTitle"><span>棋谱与局面数据</span><button id="closeFenModalBtn" class="btn btn-icon" aria-label="关闭棋谱窗口">关</button></div>
+        <label class="modal-field"><span>FEN 局面</span><textarea id="fenTextarea" class="modal-textarea" aria-label="FEN 字符串输入框"></textarea></label>
+        <label class="modal-field"><span>ICCS 历史走法</span><textarea id="iccsTextarea" class="modal-textarea" aria-label="ICCS 历史走法"></textarea></label>
+        <div class="modal-actions"><button id="copyFenBtn" class="btn">复制 FEN</button><button id="applyIccsBtn" class="btn">载入 ICCS</button><button id="exportJsonBtn" class="btn">导出 JSON</button><button id="importJsonBtn" class="btn">导入 JSON</button><input id="jsonFileInput" type="file" accept="application/json,.json" hidden /><button id="applyFenBtn" class="btn btn-primary">载入 FEN</button></div>
+      </div>
+    </div>
+
+    <div id="settingsModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
+      <div class="modal-card">
+        <div class="modal-title" id="settingsModalTitle"><span>材质工坊</span><button id="closeSettingsModalBtn" class="btn btn-icon" aria-label="关闭设置">关</button></div>
+        <div class="settings-stack">
+          <div class="material-editor" aria-label="棋子材质调节器">
+            <label><span>粗糙度 <output id="roughnessValue">0.24</output></span><input id="roughnessRange" type="range" min="0.05" max="0.8" step="0.01" value="0.24" /></label>
+            <label><span>金属度 <output id="metalnessValue">0.18</output></span><input id="metalnessRange" type="range" min="0" max="0.9" step="0.01" value="0.18" /></label>
+            <label><span>清漆层 <output id="clearcoatValue">0.58</output></span><input id="clearcoatRange" type="range" min="0" max="1" step="0.01" value="0.58" /></label>
+            <label><span>能量响应 <output id="pulseValue">0.42</output></span><input id="pulseRange" type="range" min="0" max="1" step="0.01" value="0.42" /></label>
+          </div>
+          <label class="toggle-row"><span>减少动态效果</span><input type="checkbox" id="reducedMotionToggle" /></label>
+          <label class="toggle-row"><span>挑战模式，隐藏提示且悔棋限 3 次</span><input type="checkbox" id="challengeModeToggle" /></label>
+          <label class="toggle-row"><span>程序化音效</span><input type="checkbox" id="soundToggle" checked /></label>
+        </div>
+        <div class="modal-actions"><button id="clearSaveBtn" class="btn">清空本地存档</button><button id="saveSettingsBtn" class="btn btn-primary">保存设置</button></div>
+      </div>
+    </div>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="js/xiangqi/app.js"></script>
+</body>
+</html>

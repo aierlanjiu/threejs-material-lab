@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>腾讯混元 3D (Hunyuan3D) 生成基模全景审阅与对比</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --panel-bg: #161b22;
+      --border: #30363d;
+      --text: #c9d1d9;
+      --heading: #f0f6fc;
+      --accent: #238636;
+      --accent-hover: #2ea043;
+      --tag-red: #da3633;
+      --tag-blue: #388bfd;
+      --tag-green: #3fb950;
+      --gold: #d29922;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+    header {
+      background: var(--panel-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .brand-badge {
+      background: linear-gradient(135deg, #0052d9, #00a4ff);
+      color: white;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      letter-spacing: 0.05em;
+    }
+    .brand h1 {
+      font-size: 18px;
+      color: var(--heading);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .scheme-tabs {
+      display: flex;
+      background: #090d13;
+      padding: 3px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .scheme-tab {
+      padding: 6px 18px;
+      background: transparent;
+      border: none;
+      color: #8b949e;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    .scheme-tab.active {
+      background: #21262d;
+      color: #58a6ff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    }
+    .toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn {
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      background: #21262d;
+      color: var(--heading);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+    .btn:hover { background: #30363d; border-color: #8b949e; }
+    .btn-primary { background: #238636; border-color: #2ea043; color: white; }
+    .btn-primary:hover { background: #2ea043; }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      flex: 1;
+      height: calc(100vh - 65px);
+      overflow: hidden;
+    }
+
+    /* Left Pane: 3D Canvas */
+    .viewport-pane {
+      position: relative;
+      background: radial-gradient(circle at 50% 40%, #1c2333 0%, #0d1117 100%);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
+    #three-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .viewport-overlay {
+      position: absolute;
+      top: 14px;
+      left: 16px;
+      pointer-events: none;
+    }
+    .model-tag {
+      background: rgba(22, 27, 34, 0.85);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(8px);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #58a6ff;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .model-tag .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #3fb950;
+    }
+    .viewport-controls {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      justify-content: space-between;
+      pointer-events: none;
+    }
+    .control-group {
+      pointer-events: auto;
+      background: rgba(22, 27, 34, 0.9);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(8px);
+      border-radius: 8px;
+      padding: 4px;
+      display: flex;
+      gap: 4px;
+    }
+    .ctrl-btn {
+      background: transparent;
+      border: none;
+      color: #8b949e;
+      padding: 6px 12px;
+      font-size: 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .ctrl-btn:hover { color: #f0f6fc; background: #30363d; }
+    .ctrl-btn.active { color: #58a6ff; background: #1f6feb22; font-weight: 600; }
+    .status-badge {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(22, 27, 34, 0.92);
+      border: 1px solid var(--border);
+      padding: 20px 30px;
+      border-radius: 12px;
+      text-align: center;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid #30363d;
+      border-top-color: #58a6ff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    /* Right Pane: 2D Blueprint & Specs */
+    .inspect-pane {
+      background: #0d1117;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    .pane-header {
+      padding: 14px 20px;
+      background: var(--panel-bg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .pane-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--heading);
+    }
+    .view-select-tabs {
+      display: flex;
+      gap: 6px;
+    }
+    .subtab {
+      background: #21262d;
+      border: 1px solid var(--border);
+      color: #8b949e;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .subtab.active { background: #30363d; color: #f0f6fc; border-color: #58a6ff; }
+
+    .blueprint-preview {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      background: #11161d;
+    }
+    .blueprint-img {
+      width: 100%;
+      max-height: 340px;
+      object-fit: contain;
+      background: #161b22;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      display: block;
+    }
+
+    .diff-section {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .audit-card {
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .audit-card h3 {
+      font-size: 14px;
+      color: #58a6ff;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .audit-card ul {
+      padding-left: 20px;
+      font-size: 13px;
+      color: #8b949e;
+    }
+    .audit-card li {
+      margin-bottom: 6px;
+    }
+    .audit-card li strong {
+      color: var(--heading);
+    }
+    .tag {
+      display: inline-block;
+      padding: 2px 6px;
+      font-size: 11px;
+      border-radius: 4px;
+      font-weight: 600;
+      margin-right: 6px;
+    }
+    .tag-procedural { background: #48232b; color: #ff7b72; border: 1px solid #da3633; }
+    .tag-hunyuan { background: #123d24; color: #3fb950; border: 1px solid #238636; }
+  </style>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.166.1/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="brand-badge">HUNYUAN 3D Pro</span>
+      <h1>腾讯混元生3D · 工业级基模生成与工程审阅</h1>
+    </div>
+    <div class="scheme-tabs">
+      <button class="scheme-tab active" data-scheme="hoodie">方案 A · 荔小卫 (Hoodie)</button>
+      <button class="scheme-tab" data-scheme="closed_fruit">方案 A · 闭合鲜果态</button>
+      <button class="scheme-tab" data-scheme="astro">方案 D · 荔小星 (Astro)</button>
+    </div>
+
+    <div class="toolbar-actions">
+      <a href="mascot_studio.html" class="btn">进入三维工作室 ↗</a>
+      <a href="output/blender-mcp/review.html" class="btn">原 Blender 对照页 ↗</a>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <!-- Left: 3D Viewport -->
+    <div class="viewport-pane">
+      <div class="viewport-overlay">
+        <span class="model-tag" id="model-tag"><span class="dot"></span><span id="model-label">混元 3D 基模 (GLB)</span></span>
+      </div>
+      <div id="three-container" style="width:100%; height:100%;"></div>
+      <div class="status-badge" id="loading-badge">
+        <div class="spinner"></div>
+        <p id="loading-text">正在加载 3D 基模...</p>
+      </div>
+      <div class="viewport-controls">
+        <div class="control-group">
+          <button class="ctrl-btn active" id="btn-source-hunyuan">混元 3D 基模</button>
+          <button class="ctrl-btn" id="btn-source-blender">Blender 精修绑定</button>
+        </div>
+        <div class="control-group">
+          <button class="ctrl-btn" id="btn-wireframe">线框视图 (Wireframe)</button>
+          <button class="ctrl-btn" id="btn-rotate">自动慢旋</button>
+          <button class="ctrl-btn" id="btn-reset">重置视向</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Reference & Topology Audit -->
+    <div class="inspect-pane">
+      <div class="pane-header">
+        <span class="pane-title" id="bp-title">2D 正交工业三视图蓝图</span>
+        <div class="view-select-tabs">
+          <button class="subtab active" data-view="turnaround">三视图 Turnaround</button>
+          <button class="subtab" data-view="side">90° 侧交图</button>
+          <button class="subtab" data-view="cad">等轴测 CAD 分件</button>
+        </div>
+      </div>
+      <div class="blueprint-preview">
+        <img id="blueprint-img" class="blueprint-img" src="design_sheets/ortho_blueprints/scheme_a_hoodie/01_turnaround_3view.png" alt="正交工程蓝图">
+      </div>
+
+      <div class="diff-section">
+        <div class="audit-card">
+          <h3>📐 混元基模与交互模型对照</h3>
+          <ul>
+            <li><span class="tag tag-procedural">原 Blender 拼切</span> 采用 Python 脚本堆叠成百个基本球体与圆柱布尔相交，兜帽内缘产生撕裂锯齿，手指如粗糙米其林香肠，宇航面罩扁平坍缩。</li>
+            <li><span class="tag tag-hunyuan">混元 3D 生成</span> 深度还原真实有机曲面拓扑，兜帽边缘闭合自洽，手指握绳弧度自然连续，头盔与面部轮廓作为本轮造型基准。</li>
+            <li><strong>本轮精修</strong>：沿用混元表面与贴图，分离材质区域，增加骨骼、五个表情形变及独立透明面罩。切换左侧模型核对轮廓，在陪伴工作室检查动作与声音互动。</li>
+          </ul>
+        </div>
+
+        <div class="audit-card" id="scheme-specs">
+          <h3>🔍 当前方案核心特征与校验项</h3>
+          <div id="specs-content">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+    import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+    let currentScheme = 'hoodie';
+    let currentSource = 'hunyuan';
+    let currentView = 'turnaround';
+    let autoRotate = false;
+    let wireframeMode = false;
+
+    const SCHEMES = {
+      hoodie: {
+        name: '荔小卫 (Hoodie Lychee)',
+        blueprints: {
+          turnaround: 'design_sheets/ortho_blueprints/scheme_a_hoodie/01_turnaround_3view.png',
+          side: 'design_sheets/ortho_blueprints/scheme_a_hoodie/02_ortho_side_90.png',
+          cad: 'design_sheets/ortho_blueprints/scheme_a_hoodie/03_isometric_cad_breakdown.png'
+        },
+        models: {
+          hunyuan: 'assets/mascots/hunyuan3d/scheme_a_hoodie/model_glb.glb',
+          blender: 'assets/mascots/blender/hoodie-lychee.glb'
+        },
+        specs: `
+          <ul>
+            <li><strong>兜帽闭合度</strong>：100% 佩戴兜帽形态，边缘自然贴覆脸颊，无几何破面。</li>
+            <li><strong>果梗抽绳</strong>：双手于胸前握住果梗细绳，五指微曲，骨骼解剖自然。</li>
+            <li><strong>头部面部</strong>：微凹笑嘴与红润腮红，双层透镜眼球。</li>
+            <li><strong>下肢靴履</strong>：饱满鞋头与奶白色软质鞋底。</li>
+          </ul>
+        `
+      },
+      closed_fruit: {
+        name: '荔小卫 · 闭合鲜果态 (Closed Fruit Form)',
+        blueprints: {
+          turnaround: 'design_sheets/ortho_blueprints/scheme_a_closed_fruit/01_turnaround_3view.png',
+          side: 'design_sheets/ortho_blueprints/scheme_a_closed_fruit/01_turnaround_3view.png',
+          cad: 'design_sheets/ortho_blueprints/scheme_a_hoodie/03_isometric_cad_breakdown.png'
+        },
+        models: {
+          hunyuan: 'assets/mascots/hunyuan3d/scheme_a_closed_fruit/model_glb.glb',
+          blender: 'assets/mascots/blender/hoodie-lychee.glb'
+        },
+        specs: `
+          <ul>
+            <li><strong>闭合鲜果形态</strong>：兜帽抽绳完全收紧闭合，面庞完全收拢入果壳内部，呈现完整圆形荔枝态。</li>
+            <li><strong>双手与抽绳</strong>：双手于胸前握紧果梗抽绳，红色罗纹袖口自然外翻。</li>
+            <li><strong>下肢靴履</strong>：圆头红色靴履配合米黄色厚鞋底稳定站立。</li>
+            <li><strong>拟态互动</strong>：可作为工作室中“缩进果壳 (retract_shell)”与“探出头来 (pop_out)”动作的核心形体基准。</li>
+          </ul>
+        `
+      },
+      astro: {
+
+        name: '荔小星 (Astro-Lychee)',
+        blueprints: {
+          turnaround: 'design_sheets/ortho_blueprints/scheme_d_astro/01_turnaround_3view.png',
+          side: 'design_sheets/ortho_blueprints/scheme_d_astro/02_ortho_side_90.png',
+          cad: 'design_sheets/ortho_blueprints/scheme_d_astro/03_isometric_cad_breakdown.png'
+        },
+        models: {
+          hunyuan: 'assets/mascots/hunyuan3d/scheme_d_astro/model_glb.glb',
+          blender: 'assets/mascots/blender/astro-lychee.glb'
+        },
+        specs: `
+          <ul>
+            <li><strong>宇航头盔</strong>：正球形荔枝果壳头盔，气泡状透明面罩高凸弧度。</li>
+            <li><strong>机械密封圈</strong>：橙色硅胶密封圈与八角螺栓环绕。</li>
+            <li><strong>全息HUD环</strong>：青色发光光环悬浮于面罩正前方。</li>
+            <li><strong>太空服细节</strong>：土星胸标、臂章字样与后背双喷口推进背包。</li>
+          </ul>
+        `
+      }
+    };
+
+    // Three.js Scene Setup
+    const container = document.getElementById('three-container');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0d1117);
+
+    const camera = new THREE.PerspectiveCamera(38, container.clientWidth / container.clientHeight, 0.1, 100);
+    camera.position.set(0, 1.2, 4.2);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.2;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    container.appendChild(renderer.domElement);
+
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.target.set(0, 0.8, 0);
+
+    // Studio Lights
+    const dirLight = new THREE.DirectionalLight(0xfff5ea, 2.5);
+    dirLight.position.set(3, 5, 4);
+    dirLight.castShadow = true;
+    scene.add(dirLight);
+
+    const fillLight = new THREE.DirectionalLight(0xd5e6f8, 1.2);
+    fillLight.position.set(-4, 3, 2);
+    scene.add(fillLight);
+
+    const rimLight = new THREE.DirectionalLight(0xffeedd, 1.5);
+    rimLight.position.set(0, 4, -4);
+    scene.add(rimLight);
+
+    const grid = new THREE.GridHelper(10, 20, 0x30363d, 0x161b22);
+    grid.position.y = -0.01;
+    scene.add(grid);
+
+    let currentModelGroup = null;
+    const loader = new GLTFLoader();
+
+    function loadModel(url) {
+      const badge = document.getElementById('loading-badge');
+      const text = document.getElementById('loading-text');
+      badge.style.display = 'flex';
+      text.textContent = `加载中: ${url.split('/').pop()}...`;
+
+      if (currentModelGroup) {
+        scene.remove(currentModelGroup);
+        currentModelGroup = null;
+      }
+
+      loader.load(
+        url,
+        (gltf) => {
+          currentModelGroup = gltf.scene;
+          
+          // Compute bounding box and normalize scale & center
+          const box = new THREE.Box3().setFromObject(currentModelGroup);
+          const size = box.getSize(new THREE.Vector3());
+          const center = box.getCenter(new THREE.Vector3());
+
+          const maxDim = Math.max(size.x, size.y, size.z);
+          const scale = 2.0 / (maxDim || 1);
+          currentModelGroup.scale.setScalar(scale);
+
+          // Position so bottom touches ground
+          currentModelGroup.position.x = -center.x * scale;
+          currentModelGroup.position.y = -box.min.y * scale;
+          currentModelGroup.position.z = -center.z * scale;
+
+          currentModelGroup.traverse((child) => {
+            if (child.isMesh) {
+              child.castShadow = true;
+              child.receiveShadow = true;
+              if (wireframeMode && child.material) {
+                child.material.wireframe = true;
+              }
+            }
+          });
+
+          scene.add(currentModelGroup);
+          badge.style.display = 'none';
+        },
+        (progress) => {
+          if (progress.total > 0) {
+            text.textContent = `下载中: ${Math.round((progress.loaded / progress.total) * 100)}%`;
+          }
+        },
+        (error) => {
+          console.warn('Load error:', error);
+          text.textContent = '模型尚未生成完成或文件未就绪，请稍后刷新';
+          setTimeout(() => { badge.style.display = 'none'; }, 3000);
+        }
+      );
+    }
+
+    function updateUI() {
+      const cfg = SCHEMES[currentScheme];
+      document.getElementById('blueprint-img').src = cfg.blueprints[currentView];
+      document.getElementById('specs-content').innerHTML = cfg.specs;
+      document.getElementById('bp-title').textContent = `${cfg.name} · 蓝图与设计准则`;
+      
+      const label = currentSource === 'hunyuan' ? '腾讯混元 3D 官方基模 (Hunyuan3D)' : '混元基模 · Blender 精修与绑定';
+      document.getElementById('model-label').textContent = label;
+
+      const url = cfg.models[currentSource];
+      loadModel(url);
+    }
+
+    // UI Event Handlers
+    document.querySelectorAll('.scheme-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.scheme-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentScheme = tab.dataset.scheme;
+        updateUI();
+      });
+    });
+
+    document.querySelectorAll('.subtab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.subtab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentView = tab.dataset.view;
+        document.getElementById('blueprint-img').src = SCHEMES[currentScheme].blueprints[currentView];
+      });
+    });
+
+    document.getElementById('btn-source-hunyuan').addEventListener('click', (e) => {
+      document.getElementById('btn-source-hunyuan').classList.add('active');
+      document.getElementById('btn-source-blender').classList.remove('active');
+      currentSource = 'hunyuan';
+      updateUI();
+    });
+
+    document.getElementById('btn-source-blender').addEventListener('click', (e) => {
+      document.getElementById('btn-source-blender').classList.add('active');
+      document.getElementById('btn-source-hunyuan').classList.remove('active');
+      currentSource = 'blender';
+      updateUI();
+    });
+
+    document.getElementById('btn-wireframe').addEventListener('click', (e) => {
+      wireframeMode = !wireframeMode;
+      e.target.classList.toggle('active', wireframeMode);
+      if (currentModelGroup) {
+        currentModelGroup.traverse(child => {
+          if (child.isMesh && child.material) {
+            child.material.wireframe = wireframeMode;
+          }
+        });
+      }
+    });
+
+    document.getElementById('btn-rotate').addEventListener('click', (e) => {
+      autoRotate = !autoRotate;
+      e.target.classList.toggle('active', autoRotate);
+    });
+
+    document.getElementById('btn-reset').addEventListener('click', () => {
+      camera.position.set(0, 1.2, 4.2);
+      controls.target.set(0, 0.8, 0);
+      controls.update();
+    });
+
+    window.addEventListener('resize', () => {
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+    });
+
+    function animate() {
+      requestAnimationFrame(animate);
+      if (autoRotate && currentModelGroup) {
+        currentModelGroup.rotation.y += 0.01;
+      }
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    updateUI();
+  </script>
+</body>
+</html>

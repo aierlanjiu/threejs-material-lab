@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>「荔 / LI」3D 吉祥物工业落地多角度与CMF多元材质全套蓝图</title>
+  <style>
+    :root {
+      --bg: #0b0f17;
+      --card-bg: #141b24;
+      --card-hover: #1b2432;
+      --border: #232f3e;
+      --text: #c9d1d9;
+      --text-bright: #f0f6fc;
+      --text-dim: #8b949e;
+      --accent: #ff5e62;
+      --accent-glow: rgba(255, 94, 98, 0.18);
+      --gold: #f1b347;
+      --gold-glow: rgba(241, 179, 71, 0.18);
+      --green: #3fb950;
+      --cyan: #38bdf8;
+      --purple: #a855f7;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 40px 24px 100px;
+    }
+    .header {
+      max-width: 1480px;
+      margin: 0 auto 40px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 32px;
+    }
+    .badge-bar {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .tag {
+      display: inline-block;
+      padding: 5px 14px;
+      background: var(--accent-glow);
+      color: var(--accent);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      border: 1px solid rgba(255, 94, 98, 0.35);
+    }
+    .tag.gold {
+      background: var(--gold-glow);
+      color: var(--gold);
+      border-color: rgba(241, 179, 71, 0.35);
+    }
+    .tag.cyan {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--cyan);
+      border-color: rgba(56, 189, 248, 0.35);
+    }
+    h1 {
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--text-bright);
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+    .desc {
+      color: var(--text-dim);
+      font-size: 15px;
+      max-width: 960px;
+      margin: 0 auto 16px;
+    }
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 28px;
+      margin-top: 18px;
+      color: var(--text-dim);
+      font-size: 13px;
+    }
+    .stats-bar span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .stats-bar strong {
+      color: var(--text-bright);
+    }
+
+    /* Scheme sections */
+    .scheme-section {
+      max-width: 1480px;
+      margin: 0 auto 56px;
+      background: rgba(255,255,255,0.015);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 32px 30px 36px;
+      position: relative;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.35);
+    }
+    .scheme-section.spotlight-a {
+      border-color: rgba(255, 94, 98, 0.4);
+      background: linear-gradient(180deg, rgba(255, 94, 98, 0.04) 0%, rgba(20, 27, 36, 0.4) 100%);
+    }
+    .scheme-section.spotlight-d {
+      border-color: rgba(56, 189, 248, 0.4);
+      background: linear-gradient(180deg, rgba(56, 189, 248, 0.04) 0%, rgba(20, 27, 36, 0.4) 100%);
+    }
+    .scheme-section.spotlight-cmf {
+      border-color: rgba(241, 179, 71, 0.45);
+      background: linear-gradient(180deg, rgba(241, 179, 71, 0.05) 0%, rgba(20, 27, 36, 0.4) 100%);
+    }
+    .scheme-section.spotlight-ortho {
+      border-color: rgba(63, 185, 80, 0.5);
+      background: linear-gradient(180deg, rgba(63, 185, 80, 0.05) 0%, rgba(20, 27, 36, 0.45) 100%);
+    }
+
+    .scheme-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .scheme-title-wrap h2 {
+      font-size: 24px;
+      color: var(--text-bright);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+    }
+    .scheme-desc {
+      color: var(--text-dim);
+      font-size: 14px;
+      margin-top: 8px;
+      max-width: 1000px;
+    }
+    .pill {
+      font-size: 12px;
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-weight: 600;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .pill.active {
+      background: rgba(63, 185, 80, 0.15);
+      color: var(--green);
+      border-color: rgba(63, 185, 80, 0.4);
+    }
+    .pill.gold {
+      background: rgba(241, 179, 71, 0.15);
+      color: var(--gold);
+      border-color: rgba(241, 179, 71, 0.4);
+    }
+
+    /* Grids */
+    .views-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 22px;
+    }
+    .cmf-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+      gap: 24px;
+    }
+
+    .view-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease;
+      cursor: pointer;
+    }
+    .view-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+    .view-card.card-d:hover {
+      border-color: var(--cyan);
+    }
+    .view-card.card-cmf:hover {
+      border-color: var(--gold);
+    }
+    .view-card.card-ortho:hover {
+      border-color: var(--green);
+    }
+
+    .view-img-wrap {
+      width: 100%;
+      aspect-ratio: 3/2;
+      background: #0f141c;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .view-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+    .view-card:hover .view-img-wrap img {
+      transform: scale(1.03);
+    }
+    .view-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      color: #fff;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    .zoom-hint {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.65);
+      color: #cbd5e1;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .view-card:hover .zoom-hint {
+      opacity: 1;
+    }
+
+    .view-info {
+      padding: 16px 18px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .view-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-bright);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .view-role {
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.45;
+    }
+    .cmf-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .cmf-tag {
+      font-size: 11px;
+      padding: 2px 8px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 4px;
+      color: #94a3b8;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    /* Lightbox Modal */
+    .lightbox-modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.92);
+      backdrop-filter: blur(12px);
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 24px;
+    }
+    .lightbox-modal.open {
+      display: flex;
+    }
+    .lightbox-img-container {
+      max-width: 90vw;
+      max-height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .lightbox-img-container img {
+      max-width: 100%;
+      max-height: 80vh;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+      border: 1px solid var(--border);
+      object-fit: contain;
+    }
+    .lightbox-caption {
+      margin-top: 18px;
+      text-align: center;
+      max-width: 800px;
+    }
+    .lightbox-caption h3 {
+      font-size: 18px;
+      color: var(--text-bright);
+      margin-bottom: 6px;
+    }
+    .lightbox-caption p {
+      font-size: 14px;
+      color: var(--text-dim);
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 24px;
+      right: 32px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      font-size: 24px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .lightbox-close:hover {
+      background: rgba(255,255,255,0.25);
+    }
+    .lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #fff;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 20px;
+      user-select: none;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .lightbox-nav:hover {
+      background: rgba(255,255,255,0.2);
+      transform: translateY(-50%) scale(1.08);
+    }
+    .lightbox-prev { left: 24px; }
+    .lightbox-next { right: 24px; }
+
+    /* Archive details */
+    details.archive-section {
+      max-width: 1480px;
+      margin: 0 auto 50px;
+      border: 1px dashed var(--border);
+      border-radius: 16px;
+      padding: 16px 24px;
+      background: rgba(0,0,0,0.2);
+    }
+    details.archive-section summary {
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-dim);
+      padding: 8px 0;
+      user-select: none;
+    }
+    details.archive-section summary:hover {
+      color: var(--text-bright);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="badge-bar">
+      <span class="tag">3D INDUSTRIAL MODELING ASSETS</span>
+      <span class="tag gold">CMF LUXURY MATERIAL SYSTEM</span>
+      <span class="tag cyan">AUTHENTIC ART-TOY AESTHETIC</span>
+    </div>
+    <h1>「荔 / LI」3D 吉祥物工业落地多角度与CMF全套设计图</h1>
+    <p class="desc">
+      为彻底降低 3D 建模分件、注塑开模与商业级 CMF 材质落地的研发门槛，本设计系统严格落实<strong>“垫图一致性锚定”</strong>与<strong>“全连体兜帽包裹”</strong>原则，交付两大王牌潮流方案（荔小卫、荔小星）各 5 工业视角，以及 4 款跨界多元材质典藏版设计图，共 14 张高精度生产图纸。
+    </p>
+    <div class="stats-bar">
+      <span>📐 <strong>22 张</strong> 原生 3:2 工业蓝图（含 6 张 2D 正交 CAD 工程图）</span>
+      <span>🎯 <strong>Codex</strong> 3D 拓扑建模无透视基准全面建立</span>
+      <span>🎨 <strong>6 大</strong> CMF 多元材质突破（全方案覆盖）</span>
+      <span>🔒 <strong>100%</strong> 连身兜帽包裹规范（杜绝脱帽异形）</span>
+    </div>
+  </div>
+
+  <!-- Section 0: 2D Orthographic Blueprints for 3D Modeling Agents (Codex) -->
+  <div class="scheme-section spotlight-ortho">
+    <div class="scheme-header">
+      <div class="scheme-title-wrap">
+        <h2>📐 工业级 2D 正交三视图与 CAD 建模工程蓝图（3D 拓扑建模 Agent 绝对对标基准）</h2>
+        <div class="scheme-desc">
+          专门面向 3D 拓扑建模 Agent（Codex）生产的零透视失真工程对标基准图（Orthographic Model Sheets）。采用 200mm 平视长焦镜头、纯白工程背景（#FFFFFF）与高精度边缘轮廓检测标准。精准提供【0° 正面 / 90° 纯侧面 / 180° 背面】同一基线对齐总图、90° 侧立面纵深标定图与 30° 等轴测分件装配爆炸图，彻底消除透视误差，指导 3D 资产极致复刻。
+        </div>
+      </div>
+      <span class="pill" style="background: rgba(63, 185, 80, 0.15); color: var(--green); border-color: rgba(63, 185, 80, 0.4);">
+        🎯 6/6 正交工程图绝对锁定
+      </span>
+    </div>
+
+    <!-- Scheme A Ortho -->
+    <div style="margin-bottom: 34px;">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+        <span class="tag" style="background: rgba(255, 94, 98, 0.2); color: var(--accent); border-color: rgba(255, 94, 98, 0.4);">SCHEME A · 荔小卫</span>
+        <h3 style="color: var(--text-bright); font-size: 18px; font-weight: 700;">方案 A · 果壳连帽卫衣款正交蓝图（3 张工业工程图）</h3>
+      </div>
+      <div class="views-grid">
+        <!-- SA Ortho 01: Turnaround -->
+        <div class="view-card card-ortho" onclick="openLightbox(this)"
+             data-src="ortho_blueprints/scheme_a_hoodie/01_turnaround_3view.png"
+             data-title="方案 A · 荔小卫 | 角色标准三视图总图 (Front / Side 90° / Back 180°)"
+             data-desc="【工业对齐基准】同一水平基线与地面坐标轴平视正交投影。从左至右依次对齐：0° 正立面（双手胸前拉住抽绳、微甜微笑）、90° 纯侧立面（标定果壳前后厚度、面部凸出曲率与靴子轮廓）、180° 背立面（果壳六边形凸起龟裂与下摆剪口弧度）。纯白背景，零透视失真，供 3D 建模 Agent 进行三轴多边形对齐。">
+          <div class="view-img-wrap">
+            <span class="view-badge" style="background: rgba(63, 185, 80, 0.85); color: #fff;">01 · 三视图对齐总图</span>
+            <img src="ortho_blueprints/scheme_a_hoodie/01_turnaround_3view.png" alt="方案 A 三视图总图" loading="lazy">
+            <span class="zoom-hint">🔍 点击放大</span>
+          </div>
+          <div class="view-info">
+            <div>
+              <div class="view-name">标准角色三视图总图 (Turnaround 3-View)</div>
+              <div class="view-sub">0° 正立面 / 90° 侧立面 / 180° 背立面水平同基线</div>
+              <div class="view-detail">
+                严格锁定连身兜帽包裹规范，0°、90°、180° 全平视投影，消除透视收缩，是 3D 拓扑建模与顶点校准的终极几何基准。
+              </div>
+            </div>
+            <div class="view-tags">
+              <span class="tag-mini">0°/90°/180°同轴</span>
+              <span class="tag-mini">水平基准线</span>
+              <span class="tag-mini">零透视失真</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SA Ortho 02: Side 90 -->
+        <div class="view-card card-ortho" onclick="openLightbox(this)"
+             data-src="ortho_blueprints/scheme_a_hoodie/02_ortho_side_90.png"
+             data-title="方案 A · 荔小卫 | 纯正 90 度侧立面轮廓正交图 (True 90° Lateral Profile)"
+             data-desc="【纵深与厚度标定】绝对 90 度侧剖立面，垂直于镜头。清晰揭示连帽果壳卫衣的前后径比（厚度）、面部羊脂玉脸颊前探弧度、胸前双手持抽绳的自然下垂线、波浪下摆向后包裹的收口倾角，以及红色圆头靴子外侧扣子与鞋跟厚度。">
+          <div class="view-img-wrap">
+            <span class="view-badge" style="background: rgba(63, 185, 80, 0.85); color: #fff;">02 · 90° 纯侧立面</span>
+            <img src="ortho_blueprints/scheme_a_hoodie/02_ortho_side_90.png" alt="方案 A 侧立面正交图" loading="lazy">
+            <span class="zoom-hint">🔍 点击放大</span>
+          </div>
+          <div class="view-info">
+            <div>
+              <div class="view-name">纯正 90 度侧立面正交图 (Side 90°)</div>
+              <div class="view-sub">精准标定前后径深度、兜帽厚度与下摆倾角</div>
+              <div class="view-detail">
+                绝无 3/4 偏角干涉，垂直正交侧剖视角，为 Codex 构建 3D 侧面放样截面（Lathe / Extrude Profile）提供尺寸标准。
+              </div>
+            </div>
+            <div class="view-tags">
+              <span class="tag-mini">90°纯侧面</span>
+              <span class="tag-mini">前后径标定</span>
+              <span class="tag-mini">截面放样基准</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SA Ortho 03: Isometric CAD -->
+        <div class="view-card card-ortho" onclick="openLightbox(this)"
+             data-src="ortho_blueprints/scheme_a_hoodie/03_isometric_cad_breakdown.png"
+             data-title="方案 A · 荔小卫 | 等轴测 3D 结构分件装配图 (Isometric CAD Breakdown)"
+             data-desc="【装配与结构爆炸】30° 经典等轴测 CAD 工程爆炸图。将荔小卫解构为：① 外层六边形荔枝红果壳兜帽；② 内层羊脂白玉圆润头颅与面庞；③ 下身连体波浪裙摆；④ 双手捏持的绿色抽绳组；⑤ 左右红靴与双层鞋底。辅助细虚线标注装配同轴引导。">
+          <div class="view-img-wrap">
+            <span class="view-badge" style="background: rgba(63, 185, 80, 0.85); color: #fff;">03 · 等轴测分件装配</span>
+            <img src="ortho_blueprints/scheme_a_hoodie/03_isometric_cad_breakdown.png" alt="方案 A 等轴测分件图" loading="lazy">
+            <span class="zoom-hint">🔍 点击放大</span>
+          </div>
+          <div class="view-info">
+            <div>
+              <div class="view-name">等轴测分件装配图 (Isometric CAD)</div>
+              <div class="view-sub">30° 等轴测透视，五大组件爆炸装配关系</div>
+              <div class="view-detail">
+                清晰呈现头壳、内胆、躯干、下摆、抽绳与靴子的嵌套层级，解决 Three.js 节点树层级（Scene Graph Hierarchy）构建难题。
+              </div>
+            </div>
+            <div class="view-tags">
+              <span class="tag-mini">30°等轴测</span>
+              <span class="tag-mini">分件爆炸装配</span>
+              <span class="tag-mini">节点层级指南</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scheme D Ortho -->
+    <div>
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+        <span class="tag cyan" style="background: rgba(56, 189, 248, 0.2); color: var(--cyan); border-color: rgba(56, 189, 248, 0.4);">SCHEME D · 荔小星</span>
+        <h3 style="color: var(--text-bright); font-size: 18px; font-weight: 700;">方案 D · 探索宇航员款正交蓝图（3 张工业工程图）</h3>
+      </div>
+      <div class="views-grid">
+        <!-- SD Ortho 01: Turnaround -->
+        <div class="view-card card-ortho" onclick="openLightbox(this)"
+             data-src="ortho_blueprints/scheme_d_astro/01_turnaround_3view.png"
+             data-title="方案 D · 荔小星 | 宇航员标准三视图总图 (Front / Side 90° / Back 180°)"
+             data-desc="【宇航工程对齐基准】同一水平基线平视正交三视图。对齐球形荔枝头盔、全息面罩内部 HUD 环与外圈橙色硅胶密封圈高度。背面详尽展示维生背包与微型双推进喷口结构，顶部金色幼苗天线同轴居中。">
+          <div class="view-img-wrap">
+            <span class="view-badge" style="background: rgba(56, 189, 248, 0.85); color: #fff;">01 · 宇航三视图对齐</span>
+            <img src="ortho_blueprints/scheme_d_astro/01_turnaround_3view.png" alt="方案 D 三视图总图" loading="lazy">
+            <span class="zoom-hint">🔍 点击放大</span>
+          </div>
+          <div class="view-info">
+            <div>
+              <div class="view-name">宇航员标准三视图 (Turnaround 3-View)</div>
+              <div class="view-sub">球形头盔、全息面罩与维生背包三向同轴</div>
+              <div class="view-detail">
+                消除广角畸变，精确呈现正面透明气泡面罩透射比、侧面头盔球径与背面双喷口推进背包的空间几何关系。
+              </div>
+            </div>
+            <div class="view-tags">
+              <span class="tag-mini">0°/90°/180°同轴</span>
+              <span class="tag-mini">背包双喷口</span>
+              <span class="tag-mini">全息HUD对齐</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SD Ortho 02: Side 90 -->
+        <div class="view-card card-ortho" onclick="openLightbox(this)"
+             data-src="ortho_blueprints/scheme_d_astro/02_ortho_side_90.png"
+             data-title="方案 D · 荔小星 | 纯正 90 度侧立面轮廓正交图 (True 90° Lateral Profile)"
+             data-desc="【球径与面罩弧度标定】绝对 90 度侧立面正交投影。精准呈现透明气泡面罩向前隆起的球面曲率、橙色密封卡槽圈的角度、头盔顶部金色幼苗天线的微幅后倾角（约 8°），以及背部矩形背包厚度与喷口安装倾角。">
+          <div class="view-img-wrap">
+            <span class="view-badge" style="background: rgba(56, 189, 248, 0.85); color: #fff;">02 · 90° 宇航侧立面</span>
+            <img src="ortho_blueprints/scheme_d_astro/02_ortho_side_90.png" alt="方案 D 侧立面正交图" loading="lazy">
+            <span class="zoom-hint">🔍 点击放大</span>
+          </div>
+          <div class="view-info">
+            <div>
+              <div class="view-name">纯正 90 度侧立面正交图 (Side 90°)</div>
+              <div class="view-sub">精准标定透明气泡弧度、天线后倾与背包净空</div>
+              <div class="view-detail">
+                提供透明亚克力气泡面罩的双曲面放样参数，以及太空服侧缝线、磁力靴脚踝关节与脚掌厚度的绝对基准。
+              </div>
+            </div>
+            <div class="view-tags">
+              <span class="tag-mini">90°侧剖面</span>
+              <span class="tag-mini">气泡面罩曲率</span>
+              <span class="tag-mini">天线倾角标定</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SD Ortho 03: Isometric CAD -->
+        <div class="view-card card-ortho" onclick="openLightbox(this)"
+             data-src="ortho_blueprints/scheme_d_astro/03_isometric_cad_breakdown.png"
+             data-title="方案 D · 荔小星 | 等轴测 3D 结构分件装配图 (Isometric CAD Breakdown)"
+             data-desc="【宇航航天级装配拆解】30° 等轴测工程爆炸图。由内至外精细拆解：① 羊脂玉面容内胆；② 环形悬浮青色 HUD 刻度光环；③ 高透亚克力半球气泡面罩；④ 橙色防漏气密封圈与微螺栓；⑤ 荔枝外壳头盔半球；⑥ 金色幼苗信标天线；⑦ 维生背包与磁吸太空靴。">
+          <div class="view-img-wrap">
+            <span class="view-badge" style="background: rgba(56, 189, 248, 0.85); color: #fff;">03 · 宇航等轴测装配</span>
+            <img src="ortho_blueprints/scheme_d_astro/03_isometric_cad_breakdown.png" alt="方案 D 等轴测分件图" loading="lazy">
+            <span class="zoom-hint">🔍 点击放大</span>
+          </div>
+          <div class="view-info">
+            <div>
+              <div class="view-name">等轴测分件装配图 (Isometric CAD)</div>
+              <div class="view-sub">30° 等轴测，宇航头盔与维生系统全拆解</div>
+              <div class="view-detail">
+                解决双层头盔透光渲染顺序（RenderOrder）与透明物体混合（Blending / DepthWrite）在 3D 拓扑中的工程结构配置。
+              </div>
+            </div>
+            <div class="view-tags">
+              <span class="tag-mini">30°等轴测</span>
+              <span class="tag-mini">多层头盔爆炸</span>
+              <span class="tag-mini">渲染层级标定</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 1: CMF Luxury Materials System -->
+  <div class="scheme-section spotlight-cmf">
+    <div class="scheme-header">
+      <div class="scheme-title-wrap">
+        <h2>✨ 6 大多元材质（CMF）豪华限定版设计稿（三大方案全覆盖）</h2>
+        <div class="scheme-desc">
+          打破单一塑料盲盒质感，针对【荔小卫】、【荔小星】与【壳甲小旅人】三大方案，分别探索温暖自然织物、国家非遗东方漆玉、高精航空钛金、顶级光学晶体、复古琥珀植鞣皮与战国错金青铜，提供实体周边与高端典藏衍生品的全套 CMF 落地企划。
+        </div>
+      </div>
+      <span class="pill gold">💎 6/6 材质企划全部就绪</span>
+    </div>
+    <div class="cmf-grid">
+      <!-- CMF 01 -->
+      <div class="view-card card-cmf" onclick="openLightbox(this)"
+           data-src="cmf_materials/01_hoodie_wool_corduroy.png"
+           data-title="【荔小卫 · 治愈秋冬限定版】粗坑条砖红灯芯绒 × 纯羊毛毡"
+           data-desc="面料：粗坑条复古暗红灯芯绒卫衣 + 软糯针刺纯羊毛毡果肉 + 领口内衬微绒羊羔毛 + 粗棉麻编织抽绳。温暖厚实手感，治愈系秋冬潮玩。">
+        <div class="view-img-wrap">
+          <div class="view-badge">CMF 01 · 暖绒织物</div>
+          <img src="cmf_materials/01_hoodie_wool_corduroy.png" alt="荔小卫羊毛毡灯芯绒">
+          <div class="zoom-hint">🔍 点击高清全屏</div>
+        </div>
+        <div class="view-info">
+          <div>
+            <div class="view-name">01. 荔小卫 · 治愈秋冬版</div>
+            <div class="view-role">粗坑条砖红灯芯绒外壳，针刺软糯羊毛毡果肉小脸，领口羊羔绒点缀。触觉极具治愈温暖感。</div>
+          </div>
+          <div class="cmf-tags">
+            <span class="cmf-tag">复古灯芯绒</span>
+            <span class="cmf-tag">纯羊毛毡</span>
+            <span class="cmf-tag">羊羔毛内衬</span>
+            <span class="cmf-tag">织物手办</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CMF 02 -->
+      <div class="view-card card-cmf" onclick="openLightbox(this)"
+           data-src="cmf_materials/02_hoodie_cinnabar_jade.png"
+           data-title="【荔小卫 · 东方典藏限定版】剔红朱砂雕漆 × 和田羊脂白玉"
+           data-desc="工艺：非遗剔红朱砂大漆龟裂纹卫衣 + 和田羊脂白玉精雕果肉小脸 + 24K 手工掐丝描金边缘与纯金嫩芽。传统非遗与现代 Art Toy 的极致奢华融合。">
+        <div class="view-img-wrap">
+          <div class="view-badge">CMF 02 · 东方非遗</div>
+          <img src="cmf_materials/02_hoodie_cinnabar_jade.png" alt="荔小卫剔红朱砂雕漆">
+          <div class="zoom-hint">🔍 点击高清全屏</div>
+        </div>
+        <div class="view-info">
+          <div>
+            <div class="view-name">02. 荔小卫 · 东方典藏版</div>
+            <div class="view-role">剔红朱砂大漆浮雕果壳，温润羊脂白玉精琢果肉小脸，边缘掐丝描金。故宫文创级高定藏品。</div>
+          </div>
+          <div class="cmf-tags">
+            <span class="cmf-tag">剔红朱砂漆</span>
+            <span class="cmf-tag">和田羊脂白玉</span>
+            <span class="cmf-tag">24K金掐丝</span>
+            <span class="cmf-tag">非遗典藏</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CMF 03 -->
+      <div class="view-card card-cmf" onclick="openLightbox(this)"
+           data-src="cmf_materials/03_astro_holographic_titanium.png"
+           data-title="【荔小星 · 航天极客限定版】航空钛金属灰 × 全息彩虹偏光"
+           data-desc="材质：喷砂哑光深灰航空钛金属宇航服 + 全息彩虹偏光多层镀膜气泡面罩 + 陨石风化粗粝深红陶头盔 + 橙黄硅胶密封环。重度硬核航天极客美学。">
+        <div class="view-img-wrap">
+          <div class="view-badge">CMF 03 · 航天极客</div>
+          <img src="cmf_materials/03_astro_holographic_titanium.png" alt="荔小星钛金属全息">
+          <div class="zoom-hint">🔍 点击高清全屏</div>
+        </div>
+        <div class="view-info">
+          <div>
+            <div class="view-name">03. 荔小星 · 航天极客版</div>
+            <div class="view-role">哑光钛金属喷砂宇航服，彩虹全息偏光面罩，陨石质感红陶头盔。兼备未来硬核与荔枝形态。</div>
+          </div>
+          <div class="cmf-tags">
+            <span class="cmf-tag">航空钛金属</span>
+            <span class="cmf-tag">彩虹全息镀膜</span>
+            <span class="cmf-tag">陨石陶壳</span>
+            <span class="cmf-tag">赛博太空</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CMF 04 -->
+      <div class="view-card card-cmf" onclick="openLightbox(this)"
+           data-src="cmf_materials/04_astro_optic_crystal.png"
+           data-title="【荔小星 · 光学极光限定版】切面光学白水晶 × 纯白微晶陶瓷"
+           data-desc="材质：高纯净切面光学白水晶球形头盔 + 纯白高光微晶陶瓷宇航服 + 荧光透亮荔枝甘露储罐 + 纳米冷光绿小芽天线。晶莹通透，极光微光萦绕。">
+        <div class="view-img-wrap">
+          <div class="view-badge">CMF 04 · 纯净光学</div>
+          <img src="cmf_materials/04_astro_optic_crystal.png" alt="荔小星切面光学水晶">
+          <div class="zoom-hint">🔍 点击高清全屏</div>
+        </div>
+        <div class="view-info">
+          <div>
+            <div class="view-name">04. 荔小星 · 光学极光版</div>
+            <div class="view-role">纯净多切面光学水晶头盔折射耀眼光斑，微晶陶瓷温润高光，背部夜光甘露气瓶散发呼吸微光。</div>
+          </div>
+          <div class="cmf-tags">
+            <span class="cmf-tag">切面光学水晶</span>
+            <span class="cmf-tag">微晶白陶瓷</span>
+            <span class="cmf-tag">夜光甘露</span>
+            <span class="cmf-tag">珠宝级质感</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CMF 05 -->
+      <div class="view-card card-cmf" onclick="openLightbox(this)"
+           data-src="cmf_materials/05_hermit_amber_leather.png"
+           data-title="【壳甲小旅人 · 探险家复古琥珀版】天然金珀蜜蜡 × 意大利植鞣牛皮"
+           data-desc="材质：温润半透琥珀蜜蜡果肉身躯（内含微金箔浮游） + 意大利植鞣复古原色牛皮行囊背带与手工蜡线马鞍针法 + 粗砂磨砂红陶果壳背包 + 野生核桃木手杖与复古黄铜风铃。温暖自然博物探险家质感。">
+        <div class="view-img-wrap">
+          <div class="view-badge">CMF 05 · 自然复古</div>
+          <img src="cmf_materials/05_hermit_amber_leather.png" alt="壳甲小旅人琥珀植鞣皮">
+          <div class="zoom-hint">🔍 点击高清全屏</div>
+        </div>
+        <div class="view-info">
+          <div>
+            <div class="view-name">05. 壳甲小旅人 · 探险家琥珀版</div>
+            <div class="view-role">琥珀蜜蜡半透果肉，意大利植鞣牛皮背带与黄铜搭扣，粗陶红壳背甲。自然探险博物学美感。</div>
+          </div>
+          <div class="cmf-tags">
+            <span class="cmf-tag">天然金珀蜜蜡</span>
+            <span class="cmf-tag">意大利植鞣皮</span>
+            <span class="cmf-tag">陶土背甲</span>
+            <span class="cmf-tag">黄铜五金</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CMF 06 -->
+      <div class="view-card card-cmf" onclick="openLightbox(this)"
+           data-src="cmf_materials/06_hermit_jade_bronze.png"
+           data-title="【壳甲小旅人 · 东方玉魄青铜版】和田羊脂白玉 × 战国错金青铜"
+           data-desc="工艺：特级和田羊脂白玉精琢果肉身躯 + 战国青铜斑驳古锈荔枝背壳（嵌 24K 纯金丝几何错金云纹） + 帝王绿老坑翡翠雕琢胸口叶之徽章与手杖嫩叶 + 朱砂红丝绫绳背带。东方金石与华夏古玉的大成之作。">
+        <div class="view-img-wrap">
+          <div class="view-badge">CMF 06 · 金石青铜</div>
+          <img src="cmf_materials/06_hermit_jade_bronze.png" alt="壳甲小旅人羊脂玉青铜">
+          <div class="zoom-hint">🔍 点击高清全屏</div>
+        </div>
+        <div class="view-info">
+          <div>
+            <div class="view-name">06. 壳甲小旅人 · 东方玉魄青铜版</div>
+            <div class="view-role">羊脂白玉身躯，战国青铜错金壳甲，帝王绿翡翠胸章，朱砂红绫绳。国宝级文创金石典藏。</div>
+          </div>
+          <div class="cmf-tags">
+            <span class="cmf-tag">和田羊脂白玉</span>
+            <span class="cmf-tag">战国青铜错金</span>
+            <span class="cmf-tag">帝王绿翡翠</span>
+            <span class="cmf-tag">国宝级典藏</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 2: Scheme A - Hoodie Lychee -->
+  <div class="scheme-section spotlight-a">
+    <div class="scheme-header">
+      <div class="scheme-title-wrap">
+        <h2>🔥 核心方案 A：【果壳连身卫衣款 · 荔小卫】 (Hoodie Lychee)</h2>
+        <div class="scheme-desc">
+          <strong>设计规范：</strong>采用 100% 连体茧型兜帽（Hood-On）常态，果壳作为卫衣大兜帽紧密贴合包裹；<strong>严禁任何脱帽露头构型</strong>，杜绝异形尴尬联想。招牌交互为“拉紧果梗抽绳完全收口变回一颗新鲜荔枝”。
+        </div>
+      </div>
+      <span class="pill active">✅ 5/5 工业视图已全部就绪</span>
+    </div>
+    <div class="views-grid">
+      <!-- 01 Front -->
+      <div class="view-card" onclick="openLightbox(this)"
+           data-src="scheme_a_hoodie/01_front.png"
+           data-title="方案 A · 荔小卫 · 01 正平视基准视图"
+           data-desc="基准比例：正平视视角，规范连帽兜帽开口比例、果肉圆润小脸对称度、果梗抽绳长度与双手插袋自然站姿。">
+        <div class="view-img-wrap">
+          <div class="view-badge">01 · 正视图</div>
+          <img src="scheme_a_hoodie/01_front.png" alt="荔小卫正视图">
+          <div class="zoom-hint">🔍 点击高清全屏</div>
+        </div>
+        <div class="view-info">
+          <div class="view-name">01. 正平视基准视图</div>
+          <div class="view-role">纯正平视基准，连帽兜帽比例、果梗抽绳与软萌果肉小脸。3D 建模骨骼对位图。</div>
+        </div>
+      </div>
+
+      <!-- 02 Side -->
+      <div class="view-card" onclick="openLightbox(this)"
+           data-src="scheme_a_hoodie/02_side_three_quarter.png"
+           data-title="方案 A · 荔小卫 · 02 45° 侧景立体透视"
+           data-desc="立体透视：垫图锚定。侧颜圆弧鼓起、兜帽前探深度、后脑勺弧度及卫衣波浪下摆自然垂坠感。">
+        <div class="view-img-wrap">
+          <div class="view-badge">02 · 侧透视</div>
+          <img src="scheme_a_hoodie/02_side_three_quarter.png" alt="荔小卫45度侧视图">
+          <div class="zoom-hint">🔍 点击高清全屏</div>
+        </div>
+        <div class="view-info">
+          <div class="view-name">02. 45° 侧景立体透视</div>
+          <div class="view-role">垫图锚定。侧颜颊弧、兜帽进深厚度与下摆撕裂自然波浪边。</div>
+        </div>
+      </div>
+
+      <!-- 03 Back -->
+      <div class="view-card" onclick="openLightbox(this)"
+           data-src="scheme_a_hoodie/03_back.png"
+           data-title="方案 A · 荔小卫 · 03 正背部结构拓扑"
+           data-desc="背面拓扑：垫图锚定。100% 龟裂红鳞连身包裹，帽子顶端果蒂与嫩绿小芽根部定位，卫衣背缝注塑分模线。">
+        <div class="view-img-wrap">
+          <div class="view-badge">03 · 背部拓扑</div>
+          <img src="scheme_a_hoodie/03_back.png" alt="荔小卫正背面拓扑">
+          <div class="zoom-hint">🔍 点击高清全屏</div>
+        </div>
+        <div class="view-info">
+          <div class="view-name">03. 背部结构拓扑</div>
+          <div class="view-role">垫图锚定。100% 龟裂红鳞连帽后背、顶梗生叶点与卫衣下摆。</div>
+        </div>
+      </div>
+
+      <!-- 04 Macro -->
+      <div class="view-card" onclick="openLightbox(this)"
+           data-src="scheme_a_hoodie/04_macro_joint.png"
+           data-title="方案 A · 荔小卫 · 04 CMF 材质工艺微距拆解"
+           data-desc="工艺微距：哑光磨砂硅胶果壳卫衣、0.5mm 渐变粉白内膜贴边、果肉半透次表面散射（SSS）与棉绳金属封头。">
+        <div class="view-img-wrap">
+          <div class="view-badge">04 · 材质微距</div>
+          <img src="scheme_a_hoodie/04_macro_joint.png" alt="荔小卫工艺微距">
+          <div class="zoom-hint">🔍 点击高清全屏</div>
+        </div>
+        <div class="view-info">
+          <div class="view-name">04. 材质分件与边缘微距</div>
+          <div class="view-role">垫图锚定。哑光磨砂红壳卫衣、0.5mm粉白内膜与晶润果肉质感。</div>
+        </div>
+      </div>
+
+      <!-- 05 Action (Updated: No Hood-Off) -->
+      <div class="view-card" onclick="openLightbox(this)"
+           data-src="scheme_a_hoodie/05_action.png"
+           data-title="方案 A · 荔小卫 · 05 招牌变身：抽绳收口变身荔枝"
+           data-desc="变身机制（完全杜绝脱帽）：拉紧果梗抽绳即可彻底收拢兜帽，全身缩成一颗浑圆荔枝；松开抽绳探出软萌大眼小脸。">
+        <div class="view-img-wrap">
+          <div class="view-badge">05 · 招牌变身</div>
+          <img src="scheme_a_hoodie/05_action.png" alt="荔小卫招牌变身动效">
+          <div class="zoom-hint">🔍 点击高清全屏</div>
+        </div>
+        <div class="view-info">
+          <div class="view-name">05. 抽绳收口变身荔枝</div>
+          <div class="view-role">双形态对比：拉绳完全收口变身原果 vs 露出软萌小脸。100% 兜帽连体包裹，绝无脱帽异形。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 3: Scheme D - Astro Lychee -->
+  <div class="scheme-section spotlight-d">
+    <div class="scheme-header">
+      <div class="scheme-title-wrap">
+        <h2>🚀 核心方案 D：【复古果壳宇航头盔款 · 荔小星】 (Astro-Lychee)</h2>
+        <div class="scheme-desc">
+          <strong>设计特征：</strong>球形胭脂红荔枝果壳打造成太空头盔，弧形高透气泡面罩内透出果肉好奇脸蛋，极简软胶太空服搭配背部“荔枝甘露”能量储罐，顶生信号小芽天线。
+        </div>
+      </div>
+      <span class="pill active">✅ 5/5 工业视图已全部就绪</span>
+    </div>
+    <div class="views-grid">
+      <!-- 01 Front -->
+      <div class="view-card card-d" onclick="openLightbox(this)"
+           data-src="scheme_d_astro/01_front.png"
+           data-title="方案 D · 荔小星 · 01 正平视基准视图"
+           data-desc="正面基准：球形果壳头盔正圆弧线、气泡透明面罩装配对称中心、极简白色硅胶宇航服与胸口呼吸指示标。">
+        <div class="view-img-wrap">
+          <div class="view-badge">01 · 正视图</div>
+          <img src="scheme_d_astro/01_front.png" alt="荔小星正视图">
+          <div class="zoom-hint">🔍 点击高清全屏</div>
+        </div>
+        <div class="view-info">
+          <div class="view-name">01. 正平视基准视图</div>
+          <div class="view-role">纯正平视基准，球形果壳头盔、气泡面罩与极简软胶宇航服。</div>
+        </div>
+      </div>
+
+      <!-- 02 Side -->
+      <div class="view-card card-d" onclick="openLightbox(this)"
+           data-src="scheme_d_astro/02_side_three_quarter.png"
+           data-title="方案 D · 荔小星 · 02 45° 侧景立体透视"
+           data-desc="侧景透视：垫图锚定。面罩曲率反光折射、背部生命维持背包侧边轮廓、天线向前倾角与软胶鞋底踏面。">
+        <div class="view-img-wrap">
+          <div class="view-badge">02 · 侧透视</div>
+          <img src="scheme_d_astro/02_side_three_quarter.png" alt="荔小星45度侧视图">
+          <div class="zoom-hint">🔍 点击高清全屏</div>
+        </div>
+        <div class="view-info">
+          <div class="view-name">02. 45° 侧景立体透视</div>
+          <div class="view-role">垫图锚定。球形头盔圆弧、面罩折射与背部甘露气瓶侧身。</div>
+        </div>
+      </div>
+
+      <!-- 03 Back -->
+      <div class="view-card card-d" onclick="openLightbox(this)"
+           data-src="scheme_d_astro/03_back.png"
+           data-title="方案 D · 荔小星 · 03 背部宇航背包拓扑"
+           data-desc="背部拓扑：垫图锚定。头盔后脑整块致密红鳞纹理、天线圆形安装台座、背部方圆甘露能量气罐及透明液位视窗。">
+        <div class="view-img-wrap">
+          <div class="view-badge">03 · 背部拓扑</div>
+          <img src="scheme_d_astro/03_back.png" alt="荔小星背部宇航背包拓扑">
+          <div class="zoom-hint">🔍 点击高清全屏</div>
+        </div>
+        <div class="view-info">
+          <div class="view-name">03. 背部宇航背包拓扑</div>
+          <div class="view-role">垫图锚定。100% 龟裂红鳞头盔后脑勺、天线底座与甘露储罐。</div>
+        </div>
+      </div>
+
+      <!-- 04 Macro -->
+      <div class="view-card card-d" onclick="openLightbox(this)"
+           data-src="scheme_d_astro/04_macro_joint.png"
+           data-title="方案 D · 荔小星 · 04 面罩密封圈与果壳微距"
+           data-desc="装配微距：高透亚克力面罩卡槽与硅胶密封防水圈咬合结构、头顶黄铜金色嫩芽天线及 6 种标准生产色板。">
+        <div class="view-img-wrap">
+          <div class="view-badge">04 · 密封微距</div>
+          <img src="scheme_d_astro/04_macro_joint.png" alt="荔小星面罩密封圈微距">
+          <div class="zoom-hint">🔍 点击高清全屏</div>
+        </div>
+        <div class="view-info">
+          <div class="view-name">04. 面罩密封圈与果壳微距</div>
+          <div class="view-role">垫图锚定。高透面罩嵌合密封圈、金属嫩芽天线与标准生产色板。</div>
+        </div>
+      </div>
+
+      <!-- 05 Action -->
+      <div class="view-card card-d" onclick="openLightbox(this)"
+           data-src="scheme_d_astro/05_action.png"
+           data-title="方案 D · 荔小星 · 05 招牌动作：零重力太空漫游"
+           data-desc="动态漫游：垫图锚定。零重力悬浮姿态，背部喷气背包轻微推进气流，面罩倒映浩瀚星轨与地球晨昏线。">
+        <div class="view-img-wrap">
+          <div class="view-badge">05 · 零重力漫游</div>
+          <img src="scheme_d_astro/05_action.png" alt="荔小星零重力漫游">
+          <div class="zoom-hint">🔍 点击高清全屏</div>
+        </div>
+        <div class="view-info">
+          <div class="view-name">05. 招牌动作：零重力漫游</div>
+          <div class="view-role">垫图锚定。无重力漂浮姿态、微光面罩反光与梦幻太空探索感。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 4: Scheme 1 - Hermit Lychee -->
+  <div class="scheme-section">
+    <div class="scheme-header">
+      <div class="scheme-title-wrap">
+        <h2>方案一：【壳甲小旅人 · 寄居荔】 (Hermit Lychee) —— 探险治愈主推</h2>
+        <div class="scheme-desc">
+          <strong>设计规范：</strong>将荔枝果壳作为移动壳甲背囊，胸前佩戴十字交叉复古皮革背带与叶之青铜徽章，手持野生木质旅行手杖（顶生嫩芽），背负卷轴睡袋与小铜铃。支持“完全缩壳变回原果”的强互动桌宠形态。
+        </div>
+      </div>
+      <span class="pill active">✅ 5/5 工业视图已全部就绪</span>
+    </div>
+    <div class="views-grid">
+      <div class="view-card" onclick="openLightbox(this)"
+           data-src="scheme_01_hermit/01_front.png"
+           data-title="方案一 · 壳甲小旅人 · 01 正平视基准视图"
+           data-desc="正平视基准视图：严格垫图母本。头顶半开式红鳞壳甲，胸前皮革交叉背带与青铜叶纹徽章，手持天然木手杖，晶润果肉微笑站姿。">
+        <div class="view-img-wrap">
+          <div class="view-badge">01 · 正视图</div>
+          <img src="scheme_01_hermit/01_front.png" alt="寄居荔正视图">
+          <div class="zoom-hint">🔍 点击高清全屏</div>
+        </div>
+        <div class="view-info">
+          <div class="view-name">01. 3D 建模正视图</div>
+          <div class="view-role">纯正平视正面，基准头身比、皮革背带与铜徽章、手持木手杖。</div>
+        </div>
+      </div>
+
+      <div class="view-card" onclick="openLightbox(this)"
+           data-src="scheme_01_hermit/02_side_three_quarter.png"
+           data-title="方案一 · 壳甲小旅人 · 02 45° 侧景行进透视"
+           data-desc="45° 侧景行进透视：迈步向前探索，手杖向前点地。清晰展示背部果壳背包弧度、卷轴睡袋捆扎厚度与侧面铜铃铛。">
+        <div class="view-img-wrap">
+          <div class="view-badge">02 · 侧透视</div>
+          <img src="scheme_01_hermit/02_side_three_quarter.png" alt="寄居荔侧视图">
+          <div class="zoom-hint">🔍 点击高清全屏</div>
+        </div>
+        <div class="view-info">
+          <div class="view-name">02. 45° 侧景行进透视</div>
+          <div class="view-role">侧向探索迈步姿态，背壳背包进深、卷扎行囊与木手杖前倾。</div>
+        </div>
+      </div>
+
+      <div class="view-card" onclick="openLightbox(this)"
+           data-src="scheme_01_hermit/03_back.png"
+           data-title="方案一 · 壳甲小旅人 · 03 背部果壳结构拓扑"
+           data-desc="正后背结构拓扑：100% 龟裂红鳞果壳背囊，背包上沿横置卷轴帆布睡袋与双搭扣皮革带，手杖置于侧面，双腿自立稳定。">
+        <div class="view-img-wrap">
+          <div class="view-badge">03 · 背部拓扑</div>
+          <img src="scheme_01_hermit/03_back.png" alt="寄居荔背部图">
+          <div class="zoom-hint">🔍 点击高清全屏</div>
+        </div>
+        <div class="view-info">
+          <div class="view-name">03. 背部果壳结构拓扑</div>
+          <div class="view-role">100% 龟裂鳞斑背甲、横置卷轴睡袋与皮革固定带，开模拆件图。</div>
+        </div>
+      </div>
+
+      <div class="view-card" onclick="openLightbox(this)"
+           data-src="scheme_01_hermit/04_macro_joint.png"
+           data-title="方案一 · 壳甲小旅人 · 04 材质分件与咬合微距拆解"
+           data-desc="CMF 与分件微距拆解：左侧全身旅人站姿，右侧 5 大微距镜头（壳甲表面、真皮背带铜章、白玉果肉肌肤、木手杖、帆布行囊），含官方色板与四向转角图。">
+        <div class="view-img-wrap">
+          <div class="view-badge">04 · 咬合微距</div>
+          <img src="scheme_01_hermit/04_macro_joint.png" alt="寄居荔咬合微距">
+          <div class="zoom-hint">🔍 点击高清全屏</div>
+        </div>
+        <div class="view-info">
+          <div class="view-name">04. 材质分件与咬合微距拆解</div>
+          <div class="view-role">5 大部件微距拆解、CMF 官方色板与四向三视图转角参考。</div>
+        </div>
+      </div>
+
+      <div class="view-card" onclick="openLightbox(this)"
+           data-src="scheme_01_hermit/05_transform_retracted.png"
+           data-title="方案一 · 壳甲小旅人 · 05 招牌交互：完全缩壳形态"
+           data-desc="招牌桌宠互动玩法：【整装出发行走探索模式】 vs 【完全受惊缩壳闭合为完整新鲜荔枝形态】，还原治愈桌宠变身乐趣。">
+        <div class="view-img-wrap">
+          <div class="view-badge">05 · 缩壳形态</div>
+          <img src="scheme_01_hermit/05_transform_retracted.png" alt="寄居荔缩壳形态">
+          <div class="zoom-hint">🔍 点击高清全屏</div>
+        </div>
+        <div class="view-info">
+          <div class="view-name">05. 招牌交互：完全缩壳形态</div>
+          <div class="view-role">双形态对比：行走探索态 vs 完全缩入壳内化为鲜果。强互动桌宠。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 5: Archived Scheme 2 (Expandable) -->
+  <details class="archive-section">
+    <summary>📁 点击展开：早期探索归档【方案二 · 飞天小灵宠】（用户反馈偏猎奇，已封存归档）</summary>
+    <div class="views-grid" style="margin-top: 20px;">
+      <div class="view-card" onclick="openLightbox(this)" data-src="scheme_02_wings/01_front.png" data-title="方案二 · 01 正视图" data-desc="双开翅鞘正视图。">
+        <div class="view-img-wrap"><img src="scheme_02_wings/01_front.png"></div>
+        <div class="view-info"><div class="view-name">01. 正视图 (翅翼闭合)</div></div>
+      </div>
+      <div class="view-card" onclick="openLightbox(this)" data-src="scheme_02_wings/02_side_profile.png" data-title="方案二 · 02 侧视图" data-desc="转轴机械咬合点。">
+        <div class="view-img-wrap"><img src="scheme_02_wings/02_side_profile.png"></div>
+        <div class="view-info"><div class="view-name">02. 侧视图与转轴</div></div>
+      </div>
+      <div class="view-card" onclick="openLightbox(this)" data-src="scheme_02_wings/03_back_closed.png" data-title="方案二 · 03 背部中缝" data-desc="两瓣果壳对称中缝。">
+        <div class="view-img-wrap"><img src="scheme_02_wings/03_back_closed.png"></div>
+        <div class="view-info"><div class="view-name">03. 背部翅鞘闭合中缝</div></div>
+      </div>
+      <div class="view-card" onclick="openLightbox(this)" data-src="scheme_02_wings/04_wings_spread_flight.png" data-title="方案二 · 04 双翼大开" data-desc="翅翼向上 45° 展开。">
+        <div class="view-img-wrap"><img src="scheme_02_wings/04_wings_spread_flight.png"></div>
+        <div class="view-info"><div class="view-name">04. 双翼大开飞行动态</div></div>
+      </div>
+      <div class="view-card" onclick="openLightbox(this)" data-src="scheme_02_wings/05_wing_joint_macro.png" data-title="方案二 · 05 翅轴微距" data-desc="球窝关节结构微距。">
+        <div class="view-img-wrap"><img src="scheme_02_wings/05_wing_joint_macro.png"></div>
+        <div class="view-info"><div class="view-name">05. 翅轴微距与材质拆解</div></div>
+      </div>
+    </div>
+  </details>
+
+  <!-- Interactive Lightbox Modal -->
+  <div id="lightbox" class="lightbox-modal" onclick="closeLightbox(event)">
+    <div class="lightbox-close" onclick="closeLightboxDirect()">&times;</div>
+    <div class="lightbox-nav lightbox-prev" onclick="changeImage(-1, event)">&#10094;</div>
+    <div class="lightbox-nav lightbox-next" onclick="changeImage(1, event)">&#10095;</div>
+    <div class="lightbox-img-container" onclick="event.stopPropagation()">
+      <img id="lightbox-img" src="" alt="高精度蓝图">
+    </div>
+    <div class="lightbox-caption" onclick="event.stopPropagation()">
+      <h3 id="lightbox-title"></h3>
+      <p id="lightbox-desc"></p>
+    </div>
+  </div>
+
+  <script>
+    let currentCards = [];
+    let currentIndex = -1;
+
+    function initCards() {
+      currentCards = Array.from(document.querySelectorAll('.view-card[data-src]'));
+    }
+
+    function openLightbox(card) {
+      initCards();
+      currentIndex = currentCards.indexOf(card);
+      if (currentIndex === -1) return;
+      updateLightboxContent();
+      document.getElementById('lightbox').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function updateLightboxContent() {
+      if (currentIndex < 0 || currentIndex >= currentCards.length) return;
+      const card = currentCards[currentIndex];
+      const src = card.getAttribute('data-src');
+      const title = card.getAttribute('data-title') || '';
+      const desc = card.getAttribute('data-desc') || '';
+
+      document.getElementById('lightbox-img').src = src;
+      document.getElementById('lightbox-title').textContent = title;
+      document.getElementById('lightbox-desc').textContent = desc;
+    }
+
+    function changeImage(step, event) {
+      if (event) event.stopPropagation();
+      currentIndex = (currentIndex + step + currentCards.length) % currentCards.length;
+      updateLightboxContent();
+    }
+
+    function closeLightbox(event) {
+      if (event.target.id === 'lightbox') {
+        closeLightboxDirect();
+      }
+    }
+
+    function closeLightboxDirect() {
+      document.getElementById('lightbox').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    // Keyboard controls
+    document.addEventListener('keydown', (e) => {
+      const lb = document.getElementById('lightbox');
+      if (!lb.classList.contains('open')) return;
+      if (e.key === 'Escape') closeLightboxDirect();
+      if (e.key === 'ArrowLeft') changeImage(-1);
+      if (e.key === 'ArrowRight') changeImage(1);
+    });
+  </script>
+</body>
+</html>

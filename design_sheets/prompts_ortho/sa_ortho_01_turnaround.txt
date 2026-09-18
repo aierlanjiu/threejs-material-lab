@@ -1,0 +1,20 @@
+Generate an image: 3D character design sheet for "LI / 荔 · HOODIE LYCHEE (方案A：果壳连帽卫衣款 · 荔小卫)", MODEL TURNAROUND 3-VIEW SHEET (三视图总图). 3:2 landscape.
+[STRICT REFERENCE]: Strictly preserve 100% of the character identity, proportions, and features from the attached reference image.
+
+Canvas layout: exactly three full-body orthographic views of the SAME mascot character aligned horizontally on the exact same ground plane and baseline:
+- Left: Front Orthographic View (0 degrees, looking directly forward, symmetrical standing pose)
+- Middle: True Lateral Profile View (pure 90 degrees side view, strictly perpendicular to camera)
+- Right: Back Orthographic View (180 degrees, looking directly from behind)
+
+Character specification:
+- Oversized cocoon-style textured red lychee peel hoodie (100% Hood-On, fully covering head and body, never takes off hood);
+- Hands holding two green fruit stem drawstrings centered in front of chest;
+- Round translucent jade-white face peeking out from hood opening, big glossy black round eyes with white specular glints, soft pink blushing cheeks;
+- Red rounded boots with flat white rubber soles;
+- Single curved fresh green leaf growing from apex stem.
+
+Technical Specifications:
+- Absolute orthographic projection (telephoto 200mm flat lens, zero perspective distortion, zero wide-angle distortion);
+- Pure solid clean white background (#FFFFFF);
+- Crisp, razor-sharp silhouette contour edges specifically optimized for 3D modeling edge detection;
+- Neutral, even studio diffuse lighting with subtle rim light, no heavy shadows on background.

@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f3f0eb">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23b74343'/%3E%3Ctext x='6' y='24' font-size='23' fill='white'%3E荔%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./css/mascot-studio.css">
+  <link rel="stylesheet" href="./css/li-gallery.css">
+  <title>荔 / LI · 陪伴工作室</title>
+</head>
+<body data-role="hoodie" data-chat="open">
+  <svg class="icon-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H5l-3 2V11.5A8.5 8.5 0 0 1 10.5 3h2A8.5 8.5 0 0 1 21 11.5Z"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-4 0h8"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="m4 20 8-16 8 16-8-4-8 4Zm8-4V4"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="m9 5 11 7-11 7V5Z"/></symbol>
+    <symbol id="i-prev" viewBox="0 0 24 24"><path d="M5 5v14m14-14L8 12l11 7V5Z"/></symbol>
+    <symbol id="i-next" viewBox="0 0 24 24"><path d="M19 5v14M5 5l11 7-11 7V5Z"/></symbol>
+    <symbol id="i-reset" viewBox="0 0 24 24"><path d="M3 10a9 9 0 1 1 1 8M3 4v6h6"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></symbol>
+    <symbol id="i-volume" viewBox="0 0 24 24"><path d="m11 4-6 5H2v6h3l6 5V4Zm5 4a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V3m-5 5 5-5 5 5M4 15v5h16v-5"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5L12 3Z"/></symbol>
+  </defs></svg>
+  <header class="studio-header">
+    <div class="brand"><span class="brand-mark">荔</span><div><b>LI</b><span class="brand-sub">COMPANION STUDIO</span></div></div>
+    <div class="role-switcher" role="group" aria-label="选择伙伴">
+      <button id="btn-role-hoodie" class="role-btn active" aria-pressed="true" data-role="hoodie"><span class="role-dot"></span>荔小卫</button>
+      <button id="btn-role-astro" class="role-btn" aria-pressed="false" data-role="astro"><span class="role-dot"></span>荔小星</button>
+    </div>
+    <div class="header-tools">
+      <a href="./index.html" class="quiet-button nav-back-lu" title="前往『 律 』(LÜ) 3D 材质声波实验室" style="text-decoration:none;">
+        <span style="font-size:14px;">💎</span><span>律 / LÜ 实验室</span>
+      </a>
+      <span class="connection"><span id="dot-agy" class="dot"></span><span id="connection-label">连接中</span></span>
+      <button id="chat-toggle" class="quiet-button" aria-expanded="true" aria-controls="conversation"><img class="btn-quirky-icon" src="./assets/icons/quirky/btn_chat.png" alt="" aria-hidden="true"><span>聊一会儿</span></button>
+    </div>
+  </header>
+  <div class="studio-layout">
+    <aside class="atelier" aria-label="伙伴工作台" data-panel="all">
+      <nav class="atelier-tabs" aria-label="工作台分类">
+        <button data-panel="all" class="atelier-tab-btn" aria-selected="true">全部展陈</button>
+        <button data-panel="morphology" class="atelier-tab-btn" aria-selected="false">形态材质</button>
+        <button data-panel="interaction" class="atelier-tab-btn" aria-selected="false">手绘姿态 ✦</button>
+        <button data-panel="music" class="atelier-tab-btn" aria-selected="false">音乐律动</button>
+      </nav>
+      
+      <!-- 00 / 动作形态 INTERACTIVE MORPH -->
+      <section class="atelier-section" data-section="morphology">
+        <div class="section-heading-row">
+          <h2 id="morph-section-heading"><span>00 /</span> 陪伴形态 <small id="morphology-badge">常开态</small></h2>
+        </div>
+        <div id="morphology-buttons" class="morphology-list" role="radiogroup" aria-label="形态切换">
+          <!-- Populated by JS based on current companion -->
+        </div>
+        <p class="section-note" id="morphology-description">把心事收进兜帽，把好心情留给你。</p>
+      </section>
+
+      <!-- 01 / CMF 材质工坊 -->
+      <section class="atelier-section" data-section="appearance">
+        <div class="section-heading-row">
+          <h2><span>01 /</span> CMF 材质工坊 <small id="cmf-badge">CMF 01</small></h2>
+        </div>
+        <div id="cmf-buttons" class="material-grid"></div>
+        <div id="cmf-colorways" class="colorway-bar" role="radiogroup" aria-label="工坊大师配色"></div>
+        <p class="section-note" id="material-description">细腻果壳，包裹温润白玉。</p>
+      </section>
+      <section class="atelier-section" data-section="interaction">
+        <h2><span>02 /</span> 互动姿态</h2>
+        <div id="action-buttons" class="action-list"></div>
+        <div class="emotion-row" aria-label="表情"><button data-emotion="happy">开心</button><button data-emotion="curious">好奇</button><button data-emotion="shy">害羞</button><button data-emotion="normal">自然</button></div>
+      </section>
+      <section class="atelier-section music-section" data-section="music">
+        <h2><span>03 /</span> 一起听 <small id="bpmBadge">待播放</small></h2>
+        <label class="sr-only" for="rhythmTrackSelect">选择音乐</label><select id="rhythmTrackSelect"></select>
+        <div class="music-wave" aria-hidden="true"><span id="rbar-0"></span><span id="rbar-1"></span><span id="rbar-2"></span><span id="rbar-3"></span><span id="rbar-4"></span><span></span><span></span><span></span><span></span><span></span></div>
+        <div class="music-controls"><button id="rhythmPrevBtn" class="icon-button" aria-label="上一首"><svg><use href="#i-prev"/></svg></button><button id="rhythmPlayBtn" class="play-button"><span id="rhythmPlayIcon">▷</span><span id="rhythmPlayText">开始播放</span></button><button id="rhythmNextBtn" class="icon-button" aria-label="下一首"><svg><use href="#i-next"/></svg></button></div>
+        <div class="music-meta"><span id="music-time">00:00</span><label class="upload-label"><svg><use href="#i-upload"/></svg>本地音乐<input id="music-upload" type="file" accept="audio/*"></label></div>
+      </section>
+      <p class="atelier-foot">一颗荔枝，一点好心情。</p>
+    </aside>
+    <main class="stage" aria-label="三维伙伴舞台">
+      <div class="theme-glow" aria-hidden="true"></div>
+      <div class="stage-pedestal" aria-hidden="true"></div>
+      <div class="stage-watermark" aria-hidden="true">
+        <span class="wm-studio">雪沐视觉实验室</span>
+        <span class="wm-sep">✦</span>
+        <span class="wm-title">LI COMPANION ATELIER</span>
+      </div>
+      <div class="stage-crosshairs" aria-hidden="true">
+        <span class="crosshair ch-tl">+</span>
+        <span class="crosshair ch-tr">+</span>
+        <span class="crosshair ch-bl">+</span>
+        <span class="crosshair ch-br">+</span>
+        <div class="stage-spec-tag">SPEC 1.0 · CMF & KINEMATICS ATELIER</div>
+      </div>
+      <img class="stage-decor stage-decor-corner" src="./assets/decorations/quirky/decor_corner.png" alt="" aria-hidden="true">
+      <img class="stage-decor stage-decor-stars" src="./assets/decorations/quirky/decor_stars.png" alt="" aria-hidden="true">
+      <img class="stage-decor stage-decor-branch" src="./assets/decorations/quirky/decor_branch.png" alt="" aria-hidden="true">
+      <div class="stage-heading"><div><h1 class="gallery-title">暖光藏品室</h1><p class="gallery-subtitle">把今天，放慢一点。</p><div class="gallery-companion"><span id="role-eyebrow" class="sr-only">01 / HOODIE</span><span id="role-name">荔小卫</span><span id="role-description" class="sr-only">把心事收进兜帽，把好心情留给你。</span></div></div><span class="mood"><i></i><span id="mood-label">安静陪伴</span></span></div>
+      <div id="canvas-container"><div id="loading-state" role="status">荔小卫正在醒来…</div></div>
+      <div class="stage-bottom">
+        <div class="stage-action-dock" id="stage-action-dock" aria-label="手绘动作快选坞"></div>
+        <div class="stage-bottom-controls">
+          <div class="view-presets" aria-label="模型视图"><button data-view="front" aria-pressed="false">正面</button><button data-view="side" aria-pressed="false">侧面</button><button data-view="back" aria-pressed="false">背面</button><button data-view="three-quarter" aria-pressed="true">3/4 视角</button><span id="stage-hint">拖动转身</span></div>
+          <div class="camera-toolbar" aria-label="观察与灯光"><button id="camera-reset" class="icon-button" aria-label="恢复视角"><svg><use href="#i-reset"/></svg></button><span class="toolbar-divider"></span><button id="camera-minus" class="icon-button" aria-label="缩小">−</button><button id="camera-plus" class="icon-button" aria-label="放大">＋</button><span class="toolbar-divider"></span><svg class="light-icon"><use href="#i-sun"/></svg><label class="sr-only" for="light-preset">影棚灯光</label><select id="light-preset"><option value="studio">影棚柔光</option><option value="morning">晨光</option><option value="dusk">黄昏</option></select><button id="motion-toggle" class="motion-button" aria-pressed="false">轻动效</button></div>
+        </div>
+      </div>
+    </main>
+    <aside id="conversation" class="conversation" aria-label="对话手记">
+      <div class="conversation-head"><div><h2>对话手记</h2><p id="chat-state">荔小卫在这里</p></div><button id="chat-close" class="icon-button" aria-label="收起对话"><svg><use href="#i-close"/></svg></button></div>
+      <div id="transcript-list" class="transcript-list" aria-live="polite" aria-relevant="additions"><div class="message message-mascot"><span class="message-author">荔小卫</span><p>你好呀，兜帽里的世界很小，刚好装下今天的好心情。</p></div></div>
+      <div class="conversation-settings"><label for="engine-select">对话方式</label><select id="engine-select"><option value="agy">智能对话</option><option value="xiaozhi">小智连接</option><option value="local">本地互动</option></select><button id="clear-chat" class="text-button">清空</button></div>
+      <form id="chat-form" class="composer"><label class="sr-only" for="chat-input">发送消息</label><textarea id="chat-input" rows="2" placeholder="说点什么…" maxlength="2000"></textarea><div class="composer-actions"><button id="mic-btn" class="icon-button" type="button" aria-label="开启声音互动" aria-pressed="false"><img class="btn-quirky-icon" src="./assets/icons/quirky/btn_mic.png" alt="" aria-hidden="true"></button><canvas id="wave-canvas" width="76" height="24" aria-hidden="true"></canvas><button id="speech-toggle" type="button" class="icon-button" aria-label="关闭语音朗读" aria-pressed="true"><svg><use href="#i-volume"/></svg></button><button id="send-btn" class="send-button" aria-label="发送消息"><img class="btn-quirky-icon btn-quirky-send" src="./assets/icons/quirky/btn_send.png" alt="" aria-hidden="true"></button></div></form>
+      <p id="voice-note" class="voice-note">声音互动控制表情 · 文字可发送对话</p>
+    </aside>
+  </div>
+  <div id="toast" class="toast" role="status"></div>
+  <script type="module" src="./js/mascot/studio.js"></script>
+</body>
+</html>

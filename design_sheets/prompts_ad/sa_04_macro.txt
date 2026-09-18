@@ -1,0 +1,11 @@
+3D CMF and assembly macro detail sheet for "LI / 荔 · HOODIE LYCHEE (方案A：果壳连帽卫衣款 · 荔小卫)", CMF & MECHANICAL JOINTS BREAKDOWN (材质分件与工艺微距拆解). 3:2 landscape.
+[STRICT REFERENCE]: Strictly match the exact character from the attached reference image.
+Industrial CMF breakdown layout on clean warm off-white background:
+On the left: The full-body standing character holding drawstrings.
+On the right: 5 circular magnified macro callout lenses highlighting:
+1. Micro-texture of the red lychee peel hoodie with raised polygonal facets and matte silicone feel;
+2. Scalloped hood opening with a 0.5mm smooth soft-pink transition lining framing the face;
+3. Soft milky-translucent white jade lychee pulp facial skin with subtle subsurface scattering (SSS) and rosy cheek gradient;
+4. The green stem drawstring cords with swollen bud tips held in the white mitten hands;
+5. Molded red boots with cream rubber sole lamination and side round rivet button.
+Includes official production color swatches (hex codes) and engineering callouts, ultra-clean product visualization.

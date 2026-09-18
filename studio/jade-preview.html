@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>LÜ · 玉牌试映</title>
+  <link rel="icon" href="data:,">
+  <style>
+    /* Native study-page shell. DESIGN_VARIANCE 5 / MOTION_INTENSITY 5 / VISUAL_DENSITY 2.
+       One pill scale for controls; no cards, overlays or new design-system dependency. */
+    :root{color-scheme:light dark;--paper:#e6ece9;--ink:#243b35;--muted:#50625b;--line:#b7c6bf;--active:#294b3f;--on-active:#f0f5f2}
+    @media(prefers-color-scheme:dark){:root{--paper:#1d2b27;--ink:#e2ece5;--muted:#b0c3b8;--line:#435b50;--active:#b9d4c4;--on-active:#182f24}}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.5 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+    button,a,input{-webkit-tap-highlight-color:transparent}
+    button{font:inherit;color:inherit;cursor:pointer;white-space:nowrap;min-height:44px;border:0;border-radius:999px;background:transparent;padding:9px 17px;transition:background .2s,color .2s,transform .2s}
+    button:hover{background:color-mix(in srgb,var(--ink) 8%,transparent)}
+    button:active{transform:scale(.98)}
+    button[aria-pressed="true"]{background:var(--active);color:var(--on-active)}
+    button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--ink);outline-offset:4px}
+    a{color:inherit;text-decoration:none;padding:10px 0;min-height:44px}
+    a:hover{text-decoration:underline;text-underline-offset:5px}
+    .page{min-height:100dvh;max-width:1680px;margin:auto;display:grid;grid-template-rows:auto minmax(440px,1fr) auto}
+    header{height:76px;padding:0 40px;display:flex;align-items:center;gap:22px}
+    .brand{font-size:23px;font-weight:650;letter-spacing:-1px}
+    header span{font-size:12px;color:var(--muted)}
+    header a{margin-left:auto;font-size:13px}
+    main{position:relative;display:grid;grid-template-columns:230px minmax(0,1fr);min-width:0;padding:0 40px;gap:14px}
+    .intro{padding-top:42px;align-self:start}
+    h1{font-size:38px;line-height:1.25;font-weight:500;letter-spacing:.12em;margin:0 0 16px}
+    .intro p{max-width:180px;margin:0;color:var(--muted);line-height:1.9}
+    .spec{margin-top:36px;color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+    .spec strong{display:block;font-size:20px;letter-spacing:.04em;color:var(--ink);font-weight:450;margin-bottom:3px}
+    fieldset{border:0;padding:0;margin:34px 0 0;min-width:0}
+    legend{color:var(--muted);font-size:12px;padding:0;margin-bottom:9px}
+    .colors{display:flex;gap:12px}
+    .color{position:relative;width:46px;padding:0;background:transparent!important;color:var(--ink)!important;display:grid;place-items:center;border:1px solid transparent}
+    .color[aria-pressed="true"]{border-color:var(--ink)}
+    .color i{width:27px;height:27px;border-radius:50%;background:var(--swatch);box-shadow:inset 0 0 0 1px #36574333;display:block}
+    #finishName{font-size:12px;color:var(--muted);display:block;margin-top:9px}
+    .stage{position:relative;min-width:0;min-height:440px;align-self:stretch;overflow:hidden;border-radius:12px}
+    canvas{width:100%;height:100%;display:block;touch-action:none}
+    #loading{position:absolute;inset:0;display:grid;place-content:center;padding:24px;background:var(--paper);color:var(--muted)}
+    #loading[hidden]{display:none}
+    footer{margin:22px 40px 0;padding:18px 0 22px;border-top:1px solid var(--line);display:grid;grid-template-columns:230px 1fr auto;gap:14px;align-items:center}
+    .note{font-size:12px;color:var(--muted);margin:0}
+    .modes{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+    .transport{display:flex;gap:6px;align-items:center}
+    #progress{width:90px;height:24px;accent-color:var(--active);cursor:pointer;margin-right:12px}
+    #pause{border:1px solid var(--line);min-width:72px}
+    @media(min-width:768px){.page{height:100dvh;min-height:650px}}
+    @media(max-width:1023px){header{padding:0 24px}main{padding:0 24px;grid-template-columns:180px minmax(0,1fr)}footer{margin:18px 24px 0;grid-template-columns:180px 1fr}.transport{grid-column:2}.intro{padding-top:24px}h1{font-size:32px}}
+    @media(max-width:767px){header{height:64px;padding:0 20px;gap:14px}main{padding:0 16px;grid-template-columns:minmax(0,1fr);gap:16px}.intro{padding:10px 4px 0;display:grid;grid-template-columns:1fr auto;column-gap:16px}h1{font-size:28px;margin-bottom:8px}.intro p{max-width:220px;font-size:13px}.spec{grid-column:2;grid-row:1 / 3;margin:0;align-self:center;text-align:right}.spec strong{font-size:14px}fieldset{grid-column:1 / -1;margin:18px 0 0;display:flex;align-items:center;gap:14px}legend{float:left;margin:0 6px 0 0}.colors{gap:8px}.color{width:42px;min-height:42px}.color i{width:25px;height:25px}#finishName{margin:0}.stage{height:50dvh;min-height:340px;max-height:520px}footer{margin:16px 20px 0;padding:14px 0 22px;grid-template-columns:1fr;gap:12px}.note{order:3}.transport{grid-column:1;justify-content:space-between}.modes{justify-content:space-between}.modes button{flex:1}#progress{flex:1;margin-right:18px;max-width:220px}}
+    @media(prefers-reduced-motion:reduce){button{transition:none}}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header><div class="brand">LÜ</div><span>形态试映</span><a href="../index.html">返回主舞台 ↗</a></header>
+    <main>
+      <section class="intro" aria-labelledby="title">
+        <h1 id="title">玉牌</h1>
+        <p>青玉成面，流金入隙。</p>
+        <div class="spec"><strong>1 : 1.618</strong>黄金比例 / 厚度 0.35</div>
+        <fieldset><legend>玉色</legend><div class="colors">
+          <button class="color" data-finish="celadon" style="--swatch:#98bda9" aria-label="青玉" aria-pressed="true"><i aria-hidden="true"></i></button>
+          <button class="color" data-finish="white" style="--swatch:#dce6d9" aria-label="白玉" aria-pressed="false"><i aria-hidden="true"></i></button>
+          <button class="color" data-finish="ink" style="--swatch:#35594b" aria-label="墨玉" aria-pressed="false"><i aria-hidden="true"></i></button>
+        </div><output id="finishName">青玉</output></fieldset>
+      </section>
+      <div class="stage" id="stage" aria-label="可拖动旋转的玉牌三维预览">
+        <div id="loading" role="status">正在布光…</div>
+      </div>
+    </main>
+    <footer>
+      <p class="note">独立试映 <span id="chapter">蓄势</span></p>
+      <div class="modes" role="group" aria-label="玉牌动作">
+        <button data-mode="still" aria-pressed="false">静置</button>
+        <button data-mode="slow" aria-pressed="false">齐翻</button>
+        <button data-mode="curtain" aria-pressed="true">翻幕</button>
+      </div>
+      <div class="transport"><input id="progress" type="range" min="0" max="11.6" step="0.01" value="0" aria-label="编排进度（秒）"><button id="pause" aria-pressed="false">暂停</button><button id="reset">复位视角</button></div>
+    </footer>
+  </div>
+  <script type="module">
+    import('./jade-preview.js').catch(error=>{console.error(error);document.querySelector('#loading').textContent='三维预览加载失败，请刷新重试。';});
+  </script>
+</body>
+</html>

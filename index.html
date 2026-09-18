@@ -1459,6 +1459,11 @@
         <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="15" y1="3" x2="15" y2="21"></line></svg>
         参数
       </button>
+
+      <a href="./mascot_studio.html" class="btn" id="navToLiBtn" title="前往『 荔 』(LI) 3D 陪伴工作室" style="background: rgba(183, 67, 67, 0.12); border-color: rgba(183, 67, 67, 0.35); color: #b74343; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+        <span style="font-size: 14px;">🌰</span>
+        <span>荔 / LI 工作室</span>
+      </a>
     </div>
   </header>
 
@@ -1579,7 +1584,7 @@
       <div class="amp-rail-group">
         <div class="range" style="grid-template-columns: 36px 100px 36px; margin:0;">
           <span>振幅</span>
-          <input id="waveAmpSlider" type="range" min="0.2" max="2.4" step="0.1" value="1.0">
+          <input id="waveAmpSlider" type="range" min="0.2" max="1.0" step="0.05" value="1.0" title="上限由几何预算给定：档位越高可用幅度越大">
           <output>1.0x</output>
         </div>
         <button class="btn active" id="waveMotionToggle" title="音频声波矩阵总开关">
@@ -1773,8 +1778,8 @@
         </div>
         <div class="card-block">
           <div class="pill-group" id="contentModeGroup">
-            <button class="pill-btn active" data-mode="material">纯材质</button>
-            <button class="pill-btn" data-mode="avatar" title="OneWorks 官方场景与活体表情">角色</button>
+            <button class="pill-btn" data-mode="material">纯材质</button>
+            <button class="pill-btn active" data-mode="avatar" title="OneWorks 官方场景与活体表情">角色</button>
             <button class="pill-btn" data-mode="text" title="文字与歌词排版">歌词</button>
             <button class="pill-btn" data-mode="image" title="自定义图片与 GIF">图片</button>
           </div>
@@ -1799,7 +1804,7 @@
         </div>
 
         <!-- OneWorks 8 大活体头像卡片 -->
-        <div id="avatarPanel" style="display: none;">
+        <div id="avatarPanel" style="display: block;">
           <div class="official-avatar-tools"><span id="officialAvatarStatus">OneWorks · 官方角色组件</span><a id="officialAvatarEdit" href="./studio/avatar-editor.html?slot=cloud">进入角色工作室 →</a></div>
           <div class="section-title">
             <span><svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg> 8 款角色 · OneWorks</span>
@@ -1952,7 +1957,36 @@ BEAT</textarea>
               <div class="pill-group" id="imageDistGroup">
                 <button class="pill-btn active" data-idist="mosaic">巨幅无缝拼图 (Mosaic)</button>
                 <button class="pill-btn" data-idist="tile">单元重复平铺 (Tile)</button>
+                <button class="pill-btn" data-idist="album" title="整目录导入照片，每格抽取一张">图集盲盒</button>
               </div>
+            </div>
+
+            <div id="albumPanel" style="margin-top: 10px; display: none;">
+              <div class="grid2">
+                <div class="file-upload-wrap" style="width: 100%;">
+                  <button class="btn" style="width: 100%; border-style: dashed;">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path><path d="M12 12v9"></path><path d="m16 16-4-4-4 4"></path></svg>
+                    选照片
+                  </button>
+                  <input type="file" id="albumUpload" accept="image/*" multiple>
+                </div>
+                <div class="file-upload-wrap" style="width: 100%;">
+                  <button class="btn" style="width: 100%; border-style: dashed;">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                    选文件夹
+                  </button>
+                  <input type="file" id="albumUploadDir" accept="image/*" multiple webkitdirectory directory>
+                </div>
+              </div>
+              <div class="muted" style="margin-top: 4px; font-size: 11px; line-height: 1.4;">
+                两者分开：带 <code>webkitdirectory</code> 的输入框在 Chrome 里只允许选目录，无法同时多选零散照片，所以做成两个入口。上限 120 张。
+              </div>
+              <div class="grid2" style="margin-top: 6px;">
+                <button class="btn" id="albumReseedBtn" title="换一组抽取结果">重新抽取</button>
+                <button class="btn" id="albumClearBtn" title="清空已导入的图集">清空图集</button>
+              </div>
+              <div id="albumStatus" class="muted" style="margin-top: 6px; font-size: 12px;">未导入图集</div>
+              <div id="albumPreview" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin-top: 6px;"></div>
             </div>
           </div>
         </div>
@@ -1964,7 +1998,7 @@ BEAT</textarea>
           <span><svg class="svg-icon" viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg> FOV 动态呼吸变焦</span>
         </div>
         <div class="card-block">
-          <div class="range"><span>基础 FOV 视角</span><input id="fov" type="range" min="20" max="60" step="1" value="30"><output>30</output></div>
+          <div class="range"><span>基础 FOV 视角</span><input id="fov" type="range" min="12" max="85" step="1" value="30"><output>30</output></div>
 
           <div style="margin-top: 8px;">
             <label><span>变焦律动形态</span></label>
@@ -2101,7 +2135,7 @@ const TIER_CONFIGS = {
     phaseSpread: 0.4,
     burst: 0.0,
     sequenceCadence: 16,
-    matrixScaleRange: [0.9, 1.1],
+    matrixScaleRange: [0.88, 1.04],
     microPause: 0.0,
     matrixSequence: [
       { cols: 4, rows: 4, layers: 1 },
@@ -2120,7 +2154,7 @@ const TIER_CONFIGS = {
     phaseSpread: 1.0,
     burst: 0.3,
     sequenceCadence: 8,
-    matrixScaleRange: [0.75, 1.3],
+    matrixScaleRange: [0.74, 1.04],
     microPause: 0.0,
     matrixSequence: [
       { cols: 4, rows: 4, layers: 1 },
@@ -2139,7 +2173,7 @@ const TIER_CONFIGS = {
     phaseSpread: 1.8,
     burst: 0.9,
     sequenceCadence: 4, // 档位越高切换越快
-    matrixScaleRange: [0.5, 1.6], // 尺寸变化范围最大
+    matrixScaleRange: [0.48, 1.04], // 尺寸变化范围最大：上限受格距约束，范围从"向下收缩"获得
     microPause: 0.08,
     matrixSequence: [
       { cols: 2, rows: 2, layers: 1 },
@@ -2153,6 +2187,69 @@ const TIER_CONFIGS = {
   }
 };
 
+// -------------------------------------------------------------
+// 主画面几何契约 (Geometry Contract)
+// 穿模根因：方块尺寸、旋转、波形位移、阵型收拢四者各自为政，没有任何共享的空间预算，
+// 于是"档位尺寸上限 1.6 / 格距 1.22 / 波形位移 1.2 / 圆环单环塞 18 块"叠加后必然互穿。
+// 这里把四者收敛到同一套预算：格距 = 两块占位 + 缝隙 + 两块位移余量。
+// -------------------------------------------------------------
+const UNIT_EDGE = 1.0;            // RoundedBoxGeometry(1,1,1) 的实际边长
+const UNIT_CLEARANCE = 0.08;      // 相邻方块之间必须保留的最小可见缝隙（世界单位）
+const UNIT_SAFETY = 0.05;         // 预算安全余量：插值滞后与浮点误差不允许吃掉可见缝隙
+const WAVE_HEADROOM = 0.72;       // 波形只使用位移余量的 72%，其余留给相位滞后与阵型过渡
+const ROTATION_ENVELOPE = 1.12;   // 允许的旋转投影包络：世界轴占位系数 |cos|+|sin| ≤ 1.12 (≈13.5°)
+const MOSAIC_PITCH = 1.10;        // 巨像拼图必须贴合成整幅画面，单独使用近贴合格距
+const SPHERE_PACK_MARGIN = 1.08;  // 球面阵型的额外排布余量（角尖方向比轴向更早贴近）
+
+// 每档几何预算：
+//   maxScale  该档尺寸上限（波形缩放会先折算进上限再统一夹取）
+//   travel    单块沿任一轴相对格位的最大位移，决定波形可用幅度与格距余量
+//   waveLen   波形波长（单位：格）。波长越短相邻块相位差越大，位移互相抵消的空间越小
+const GEOMETRY_BUDGET = {
+  1: { maxScale: 1.04, travel: 0.055, waveLen: 14, rotXZ: 0.06, rotY: 0.10 },
+  2: { maxScale: 1.04, travel: 0.090, waveLen: 10, rotXZ: 0.10, rotY: 0.16 },
+  3: { maxScale: 1.04, travel: 0.130, waveLen: 7,  rotXZ: 0.14, rotY: 0.22 }
+};
+
+let geometryCache = { tier: 0, value: null };
+function activeGeometry() {
+  const tier = state?.intensityTier || 2;
+  if (geometryCache.tier !== tier) {
+    const budget = GEOMETRY_BUDGET[tier] || GEOMETRY_BUDGET[2];
+    const halfExtent = 0.5 * UNIT_EDGE * budget.maxScale * ROTATION_ENVELOPE; // 单块世界轴半宽上限
+    const pitch = 2 * halfExtent + UNIT_CLEARANCE + UNIT_SAFETY + 2 * budget.travel; // 相邻两块的最小中心距
+    // 相邻格相位差 Δφ = 2π/λ 时两块相对位移为 2A·sin(Δφ/2)，令其 ≤ 2·travel·WAVE_HEADROOM
+    const waveAmpMax = (budget.travel * WAVE_HEADROOM) / Math.sin(Math.PI / budget.waveLen);
+    geometryCache = { tier, value: { ...budget, pitch, depthPitch: pitch + 0.04, halfExtent, waveAmpMax,
+      mosaicPitch: MOSAIC_PITCH, clearance: UNIT_CLEARANCE } };
+  }
+  return geometryCache.value;
+}
+
+// 旋转投影包络：正方体在世界轴上的占位系数（= 最大值行的 |R| 行和），用于把尺寸随旋转收回来
+const envelopeEuler = new THREE.Euler();
+const envelopeMatrix = new THREE.Matrix4();
+function projectedEnvelope(rotX, rotY, rotZ) {
+  envelopeEuler.set(rotX, rotY, rotZ);
+  envelopeMatrix.makeRotationFromEuler(envelopeEuler);
+  const e = envelopeMatrix.elements;
+  return Math.max(
+    Math.abs(e[0]) + Math.abs(e[4]) + Math.abs(e[8]),
+    Math.abs(e[1]) + Math.abs(e[5]) + Math.abs(e[9]),
+    Math.abs(e[2]) + Math.abs(e[6]) + Math.abs(e[10])
+  );
+}
+
+// 取景距离：整体由阵型实际外接半径推导，格距变化后再也不会出现"方阵顶出画面"
+function framingDistance(radius) {
+  const verticalHalf = THREE.MathUtils.degToRad(camera.fov * 0.5);
+  const horizontalHalf = Math.atan(Math.tan(verticalHalf) * camera.aspect);
+  // 取景系数：数值越小主体越大（距离 ∝ 系数）。1.12 是几何契约落地时为"方阵绝不出画"取的保守值，
+  // 代价是主体在画面里偏小、氛围被背景吞掉。可用 ?framek= 覆盖以便实测调参。
+  const k = Number(window.__FRAME_K) > 0 ? Number(window.__FRAME_K) : 0.74;
+  return radius * k / Math.sin(Math.min(verticalHalf, horizontalHalf));
+}
+
 const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
 const stage = $('#stage');
@@ -2160,7 +2257,9 @@ const statusText = $('#statusText');
 const statusDot = $('#statusDot');
 
 const state = {
-  contentMode: 'material',
+  // 默认即为"角色在场"：装置的定义里有一个属于用户自己的活物，而不是一墙水晶。
+  // 这也让首屏不需要任何操作就成立——美是默认状态，不是奖励。
+  contentMode: 'avatar',
   layerMode: 'surface', // surface | inside | back
   orbitMode: 'arc',    // arc | full
   camMotionMode: 'auto', // auto | on | off
@@ -2169,6 +2268,11 @@ const state = {
   textColorMode: 'auto', // auto | dark | white | gold | cyan
   selectedAvatar: 'cloud',
   avatarDist: 'all', // all | mosaic | center | variety
+  // 自定义图集盲盒：用户整目录导入照片后，矩阵每格从图集里抽取一张。
+  // 抽取按 (seed, slot) 的稳定伪随机决定，所以"同一个种子 → 同一张排布"，
+  // 重新抽取只改种子。这样盲盒结果可复现，也不会每帧抖动。
+  imageAlbum: [],        // [{ key, name, url }]
+  albumSeed: 1,
   adhesionCraft: 'conformal', // conformal | emboss | hologram
   imageDist: 'mosaic', // mosaic | tile
   mosaicLock: true, // 巨像整联共振锁：开启时锁定面孔相对构型，防律动撕裂
@@ -2246,6 +2350,10 @@ const state = {
   backgroundColor: '#727b88',
   time: 0,
   waveAccumulator: 0,
+
+  // 静息待机态：装置未演奏时自主呼吸的强度包络 (0 = 完全收起, 1 = 满幅静息)。
+  // 独立于音频能量，不参与节拍/起音估计，只在"没有音乐"时接管画面，避免装置看起来是"死的"。
+  idleBreath: 0,
 
   // 动态活体交互
   gazeFollow: true,
@@ -2331,7 +2439,15 @@ controls.minDistance = 2.0;
 controls.maxDistance = 50;
 
 // 3. 后处理通道 (窄半径，防晃眼防模糊)
-const composer = new EffectComposer(renderer);
+// 主画面毛边根因：renderer 的 antialias 只作用于默认帧缓冲；一旦画面经过 EffectComposer，
+// 实际多重采样数由 renderTarget.samples 决定（EffectComposer 默认缓冲为 0 = 无 MSAA），
+// 于是玻璃与晶体高光边缘在主画面上仍然是硬锯齿。显式给后处理缓冲开启多重采样。
+const composerBufferSize = renderer.getDrawingBufferSize(new THREE.Vector2());
+const composerTarget = new THREE.WebGLRenderTarget(composerBufferSize.width, composerBufferSize.height, {
+  type: THREE.HalfFloatType,
+  samples: Math.max(1, Math.min(4, renderer.capabilities.maxSamples || 1))
+});
+const composer = new EffectComposer(renderer, composerTarget);
 const renderPass = new RenderPass(scene, camera);
 composer.addPass(renderPass);
 
@@ -2933,6 +3049,110 @@ function getSmartContrastTextColor(baseColorHex, userPreference = 'auto') {
   }
 }
 
+// -------------------------------------------------------------
+// 自定义图集盲盒 (Custom Album Blind Box)
+// 用户整目录导入照片，矩阵每格抽一张。抽取结果由 (种子, 格号) 稳定决定：
+// 同一个种子必得同一张排布，所以"重新抽取"只是换种子，而重建（歌词同步、材质微调）
+// 不会让画面换牌。纹理解码后按需缓存，清空图集时统一释放。
+// -------------------------------------------------------------
+const albumTextureCache = new Map();   // key -> { texture, w, h }
+const ALBUM_MAX_EDGE = 1024;           // 单张解码上限，防止整目录导入时显存爆掉
+const ALBUM_MAX_FILES = 120;           // 单次导入上限
+
+function clearImageAlbum() {
+  state.imageAlbum.forEach(entry => {
+    const cached = albumTextureCache.get(entry.key);
+    if (cached) { cached.texture.dispose(); albumTextureCache.delete(entry.key); }
+    if (entry.url) URL.revokeObjectURL(entry.url);
+  });
+  state.imageAlbum = [];
+  albumTextureCache.clear();
+}
+
+// 稳定伪随机：种子 + 格号经一次整数雪崩后取模。同输入必同输出，绝不使用 Math.random。
+function albumPickFor(slotIdx) {
+  const n = state.imageAlbum.length;
+  if (!n) return null;
+  let h = (Math.imul(state.albumSeed | 0, 0x9e3779b1) ^ Math.imul(slotIdx + 1, 0x85ebca6b)) >>> 0;
+  h ^= h >>> 13; h = Math.imul(h, 0xc2b2ae35) >>> 0; h ^= h >>> 16;
+  // 关键：最后一步异或会把结果拉回【有符号】32 位，负数取模得到负索引，
+  // 取到的是 undefined，表现就是"有些格子没图"。必须再 >>> 0 归一为非负。
+  h = h >>> 0;
+  return state.imageAlbum[h % n];
+}
+
+function albumTextureCached(entry) {
+  const cached = albumTextureCache.get(entry.key);
+  if (cached) return cached.texture;
+  const bitmap = entry.bitmap;
+  if (!bitmap) return null;
+  // 居中正方裁剪：矩阵单元是方的，直接拉伸会把照片压扁。
+  const edge = Math.min(bitmap.width, bitmap.height);
+  const scale = Math.min(1, ALBUM_MAX_EDGE / edge);
+  const out = Math.max(1, Math.round(edge * scale));
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = out;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(bitmap, (bitmap.width - edge) / 2, (bitmap.height - edge) / 2, edge, edge, 0, 0, out, out);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = renderer.capabilities.getMaxAnisotropy?.() || 1;
+  albumTextureCache.set(entry.key, { texture, w: out, h: out });
+  return texture;
+}
+
+async function loadImageAlbum(files) {
+  const list = Array.from(files).filter(f => f && f.type && f.type.startsWith('image/')).slice(0, ALBUM_MAX_FILES);
+  const status = $('#albumStatus');
+  if (!list.length) {
+    if (status) status.textContent = '没有可用的图片文件';
+    return;
+  }
+  if (status) status.textContent = `正在解码 ${list.length} 张…`;
+  clearImageAlbum();
+  const loaded = [];
+  for (let i = 0; i < list.length; i++) {
+    const file = list[i];
+    try {
+      const bitmap = await createImageBitmap(file);
+      loaded.push({ key: `${i}:${file.name}:${file.size}:${file.lastModified}`, name: file.name, bitmap, url: '' });
+    } catch (error) {
+      // 单张损坏或格式不支持不应中断整批导入
+      console.warn('图集跳过', file.name, error?.message);
+    }
+  }
+  state.imageAlbum = loaded;
+  state.albumSeed = (state.albumSeed % 2147483647) + 1;
+  // 预热贴图：让首帧就有画面，而不是等第一格渲染时才解码
+  loaded.forEach(entry => albumTextureCached(entry));
+  renderAlbumPreview();
+  if (status) status.textContent = loaded.length
+    ? `已导入 ${loaded.length} 张${loaded.length < list.length ? `（跳过 ${list.length - loaded.length} 张）` : ''} · 种子 ${state.albumSeed}`
+    : '导入失败：没有可解码的图片';
+  rebuildMatrix();
+}
+
+function renderAlbumPreview() {
+  const box = $('#albumPreview');
+  if (!box) return;
+  // 每张 1024px 源图做一次 toDataURL 并不便宜，所以只在数量变化时重建缩略图
+  if (box.childElementCount === Math.min(12, state.imageAlbum.length) && box.dataset.albumSize === String(state.imageAlbum.length)) return;
+  box.dataset.albumSize = String(state.imageAlbum.length);
+  box.innerHTML = '';
+  state.imageAlbum.slice(0, 12).forEach(entry => {
+    const tex = albumTextureCache.get(entry.key)?.texture;
+    if (!tex) return;
+    const thumb = document.createElement('canvas');
+    thumb.width = thumb.height = 120;
+    thumb.getContext('2d').drawImage(tex.image, 0, 0, 120, 120);
+    const img = document.createElement('img');
+    img.src = thumb.toDataURL('image/jpeg', 0.55);
+    img.title = entry.name;
+    img.style.cssText = 'width:100%;aspect-ratio:1;object-fit:cover;border-radius:4px;';
+    box.appendChild(img);
+  });
+}
+
 // 文字贴图生成
 function createTypographyTexture(char, craftType, baseColorHex) {
   const size = 512;
@@ -3454,16 +3674,22 @@ function commitMatrixRebuild() {
   let cols = state.gridCols;
   let rows = state.gridRows;
   let layers = state.gridLayers;
-  studioFloor.position.y = -(rows * 1.22) / 2 - 1.0;
-  const shadowExtent = Math.max(cols,rows,layers)*1.5;
+  const geometry = activeGeometry();
+  const isMosaicLayout = (!(state.isPlayingMusic && state.isIntroPlaying && state.enableTitleIntro) && state.contentMode === 'avatar' && state.avatarDist === 'mosaic') ||
+                         (!(state.isPlayingMusic && state.isIntroPlaying && state.enableTitleIntro) && state.contentMode === 'image' && state.imageDist === 'mosaic');
+  // 格距由几何契约给出：巨像拼图必须贴合画面，常规方阵使用"两块占位 + 缝隙 + 位移余量"的格距
+  const spacingX = isMosaicLayout ? geometry.mosaicPitch : geometry.pitch;
+  const spacingY = spacingX;
+  const spacingZ = isMosaicLayout ? geometry.mosaicPitch + 0.02 : geometry.depthPitch;
+  studioFloor.position.y = -(rows * spacingY) / 2 - 1.0;
+  const shadowExtent = Math.max(cols*spacingX, rows*spacingY, layers*spacingZ)*0.9;
   Object.assign(keyLight.shadow.camera,{left:-shadowExtent,right:shadowExtent,top:shadowExtent,bottom:-shadowExtent,far:70});
   keyLight.shadow.camera.updateProjectionMatrix();
 
   const isShowingIntro = !pureMaterial && state.isPlayingMusic && state.isIntroPlaying && state.enableTitleIntro;
 
   // 摄像机自适应视距（仅在首次初始化时设定机位，移除无效 controls.state 判断以保留用户手动视角与镜头预设）
-  const maxDim = Math.max(cols, rows, layers);
-  const targetCamDist = 4.2 + maxDim * 2.2;
+  const targetCamDist = framingDistance(formationRadius(isMosaicLayout ? 'grid' : state.activeFormation));
   if (isFirstCameraInit) {
     camera.position.set(targetCamDist * 0.55, targetCamDist * 0.42, targetCamDist * 0.88);
     controls.target.set(0, 0, 0);
@@ -3471,13 +3697,7 @@ function commitMatrixRebuild() {
   }
 
   // 判定是否为巨幅拼图合成模式 (巨型活体表情 / 巨型图片拼图)
-  const isMosaic = (!isShowingIntro && state.contentMode === 'avatar' && state.avatarDist === 'mosaic') ||
-                   (!isShowingIntro && state.contentMode === 'image' && state.imageDist === 'mosaic');
-
-  // 间隙智能自适应：巨像拼图模式微收缩至 1.10（缝隙 0.10，兼具微缝紧致感与晶体倒角高光立体感），常规模式为 1.22
-  const spacingX = isMosaic ? 1.10 : 1.22;
-  const spacingY = isMosaic ? 1.10 : 1.22;
-  const spacingZ = isMosaic ? 1.12 : 1.26;
+  const isMosaic = isMosaicLayout;
 
   let totalBlocks = rows * cols * layers;
   let placedCount = 0;
@@ -3531,7 +3751,19 @@ function commitMatrixRebuild() {
           } else {
             shouldRenderContent = false;
           }
-        } else if (state.contentMode === 'text' || state.matrixSequence === 'lyrics_stream') {
+        } else if (state.contentMode === 'image' && state.imageDist === 'album') {
+          // 图集盲盒：每格按 (种子, 格号) 的稳定伪随机抽取一张。
+          // 必须用稳定哈希而不是 Math.random()——重建随时可能发生（歌词同步、材质微调、
+          // 阵型切换），随机数会让每次重建都换一张，看起来是闪烁而不是盲盒。
+          const pick = state.imageAlbum.length ? albumPickFor(slotIdx) : null;
+          if (pick) {
+            texture = albumTextureCached(pick);
+            shouldRenderContent = !!texture;
+          } else {
+            shouldRenderContent = false;
+          }
+        }
+ else if (state.contentMode === 'text' || state.matrixSequence === 'lyrics_stream') {
           // 歌词/文字排版模式：严格展示歌词文本
           const activePhrase = state.currentLyricPhrase;
           if (activePhrase && activePhrase.trim() !== '') {
@@ -3600,6 +3832,8 @@ function commitMatrixRebuild() {
         const reused = reusable[slotIdx];
         if (reused) {
           placedCount += reused.userData.contentCount || 0;
+          // 复用单元已在场：直接标记入场完成，否则它会带着上一轮的 arrival 永远停在不可见状态
+          if (reused.userData.arrival) reused.userData.arrival.ready = true;
           Object.assign(reused.userData, { baseX: x, baseY: y, baseZ: z,
             distFromCenter: Math.hypot(x, y, z), gridR: r, gridC: c, gridL: l });
           matrixGroup.add(reused);
@@ -3618,11 +3852,30 @@ function commitMatrixRebuild() {
         } else {
           unitGroup.position.set(x, y, z);
         }
+        // 入场错时：所有单元若同一帧从中心长出，读起来是"融化"而不是"到来"。
+        // 用对角推进（cellDiag）而不是径向距离：4×4 方阵里大量格子到中心距离相同，
+        // 径向键区分度不足（实测跨度只有 0.125s，肉眼读不出顺序）；
+        // 对角坐标在方阵上天然均匀分层，扫掠方向也正是这类矩阵最惯用的"翻页"方向。
+        //
+        // 注意：这里刻意不判断 oldPose。矩阵重建时 previous 总是有值，若按 oldPose 门控，
+        // 入场就永远不会发生（旧位姿会被整段继承）。真正的"复用"走的是上面的 reusable 分支，
+        // 那条路径直接 continue，根本不会走到这里——所以"走到这里"本身就等价于"这是新单元"。
+        //
+        // 关于"内容优先"：不能直接用 shouldRenderContent 判断，因为它在材质模式下默认就是 true，
+        // 会让所有格子挤在同一拍、错时完全失效。改为构建结束后按内容密度决定。
+        const arrival = unitGroup.userData.arrival || { at: 0, ready: false };
+        const diag = (x + y) / (geometry.pitch * Math.SQRT2); // 与波形同源的 1-Lipschitz 对角坐标
+        arrival.at = state.time + (prefersReducedMotion ? 0
+          : 0.06 + THREE.MathUtils.clamp((diag + 1.5) / 3, 0, 1) * 0.78);
+        arrival.ready = false;
+        if (!prefersReducedMotion) unitGroup.scale.setScalar(0.001);
+
         unitGroup.userData = {
           baseX: x, baseY: y, baseZ: z,
           contentCount: shouldRenderContent && texture ? 1 : 0,
           distFromCenter: Math.sqrt(x * x + y * y + z * z),
-          gridR: r, gridC: c, gridL: l
+          gridR: r, gridC: c, gridL: l,
+          arrival
         };
 
         const material = createMaterialPreset(matType, colorVal);
@@ -3692,6 +3945,26 @@ function commitMatrixRebuild() {
   }
 
   spareUnits = reusable.slice(totalBlocks);
+
+  // 入场优先级：按"内容密度"而不是"这一格有没有内容"决定。
+  // 密集模式（默认材质方阵、全方阵群像）内容铺满整面，此时"内容优先"没有意义，保留距离错时即可；
+  // 稀疏模式（中心单体、巨像拼合、单张图片）全场只有一处内容，那才是装置的主角，必须抢到第一拍。
+  {
+    const built = matrixGroup.children;
+    let contentUnits = 0;
+    for (let i = 0; i < built.length; i++) if (built[i].userData.contentCount) contentUnits++;
+    const sparseContent = contentUnits > 0 && contentUnits <= Math.max(1, built.length * 0.25);
+    if (sparseContent) {
+      // 比最早的距离档再提前一点：对角扫掠里"中心格"和"某些角落"可能落在同一档
+      // （两者对角键恰好相等），主语若和陪衬同时到达就失去了主次，所以显式抢半个档次。
+      const earliest = state.time + (prefersReducedMotion ? 0 : 0.02);
+      for (let i = 0; i < built.length; i++) {
+        const u = built[i];
+        if (u.userData.contentCount && u.userData.arrival) u.userData.arrival.at = earliest;
+      }
+    }
+  }
+
   activePhysicalMaterials = [];
   matrixGroup.traverse(obj => {
     if (obj.material?.isMeshPhysicalMaterial) {
@@ -3725,19 +3998,16 @@ function commitMatrixRebuild() {
   });
   activeLiveTextureKeys = Array.from(referencedKeys);
 
-  // 仅尺寸变化时补足取景空间；材质重建不改用户角度或缩放。
+  // 仅尺寸/阵型变化时补足取景空间；材质重建不改用户角度或缩放。
   const matrixShape = `${cols}:${rows}:${layers}:${state.activeFormation}`;
   if (lastMatrixShape && matrixShape !== lastMatrixShape) {
-    const sphere = new THREE.Sphere(new THREE.Vector3(), Math.hypot(cols * spacingX, rows * spacingY, layers * spacingZ) * 0.5);
-    if (state.activeFormation === 'fan' || state.activeFormation === 'orbit') sphere.radius = Math.max(sphere.radius,rows*1.0+1.5);
-    const verticalHalf = THREE.MathUtils.degToRad(camera.fov * 0.5);
-    const horizontalHalf = Math.atan(Math.tan(verticalHalf) * camera.aspect);
-    const radius = sphere.radius + sphere.center.distanceTo(controls.target);
-    const fitDistance = radius * 1.08 / Math.sin(Math.min(verticalHalf, horizontalHalf));
+    const fitDistance = framingDistance(formationRadius(isMosaicLayout ? 'grid' : state.activeFormation));
     pendingFrameDistance = Math.max(camera.position.distanceTo(controls.target), fitDistance);
     controls.maxDistance = Math.max(controls.maxDistance, fitDistance * 1.1);
   }
   lastMatrixShape = matrixShape;
+  // 阵型过渡窗口：几何避让求解器在此期间必须保持工作
+  state.morphUntil = performance.now() + 900;
 
   const matName = ui.material.options[ui.material.selectedIndex].text;
   const specText = layers > 1 ? `${cols}×${rows}×${layers} ${layers}层` : `${cols}×${rows} 方阵`;
@@ -4605,34 +4875,129 @@ let lastMovementIdx = -1;
 const FORMATION_SEQUENCE = ['grid', 'helix', 'ring', 'fan', 'orbit', 'terrace', 'sphere'];
 const FORMATION_LABELS = { grid: '阵列', helix: '双螺旋', ring: '圆环', fan: '折扇', orbit: '轨道', terrace: '阶梯', sphere: '球面' };
 
+// 阵型几何：所有半径、弧长、环距、层距一律由 activeGeometry().pitch 推导。
+// 原实现里"圆环单环硬塞 18 块 / 折扇排距 0.95 / 轨道层距 0.75"都小于方块边长，属于结构性穿模。
+const FORMATION_PACK_CACHE = new Map();
+
+function chordRadiusFor(step, minDistance) {
+  const half = Math.min(Math.abs(step), Math.PI / 2) / 2;
+  return half > 1e-4 ? minDistance / (2 * Math.sin(half)) : minDistance * 1.5;
+}
+
+// 同心环排布：内环半径 = 最小中心距，环间距 = 最小中心距，每环容量由周长决定
+function ringSlot(index, count, minDistance) {
+  let remaining = index % Math.max(1, count);
+  let radius = minDistance;
+  for (let ring = 0; ring < 64; ring++) {
+    const capacity = Math.max(1, Math.floor((2 * Math.PI * radius) / minDistance));
+    if (remaining < capacity) return { radius, angle: (remaining / capacity) * Math.PI * 2, ring, capacity };
+    remaining -= capacity;
+    radius += minDistance;
+  }
+  return { radius, angle: 0, ring: 0, capacity: 1 };
+}
+
+function ringOuterRadius(count, minDistance) {
+  return count > 1 ? ringSlot(count - 1, count, minDistance).radius : minDistance;
+}
+
+// 斐波那契球面分布：先求出单位球上的最近点距，再整体放大到"最近点距 = 格距"
+function spherePack(count) {
+  const key = `sphere-${count}`;
+  let pack = FORMATION_PACK_CACHE.get(key);
+  if (!pack) {
+    const golden = Math.PI * (3 - Math.sqrt(5));
+    const points = [];
+    for (let i = 0; i < count; i++) {
+      const latitude = 1 - 2 * (i + 0.5) / count;
+      const angle = i * golden;
+      const ring = Math.sqrt(Math.max(0, 1 - latitude * latitude));
+      points.push([Math.cos(angle) * ring, latitude, Math.sin(angle) * ring]);
+    }
+    let min = Infinity;
+    for (let i = 0; i < points.length; i++) {
+      for (let j = i + 1; j < points.length; j++) {
+        const a = points[i], b = points[j];
+        const distance = Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+        if (distance < min) min = distance;
+      }
+    }
+    pack = { points, min: Number.isFinite(min) && min > 1e-6 ? min : 1 };
+    FORMATION_PACK_CACHE.set(key, pack);
+  }
+  return pack;
+}
+
 function formationPosition(data, mode) {
   const {gridR:r, gridC:c, gridL:l, baseX:x, baseY:y, baseZ:z}=data;
-  const cols=state.gridCols, rows=state.gridRows, count=cols*rows*state.gridLayers;
-  const index=l*cols*rows+r*cols+c;
-  const extent=Math.max(cols,rows)*.62;
-  const phase=index/Math.max(1,count)*Math.PI*2;
-  if (mode==='ring') return [Math.cos(phase)*extent, Math.sin(phase)*extent, (index%2-.5)*.55];
+  const cols=state.gridCols, rows=state.gridRows, layers=state.gridLayers;
+  const index2d=r*cols+c;
+  const count2d=Math.max(1,cols*rows);
+  const count=Math.max(1,count2d*layers);
+  const D=activeGeometry().pitch;          // 相邻两块的最小中心距
+  const span=Math.max(cols,rows)*D*0.5;
+  if (mode==='ring') {
+    // 同心圆环占据 X-Y 平面；层数沿 Z 叠放，层距由格距保证
+    const slot=ringSlot(index2d,count2d,D);
+    return [Math.cos(slot.angle)*slot.radius, Math.sin(slot.angle)*slot.radius, z];
+  }
   if (mode==='helix') {
-    const angle=r/Math.max(1,rows-1)*Math.PI*1.5+c*Math.PI*2/cols;
-    return [Math.cos(angle)*extent*.72, y, Math.sin(angle)*extent*.72+z];
+    // 同排由弦长保证间距；跨排由 Y 轴格距天然分离
+    const radius=Math.max(span*0.72, cols>1 ? chordRadiusFor((Math.PI*2)/cols, D) : span*0.72);
+    const angle=(rows>1 ? r/(rows-1) : 0)*Math.PI*1.5 + (c*Math.PI*2)/Math.max(1,cols);
+    return [Math.cos(angle)*radius, y, Math.sin(angle)*radius+z];
   }
   if (mode==='fan') {
-    const angle=(c/Math.max(1,cols-1)-.5)*Math.PI*.9;
-    const radius=1.5+r*.95;
-    return [Math.sin(angle)*radius,Math.cos(angle)*radius-rows*.48, z];
+    // 折扇：张角决定内弧半径，排距 = 格距
+    const spread=Math.PI*0.9;
+    const step=cols>1 ? spread/(cols-1) : 0;
+    const inner=Math.max(D*1.2, cols>1 ? chordRadiusFor(step, D)*1.04 : D*1.2);
+    const radius=inner+r*D;
+    const angle=(c-(cols-1)/2)*step;
+    return [Math.sin(angle)*radius, Math.cos(angle)*radius-rows*D*0.5, z];
   }
   if (mode==='orbit') {
-    const angle=c/cols*Math.PI*2+r*.35;
-    return [Math.cos(angle)*(1.1+r*.85),Math.sin(angle)*(1.1+r*.85)*.55, (r-(rows-1)/2)*.75+z];
+    // 轨道：每排一条水平轨道（X-Z 平面），排距 = 格距；层数向外扩散成同心轨道
+    const baseRadius=cols>1 ? chordRadiusFor((Math.PI*2)/cols, D) : Math.max(D*1.3, span*0.6);
+    const radius=baseRadius+l*D;
+    const angle=(c/Math.max(1,cols))*Math.PI*2 + r*0.6 + l*0.25;
+    return [Math.cos(angle)*radius, (r-(rows-1)/2)*D, Math.sin(angle)*radius];
   }
-  if (mode==='terrace') return [x,y+Math.sin(c/Math.max(1,cols-1)*Math.PI)*1.1,z+(c-(cols-1)/2)*.55];
+  if (mode==='terrace') return [x, y+Math.sin(cols>1 ? (c/(cols-1))*Math.PI : Math.PI/2)*D*0.6, z+(c-(cols-1)/2)*D*0.45];
   if (mode==='sphere') {
-    const latitude=1-2*(index+.5)/count;
-    const angle=index*Math.PI*(3-Math.sqrt(5));
-    const ring=Math.sqrt(1-latitude*latitude)*extent;
-    return [Math.cos(angle)*ring,latitude*extent,Math.sin(angle)*ring];
+    // 球面：单位球最近点距归一到格距；多层向外扩散为同心球壳（径向间距 = 格距）
+    const pack=spherePack(count2d);
+    // 球面是唯一"相邻方向任意"的阵型：对角方向的角尖比轴距更容易贴近，因此留出额外余量
+    const radius=D*SPHERE_PACK_MARGIN/pack.min;
+    const point=pack.points[index2d % pack.points.length];
+    const shellScale=radius>1e-4 ? 1+(l-(layers-1)/2)*D/radius : 1;
+    return [point[0]*radius*shellScale, point[1]*radius*shellScale, point[2]*radius*shellScale];
   }
   return [x,y,z];
+}
+
+// 当前阵型的外接半径：取景与阴影范围共用，避免"阵型一换就被裁切"
+function formationRadius(mode) {
+  const cols=state.gridCols, rows=state.gridRows, layers=state.gridLayers;
+  const count2d=Math.max(1,cols*rows);
+  const lay=activeGeometry(), D=lay.pitch;
+  const gridRadius=Math.hypot(cols*D, rows*D, layers*lay.depthPitch)*0.5;
+  if (mode==='ring') return Math.max(ringOuterRadius(count2d,D)+D*0.5, D);
+  if (mode==='sphere') { const pack=spherePack(count2d); const base=D*SPHERE_PACK_MARGIN/pack.min; return base*(1+(layers-1)/2*D/base)+D*0.5; }
+  if (mode==='orbit') {
+    const baseRadius=cols>1 ? chordRadiusFor((Math.PI*2)/cols, D) : Math.max(D*1.3, Math.max(cols,rows)*D*0.3);
+    return Math.hypot(baseRadius+(layers-1)*D, rows*D*0.5)+D*0.5;
+  }
+  if (mode==='fan') {
+    const spread=Math.PI*0.9, step=cols>1 ? spread/(cols-1) : 0;
+    const inner=Math.max(D*1.2, cols>1 ? chordRadiusFor(step, D)*1.04 : D*1.2);
+    return inner+(rows-1)*D+D*0.5;
+  }
+  if (mode==='helix') {
+    const radius=Math.max(Math.max(cols,rows)*D*0.36, cols>1 ? chordRadiusFor((Math.PI*2)/cols, D) : Math.max(cols,rows)*D*0.36);
+    return Math.hypot(radius, rows*D*0.5)+D*0.5;
+  }
+  return gridRadius;
 }
 
 function updateMasterChoreography(dt = 0.016) {
@@ -4726,9 +5091,15 @@ function updateMasterChoreography(dt = 0.016) {
   }
 
   // 1. 旋转视角运镜 (开/关/自动) 与 FOV 动态呼吸 (减少动效时禁止自动相机和动态 FOV)
-  const shouldMoveCam = !prefersReducedMotion && ((state.camMotionMode === 'on') || (state.camMotionMode === 'auto' && state.isPlayingMusic));
+  // 待机静息态同样属于"装置正在演"，因此 auto 档在静息时也接管镜头；
+  // 静息用更慢的振幅与频率 (drift)，让镜头像呼吸而不是巡视。
+  const idleActive = state.idleBreath > 0.25;
+  const idleMix = idleActive ? state.idleBreath : 0;
+  const drift = 1 - 0.55 * idleMix;
+  const shouldMoveCam = !prefersReducedMotion && ((state.camMotionMode === 'on') ||
+    (state.camMotionMode === 'auto' && (state.isPlayingMusic || idleActive)));
   const maxDim = Math.max(state.gridCols, state.gridRows, state.gridLayers);
-  let baseCamDist = (4.2 + maxDim * 2.2) * (state.activeFormation === 'grid' ? 1 : 1.18);
+  let baseCamDist = framingDistance(formationRadius(state.activeFormation));
   const baseFov = +ui.fov.value;
   let targetFov = baseFov;
   const tMul = state.tierMultiplier || 1.0;
@@ -4745,7 +5116,7 @@ function updateMasterChoreography(dt = 0.016) {
       targetFov = baseFov + dollyOsc * state.fovPulseAmp * tMul;
       // 距离动态反向补偿
       const fovRad1 = (baseFov * Math.PI) / 360;
-      const clampedFov = Math.max(15, Math.min(75, targetFov));
+      const clampedFov = Math.max(12, Math.min(85, targetFov));
       const fovRad2 = (clampedFov * Math.PI) / 360;
       baseCamDist = baseCamDist * (Math.tan(fovRad1) / Math.tan(fovRad2));
     } else if (state.fovMode === 'sine') {
@@ -4766,7 +5137,7 @@ function updateMasterChoreography(dt = 0.016) {
     const fovLerp = Math.min(1.0, 1.0 - Math.exp(-12.0 * dt));
     state.currentFov += (targetFov - state.currentFov) * fovLerp;
   }
-  const clampedFov = Math.max(15, Math.min(75, state.currentFov));
+  const clampedFov = Math.max(12, Math.min(85, state.currentFov));
   if (Math.abs(camera.fov - clampedFov) > 0.001) {
     camera.fov = clampedFov;
     camera.updateProjectionMatrix();
@@ -4774,6 +5145,29 @@ function updateMasterChoreography(dt = 0.016) {
 
   if (shouldMoveCam) {
     const camDist = baseCamDist + Math.sin(state.time * 0.4) * 1.8 - (state.bassEnergy * 0.8 * tMul);
+
+    if (idleActive) {
+      // 静息构图：0.13 / 0.075 / 0.055 rad/s 三个互相不可通约的低频叠加，
+      // 在肉眼尺度上不呈现可预期的循环周期，避免用户学会机位之后注意力脱落。
+      let idleAngle;
+      if (state.orbitMode === 'arc') {
+        idleAngle = Math.sin(state.time * 0.09) * 0.42 * drift + Math.sin(state.time * 0.021) * 0.16;
+      } else {
+        idleAngle = state.time * 0.06;
+      }
+      const idleDist = camDist * 0.93 + Math.sin(state.time * 0.05) * 1.1;
+      const targetCamX = Math.sin(idleAngle) * idleDist;
+      const targetCamZ = Math.cos(idleAngle) * idleDist;
+      const targetCamY = (maxDim * 0.8) + Math.sin(state.time * 0.042) * 1.8;
+      const idleCamLerp = Math.min(1.0, 1.0 - Math.exp(-1.1 * dt));
+      camera.position.x += (targetCamX - camera.position.x) * idleCamLerp;
+      camera.position.y += (targetCamY - camera.position.y) * idleCamLerp;
+      camera.position.z += (targetCamZ - camera.position.z) * idleCamLerp;
+      const idleTargetLerp = Math.min(1.0, 1.0 - Math.exp(-1.6 * dt));
+      controls.target.x += (0 - controls.target.x) * idleTargetLerp;
+      controls.target.y += (0 - controls.target.y) * idleTargetLerp;
+      controls.target.z += (0 - controls.target.z) * idleTargetLerp;
+    } else {
     let targetCamX = 0;
     let targetCamZ = camDist;
 
@@ -4799,6 +5193,7 @@ function updateMasterChoreography(dt = 0.016) {
     controls.target.x += (0 - controls.target.x) * targetLerp;
     controls.target.y += (0 - controls.target.y) * targetLerp;
     controls.target.z += (0 - controls.target.z) * targetLerp;
+    }
   }
 
   // Music modulates illumination, never the material's physical identity or user sliders.
@@ -4813,7 +5208,189 @@ function updateMasterChoreography(dt = 0.016) {
 // -------------------------------------------------------------
 // 14. 主渲染循环 (6 大声波形态与全曲目 Beat 卡点)
 // -------------------------------------------------------------
+// 几何避让求解器：把"本帧目标队形"投影回无穿模的可行集。
+// 判据是精确的定向包围盒分离轴测试（半宽各外扩半缝隙，等价于要求保留可见缝隙），
+// 因此不会像轴对齐判据那样误判带旋转的方块、把它推出去再引发连锁反应。
+// 设计预算已约束常态运动，这里常态近乎零修正，只在阵型过渡的交叉路径上兜底。
 let lastFrameTimestamp = 0;
+const separationStats = { frames: 0, pairs: 0, pushed: 0, maxPush: 0, totalPush: 0, active: false };
+const _sepHash = new Map();
+const _sepQuat = new THREE.Quaternion();
+const _sepPush = new THREE.Vector3();
+const _sepAxis = new THREE.Vector3();
+const _sepDelta = new THREE.Vector3();
+const _sepMatrix = new THREE.Matrix4();
+const _sepEuler = new THREE.Euler();
+const _sepPosition = new THREE.Vector3();
+const _sepScale = new THREE.Vector3();
+const _sepQuaternion = new THREE.Quaternion();
+const _sepBoxes = [];
+const _sepBestAxis = new THREE.Vector3();
+
+function sepBox(index) {
+  let box = _sepBoxes[index];
+  if (!box) {
+    box = _sepBoxes[index] = {
+      center: new THREE.Vector3(),
+      axes: [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()],
+      half: [0, 0, 0],
+      extent: [0, 0, 0]
+    };
+  }
+  return box;
+}
+
+// 目标位姿 → 世界空间定向包围盒（含自身旋转/缩放与整体旋转的合成）
+function fillTargetBox(unit, box) {
+  const target = unit.userData.target;
+  _sepEuler.set(target.rotX, target.rotY, target.rotZ);
+  _sepQuaternion.setFromEuler(_sepEuler);
+  _sepPosition.set(target.x, target.y, target.z);
+  _sepScale.set(target.scaleX, target.scaleY, target.scaleZ);
+  _sepMatrix.compose(_sepPosition, _sepQuaternion, _sepScale);
+  _sepMatrix.premultiply(matrixGroup.matrixWorld);
+  const e = _sepMatrix.elements;
+  box.center.set(e[12], e[13], e[14]);
+  for (let i = 0; i < 3; i++) {
+    const x = e[i * 4], y = e[i * 4 + 1], z = e[i * 4 + 2];
+    const length = Math.hypot(x, y, z) || 1;
+    box.axes[i].set(x / length, y / length, z / length);
+    box.half[i] = 0.5 * length;
+  }
+  for (let i = 0; i < 3; i++) {
+    box.extent[i] = Math.abs(box.axes[0].getComponent(i)) * box.half[0]
+      + Math.abs(box.axes[1].getComponent(i)) * box.half[1]
+      + Math.abs(box.axes[2].getComponent(i)) * box.half[2];
+  }
+  return box;
+}
+
+// 精确 OBB 分离轴测试（3+3 面轴 + 9 叉积轴）：命中返回最小平移向量，未命中返回 null
+function obbMinimumTranslation(a, b, margin) {
+  const R = [[0, 0, 0], [0, 0, 0], [0, 0, 0]], AbsR = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+  const EPS = 1e-6;
+  for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) {
+    R[i][j] = a.axes[i].dot(b.axes[j]);
+    AbsR[i][j] = Math.abs(R[i][j]) + EPS;
+  }
+  _sepDelta.copy(b.center).sub(a.center);
+  const t = [_sepDelta.dot(a.axes[0]), _sepDelta.dot(a.axes[1]), _sepDelta.dot(a.axes[2])];
+  const ra = [a.half[0] + margin, a.half[1] + margin, a.half[2] + margin];
+  const rb = [b.half[0] + margin, b.half[1] + margin, b.half[2] + margin];
+  let best = Infinity, bestSign = 1, found = false;
+
+  const consider = (projected, radius, axis, flip) => {
+    const overlap = radius - Math.abs(projected);
+    if (overlap <= 0) return false;
+    if (overlap < best) {
+      best = overlap;
+      bestSign = (projected < 0 ? -1 : 1) * flip;
+      _sepBestAxis.copy(axis);
+      if (flip < 0) _sepBestAxis.negate();
+      found = true;
+    }
+    return true;
+  };
+
+  for (let i = 0; i < 3; i++) {
+    const radius = ra[i] + rb[0] * AbsR[i][0] + rb[1] * AbsR[i][1] + rb[2] * AbsR[i][2];
+    if (!consider(t[i], radius, a.axes[i], 1)) return null;
+  }
+  for (let j = 0; j < 3; j++) {
+    const projected = t[0] * R[0][j] + t[1] * R[1][j] + t[2] * R[2][j];
+    const radius = ra[0] * AbsR[0][j] + ra[1] * AbsR[1][j] + ra[2] * AbsR[2][j] + rb[j];
+    if (!consider(projected, radius, b.axes[j], -1)) return null;
+  }
+  for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) {
+    const i1 = (i + 1) % 3, i2 = (i + 2) % 3, j1 = (j + 1) % 3, j2 = (j + 2) % 3;
+    const projected = t[i2] * R[i1][j] - t[i1] * R[i2][j];
+    const radius = ra[i1] * AbsR[i2][j] + ra[i2] * AbsR[i1][j] + rb[j1] * AbsR[i][j2] + rb[j2] * AbsR[i][j1];
+    _sepAxis.copy(a.axes[i1]).multiplyScalar(R[i2][j]).addScaledVector(a.axes[i2], -R[i1][j]);
+    if (_sepAxis.lengthSq() < 1e-10) continue;
+    _sepAxis.normalize();
+    if (!consider(projected, radius, _sepAxis, 1)) return null;
+  }
+  return found ? { depth: best, axis: _sepBestAxis, sign: bestSign } : null;
+}
+
+function resolveTargetSeparation(lay) {
+  const units = matrixGroup.children;
+  const count = units.length;
+  separationStats.frames++;
+  separationStats.pairs = 0; separationStats.pushed = 0;
+  separationStats.maxPush = 0; separationStats.totalPush = 0;
+  // 静止且不在阵型过渡窗口内时无需避让：格距本身已保证分离
+  const active = state.isPlayingMusic || performance.now() < (state.morphUntil || 0);
+  separationStats.active = active;
+  if (!active || count < 2 || count > 1500) {
+    matrixGroup.userData.separation = { ...separationStats };
+    return;
+  }
+
+  matrixGroup.updateWorldMatrix(true, false);
+  const P = Math.max(lay ? lay.pitch : activeGeometry().pitch, 0.5);
+  const clear = UNIT_CLEARANCE;
+  const cellOf = value => Math.max(0, Math.min(4095, Math.floor(value) + 2048));
+  const inv = 1 / P;
+
+  _sepHash.clear();
+  for (let i = 0; i < count; i++) {
+    const box = fillTargetBox(units[i], sepBox(i));
+    const key = (cellOf(box.center.x * inv) * 4096 + cellOf(box.center.y * inv)) * 4096 + cellOf(box.center.z * inv);
+    const bucket = _sepHash.get(key);
+    if (bucket) bucket.push(i); else _sepHash.set(key, [i]);
+  }
+  _sepQuat.setFromRotationMatrix(matrixGroup.matrixWorld).invert();
+
+  // 宽相：世界轴包围盒粗筛（必要条件的快速否定），只保留真正可能接触的对
+  const candidates = [];
+  for (let i = 0; i < count; i++) {
+    const a = _sepBoxes[i];
+    const cx = cellOf(a.center.x * inv), cy = cellOf(a.center.y * inv), cz = cellOf(a.center.z * inv);
+    for (let ox = -1; ox <= 1; ox++) for (let oy = -1; oy <= 1; oy++) for (let oz = -1; oz <= 1; oz++) {
+      const bucket = _sepHash.get(((cx + ox) * 4096 + (cy + oy)) * 4096 + (cz + oz));
+      if (!bucket) continue;
+      for (let k = 0; k < bucket.length; k++) {
+        const j = bucket[k];
+        if (j <= i) continue;
+        const b = _sepBoxes[j];
+        if (Math.abs(b.center.x - a.center.x) >= a.extent[0] + b.extent[0] + clear) continue;
+        if (Math.abs(b.center.y - a.center.y) >= a.extent[1] + b.extent[1] + clear) continue;
+        if (Math.abs(b.center.z - a.center.z) >= a.extent[2] + b.extent[2] + clear) continue;
+        candidates.push([i, j]);
+      }
+    }
+  }
+  separationStats.pairs = candidates.length;
+  if (!candidates.length) {
+    matrixGroup.userData.separation = { ...separationStats };
+    return;
+  }
+
+  // 多次松弛：按最小平移向量分离并复查，直到本帧目标集不再互相插入
+  for (let pass = 0; pass < 5; pass++) {
+    let resolved = 0;
+    for (let index = 0; index < candidates.length; index++) {
+      const unitA = units[candidates[index][0]], unitB = units[candidates[index][1]];
+      const a = fillTargetBox(unitA, _sepBoxes[candidates[index][0]]);
+      const b = fillTargetBox(unitB, _sepBoxes[candidates[index][1]]);
+      const hit = obbMinimumTranslation(a, b, clear * 0.5);
+      if (!hit) continue;
+      _sepPush.copy(hit.axis).multiplyScalar(hit.depth * 0.5 * hit.sign);
+      _sepPush.applyQuaternion(_sepQuat);
+      unitA.userData.target.x -= _sepPush.x; unitA.userData.target.y -= _sepPush.y; unitA.userData.target.z -= _sepPush.z;
+      unitB.userData.target.x += _sepPush.x; unitB.userData.target.y += _sepPush.y; unitB.userData.target.z += _sepPush.z;
+      resolved++;
+      if (!pass) {
+        separationStats.pushed++;
+        separationStats.maxPush = Math.max(separationStats.maxPush, hit.depth);
+        separationStats.totalPush += hit.depth;
+      }
+    }
+    if (!resolved) break;
+  }
+  matrixGroup.userData.separation = { ...separationStats };
+}
 
 function animate(nowTimestamp) {
   const frameNow = Number.isFinite(nowTimestamp) ? nowTimestamp : performance.now();
@@ -4896,28 +5473,30 @@ function animate(nowTimestamp) {
     state.midEnergy *= idleDecayFactor;
     state.trebleEnergy *= idleDecayFactor;
   }
-  state.beatPulse *= Math.exp(-dt * (2.5 + tierCfg.response * 18));
 
-  if (!state.isPlayingMusic && state.camMotionMode === 'on' && !prefersReducedMotion) {
-    const maxDim = Math.max(state.gridCols, state.gridRows, state.gridLayers);
-    const camDist = 4.2 + maxDim * 2.2;
-    if (state.orbitMode === 'arc') {
-      const angle = Math.sin(state.time * 0.5) * 0.65;
-      camera.position.x = Math.sin(angle) * camDist;
-      camera.position.z = Math.cos(angle) * camDist;
-      camera.position.y = maxDim * 0.8;
-      controls.target.set(0, 0, 0);
-    } else {
-      matrixGroup.rotation.y += 0.192 * dt * state.speedMultiplier;
-    }
+  // -------------------------------------------------------------
+  // 13-b. 静息待机态 (Idle Rest State)
+  // 装置的定义是"不通电也在散发气场"：未演奏时不允许画面完全静止，否则它退化成一台播放器。
+  // 这里合成一组纯时间驱动的缓慢呼吸量，只走"整体呼吸 + 深度慢波"两条通道，
+  // 刻意不触碰 beatCount / waveAccumulator / 起音估计，因此不会污染任何音乐驱动的逻辑，
+  // 也不会让行进中的节拍相位产生跳变。音乐一起，idleBreath 自行退出，交接是连续的。
+  // -------------------------------------------------------------
+  // 上升缓慢 (装置"醒来"需要几秒)、下降干脆 (音乐一响立刻交还控制权，不允许两套画面同时驱动)。
+  const idleWanted = !state.isPlayingMusic && !prefersReducedMotion;
+  if (idleWanted) {
+    state.idleBreath += (1 - state.idleBreath) * Math.min(1, 1 - Math.exp(-0.55 * dt));
+  } else {
+    state.idleBreath *= Math.exp(-6.0 * dt);
+    if (state.idleBreath < 0.002) state.idleBreath = 0;
   }
+  state.beatPulse *= Math.exp(-dt * (2.5 + tierCfg.response * 18));
 
   updateMasterChoreography(dt);
   if (matrixDirty) commitMatrixRebuild();
 
   if (pendingFrameDistance !== null) {
     const autoCamera = !prefersReducedMotion && (state.camMotionMode === 'on' ||
-      (state.camMotionMode === 'auto' && state.isPlayingMusic));
+      (state.camMotionMode === 'auto' && (state.isPlayingMusic || state.idleBreath > 0.25)));
     if (autoCamera) {
       pendingFrameDistance = null;
     } else {
@@ -4932,10 +5511,36 @@ function animate(nowTimestamp) {
   }
 
   if (matrixGroup.children.length) {
-    const amp = state.waveAmpMultiplier * tierCfg.motionRange * motionFactor * 0.42;
+    const lay = activeGeometry();
+    const P = lay.pitch;
     const bass = state.bassEnergy;
     const mid = state.midEnergy;
     const treble = state.trebleEnergy;
+    // 相邻格相位差 Δφ = 2π/λ，两块相对位移 = 2A·sin(Δφ/2) ≤ 2·travel ⇒ A ≤ travel / sin(Δφ/2)
+    const kPerCell = (Math.PI * 2) / lay.waveLen;
+    const ampBase = lay.waveAmpMax * THREE.MathUtils.clamp(state.waveAmpMultiplier, 0.2, 1);
+    const energy = THREE.MathUtils.clamp(bass * 0.7 + mid * 0.3, 0, 1);
+    const drive = THREE.MathUtils.clamp(bass * 1.3 + mid * 0.3, 0, 1);
+    const live = state.waveMotion && state.isPlayingMusic && state.audioReady && !prefersReducedMotion && (bass > 0.015 || mid > 0.02);
+    const drum = state.waveMotion && state.isPlayingMusic && state.audioReady && !prefersReducedMotion;
+    const isShowingIntro = state.isPlayingMusic && state.isIntroPlaying && state.enableTitleIntro;
+    const isMosaic = (!isShowingIntro && state.contentMode === 'avatar' && state.avatarDist === 'mosaic') ||
+                     (!isShowingIntro && state.contentMode === 'image' && state.imageDist === 'mosaic');
+    const mosaicLocked = isMosaic && state.mosaicLock;
+    const gridLocked = state.contentMode === 'text' || state.matrixSequence === 'lyrics_stream';
+    const burst = THREE.MathUtils.clamp(tierCfg.burst, 0, 1);
+    // 节拍包络：release 落拍即释放，anticipation 在下一拍前收紧
+    const release = Math.exp(-state.beatPhase * (state.intensityTier === 3 ? 10 : 5));
+    const anticipation = Math.pow(Math.max(0, (state.beatPhase - 0.72) / 0.28), 2);
+    const punch = drum ? THREE.MathUtils.clamp(release * (0.35 + burst * 0.55), 0, 1) * drive : 0;
+    // 整面呼吸：所有方块同向等比外扩，相对距离同比放大，不占用任何位移预算
+    const breathe = drum ? 1 + THREE.MathUtils.clamp(release * (0.045 + burst * 0.075), 0, 0.18) * drive : 1;
+    // 静息缩放：2% 量级、12 秒一个来回，是"被托住"的起伏而不是变焦。
+    // 位移与单块缩放都由上一个分支统一处理；这里只用整面等比缩放，不占用任何位移预算。
+    // 关闭波浪总开关时静息态也一起静止——用户关掉律动是明确意图，装置不应该继续自己动。
+    const idleLevel = (state.waveMotion && state.idleBreath > 0.004) ? state.idleBreath : 0;
+    const breatheIdle = 1 + Math.sin(state.time * 0.17) * 0.020 * idleLevel;
+    const [scaleLow, scaleHigh] = tierCfg.matrixScaleRange;
 
     matrixGroup.children.forEach(unit => {
       const uData = unit.userData;
@@ -4956,145 +5561,191 @@ function animate(nowTimestamp) {
       const l = uData.gridL || 0;
       const r = uData.gridR || 0;
       const c = uData.gridC || 0;
-      const d = uData.distFromCenter || 0.1;
 
-      const isShowingIntro = state.isPlayingMusic && state.isIntroPlaying && state.enableTitleIntro;
-      const isMosaic = (!isShowingIntro && state.contentMode === 'avatar' && state.avatarDist === 'mosaic') ||
-                       (!isShowingIntro && state.contentMode === 'image' && state.imageDist === 'mosaic');
+      // 入场时间片：未到点的单元保持不可见，让"到来"按顺序发生而不是一次性融化。
+      // 用 state.time（全局推进的演出时钟）而不是每个单元自己的时间戳，避免重建时各单元时钟不一致。
+      // 注意：位姿推进在下面另一个 forEach 里，那里必须重新判定 ready（作用域不共享）。
+      const arrival = uData.arrival;
+      if (arrival && !arrival.ready && state.time >= arrival.at) arrival.ready = true;
 
-      if (state.waveMotion && state.isPlayingMusic && state.audioReady && !prefersReducedMotion && (bass > 0.015 || mid > 0.02)) {
-        if (isMosaic && state.mosaicLock) {
-          const globalPhase = state.waveAccumulator * 3.8;
-          const unifiedLift = Math.sin(globalPhase) * (bass * 0.40 + mid * 0.18) * amp;
-          const unifiedRotX = -Math.cos(globalPhase) * 0.07 * amp;
-          const unifiedRotZ = Math.sin(globalPhase * 0.5) * 0.05 * amp;
-          const unifiedRotY = Math.sin(state.time * 0.8) * 0.03 * amp;
-          const microParallax = Math.sin(globalPhase - (r * 0.15 + c * 0.15)) * 0.025 * amp;
+      // 阵型位姿先算：波形相位必须跟着"方块实际所在的位置"走。
+      // 用格坐标当相位会让球面/圆环上真正相邻的两块相位相差极大，位移直接顶穿预算。
+      let targetX = uData.baseX;
+      let targetY = uData.baseY;
+      let targetZ = uData.baseZ;
+      if (!mosaicLocked && !gridLocked) {
+        const pose = formationPosition(uData, state.activeFormation);
+        targetX = pose[0]; targetY = pose[1]; targetZ = pose[2];
+      }
+      // 平面半径 / 对角坐标 / 垂直坐标都是 1-Lipschitz：相邻两块的相位差 ≤ 每格相位差，
+      // 于是相对位移 ≤ 2A·sin(Δφ/2) 恒成立，幅度预算才是可证明的。
+      const cellD = Math.hypot(targetX, targetY) / P;
+      const cellDiag = (targetX + targetY) / (P * Math.SQRT2);
 
-          m.targetY = uData.baseY + unifiedLift + microParallax;
-          m.targetRotX = unifiedRotX;
-          m.targetRotY = unifiedRotY;
-          m.targetRotZ = unifiedRotZ;
-          m.targetScaleY = 1.0 + Math.sin(globalPhase) * 0.06 * amp;
-          m.targetScaleX = m.targetScaleZ = 1.0 - Math.sin(globalPhase) * 0.02 * amp;
-        } else if (state.wavePattern === 'ripple') {
-          const phase = state.waveAccumulator * 4.2 - (d * 1.65 * tierCfg.phaseSpread) + (l * 0.75);
-          const decay = Math.exp(-0.06 * d);
-          const burstOffset = tierCfg.burst * (state.beatPulse + Math.pow(bass, 2.0)) * Math.sin(phase);
-          const waveHeight = (Math.sin(phase) + burstOffset) * (bass * 0.65 + mid * 0.28) * amp * decay;
+      // 静态基准：回到格位、正立、原尺寸
+      let waveY = 0;
+      m.targetRotX = 0; m.targetRotY = 0; m.targetRotZ = 0;
+      m.targetScaleX = 1; m.targetScaleY = 1; m.targetScaleZ = 1;
 
-          m.targetY = uData.baseY + waveHeight;
-          const nx = uData.baseX / (d + 0.001);
-          const nz = uData.baseZ / (d + 0.001);
-          m.targetRotX = -Math.cos(phase) * nz * 0.16 * amp;
-          m.targetRotZ = Math.cos(phase) * nx * 0.16 * amp;
-          m.targetRotY = Math.sin(phase * 0.5) * 0.06 * amp;
-          m.targetScaleY = 1.0 + Math.sin(phase) * 0.10 * amp;
-          m.targetScaleX = 1.0 - Math.sin(phase) * 0.03 * amp;
-          m.targetScaleZ = m.targetScaleX;
+      if (live && mosaicLocked) {
+        // 巨像整联锁：整幅画面同频呼吸，只保留毫米级视差，绝不撕裂拼图
+        const globalPhase = state.waveAccumulator * 2.4;
+        waveY = Math.sin(globalPhase) * ampBase * 0.32 * THREE.MathUtils.clamp(energy + punch * 0.5, 0, 1);
+        m.targetRotX = -Math.cos(globalPhase) * 0.03;
+        m.targetRotZ = Math.sin(globalPhase * 0.5) * 0.025;
+        m.targetScaleY = 1 + Math.sin(globalPhase) * 0.018;
+        m.targetScaleX = m.targetScaleZ = 1 - Math.sin(globalPhase) * 0.010;
+      } else if (idleLevel > 0) {
+        // 静息呼吸：只走"深度方向的极缓行进波"一条通道，不占用横向位移预算。
+        // 相位刻意使用 cellD/cellDiag 这类 1-Lipschitz 坐标而不用格坐标：球面与圆环阵型上
+        // 真正相邻的两块在格坐标里可能相距很远，用格坐标会让它们反向运动、相对位移翻倍顶穿预算。
+        // 幅度取 ampBase 满量程：相邻格相位差 Δφ=0.30 rad，相对位移 2A·sin(Δφ/2)≈0.31A，
+        // 远低于位移预算，因此"看得见"与"不穿模"可以同时成立 (回归里以避让求解器推动=0 验证)。
+        // 不额外乘 m.targetScale：空间缩放与单块缩放相乘才是真实占位，只用一个通道才不吃两遍余量。
+        const depthPhase = cellDiag * 0.30 + l * 0.4;
+        const breath = Math.sin(state.time * 0.32 + depthPhase);
+        const swell = Math.sin(state.time * 0.11 + cellD * 0.16);
+        waveY = breath * ampBase * idleLevel;
+        m.targetRotX = breath * 0.026 * idleLevel;
+        m.targetRotZ = swell * 0.020 * idleLevel;
+      } else if (live) {
+        const amp = ampBase;
+        if (state.wavePattern === 'ripple') {
+          // 长波长同心涟漪：中心先行，向外扩散并轻微衰减
+          const phase = state.waveAccumulator * 2.6 - cellD * kPerCell + l * 0.5;
+          const decay = Math.exp(-0.07 * cellD);
+          const swing = Math.sin(phase);
+          const gain = THREE.MathUtils.clamp(energy + punch * 0.55, 0, 1);
+          waveY = swing * amp * gain * decay;
+          const nx = uData.baseX / (uData.distFromCenter + 0.001);
+          const nz = uData.baseZ / (uData.distFromCenter + 0.001);
+          m.targetRotX = -Math.cos(phase) * nz * lay.rotXZ * gain;
+          m.targetRotZ = Math.cos(phase) * nx * lay.rotXZ * gain;
+          m.targetRotY = Math.sin(phase * 0.5) * lay.rotY * 0.45 * gain;
+          m.targetScaleY = 1 + swing * 0.08 * gain;
+          m.targetScaleX = m.targetScaleZ = 1 - swing * 0.025 * gain;
         } else if (state.wavePattern === 'diagonal') {
-          const diagCoord = (r + c + l * 1.25);
-          const phase = state.waveAccumulator * 4.8 - (diagCoord * 0.82 * tierCfg.phaseSpread);
-          const waveHeight = (Math.sin(phase) + state.beatPulse * tierCfg.burst * 0.55) * (bass * 0.75 + mid * 0.32) * amp;
-
-          m.targetY = uData.baseY + waveHeight;
-          m.targetRotX = Math.sin(phase) * 0.22 * amp;
-          m.targetRotZ = Math.sin(phase) * 0.22 * amp;
-          m.targetRotY = Math.cos(phase) * 0.10 * amp;
-          m.targetScaleY = 1.0 + Math.sin(phase) * 0.12 * amp;
-          m.targetScaleX = m.targetScaleZ = 1.0 - Math.sin(phase) * 0.04 * amp;
+          // 斜向推进的平面波：整排整体抬起，像一块薄片扫过方阵
+          const phase = state.waveAccumulator * 3.0 - cellDiag * kPerCell + l * 0.5;
+          const gain = THREE.MathUtils.clamp(energy + punch * 0.45, 0, 1);
+          waveY = Math.sin(phase) * amp * gain;
+          m.targetRotX = Math.sin(phase) * lay.rotXZ * 0.9 * gain;
+          m.targetRotZ = Math.sin(phase) * lay.rotXZ * 0.9 * gain;
+          m.targetRotY = Math.cos(phase) * lay.rotY * 0.5 * gain;
+          m.targetScaleY = 1 + Math.sin(phase) * 0.09 * gain;
+          m.targetScaleX = m.targetScaleZ = 1 - Math.sin(phase) * 0.03 * gain;
         } else if (state.wavePattern === 'equalizer') {
+          // 频谱柱：低/中/高频各自抬升，同列整体平移，天然不产生相对位移
           const maxDim = Math.max(state.gridCols, 1);
           const colRatio = (c + l * 0.5) / (maxDim + (state.gridLayers - 1) * 0.5);
           const freqEnergy = colRatio < 0.35 ? bass : (colRatio < 0.70 ? mid : treble);
-          const lift = Math.pow(freqEnergy, 1.25) * 1.35 * amp;
-
-          m.targetY = uData.baseY + lift;
-          m.targetRotX = 0;
-          m.targetRotY = Math.sin(state.time * 4.0 + c) * 0.12 * freqEnergy * amp;
-          m.targetRotZ = 0;
-          m.targetScaleY = 1.0 + lift * 0.20;
-          m.targetScaleX = m.targetScaleZ = 1.0 - lift * 0.05;
+          const lift = Math.pow(freqEnergy, 1.25) * ampBase * 1.15;
+          const norm = THREE.MathUtils.clamp(lift / Math.max(ampBase, 0.001), 0, 1.2);
+          waveY = lift;
+          m.targetRotY = Math.sin(state.time * 3.0 + c * 0.7) * lay.rotY * 0.5 * freqEnergy;
+          m.targetScaleY = 1 + norm * 0.12;
+          m.targetScaleX = m.targetScaleZ = 1 - norm * 0.03;
         } else if (state.wavePattern === 'spiral') {
-          const angle = Math.atan2(uData.baseY, uData.baseX);
-          const phase = state.waveAccumulator * 5.2 + angle * 2.2 - (d * 1.3 * tierCfg.phaseSpread) + (l * 0.8);
-
-          m.targetY = uData.baseY + Math.sin(phase) * (bass * 0.60 * amp);
-          m.targetRotY = Math.sin(phase * 0.5) * 0.5 * amp;
-          m.targetRotX = Math.cos(phase) * 0.12 * amp;
-          m.targetRotZ = Math.sin(phase) * 0.12 * amp;
-          m.targetScaleY = 1.0 + Math.sin(phase) * 0.10 * amp;
-          m.targetScaleX = m.targetScaleZ = 1.0;
+          // 螺旋波：半径相位 + 角度相位，绕轴盘旋
+          const angle = Math.atan2(targetY, targetX);
+          const phase = state.waveAccumulator * 3.2 - cellD * kPerCell + angle * 0.35 + l * 0.5;
+          const gain = THREE.MathUtils.clamp(energy + punch * 0.4, 0, 1);
+          waveY = Math.sin(phase) * amp * gain;
+          m.targetRotY = Math.sin(phase * 0.5) * lay.rotY * gain;
+          m.targetRotX = Math.cos(phase) * lay.rotXZ * 0.8 * gain;
+          m.targetRotZ = Math.sin(phase) * lay.rotXZ * 0.8 * gain;
+          m.targetScaleY = 1 + Math.sin(phase) * 0.07 * gain;
+          m.targetScaleX = m.targetScaleZ = 1;
         } else if (state.wavePattern === 'heartbeat') {
-          const shockDelay = d * 0.32 * tierCfg.phaseSpread;
-          const shockPhase = state.waveAccumulator * 10.0 - shockDelay;
-          const blast = (Math.pow(bass, 2.0) + state.beatPulse * tierCfg.burst) * amp * (1.0 + tierCfg.burst);
-          const squash = Math.sin(shockPhase) * blast;
-
-          m.targetY = uData.baseY + Math.max(0, squash * 0.85) + (d * 0.12 * blast);
-          m.targetScaleY = 1.0 + squash * 0.32;
-          m.targetScaleX = m.targetScaleZ = 1.0 - squash * 0.10;
-          m.targetRotX = Math.sin(shockPhase) * 0.08 * blast;
-          m.targetRotZ = Math.cos(shockPhase) * 0.08 * blast;
-          m.targetRotY = 0;
+          // 心跳冲击：单侧脉冲向外推，不出现负向位移
+          const phase = state.waveAccumulator * 4.5 - cellD * kPerCell;
+          const shock = Math.pow(Math.max(0, Math.sin(phase)), 2);
+          const blast = shock * amp * (0.55 + punch * 0.75);
+          const norm = THREE.MathUtils.clamp(blast / Math.max(amp, 0.001), 0, 1);
+          waveY = blast;
+          m.targetScaleY = 1 + norm * 0.22;
+          m.targetScaleX = m.targetScaleZ = 1 - norm * 0.08;
+          m.targetRotX = Math.sin(phase) * lay.rotXZ * 0.5;
+          m.targetRotZ = Math.cos(phase) * lay.rotXZ * 0.5;
         } else if (state.wavePattern === 'glitch') {
+          // 数字错拍：整块按拍吸附到固定角度；抬升只保留棋盘格差，避免出现超出位移预算的空间梯度
           const isEven = (r + c + l) % 2 === 0;
           const stepBeat = state.beatCount + Math.floor(state.beatPhase * (state.intensityTier === 3 ? 2 : 1));
-          const lockAngle = ((stepBeat % 4) * (Math.PI / 4)) * (isEven ? 1 : -1);
-
-          m.targetY = uData.baseY + (isEven ? bass : mid) * 0.75 * amp;
-          m.targetRotY = lockAngle;
-          m.targetRotX = isEven ? (bass * 0.25 * amp) : (-bass * 0.25 * amp);
-          m.targetRotZ = !isEven ? (mid * 0.20 * amp) : (-mid * 0.20 * amp);
-          m.targetScaleY = 1.0 + (isEven ? bass : mid) * 0.15 * amp;
-          m.targetScaleX = m.targetScaleZ = 1.0;
+          waveY = (isEven ? bass : mid) * amp * 0.7;
+          m.targetRotY = ((stepBeat % 4) * (Math.PI / 4)) * (isEven ? 1 : -1);
+          m.targetRotX = (isEven ? 1 : -1) * bass * lay.rotXZ * 0.6;
+          m.targetRotZ = (isEven ? -1 : 1) * mid * lay.rotXZ * 0.5;
+          m.targetScaleY = 1 + (isEven ? bass : mid) * 0.10;
+          m.targetScaleX = m.targetScaleZ = 1;
         }
-      } else {
-        m.targetY = uData.baseY;
-        m.targetRotX = 0;
-        m.targetRotY = 0;
-        m.targetRotZ = 0;
-        m.targetScaleX = 1.0;
-        m.targetScaleY = 1.0;
-        m.targetScaleZ = 1.0;
       }
 
-      let targetX = uData.baseX;
-      let targetZ = uData.baseZ;
-      if (!(isMosaic && state.mosaicLock) && state.contentMode !== 'text' && state.matrixSequence !== 'lyrics_stream') {
-        const pose=formationPosition(uData,state.activeFormation);
-        targetX=pose[0]; targetZ=pose[2]; m.targetY += pose[1]-uData.baseY;
+      // 节拍尺寸脉冲：上限受格距约束，范围主要向下展开（收缩不会产生穿模）
+      if (drum) {
+        const size = 1 + ((scaleHigh - 1) * release - (1 - scaleLow) * anticipation) * drive;
+        m.targetScaleX = THREE.MathUtils.clamp(m.targetScaleX * size, scaleLow, scaleHigh);
+        m.targetScaleY = THREE.MathUtils.clamp(m.targetScaleY * size, scaleLow, scaleHigh);
+        m.targetScaleZ = THREE.MathUtils.clamp(m.targetScaleZ * size, scaleLow, scaleHigh);
       }
-      const dancing = state.waveMotion && state.isPlayingMusic && state.audioReady && !prefersReducedMotion;
-      if (dancing && !(isMosaic && state.mosaicLock) && state.contentMode !== 'text' && state.matrixSequence !== 'lyrics_stream') {
-        const phase = state.beatPhase;
-        const energy = Math.min(1, bass * 1.3 + mid * 0.3);
-        const groupSign = (r + c + l) % 2 ? 1 : -1;
-        const release = Math.exp(-phase * (state.intensityTier === 3 ? 10 : 5));
-        const anticipation = Math.pow(Math.max(0, (phase - 0.72) / 0.28), 2);
-        const spread = state.intensityTier === 1 ? Math.sin(phase * Math.PI * 2) * 0.035 :
-          state.intensityTier === 2 ? Math.sin(phase * Math.PI * 2 + groupSign * 0.65) * 0.13 :
-          release * 0.38 - anticipation * 0.13;
-        targetX += uData.baseX * spread * energy * state.waveAmpMultiplier;
-        targetZ += (state.intensityTier === 1 ? 0 : groupSign * release * tierCfg.burst * 1.1) * energy;
-        m.targetY += uData.baseY * spread * energy * 0.5;
-        const [low, high] = tierCfg.matrixScaleRange;
-        const size = 1 + ((high - 1) * release - (1 - low) * anticipation) * energy;
-        m.targetScaleX = THREE.MathUtils.clamp(m.targetScaleX * size, low, high);
-        m.targetScaleY = THREE.MathUtils.clamp(m.targetScaleY * size, low, high);
-        m.targetScaleZ = THREE.MathUtils.clamp(m.targetScaleZ * size, low, high);
+      if (mosaicLocked) {
+        // 拼图必须保持贴合：尺寸只允许在极小范围内浮动
+        m.targetScaleX = THREE.MathUtils.clamp(m.targetScaleX, 0.985, 1.02);
+        m.targetScaleY = THREE.MathUtils.clamp(m.targetScaleY, 0.985, 1.02);
+        m.targetScaleZ = THREE.MathUtils.clamp(m.targetScaleZ, 0.985, 1.02);
       }
+
+      // 整面呼吸 + 波形位移 (静息呼吸是极缓的整体缩放，与演奏态的节拍呼吸互斥)
+      const breatheAll = breathe * breatheIdle;
+      targetX *= breatheAll;
+      targetY = targetY * breatheAll + waveY;
+      targetZ *= breatheAll;
+
+      // 旋转投影补偿：转得越多世界轴占位越大，按包络把尺寸收回预算，避免"一转就咬在一起"
+      const envelope = projectedEnvelope(m.targetRotX, m.targetRotY, m.targetRotZ);
+      const scaleCap = (lay.maxScale * ROTATION_ENVELOPE) / envelope;
+      m.targetScaleX = Math.min(m.targetScaleX, scaleCap);
+      m.targetScaleY = Math.min(m.targetScaleY, scaleCap);
+      m.targetScaleZ = Math.min(m.targetScaleZ, scaleCap);
+
+      // 写入本帧目标位姿：几何避让在目标层完成，渲染层只负责平滑跟随
+      if (!uData.target) uData.target = { x: 0, y: 0, z: 0, rotX: 0, rotY: 0, rotZ: 0, scaleX: 1, scaleY: 1, scaleZ: 1, half: new THREE.Vector3(), world: new THREE.Vector3() };
+      const target = uData.target;
+      target.x = targetX; target.y = targetY; target.z = targetZ;
+      target.rotX = m.targetRotX; target.rotY = m.targetRotY; target.rotZ = m.targetRotZ;
+      target.scaleX = m.targetScaleX; target.scaleY = m.targetScaleY; target.scaleZ = m.targetScaleZ;
+    });
+
+    // 目标层几何避让：把"本帧想要的队形"投影到无穿模的可行集，再让渲染层跟随，
+    // 这样避让不会与位置插值互相拉扯（渲染层硬推会在过渡中把方块卡在半路）。
+    resolveTargetSeparation(lay);
+
+    matrixGroup.children.forEach(unit => {
+      const uData = unit.userData;
+      const m = uData.motion;
+      const target = uData.target;
+      if (!m || !target) return;
       const lerpFactor = prefersReducedMotion ? 1 : Math.min(1.0, 1.0 - Math.exp(-tierCfg.response * 60.0 * dt));
       const spatialBlend = prefersReducedMotion ? 1 : 1-Math.exp(-[0,2.4,4.5,7][state.intensityTier]*dt);
-      unit.position.x += (targetX - unit.position.x) * spatialBlend;
-      unit.position.z += (targetZ - unit.position.z) * spatialBlend;
-      unit.position.y += (m.targetY - unit.position.y) * spatialBlend;
-      unit.rotation.x += (m.targetRotX - unit.rotation.x) * lerpFactor;
-      unit.rotation.y += (m.targetRotY - unit.rotation.y) * lerpFactor;
-      unit.rotation.z += (m.targetRotZ - unit.rotation.z) * lerpFactor;
-      unit.scale.x += (m.targetScaleX - unit.scale.x) * lerpFactor;
-      unit.scale.y += (m.targetScaleY - unit.scale.y) * lerpFactor;
-      unit.scale.z += (m.targetScaleZ - unit.scale.z) * lerpFactor;
+      // 入场时间片未到：本帧不推进位姿，也不写入可见尺寸，让"到来"保持在自己的时间片上。
+      // 必须在本循环内重新判定：上面的目标层循环与这里是两个独立的 forEach，作用域不共享。
+      if (uData.arrival && !uData.arrival.ready) return;
+      unit.position.x += (target.x - unit.position.x) * spatialBlend;
+      unit.position.y += (target.y - unit.position.y) * spatialBlend;
+      unit.position.z += (target.z - unit.position.z) * spatialBlend;
+      unit.rotation.x += (target.rotX - unit.rotation.x) * lerpFactor;
+      unit.rotation.y += (target.rotY - unit.rotation.y) * lerpFactor;
+      unit.rotation.z += (target.rotZ - unit.rotation.z) * lerpFactor;
+      unit.scale.x += (target.scaleX - unit.scale.x) * lerpFactor;
+      unit.scale.y += (target.scaleY - unit.scale.y) * lerpFactor;
+      unit.scale.z += (target.scaleZ - unit.scale.z) * lerpFactor;
+      // 渲染层占位兜底：旋转是振荡量，插值滞后会让"实际到达的旋转"超过目标旋转，
+      // 按目标旋转算出的尺寸补偿会同时失效。这里直接按渲染姿态把世界轴占位收回预算内。
+      const renderedEnvelope = projectedEnvelope(unit.rotation.x, unit.rotation.y, unit.rotation.z);
+      const renderedCap = (lay.maxScale * ROTATION_ENVELOPE) / renderedEnvelope;
+      if (unit.scale.x > renderedCap) {
+        const shrink = renderedCap / unit.scale.x;
+        unit.scale.x *= shrink; unit.scale.y *= shrink; unit.scale.z *= shrink;
+      }
     });
   }
 
@@ -5424,6 +6075,39 @@ $('#imageDistGroup')?.addEventListener('click', e => {
   $$('#imageDistGroup .pill-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   state.imageDist = btn.dataset.idist;
+  // 图集盲盒专属控件只在选中"图集盲盒"时出现，避免面板常驻一堆用不上的东西
+  const albumPanel = $('#albumPanel');
+  if (albumPanel) albumPanel.style.display = state.imageDist === 'album' ? 'block' : 'none';
+  if (state.imageDist === 'album' && !state.imageAlbum.length) {
+    const status = $('#albumStatus');
+    if (status) status.textContent = '请先导入图集（可多选照片或选择整个文件夹）';
+  }
+  rebuildMatrix();
+});
+
+// 自定义图集盲盒
+$('#albumUpload')?.addEventListener('change', e => {
+  loadImageAlbum(e.target.files);
+});
+$('#albumUploadDir')?.addEventListener('change', e => {
+  loadImageAlbum(e.target.files);
+});
+$('#albumReseedBtn')?.addEventListener('click', () => {
+  if (!state.imageAlbum.length) {
+    const status = $('#albumStatus');
+    if (status) status.textContent = '请先导入图集';
+    return;
+  }
+  state.albumSeed = (state.albumSeed % 2147483647) + 1;
+  const status = $('#albumStatus');
+  if (status) status.textContent = `已导入 ${state.imageAlbum.length} 张 · 种子 ${state.albumSeed}`;
+  rebuildMatrix();
+});
+$('#albumClearBtn')?.addEventListener('click', () => {
+  clearImageAlbum();
+  renderAlbumPreview();
+  const status = $('#albumStatus');
+  if (status) status.textContent = '未导入图集';
   rebuildMatrix();
 });
 
@@ -5867,8 +6551,7 @@ $$('.swatch[data-c]').forEach(btn => {
 
 $('#resetCam').addEventListener('click', () => {
   pendingFrameDistance = null;
-  const maxDim = Math.max(state.gridCols, state.gridRows, state.gridLayers);
-  const targetCamDist = 4.2 + maxDim * 2.2;
+  const targetCamDist = framingDistance(formationRadius(state.activeFormation));
   camera.position.set(targetCamDist * 0.55, targetCamDist * 0.42, targetCamDist * 0.88);
   camera.fov = 30;
   ui.fov.value = 30;
@@ -5882,8 +6565,7 @@ $$('.preset-cam-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     pendingFrameDistance = null;
     const type = btn.dataset.cam;
-    const maxDim = Math.max(state.gridCols, state.gridRows, state.gridLayers);
-    const targetCamDist = 4.2 + maxDim * 2.2;
+    const targetCamDist = framingDistance(formationRadius(state.activeFormation));
     if (type === 'front') camera.position.set(0, 0, targetCamDist);
     else if (type === 'top') camera.position.set(0, targetCamDist * 1.2, 0.01);
     else if (type === 'iso') camera.position.set(targetCamDist * 0.65, targetCamDist * 0.55, targetCamDist * 0.75);
@@ -6008,9 +6690,30 @@ window.playTrackAtIndex = playTrackAtIndex;
 window.updateMasterChoreography = updateMasterChoreography;
 window.getPlaybackTime = getPlaybackTime;
 window.parseLrcString = parseLrcString;
+// 只读诊断入口：供几何/后处理回归测试读取实际间距、采样数与避让统计，不参与渲染
+window.luDiagnostics = {
+  get renderer(){ return renderer; },
+  get composer(){ return composer; },
+  get camera(){ return camera; },
+  get scene(){ return scene; },
+  get matrixGroup(){ return matrixGroup; },
+  get geometry(){ return activeGeometry(); },
+  get separation(){ return matrixGroup.userData.separation || null; },
+  get pitch(){ return activeGeometry().pitch; }
+};
 
 // 初始化启动
 rebuildMatrix();
+// 角色贴图是启动时同步建的空画布，内容要等 avatar-bridge 动态 import 完成后才画上去。
+// 默认模式就是"角色在场"，所以这里必须先点一次火，否则首屏是一张空白脸。
+// 其余角色错时预热：既填满面板缩略图，又避免 8 个角色同时抢首帧。
+if (state.contentMode === 'avatar') {
+  renderAvatarRig(state.selectedAvatar, performance.now() / 1000);
+  AVATAR_KEYS.forEach((key, index) => {
+    if (key === state.selectedAvatar) return;
+    setTimeout(() => renderAvatarRig(key, performance.now() / 1000), 400 + index * 150);
+  });
+}
 if (window.matchMedia('(max-width: 1200px)').matches) {
   $('#inspectorPanel')?.classList.add('collapsed');
 }

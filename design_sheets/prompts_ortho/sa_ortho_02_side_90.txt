@@ -1,0 +1,20 @@
+Generate an image: 3D character design sheet for "LI / 荔 · HOODIE LYCHEE (方案A：果壳连帽卫衣款 · 荔小卫)", TRUE 90-DEGREE LATERAL PROFILE VIEW (侧立面轮廓正交图). 3:2 landscape.
+[STRICT REFERENCE]: Strictly preserve 100% of the character identity, proportions, and features from the attached reference image.
+
+View Angle: absolute 90-degree side profile (pure lateral view, strictly perpendicular to camera, zero three-quarter turn, zero perspective convergence).
+
+Subject Details:
+- The character is viewed strictly from the side in a clean standing pose;
+- Clearly showcases the exact depth and thickness of the oversized bumpy red lychee shell hoodie;
+- Hood opening curves forward with delicate pinkish-white inner lining;
+- Plump white jade cheek curve protruding forward;
+- Chest hands holding the hanging green fruit stem drawstrings;
+- Profile of red boots with flat white rubber soles;
+- Back of the hoodie shows the round convex curvature and natural drape.
+
+Rendering Specification:
+- Orthographic projection, CAD technical drawing standard;
+- Pure solid clean white background (#FFFFFF);
+- Razor-sharp outline and silhouette contours for 3D modeling and depth calibration;
+- Balanced soft studio lighting with crisp contact shadow directly under feet;
+- No perspective distortion, telephoto 200mm flat lens.

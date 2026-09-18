@@ -3,3 +3,15 @@ Thumbs.db
 *.log
 .vscode/
 .idea/
+node_modules/
+*.blend
+*.blend1
+*.zip
+*.tar
+output/
+.playwright-cli/
+*.before.js
+mouth_crop.png
+temp_astro_tex.png
+*el.naturalHeight*
+__pycache__/

@@ -1,0 +1,20 @@
+Generate an image: 3D character design sheet for "LI / 荔 · ASTRO-LYCHEE (方案D：探索宇航员款 · 荔小星)", ISOMETRIC CAD EXPLODED BREAKDOWN (等轴测分件装配图). 3:2 landscape.
+[STRICT REFERENCE]: Strictly preserve 100% of the astronaut character identity, helmet shape, and features from the attached reference image.
+
+Projection: 30-degree isometric orthographic technical view (CAD engineering blueprint).
+
+Composition:
+- Main center figure: high-fidelity 3D astronaut mascot with subtle cyan wireframe polygon overlay;
+- Surrounding exploded floating component parts:
+  1. Outer textured red lychee helmet hemisphere shell;
+  2. Spherical clear acrylic bubble visor dome;
+  3. Circular orange sealing gasket ring with micro hex bolts;
+  4. Glowing cyan holographic HUD rings with circular tech markings;
+  5. Inner smiling milky jade head core;
+  6. Spacesuit torso module and detachable life-support backpack with dual thrusters;
+  7. Left and right magnetic space boots.
+- Fine technical alignment dashed guidelines connecting exploded parts.
+
+Background & Styling:
+- Solid neutral clean white background (#FFFFFF);
+- Industrial product modeling specification sheet, sharp crisp focus, clean lighting.

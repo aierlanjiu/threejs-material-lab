@@ -1,0 +1,75 @@
+{
+  "version": 2,
+  "source": "Tencent Hunyuan 3D Pro + Blender",
+  "rig_script": "scripts/blender/repair_li_rig.py",
+  "models": {
+    "hoodie": {
+      "passed": true,
+      "bones": 32,
+      "vertices": 306300,
+      "weight_sum_max_error": 1.7881393432617188e-07,
+      "seams": {
+        "Boots": {
+          "vertices": 353,
+          "max_weight_difference": 0.0
+        },
+        "Hand_Surface.L": {
+          "vertices": 187,
+          "max_weight_difference": 0.0
+        },
+        "Hand_Surface.R": {
+          "vertices": 170,
+          "max_weight_difference": 0.0
+        },
+        "Hood_Shell": {
+          "vertices": 923,
+          "max_weight_difference": 0.0
+        }
+      },
+      "morph_max_delta": {
+        "KneeFix_L": 0.19288207590579987,
+        "KneeFix_R": 0.19311609864234924,
+        "blink": 0.18695491552352905,
+        "smile": 0.043671004474163055,
+        "curious": 0.023000001907348633,
+        "shy": 0.06579804420471191,
+        "mouth_open": 0.07901802659034729,
+        "ElbowFix_L": 0.32333388924598694,
+        "ElbowFix_R": 0.32636353373527527
+      },
+      "all_original_topology_materials_and_facial_morphs_retained": true,
+      "sha256": "6a9a84177eed2ed5abcb87dfdeb99e2040e9b1d7ea2b3686c39f348ac8f0977e",
+      "bytes": 49329556
+    },
+    "astro": {
+      "passed": true,
+      "bones": 27,
+      "vertices": 334259,
+      "weight_sum_max_error": 1.7881393432617188e-07,
+      "seams": {
+        "Boots": {
+          "vertices": 270,
+          "max_weight_difference": 0.0
+        },
+        "Helmet_Shell": {
+          "vertices": 676,
+          "max_weight_difference": 0.0
+        }
+      },
+      "morph_max_delta": {
+        "KneeFix_L": 0.11201661080121994,
+        "KneeFix_R": 0.11198075115680695,
+        "blink": 0.1744842678308487,
+        "smile": 0.0429362878203392,
+        "curious": 0.023000001907348633,
+        "shy": 0.061933279037475586,
+        "mouth_open": 0.11558389663696289,
+        "ElbowFix_L": 0.2366017997264862,
+        "ElbowFix_R": 0.23673656582832336
+      },
+      "all_original_topology_materials_and_facial_morphs_retained": true,
+      "sha256": "3d5531b2c4c6579dc334949448939b4b4142747cf4e6b3b51696d3e03552ec01",
+      "bytes": 53067708
+    }
+  }
+}

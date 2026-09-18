@@ -1,0 +1,20 @@
+Generate an image: 3D character design sheet for "LI / 荔 · ASTRO-LYCHEE (方案D：探索宇航员款 · 荔小星)", MODEL TURNAROUND 3-VIEW SHEET (三视图总图). 3:2 landscape.
+[STRICT REFERENCE]: Strictly preserve 100% of the astronaut character identity, helmet shape, and features from the attached reference image.
+
+Canvas layout: exactly three full-body orthographic views of the SAME astronaut mascot character aligned horizontally on the exact same ground plane and baseline:
+- Left: Front Orthographic View (0 degrees, looking directly forward, symmetrical standing pose)
+- Middle: True Lateral Profile View (pure 90 degrees side view, strictly perpendicular to camera)
+- Right: Back Orthographic View (180 degrees, looking directly from behind)
+
+Character specification:
+- Spherical red textured lychee helmet with circular opening sealed by an orange silicone gasket ring;
+- Transparent glass bubble visor; inside visor is a glowing cyan holographic HUD circular ring framing the cute smiling milky-white jade face;
+- Top golden sprout beacon antenna with subtle light pulse;
+- Minimalist matte white aerodynamic spacesuit with orange warning badges, life-support chest module, and white magnetic boots with orange tread soles;
+- Small white backpack on the back with dual mini thruster nozzles.
+
+Technical Specifications:
+- Absolute orthographic projection (telephoto 200mm flat lens, zero perspective distortion, zero wide-angle distortion);
+- Pure solid clean white background (#FFFFFF);
+- Crisp, razor-sharp silhouette contour edges specifically optimized for 3D modeling edge detection;
+- Neutral, even studio diffuse lighting with subtle rim light, no heavy shadows on background.

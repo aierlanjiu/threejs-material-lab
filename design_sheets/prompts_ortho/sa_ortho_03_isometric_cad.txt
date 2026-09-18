@@ -1,0 +1,18 @@
+Generate an image: 3D character design sheet for "LI / 荔 · HOODIE LYCHEE (方案A：果壳连帽卫衣款 · 荔小卫)", ISOMETRIC CAD EXPLODED BREAKDOWN (等轴测分件装配图). 3:2 landscape.
+[STRICT REFERENCE]: Strictly preserve 100% of the character identity, proportions, and features from the attached reference image.
+
+Projection: 30-degree isometric orthographic technical view (CAD engineering blueprint).
+
+Composition:
+- Main center figure: high-fidelity 3D stylized vinyl collectible mascot in default standing pose with subtle translucent wireframe polygon overlay;
+- Surrounding exploded floating component parts:
+  1. Outer textured red lychee shell hoodie hood section;
+  2. Translucent milky white jade inner head and smiling face sphere;
+  3. Lower scalloped hoodie skirt section;
+  4. Pair of hanging green stem drawstrings;
+  5. Left and right red rounded boots with white sole slices.
+- Fine technical alignment dashed guidelines connecting parts.
+
+Background & Styling:
+- Solid neutral clean white background (#FFFFFF);
+- Industrial product modeling specification sheet, sharp crisp focus, clean lighting.

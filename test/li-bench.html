@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>荔 · 保真度比对台 (Fidelity Bench)</title>
+<style>
+  html,body{margin:0;height:100%;background:#f3f0eb;overflow:hidden;font:12px/1.5 -apple-system,"PingFang SC",system-ui,sans-serif;color:#8a8378}
+  #stage{position:fixed;inset:0}
+  #hud{position:fixed;left:12px;top:10px;padding:6px 10px;background:rgba(255,255,255,.8);border-radius:8px;letter-spacing:.04em}
+  canvas{display:block}
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<div id="hud">fidelity bench · ready</div>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.166.1/+esm';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/controls/OrbitControls.js/+esm';
+import { RoomEnvironment } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/environments/RoomEnvironment.js/+esm';
+import { EffectComposer } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/postprocessing/EffectComposer.js/+esm';
+import { RenderPass } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/postprocessing/RenderPass.js/+esm';
+import { UnrealBloomPass } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/postprocessing/UnrealBloomPass.js/+esm';
+import { OutputPass } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/postprocessing/OutputPass.js/+esm';
+import { HoodieLychee } from '../js/mascot/hoodie-lychee.js';
+import { AstroLychee } from '../js/mascot/astro-lychee.js';
+
+const stage = document.getElementById('stage');
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(2); renderer.setSize(innerWidth, innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.VSMShadowMap;
+stage.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0xf3f0eb);
+const camera = new THREE.PerspectiveCamera(30, innerWidth / innerHeight, .1, 60);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.enablePan = false;
+
+const pmrem = new THREE.PMREMGenerator(renderer), room = new RoomEnvironment();
+const environment = pmrem.fromScene(room, .04); scene.environment = environment.texture;
+scene.environmentIntensity = .44;
+
+const key = new THREE.DirectionalLight(0xfff1e2, 3.15); key.position.set(-2.7, 5.4, 6.6); key.castShadow = true;
+key.shadow.mapSize.set(1024, 1024); key.shadow.camera.left = key.shadow.camera.bottom = -2.8;
+key.shadow.camera.right = key.shadow.camera.top = 2.8; key.shadow.camera.near = .5; key.shadow.camera.far = 15;
+key.shadow.normalBias = .026; key.shadow.bias = -.00015; key.shadow.radius = 4; key.shadow.blurSamples = 8;
+const fill = new THREE.DirectionalLight(0xeaf0f4, 1.15); fill.position.set(4.6, 2.7, 4.4);
+const rim = new THREE.DirectionalLight(0xfff2d8, 1.35); rim.position.set(1.4, 4.4, -4.6);
+scene.add(key, fill, rim);
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.ShadowMaterial({ color: 0x7b6557, opacity: .20 }));
+floor.rotation.x = -Math.PI / 2; floor.position.y = -.015; floor.receiveShadow = true; scene.add(floor);
+const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 }));
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), .075, .35, 2.8); composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+const mascots = { hoodie: new HoodieLychee(), astro: new AstroLychee() };
+Object.values(mascots).forEach(m => { scene.add(m.group); m.group.visible = false; });
+let current = 'hoodie'; mascots.hoodie.group.visible = true;
+mascots.hoodie.setMaterialVariant('default');
+
+function resize() { renderer.setSize(innerWidth, innerHeight); composer.setSize(innerWidth, innerHeight); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); }
+addEventListener('resize', resize); resize();
+
+// Deterministic framing presets shared with the capture script.
+const VIEWS = {
+  front: { distance: 8.6, height: 1.52, yaw: 0, pitch: .02, fov: 30, tx: 0 },
+  macro: { distance: 3.0, height: 2.30, yaw: 0, pitch: .015, fov: 30 },
+  side: { distance: 8.8, height: 1.52, yaw: .78, pitch: .04, fov: 30 },
+  low: { distance: 8.4, height: 1.30, yaw: .18, pitch: -.02, fov: 30 },
+  back: { distance: 8.8, height: 1.52, yaw: Math.PI - .35, pitch: .05, fov: 30 },
+  feet: { distance: 3.6, height: .42, yaw: .35, pitch: .10, fov: 30 },
+};
+window.bench = {
+  THREE, scene, camera, renderer, composer, bloom, key, fill, rim, controls, mascots, environment,
+  view(name = 'front', over = {}) {
+    const v = { ...(VIEWS[name] || VIEWS.front), ...over };
+    if (v.fov !== camera.fov) { camera.fov = v.fov; camera.updateProjectionMatrix(); }
+    controls.target.set(v.tx || 0, v.height, 0);
+    camera.position.copy(controls.target).addScaledVector(new THREE.Vector3(v.yaw, v.pitch, 1).normalize(), v.distance);
+    controls.update(); return v;
+  },
+  role(name) {
+    if (!mascots[name]) return current;
+    Object.entries(mascots).forEach(([k, m]) => m.group.visible = k === name);
+    current = name; return current;
+  },
+  variant(name) { mascots[current].setMaterialVariant(name); return name; },
+  emotion(name) { mascots[current].setEmotion(name); return name; },
+  action(name) { mascots[current].triggerAction(name); return name; },
+  material(name) { return mascots[current].mats[name]; },
+  probe() {
+    const m = mascots[current], out = {};
+    for (const key of ['torso', 'shell', 'shellInner']) {
+      const shell = m[key]; if (!shell) continue;
+      const mat = new THREE.Matrix4(), pos = new THREE.Vector3(), quat = new THREE.Quaternion(), scl = new THREE.Vector3();
+      shell.relief.getMatrixAt(3, mat); mat.decompose(pos, quat, scl);
+      out[key] = { count: shell.count, aperture: shell.aperture, visible: shell.relief.visible,
+        sampleScale: scl.toArray().map(v => +v.toFixed(4)),
+        height: +shell.relief.geometry.boundingBox?.max.z?.toFixed(3) || null,
+        groupScale: shell.group.scale.toArray() };
+    }
+    return out;
+  },
+  setMaterial(name, patch) { const m = mascots[current].mats[name]; Object.assign(m, patch); m.needsUpdate = true; return m; },
+  exposure(v) { renderer.toneMappingExposure = v; return v; },
+  env(v) { scene.environmentIntensity = v; return v; },
+  light(name, patch) { Object.assign({ key, fill, rim }[name], patch); return true; },
+  stats() {
+    const r = mascots[current]; let tris = 0, meshes = 0;
+    r.group.traverseVisible(o => { if (o.isMesh) { meshes++; tris += (o.geometry.index ? o.geometry.index.count : o.geometry.attributes.position.count) / 3 * (o.isInstancedMesh ? o.count : 1); } });
+    const box = new THREE.Box3().setFromObject(r.group);
+    return { role: current, variant: r.variant, tris: Math.round(tris), meshes, calls: renderer.info.render.calls, bounds: { y: [+box.min.y.toFixed(3), +box.max.y.toFixed(3)], x: [+box.min.x.toFixed(3), +box.max.x.toFixed(3)], z: [+box.min.z.toFixed(3), +box.max.z.toFixed(3)] } };
+  },
+  ready: true,
+};
+
+let t = 0, last = performance.now();
+(function animate(now) {
+  const dt = Math.min(.05, (now - last) / 1000); last = now; t += dt;
+  mascots[current].update(t, dt, 0, null);
+  controls.update(); renderer.info.reset(); composer.render();
+  requestAnimationFrame(animate);
+})(performance.now());
+</script>
+</body>
+</html>
