@@ -6,6 +6,20 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%233158A6%22/><text x=%2216%22 y=%2222%22 text-anchor=%22middle%22 font-size=%2218%22 fill=%22white%22>律</text></svg>" />
   <title>『 律 』LÜ - 3D 物理材质与全变量声波共振工作台</title>
   <style>
+    @font-face {
+      font-family: "TsangerJinKai02";
+      src: url("./assets/fonts/TsangerJinKai02-W04.ttf") format("truetype");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: "TsangerJinKai02";
+      src: url("./assets/fonts/TsangerJinKai02-W05.ttf") format("truetype");
+      font-weight: 500 900;
+      font-style: normal;
+      font-display: swap;
+    }
     :root {
       color-scheme: light;
       --bg: #f8fafc;
@@ -179,13 +193,20 @@
     #stage { position: absolute; inset: 0; }
     canvas { display: block; width: 100%; height: 100%; }
 
-    /* 舞台 HUD 浮层 */
     .stage-hud-left {
       position: absolute;
       left: 14px;
       bottom: 14px;
       pointer-events: none;
-      z-index: 10;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .stage-hud-left.mode-gravity {
+      bottom: auto;
+      top: 14px;
     }
     .badge {
       padding: 6px 12px;
@@ -227,7 +248,7 @@
       flex-direction: column;
       gap: 6px;
       align-items: flex-end;
-      z-index: 10;
+      z-index: 30;
     }
     .legend {
       padding: 4px 10px;
@@ -590,49 +611,118 @@
       box-shadow: none;
     }
     button.btn.recording {
-      background: var(--danger);
-      color: #fff;
-      border-color: var(--danger);
-      animation: pulseRecord 1.2s infinite;
-      box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35);
+      background: rgba(239, 68, 68, 0.12);
+      color: var(--danger);
+      border-color: rgba(239, 68, 68, 0.4);
+      box-shadow: 0 2px 10px rgba(239, 68, 68, 0.15);
     }
-    @keyframes pulseRecord {
+    button.btn.recording .rec-dot {
+      animation: pulseRecordDot 1.2s infinite ease-in-out;
+    }
+    @keyframes pulseRecordDot {
       0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.88; transform: scale(0.98); }
+      50% { opacity: 0.35; transform: scale(0.75); }
+    }
+
+    #avatarGroupTabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+    #avatarGroupTabs .pill-btn {
+      flex: 1;
+      text-align: center;
+      white-space: nowrap;
+      padding: 5px 4px;
+      font-size: 11px;
+      touch-action: manipulation;
+    }
+    #avatarGroupTabs .pill-btn:focus-visible {
+      outline: 2px solid var(--accent, #0284c7);
+      outline-offset: 1px;
+      z-index: 1;
+    }
+
+    #avatarPresetGrid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr) !important;
+      gap: 6px;
+      max-height: 280px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 2px;
+      margin-bottom: 8px;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+    }
+    #avatarPresetGrid::-webkit-scrollbar {
+      width: 4px;
+    }
+    #avatarPresetGrid::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    #avatarPresetGrid::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.35);
+      border-radius: 4px;
+    }
+    #avatarPresetGrid::-webkit-scrollbar-thumb:hover {
+      background: rgba(148, 163, 184, 0.6);
     }
 
     .avatar-card {
       border: 1px solid rgba(208, 212, 219, 0.7);
-      background: var(--input-bg);
-      border-radius: 10px;
+      background: var(--input-bg, #ffffff);
+      border-radius: 8px;
       padding: 6px 3px;
       text-align: center;
       cursor: pointer;
-      transition: color 0.18s ease, background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+      transition: color 0.18s ease, background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
       font-size: 10px;
       font-weight: 600;
-      color: var(--text-secondary);
+      color: var(--text-secondary, #475569);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 54px;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      outline: none;
+      position: relative;
     }
     .avatar-card:hover {
-      border-color: var(--accent);
-      color: var(--accent);
+      border-color: var(--accent, #0284c7);
+      color: var(--accent, #0284c7);
       box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
     }
-    .avatar-card.active {
-      border-color: var(--accent);
-      background: rgba(49, 88, 166, 0.08);
-      color: var(--accent);
-      box-shadow: none;
+    .avatar-card.active,
+    .avatar-card[aria-selected="true"] {
+      border-color: var(--accent, #0284c7);
+      background: var(--accent-subtle, rgba(2, 132, 199, 0.08));
+      color: var(--accent, #0284c7);
+      font-weight: 700;
+      box-shadow: 0 0 0 1px var(--accent, #0284c7);
     }
-    .avatar-icon-canvas {
-      width: 40px;
-      height: 40px;
+    .avatar-card:focus-visible {
+      outline: 2px solid var(--accent, #0284c7);
+      outline-offset: 2px;
+      z-index: 2;
+    }
+    .avatar-icon-canvas,
+    .avatar-card canvas,
+    .avatar-card img {
+      width: 38px;
+      height: 38px;
       margin: 0 auto 3px;
       display: block;
-      border-radius: 8px;
+      border-radius: 6px;
       box-shadow: none;
       background: transparent;
+      object-fit: contain;
+      pointer-events: none;
     }
+
 
     .file-upload-wrap {
       position: relative;
@@ -1142,10 +1232,12 @@
         font-size: 0 !important;
       }
       #stopTrackBtn { display: none; }
-      .stageWrap { grid-row: 2; min-width: 0; }
       .stage-hud-right { right: 8px; top: 8px; }
       .legend { display: none; }
       .preset-cam-btn { min-height: 44px; padding: 8px 10px; }
+      .mode-gravity .preset-cam-group { display: none !important; }
+      .stage-hud-left.mode-gravity { top: 6px; left: 6px; gap: 4px; max-width: calc(100% - 70px); }
+      .stage-hud-left.mode-gravity #status { display: none !important; }
       .bottom-dynamic-dock {
         grid-row: 3;
         height: 188px;
@@ -1364,8 +1456,537 @@
 .official-avatar-tools{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;margin-bottom:12px;}
 .official-avatar-tools a{color:#3457a0;text-decoration:none;min-height:40px;display:flex;align-items:center;}
 #officialAvatarStatus{color:#67717d;font-size:11px;}
-@media(hover:hover){#materialSamples button:hover{background:#eceff3;}.material-families button:hover{color:#263348;}}
 @media(prefers-reduced-motion:reduce){#lockMaterialToggle:after{transition:none;}}
+/* Cube Motion 辅助样式 */
+.morph-btn { position: relative; overflow: hidden; display: inline-flex; align-items: center; justify-content: center; }
+.morph-btn > .face { display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; }
+.morph-btn > .face[aria-hidden="true"],
+.morph-btn > .face[inert] {
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 22px;
+  border-radius: 999px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  z-index: 9999;
+  pointer-events: none;
+  display: none;
+  letter-spacing: -0.2px;
+}
+
+/* =========================================================================
+   Kinetic Lyrics Display (双引擎灵动歌词系统)
+   ========================================================================= */
+.kinetic-lyrics-stage {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* 模式切换器胶囊 */
+.kinetic-mode-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  padding: 3px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+  pointer-events: auto;
+}
+.kinetic-mode-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+}
+.kinetic-mode-btn:hover {
+  color: var(--text);
+  background: rgba(15, 23, 42, 0.05);
+}
+.kinetic-mode-btn.active {
+  color: #ffffff;
+  background: var(--accent);
+  box-shadow: 0 2px 8px var(--accent-glow);
+}
+
+/* --- 版本一：Daniel White 风格 3D Slot-Text --- */
+.cube-lyrics-deck {
+  pointer-events: auto;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 26px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.09), 0 2px 6px rgba(15, 23, 42, 0.04);
+  max-width: 90vw;
+  user-select: none;
+}
+.cube-line {
+  text-align: center;
+  white-space: nowrap;
+}
+.cube-line-past {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  opacity: 0.45;
+  transform: scale(0.92);
+  height: 18px;
+  line-height: 18px;
+  filter: blur(0.5px);
+  transition: all 0.3s ease;
+}
+.cube-line-next {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  opacity: 0.55;
+  transform: scale(0.94);
+  height: 18px;
+  line-height: 18px;
+  transition: all 0.3s ease;
+}
+.cube-line-active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+}
+.cube-slots-track {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  perspective: 800px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: min(90vw, 780px);
+}
+.cube-slot {
+  width: 32px;
+  height: 42px;
+  position: relative;
+}
+.cube-slot-space {
+  width: 14px;
+}
+.cube-slot-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transform-origin: 50% 50% -16px;
+}
+.cube-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+  border-radius: 8px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  letter-spacing: -0.5px;
+}
+.cube-face-front {
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--text);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transform: translateZ(0px);
+}
+.cube-face-top {
+  background: var(--accent);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transform: rotateX(90deg) translateZ(16px);
+}
+.cube-slot.char-sung .cube-face-front {
+  color: var(--accent);
+  border-color: rgba(2, 132, 199, 0.3);
+}
+.cube-slot.char-active .cube-face-front {
+  color: #ffffff;
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 16px var(--accent-glow);
+  transform: scale(1.06);
+}
+
+/* --- 版本二：aaayandev 风格 物理重力沙盒与反重力升空 --- */
+.gravity-lyrics-wrapper {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.gravity-dock-container {
+  position: absolute;
+  top: 48px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: auto;
+}
+.gravity-dock {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 6px 20px;
+  border-radius: 18px;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.24);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.gravity-dock-placeholder {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 0.5px;
+}
+.gravity-dock-slot {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px dashed rgba(255, 255, 255, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.04);
+}
+.gravity-canvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: auto;
+}
+
+/* Stage-first layout: the controls stay available in a quiet sliding drawer. */
+html, body, button, input, select, textarea { font-family: "TsangerJinKai02", "PingFang SC", sans-serif; }
+body { background: #f3f1ed; }
+.app { grid-template-columns: minmax(0, 1fr); grid-template-rows: 76px minmax(0, 1fr); }
+
+/* 顶部 Master Deck HUD：水平绝对居中母带控制中枢 + 高透磨砂玻璃 */
+.master-deck-hud {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto minmax(180px, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  background: rgba(251, 250, 247, 0.75);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+.brand-section { justify-self: start; display: flex; align-items: center; gap: 10px; }
+.deck-player {
+  justify-self: center;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.58);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 14px;
+  padding: 5px 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03), inset 0 1px 1px rgba(255, 255, 255, 0.95);
+}
+.top-actions { justify-self: end; display: flex; align-items: center; gap: 6px; }
+
+.deck-controls { display: flex; align-items: center; gap: 6px; }
+.deck-controls .btn {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+.deck-controls #playPauseBtn {
+  min-width: 82px !important;
+  background: #273546 !important;
+  color: #fff !important;
+  border-color: #273546 !important;
+  box-shadow: 0 4px 12px rgba(39, 53, 70, 0.25) !important;
+}
+.deck-controls #recordToggle {
+  min-width: 80px !important;
+  background: rgba(255, 255, 255, 0.75) !important;
+  border: 1px solid rgba(239, 68, 68, 0.35) !important;
+  color: #ef4444 !important;
+}
+.deck-controls #recordToggle.recording {
+  background: #ef4444 !important;
+  color: #fff !important;
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.45) !important;
+}
+
+/* 全界面透明磨砂玻璃系统 */
+.stageWrap { grid-row: 2; grid-column: 1; box-shadow: 0 18px 44px #24344818; }
+.brand-glyph-box { background: #2d405d; box-shadow: 0 5px 14px #263c5d36; }
+
+.stage-hud-left .badge, .stage-hud-left .kinetic-mode-switcher, #immersiveToggle, .preset-cam-group {
+  background: rgba(255, 255, 255, 0.72) !important;
+  backdrop-filter: blur(16px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.75) !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08) !important;
+}
+
+.bottom-dynamic-dock {
+  position: fixed; left: 12px; right: 12px; bottom: 12px; width: auto;
+  z-index: 45;
+  background: rgba(251, 250, 247, 0.78);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 20px;
+  box-shadow: 0 22px 60px rgba(15, 23, 42, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  opacity: 0;
+  pointer-events: none; transform: translateY(calc(100% + 28px));
+  transition: transform 260ms cubic-bezier(.2,.8,.2,1), opacity 200ms ease;
+}
+body.workbench-open .bottom-dynamic-dock { opacity: 1; pointer-events: auto; transform: translateY(0); }
+.bottom-dynamic-dock .dock-section {
+  background: rgba(255, 255, 255, 0.52);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+}
+
+.modular-inspector {
+  position: fixed; top: 96px; right: 12px; bottom: 12px; width: min(376px, calc(100vw - 24px));
+  z-index: 48;
+  background: rgba(251, 250, 247, 0.82);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 18px;
+  box-shadow: 0 22px 60px rgba(15, 23, 42, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transition: transform 260ms cubic-bezier(.2,.8,.2,1), opacity 200ms ease, visibility 200ms ease;
+}
+.modular-inspector.collapsed { width: min(376px, calc(100vw - 24px)); margin: 0; visibility: hidden; opacity: 0; transform: translateX(calc(100% + 24px)); pointer-events: none; }
+.inspector-heading { display: flex; align-items: center; justify-content: space-between; flex: 0 0 40px; padding: 0 14px; border-bottom: 1px solid rgba(228, 224, 216, 0.6); color: #465874; font-size: 13px; font-weight: 700; }
+#inspectorCloseBtn { border: 0; border-radius: 8px; background: transparent; color: #465874; padding: 6px 10px; cursor: pointer; font-size: 12px; }
+#inspectorCloseBtn:hover { background: rgba(233, 237, 243, 0.8); }
+body.workbench-open .modular-inspector:not(.collapsed) { bottom: 174px; }
+
+#workbenchHandle, #inspectorDockButton {
+  position: fixed; z-index: 52; bottom: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  background: rgba(253, 252, 249, 0.82);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  color: #2d405d; border-radius: 999px;
+  padding: 9px 16px; min-height: 40px; font-weight: 600; font-size: 13px;
+  box-shadow: 0 10px 28px rgba(33, 52, 80, 0.18); cursor: pointer;
+  transition: bottom 260ms cubic-bezier(.2,.8,.2,1), transform 200ms ease, opacity 200ms ease;
+}
+#workbenchHandle { right: 16px; }
+#inspectorDockButton { right: 114px; bottom: 170px; opacity: 0; pointer-events: none; }
+body.workbench-open #workbenchHandle { bottom: 170px; }
+body.workbench-open #inspectorDockButton { opacity: 1; pointer-events: auto; }
+body.inspector-open #workbenchHandle, body.inspector-open #inspectorDockButton { opacity: 0; pointer-events: none; }
+#workbenchHandle:hover, #inspectorDockButton:hover { transform: translateY(-2px); }
+body.immersive #workbenchHandle, body.immersive #inspectorDockButton { display: none; }
+.stage-hud-left { max-width: calc(100% - 24px); }
+.stage-hud-left #status { min-width: 0; }
+
+@media (max-width: 760px) {
+  .app { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); padding: 6px; gap: 6px; }
+  .master-deck-hud { height: auto; min-height: 160px; display: grid; grid-template-columns: 34px minmax(0, 1fr); grid-template-rows: 36px auto; gap: 6px; padding: 6px 8px; box-sizing: border-box; }
+  .brand-section { flex-basis: auto; width: 32px; min-width: 32px; align-self: center; }
+  .brand-glyph-box { width: 30px; height: 30px; }
+  .brand-text { display: none; }
+  .top-actions { justify-self: end; align-self: center; gap: 6px; min-width: 0; display: flex; align-items: center; }
+  .top-actions .btn { width: 34px; min-width: 34px; height: 34px; min-height: 34px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 8px; }
+  #inspectorToggleBtn { display: none; }
+  .deck-player { grid-column: 1 / -1; grid-row: 2; display: grid !important; height: auto; min-height: 114px; grid-template-columns: minmax(0, 1fr) 38px; grid-template-rows: 20px 40px 22px 30px; gap: 4px; padding: 6px 8px; box-sizing: border-box; border-radius: 12px; }
+  .deck-info { grid-row: 1; grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; overflow: hidden; min-width: 0; font-size: 12px; }
+  .audio-visualizer { display: none; }
+  
+  /* 播放与录制控制栏：居中对称，播放圆钮位于正中心 */
+  .deck-controls { grid-row: 2; grid-column: 1 / -1; display: flex !important; justify-content: center; align-items: center; gap: 10px; width: 100%; margin: 0 auto; }
+  .deck-controls #recordToggle { 
+    order: 1; 
+    width: 32px !important; 
+    min-width: 32px !important; 
+    max-width: 32px !important; 
+    height: 32px !important; 
+    min-height: 32px !important; 
+  }
+  .deck-controls #prevTrackBtn { 
+    order: 2; 
+    width: 32px !important; 
+    min-width: 32px !important; 
+    max-width: 32px !important; 
+    height: 32px !important; 
+    min-height: 32px !important; 
+  }
+  .deck-controls #playPauseBtn { 
+    order: 3;
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    border-radius: 50% !important;
+    background: #0f172a !important;
+    color: #ffffff !important;
+    box-shadow: 0 3px 10px rgba(15, 23, 42, 0.28) !important;
+    border: none !important;
+  }
+  .deck-controls #nextTrackBtn { 
+    order: 4; 
+    width: 32px !important; 
+    min-width: 32px !important; 
+    max-width: 32px !important; 
+    height: 32px !important; 
+    min-height: 32px !important; 
+  }
+  .deck-controls #stopTrackBtn { 
+    order: 5; 
+    display: flex !important; 
+    width: 32px !important; 
+    min-width: 32px !important; 
+    max-width: 32px !important; 
+    height: 32px !important; 
+    min-height: 32px !important; 
+  }
+  
+  .deck-controls button {
+    width: 32px !important;
+    min-width: 32px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    font-size: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    border: 1px solid rgba(148, 163, 184, 0.3) !important;
+    color: #475569 !important;
+  }
+  .deck-controls button:active { transform: scale(0.95); }
+  .deck-controls .face {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    height: 100% !important;
+    gap: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .deck-controls .svg-icon {
+    margin: 0 !important;
+    display: block !important;
+  }
+  .deck-controls #playPauseBtn .face-play svg {
+    width: 18px !important;
+    height: 18px !important;
+    transform: translateX(1px); /* 光学微调三角形视觉中心 */
+  }
+  .deck-controls #playPauseBtn .face-pause svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+  .deck-controls #recordToggle .svg-icon {
+    width: 16px !important;
+    height: 16px !important;
+    color: #ef4444 !important;
+  }
+  .deck-controls #recordToggle .rec-dot {
+    width: 10px !important;
+    height: 10px !important;
+    margin: 0 !important;
+  }
+  .deck-controls #recordToggle .rec-label, .deck-controls #recordToggle .rec-timer { display: none !important; }
+
+  .time-rail-wrap { grid-row: 3; grid-column: 1 / -1; margin: 0; display: grid; grid-template-columns: 80px minmax(0, 1fr); gap: 8px; align-items: center; width: 100%; }
+  #timeDisplay { font-size: 11px; font-variant-numeric: tabular-nums; color: #64748b; font-weight: 500; }
+  #timeProgressSlider { height: 18px; margin: 0; width: 100%; cursor: pointer; }
+  
+  #playlistSelect { grid-row: 4; grid-column: 1; min-height: 28px; height: 28px; font-size: 12px; border-radius: 8px; padding: 0 8px; }
+  .deck-player > .file-upload-wrap { grid-row: 4; grid-column: 2; width: 38px; }
+  .deck-player > .file-upload-wrap .btn { width: 38px; min-width: 38px; min-height: 28px; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 0 !important; border-radius: 8px; }
+  .deck-player > .file-upload-wrap .btn svg { width: 16px; height: 16px; margin: 0; }
+  .stageWrap { grid-row: 2; }
+  .stage-hud-left { left: 8px; bottom: 8px; right: 8px; max-width: none; }
+  .stage-hud-left #status { display: none; }
+  .stage-hud-left.mode-gravity { top: 8px; left: 8px; right: auto; max-width: calc(100% - 88px); }
+  .kinetic-mode-switcher { max-width: 100%; }
+  .cube-slot { width: 22px; height: 30px; }
+  .cube-slot-space { width: 9px; }
+  .cube-face { font-size: 16px; border-radius: 6px; }
+  .cube-slots-track { gap: 2px; max-width: calc(100vw - 32px); }
+  .bottom-dynamic-dock { left: 6px; right: 6px; bottom: 6px; height: 166px; display: flex; gap: 10px; padding: 10px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; }
+  .bottom-dynamic-dock .dock-section, .bottom-dynamic-dock .dock-section:first-child, .bottom-dynamic-dock .dock-section:nth-child(2) { flex: 0 0 min(82vw, 318px); min-width: 0 !important; height: 142px; scroll-snap-align: start; }
+  .bottom-dynamic-dock .dock-section { display: flex; flex-direction: column; }
+  .modular-inspector { top: auto; bottom: 0; left: 0; right: 0; width: 100%; max-width: 100%; height: min(68dvh, 600px); border-radius: 18px 18px 0 0; }
+  .modular-inspector.collapsed { width: 100%; max-width: 100%; transform: translateY(100%); }
+  body.workbench-open .modular-inspector:not(.collapsed) { bottom: 0; }
+  #workbenchHandle { right: 12px; bottom: 58px; }
+  body.workbench-open #workbenchHandle { bottom: 178px; }
+  #inspectorDockButton { right: 108px; bottom: 178px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bottom-dynamic-dock, .modular-inspector, #workbenchHandle, #inspectorDockButton { transition-duration: 1ms; }
+}
     </style>
 </head>
 <body>
@@ -1403,9 +2024,27 @@
         <button class="btn" id="prevTrackBtn" title="上一首">
           <svg class="svg-icon" viewBox="0 0 24 24"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5"></line></svg>
         </button>
-        <button class="btn" id="playPauseBtn" style="min-width: 110px; font-weight: 700;" aria-label="播放">
-          <svg class="svg-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-          播放
+        <button class="btn morph-btn" id="playPauseBtn" style="min-width: 96px; font-weight: 700; position: relative;" aria-label="播放">
+          <span class="face face-play" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;">
+            <svg class="svg-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            播放
+          </span>
+          <span class="face face-pause" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;opacity:0;" aria-hidden="true" inert>
+            <svg class="svg-icon" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+            暂停
+          </span>
+        </button>
+        <button class="btn morph-btn" id="recordToggle" style="min-width: 96px; font-weight: 700; position: relative;" title="开始 60FPS 母带录制">
+          <span class="face face-idle" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;">
+            <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4" fill="currentColor"></circle></svg> 录制
+          </span>
+          <span class="face face-rec" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;opacity:0;" aria-hidden="true" inert>
+            <span class="rec-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;box-shadow:0 0 8px #ef4444;"></span>
+            <span class="rec-label">录制中</span> <span class="rec-timer" style="font-variant-numeric:tabular-nums;font-size:11px;">00:00</span>
+          </span>
+          <span class="face face-done" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;opacity:0;" aria-hidden="true" inert>
+            <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> 已导出
+          </span>
         </button>
         <button class="btn" id="nextTrackBtn" title="下一首">
           <svg class="svg-icon" viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19"></line></svg>
@@ -1445,11 +2084,6 @@
 
     <!-- 顶部快捷工具组 -->
     <div class="top-actions">
-      <button class="btn" id="recordToggle" style="font-weight: 700;">
-        <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4" fill="currentColor"></circle></svg>
-        录制
-      </button>
-
       <button class="btn active" id="toggleAutoChoreo" title="全变量乐章编排流变总开关">
         <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
         流变
@@ -1470,16 +2104,33 @@
   <!-- 3D 舞台视口区域 -->
   <section class="stageWrap" id="stageWrap">
     <div id="stage"></div>
+    <div id="kineticLyricsStage" class="kinetic-lyrics-stage"></div>
 
-    <div class="stage-hud-left">
+    <div class="stage-hud-left" id="stageHudLeft">
       <div class="badge" id="status">
         <div class="dot choreographing" id="statusDot"></div>
         <span id="statusText">全变量声波电台演出中…</span>
       </div>
+      <div class="kinetic-mode-switcher" id="kineticModeSwitcher" role="radiogroup" aria-label="灵动歌词模式">
+        <button type="button" class="kinetic-mode-btn active" data-mode="slot" title="Daniel White 机械魔方 3D 轴心翻转模式">
+          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          机械魔方
+        </button>
+        <button type="button" class="kinetic-mode-btn" data-mode="gravity" title="aaayandev 物理重力沙盒与反重力升空模式">
+          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v6l4 2"></path></svg>
+          物理反重力
+        </button>
+        <button type="button" class="kinetic-mode-btn" data-mode="off" title="隐藏灵动歌词">
+          关闭
+        </button>
+      </div>
     </div>
 
     <div class="stage-hud-right">
-      <button type="button" id="immersiveToggle" aria-pressed="false" title="沉浸模式 (F)，Esc 返回">沉浸</button>
+      <button type="button" class="morph-btn" id="immersiveToggle" aria-pressed="false" title="沉浸模式 (F)，Esc 返回" style="position: relative; min-width: 60px;">
+        <span class="face face-normal" style="display:inline-block;">沉浸</span>
+        <span class="face face-active" style="display:inline-block;opacity:0;" aria-hidden="true" inert>返回工作台</span>
+      </button>
       <div class="legend">
         <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
         通透水晶 / 6大声波形态 / 物理色散 / 影棚柔光
@@ -1498,8 +2149,10 @@
     </div>
   </section>
 
+  <button type="button" id="workbenchHandle" aria-controls="workbenchDock" aria-expanded="false" aria-label="唤出调律工作台" title="显示工作台，也可按 W">调律</button>
+  <button type="button" id="inspectorDockButton" aria-controls="inspectorPanel" aria-expanded="false">参数面板</button>
   <!-- 底部 Dynamic Flow Dock (改版: 六个波形样本板、三张运动样本卡、节拍旋钮视觉、振幅精度轨) -->
-  <nav class="bottom-dynamic-dock">
+  <nav class="bottom-dynamic-dock" id="workbenchDock" aria-label="调律工作台">
     <!-- 六个波形样本板 -->
     <div class="dock-section">
       <div class="dock-label">
@@ -1584,7 +2237,7 @@
       <div class="amp-rail-group">
         <div class="range" style="grid-template-columns: 36px 100px 36px; margin:0;">
           <span>振幅</span>
-          <input id="waveAmpSlider" type="range" min="0.2" max="1.0" step="0.05" value="1.0" title="上限由几何预算给定：档位越高可用幅度越大">
+          <input id="waveAmpSlider" type="range" min="0.2" max="1.0" step="0.05" value="1.0" title="同时调整方阵波形与自动运镜幅度">
           <output>1.0x</output>
         </div>
         <button class="btn active" id="waveMotionToggle" title="音频声波矩阵总开关">
@@ -1597,6 +2250,7 @@
 
   <!-- 右侧/移动端模块化检查器 (Tab 下划线, 矩阵预设微缩网格) -->
   <aside class="modular-inspector" id="inspectorPanel">
+    <div class="inspector-heading"><span>调律参数</span><button type="button" id="inspectorCloseBtn" aria-label="关闭参数面板">收起</button></div>
     <!-- Tab 导航栏 (下划线风格) -->
     <div class="inspector-tabs">
       <button class="inspector-tab-btn active" data-tab="tab-optics" title="材质与光学">
@@ -1749,6 +2403,13 @@
             <label><span>项目内置高清背景环境</span></label>
             <select id="presetBgSelect">
               <option value="studio/alpine-light-background-v1.png" selected>山湖晨光 · 风景壁纸</option>
+              <optgroup label="航海王海报壁纸 (9:16 极速匹配)">
+                <option value="images/wallpapers/op_luffy_kaido.jpg">路飞 vs 凯多 (Luffy x Kaido)</option>
+                <option value="images/wallpapers/op_zoro_mihawk.jpg">索隆 vs 鹰眼 (Zoro x Mihawk)</option>
+                <option value="images/wallpapers/op_shanks_blackbeard.jpg">红发 vs 黑胡子 (Shanks x Blackbeard)</option>
+                <option value="images/wallpapers/op_law_doflamingo.jpg">罗 vs 明哥 (Law x Doflamingo)</option>
+                <option value="images/wallpapers/op_luffy_crocodile.jpg">路飞 vs 克洛克达尔 (Luffy x Crocodile)</option>
+              </optgroup>
               <option value="">-- 选择项目内置背景图 --</option>
               <option value="images/ocean_waves.jpg">1: 深邃海洋 (Ocean Waves)</option>
               <option value="images/zen_stones.jpg">2: 禅宗叠石 (Zen Stones)</option>
@@ -1779,7 +2440,7 @@
         <div class="card-block">
           <div class="pill-group" id="contentModeGroup">
             <button class="pill-btn" data-mode="material">纯材质</button>
-            <button class="pill-btn active" data-mode="avatar" title="OneWorks 官方场景与活体表情">角色</button>
+            <button class="pill-btn active" data-mode="avatar" title="29 位角色实时表情">角色</button>
             <button class="pill-btn" data-mode="text" title="文字与歌词排版">歌词</button>
             <button class="pill-btn" data-mode="image" title="自定义图片与 GIF">图片</button>
           </div>
@@ -1803,23 +2464,19 @@
           </div>
         </div>
 
-        <!-- OneWorks 8 大活体头像卡片 -->
+        <!-- 29 位实时角色面板 -->
         <div id="avatarPanel" style="display: block;">
-          <div class="official-avatar-tools"><span id="officialAvatarStatus">OneWorks · 官方角色组件</span><a id="officialAvatarEdit" href="./studio/avatar-editor.html?slot=cloud">进入角色工作室 →</a></div>
+          <div class="official-avatar-tools"><span id="officialAvatarStatus">29 位角色 · 实时表情</span></div>
           <div class="section-title">
-            <span><svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg> 8 款角色 · OneWorks</span>
+            <span><svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg> 实时角色</span>
           </div>
           <div class="card-block">
-            <div class="grid4" id="avatarPresetGrid">
-              <div class="avatar-card active" data-avatar="cloud"><canvas class="avatar-icon-canvas" id="thumb_cloud"></canvas>云朵精灵</div>
-              <div class="avatar-card" data-avatar="rabbit"><canvas class="avatar-icon-canvas" id="thumb_rabbit"></canvas>软萌白兔</div>
-              <div class="avatar-card" data-avatar="sun"><canvas class="avatar-icon-canvas" id="thumb_sun"></canvas>太阳之子</div>
-              <div class="avatar-card" data-avatar="bear"><canvas class="avatar-icon-canvas" id="thumb_bear"></canvas>治愈小熊</div>
-              <div class="avatar-card" data-avatar="dog"><canvas class="avatar-icon-canvas" id="thumb_dog"></canvas>忠诚小狗</div>
-              <div class="avatar-card" data-avatar="agent"><canvas class="avatar-icon-canvas" id="thumb_agent"></canvas>小狐狸</div>
-              <div class="avatar-card" data-avatar="cat"><canvas class="avatar-icon-canvas" id="thumb_cat"></canvas>灵动喵喵</div>
-              <div class="avatar-card" data-avatar="bun"><canvas class="avatar-icon-canvas" id="thumb_bun"></canvas>闪亮小包</div>
+            <div class="pill-group" id="avatarGroupTabs">
+              <button class="pill-btn active" data-group="one-piece">海贼王 10</button>
+              <button class="pill-btn" data-group="dragon-ball">龙珠 10</button>
+              <button class="pill-btn" data-group="naruto">火影忍者 9</button>
             </div>
+            <div id="avatarPresetGrid"></div>
 
             <div style="margin-top: 8px;">
               <label><span>头像排布方式</span></label>
@@ -1892,12 +2549,12 @@ BEAT</textarea>
               ⚡ 智能自适应时间轴同步已就绪
             </div>
 
-            <!-- 新增 - / 数值 / + 的 lyricOffsetMs 步进器，默认 -180ms -->
+            <!-- 歌词时钟偏移步进器，默认与音频时钟一致 -->
             <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px; background: var(--bg-white); border: 1px solid var(--text-graphite); padding: 6px 12px; border-radius: 4px;">
               <span style="font-size: 12px; font-weight: 700;">歌词时钟偏移 (lyricOffsetMs):</span>
               <div style="display: flex; align-items: center; gap: 4px;">
                 <button class="btn" id="lyricOffsetDecBtn" style="padding: 0; min-width: 36px; min-height: 36px; font-weight: 800;">-</button>
-                <input type="number" id="lyricOffsetInput" value="-180" step="10" style="width: 70px; text-align: center; font-size: 12px; min-height: 36px; padding: 0 4px;">
+                <input type="number" id="lyricOffsetInput" value="0" step="10" style="width: 70px; text-align: center; font-size: 12px; min-height: 36px; padding: 0 4px;">
                 <span style="font-size: 12px;">ms</span>
                 <button class="btn" id="lyricOffsetIncBtn" style="padding: 0; min-width: 36px; min-height: 36px; font-weight: 800;">+</button>
               </div>
@@ -1917,6 +2574,14 @@ BEAT</textarea>
                 <button class="pill-btn" data-tcolor="white">立体纯白</button>
                 <button class="pill-btn" data-tcolor="gold">奢华鎏金</button>
                 <button class="pill-btn" data-tcolor="cyan">赛博蔚蓝</button>
+              </div>
+            </div>
+            <div style="margin-top: 10px;">
+              <label><span>灵动歌词引擎风格 (Kinetic Lyrics)</span></label>
+              <div class="pill-group" id="kineticEngineModeGroup">
+                <button class="pill-btn active" data-kmode="slot">3D机械魔方</button>
+                <button class="pill-btn" data-kmode="gravity">物理反重力</button>
+                <button class="pill-btn" data-kmode="off">隐藏关闭</button>
               </div>
             </div>
           </div>
@@ -2124,6 +2789,73 @@ import { EffectComposer } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examp
 import { RenderPass } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/postprocessing/RenderPass.js/+esm';
 import { UnrealBloomPass } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/postprocessing/UnrealBloomPass.js/+esm';
 import { OutputPass } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/postprocessing/OutputPass.js/+esm';
+import { motionRise, motionLeave, motionMorph, motionTabSwitch, motionToast, motionTextMorph, haptic } from './js/ui/motion-adapter.js';
+import { KineticLyricsManager } from './js/ui/kinetic-lyrics.js';
+import { lyricCharacters, characterCues, characterCursorAt } from './js/ui/lyric-timing.js';
+import { AVATAR_MANIFEST } from './assets/live-avatars/manifest.js';
+
+function showToast(msg, duration = 3000) {
+  motionToast($('#toast'), msg, duration);
+}
+
+// 3D 阻尼超调运镜系统 (Damped Camera Transition with ~1.5% Overshoot)
+let cameraTransition = null;
+
+function transitionCameraTo(targetPos, duration = 800) {
+  haptic.click('mechanical');
+  const startPos = camera.position.clone();
+  cameraTransition = {
+    startPos,
+    targetPos: targetPos.clone(),
+    startTime: performance.now(),
+    duration: Math.max(250, duration)
+  };
+}
+
+// 检查器 Tab 焦点微呼吸 (Spatial Focus Pulling)
+let focusBreath = null;
+function triggerCameraFocusBreath(intensity = 0.5, duration = 400) {
+  if (prefersReducedMotion || kineticLyricsManager.mode !== 'off') return;
+  const baseFov = Number(ui.fov.value) || 30;
+  focusBreath = {
+    baseFov,
+    delta: intensity,
+    startTime: performance.now(),
+    duration
+  };
+}
+
+// 材质更换时的影棚柔光微脉冲
+let glowPulse = null;
+function triggerMaterialGlowPulse(duration = 360) {
+  if (prefersReducedMotion) return;
+  const baseBloom = Number(ui.bloom.value) || 0.45;
+  glowPulse = {
+    baseBloom,
+    startTime: performance.now(),
+    duration
+  };
+}
+
+function setPlayPauseButtonState(isPlaying) {
+  const btn = $('#playPauseBtn');
+  if (!btn) return;
+  const facePlay = btn.querySelector('.face-play');
+  const facePause = btn.querySelector('.face-pause');
+  if (isPlaying) {
+    btn.classList.add('choreography-active');
+    btn.setAttribute('aria-label', '暂停');
+    if (facePlay && facePause) {
+      motionMorph(facePlay, facePause);
+    }
+  } else {
+    btn.classList.remove('choreography-active');
+    btn.setAttribute('aria-label', '播放');
+    if (facePlay && facePause) {
+      motionMorph(facePause, facePlay);
+    }
+  }
+}
 
 
 // 3 档物理形态控制参数配置表 (沉静 / 律动 / 冲击)
@@ -2266,7 +2998,7 @@ const state = {
   tempoSpeed: 'medium', // slow | medium | fast
   speedMultiplier: 1.0,
   textColorMode: 'auto', // auto | dark | white | gold | cyan
-  selectedAvatar: 'cloud',
+  selectedAvatar: 'one-piece/luffy',
   avatarDist: 'all', // all | mosaic | center | variety
   // 自定义图集盲盒：用户整目录导入照片后，矩阵每格从图集里抽取一张。
   // 抽取按 (seed, slot) 的稳定伪随机决定，所以"同一个种子 → 同一张排布"，
@@ -2325,7 +3057,7 @@ const state = {
   audioRequestId: 0,
   playbackOffset: 0.0,
   playbackStartTime: 0.0,
-  lyricOffsetMs: -180,
+  lyricOffsetMs: 0,
   trackCustomLyricsMap: {},
   currentTrackIndex: 0,
   playlist: [
@@ -2423,6 +3155,11 @@ renderer.toneMappingExposure = 1.0;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 stage.appendChild(renderer.domElement);
 
+// 初始化双引擎灵动歌词系统 (Dual-Engine Kinetic Lyrics Display)
+const stageWrapEl = document.getElementById('stageWrap');
+const kineticLyricsManager = new KineticLyricsManager(stageWrapEl);
+window.kineticLyricsManager = kineticLyricsManager;
+
 // 2. 场景与相机
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(state.backgroundColor);
@@ -2430,6 +3167,17 @@ scene.fog = new THREE.FogExp2(state.backgroundColor, 0.008);
 
 const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 150);
 camera.position.set(7.5, 5.5, 12.0);
+
+stageWrapEl.addEventListener('pointermove', event => {
+  const bounds = stageWrapEl.getBoundingClientRect();
+  if (!bounds.width || !bounds.height) return;
+  state.mouseNormX = THREE.MathUtils.clamp((event.clientX - bounds.left) / bounds.width * 2 - 1, -1, 1);
+  state.mouseNormY = THREE.MathUtils.clamp((event.clientY - bounds.top) / bounds.height * 2 - 1, -1, 1);
+});
+stageWrapEl.addEventListener('pointerleave', () => {
+  state.mouseNormX = 0;
+  state.mouseNormY = 0;
+});
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -2919,20 +3667,9 @@ const glacialIceNormal = createGlacialIceNormal();
 const acidEtchedNormal = createAcidEtchedFrostedNormal();
 
 // -------------------------------------------------------------
-// 7. OneWorks 活体智能体生命渲染引擎
+// 7. 单层角色的实时眼部与姿态渲染
 // -------------------------------------------------------------
-const ONEWORKS_AVATAR_CONFIGS = {
-  cloud:  { name: '云朵精灵', bg: '#70b5ff', bodyColor: '#ffffff', type: 'cloud' },
-  rabbit: { name: '软萌白兔', bg: '#fbc89b', bodyColor: '#ffffff', type: 'rabbit' },
-  sun:    { name: '太阳之子', bg: '#948999', bodyColor: '#f3ba8a', type: 'sun' },
-  bear:   { name: '治愈小熊', bg: '#feeebe', bodyColor: '#eed6b8', type: 'bear' },
-  dog:    { name: '忠诚小狗', bg: '#c7d2fe', bodyColor: '#ffffff', type: 'dog' },
-  agent:  { name: '智能球体', bg: '#38bdf8', bodyColor: '#2563eb', type: 'agent' },
-  cat:    { name: '灵动喵喵', bg: '#fbcfe8', bodyColor: '#ffffff', type: 'cat' },
-  bun:    { name: '闪亮小包', bg: '#fecdd3', bodyColor: '#fff1f2', type: 'bun' }
-};
-
-const AVATAR_KEYS = Object.keys(ONEWORKS_AVATAR_CONFIGS);
+const AVATAR_KEYS = AVATAR_MANIFEST.characters.map(character => character.id);
 const liveTextureMap = {};
 const avatarCanvases = {};
 const avatarPending = new Set();
@@ -2941,19 +3678,20 @@ let avatarBridge;
 function renderAvatarRig(key,time,lookX=0,lookY=0,emote='normal') {
   if(avatarPending.has(key)||avatarFailed.has(key))return;
   avatarPending.add(key);
-  (avatarBridge??=import('./studio/avatar-bridge.js?v=20260911-motion')).then(api=>api.renderOfficialAvatar(key,avatarCanvases[key],time,emote,prefersReducedMotion||!state.enableBlink))
-    .then(changed=>{if(changed){liveTextureMap[key].needsUpdate=true;updateAvatarThumbnail(key);}})
-    .catch(error=>{avatarFailed.add(key);const status=$('#officialAvatarStatus');if(status)status.textContent='角色加载失败，请刷新或打开编辑器';console.warn('OneWorks avatar:',error.message);})
+  (avatarBridge??=import('./js/avatar/live.js?v=20260923')).then(api=>api.renderLiveAvatar(key,avatarCanvases[key],time,emote||'normal',{
+    reduced:prefersReducedMotion,blink:state.enableBlink,lookX,lookY
+  }))
+    .then(changed=>{if(changed)liveTextureMap[key].needsUpdate=true;})
+    .catch(error=>{avatarFailed.add(key);const status=$('#officialAvatarStatus');if(status)status.textContent='角色加载失败，请刷新';console.warn('Live avatar:',error.message);})
     .finally(()=>avatarPending.delete(key));
-}
-function updateAvatarThumbnail(key){
-  const canvas=$('#thumb_'+key);if(!canvas)return;
-  canvas.width=canvas.height=88;const ctx=canvas.getContext('2d');ctx.clearRect(0,0,88,88);ctx.drawImage(avatarCanvases[key],0,0,88,88);
 }
 AVATAR_KEYS.forEach(key=>{
   const canvas=document.createElement('canvas');canvas.width=canvas.height=256;avatarCanvases[key]=canvas;
   liveTextureMap[key]=new THREE.CanvasTexture(canvas);liveTextureMap[key].colorSpace=THREE.SRGBColorSpace;
 });
+window.liveTextureMap = liveTextureMap;
+window.renderAvatarRig = renderAvatarRig;
+window.AVATAR_KEYS = AVATAR_KEYS;
 
 // 缓存 prefers-reduced-motion 媒体查询并响应动态变化
 const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -3691,8 +4429,10 @@ function commitMatrixRebuild() {
   // 摄像机自适应视距（仅在首次初始化时设定机位，移除无效 controls.state 判断以保留用户手动视角与镜头预设）
   const targetCamDist = framingDistance(formationRadius(isMosaicLayout ? 'grid' : state.activeFormation));
   if (isFirstCameraInit) {
-    camera.position.set(targetCamDist * 0.55, targetCamDist * 0.42, targetCamDist * 0.88);
-    controls.target.set(0, 0, 0);
+    if (kineticLyricsManager.mode !== 'gravity') {
+      camera.position.set(targetCamDist * 0.55, targetCamDist * 0.42, targetCamDist * 0.88);
+      controls.target.set(0, 0, 0);
+    }
     isFirstCameraInit = false;
   }
 
@@ -4000,7 +4740,7 @@ function commitMatrixRebuild() {
 
   // 仅尺寸/阵型变化时补足取景空间；材质重建不改用户角度或缩放。
   const matrixShape = `${cols}:${rows}:${layers}:${state.activeFormation}`;
-  if (lastMatrixShape && matrixShape !== lastMatrixShape) {
+  if (lastMatrixShape && matrixShape !== lastMatrixShape && kineticLyricsManager.mode === 'off') {
     const fitDistance = framingDistance(formationRadius(isMosaicLayout ? 'grid' : state.activeFormation));
     pendingFrameDistance = Math.max(camera.position.distanceTo(controls.target), fitDistance);
     controls.maxDistance = Math.max(controls.maxDistance, fitDistance * 1.1);
@@ -4038,8 +4778,11 @@ function resetBeatClock() {
 }
 
 function getPlaybackTime() {
+  if (state.mockPlaybackTime !== undefined && state.mockPlaybackTime !== null) {
+    return state.mockPlaybackTime;
+  }
   const curTrack = state.playlist[state.currentTrackIndex];
-  const dur = (curTrack && curTrack.buffer && curTrack.buffer.duration) ? curTrack.buffer.duration : 180;
+  const dur = getTrackDuration(curTrack);
   let t = state.playbackOffset;
   if (state.isPlayingMusic && state.audioReady && state.audioCtx) {
     t += (state.audioCtx.currentTime - state.playbackStartTime);
@@ -4047,6 +4790,20 @@ function getPlaybackTime() {
   if (dur > 0) t = t % dur;
   return Math.max(0, t);
 }
+
+function getTrackDuration(track) {
+  if (track?.buffer?.duration) return track.buffer.duration;
+  if (track?.isPreset && SONG_LYRICS_MAP[track.title]) {
+    const lines = SONG_LYRICS_MAP[track.title];
+    return lines[lines.length - 1].time + 6;
+  }
+  return 180;
+}
+
+window.setPlaybackTime = function(t) {
+  state.mockPlaybackTime = t;
+  updateProgressUI(true);
+};
 
 function formatTime(sec) {
   if (isNaN(sec) || sec < 0) sec = 0;
@@ -4062,7 +4819,7 @@ function updateProgressUI(force = false) {
   if (!force && now - lastProgressUiUpdate < 100) return;
   lastProgressUiUpdate = now;
   const curTrack = state.playlist[state.currentTrackIndex];
-  const dur = (curTrack && curTrack.buffer && curTrack.buffer.duration) ? curTrack.buffer.duration : 180;
+  const dur = getTrackDuration(curTrack);
   const curTime = getPlaybackTime();
   if ($('#timeDisplay')) {
     $('#timeDisplay').textContent = `${formatTime(curTime)} / ${formatTime(dur)}`;
@@ -4107,6 +4864,7 @@ function startBufferPlayback(track, startPos = 0) {
 
 function playTrackAtIndex(idx, resumeFromOffset = false) {
   try {
+    state.mockPlaybackTime = null;
     const requestId = ++state.audioRequestId;
     audioLoadController?.abort();
     audioLoadController = new AbortController();
@@ -4147,9 +4905,7 @@ function playTrackAtIndex(idx, resumeFromOffset = false) {
     if (synthInterval) clearInterval(synthInterval);
 
     state.isPlayingMusic = true;
-    $('#playPauseBtn').classList.add('choreography-active');
-    $('#playPauseBtn').setAttribute('aria-label', '暂停');
-    $('#playPauseBtn').innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg> 暂停`;
+    setPlayPauseButtonState(true);
 
     if (track.buffer) {
       startBufferPlayback(track, state.playbackOffset);
@@ -4261,10 +5017,8 @@ function pauseMusic() {
   }
   if (synthInterval) clearInterval(synthInterval);
 
-  $('#playPauseBtn').classList.remove('choreography-active');
   if (wasLoading) $('#nowPlayingText').textContent = `已暂停：${state.songTitle}`;
-  $('#playPauseBtn').setAttribute('aria-label', '播放');
-  $('#playPauseBtn').innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> 播放`;
+  setPlayPauseButtonState(false);
 
   if (state.baseBloom !== undefined) {
     ui.bloom.value = state.baseBloom;
@@ -4325,6 +5079,8 @@ function getOptimalMimeType(format) {
   return { mimeType: '', ext: format === 'mp4' ? 'mp4' : 'webm', containerMime: format === 'mp4' ? 'video/mp4' : 'video/webm' };
 }
 
+let recordTimerInterval = null;
+
 function toggleScreenRecording() {
   if (!state.isRecording) {
     const canvas = stage.querySelector('canvas');
@@ -4365,7 +5121,7 @@ function toggleScreenRecording() {
       const url = URL.createObjectURL(blob);
       const now = new Date();
       const timeStr = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}${String(now.getSeconds()).padStart(2,'0')}`;
-      const avatarName = (state.selectedAvatar || 'master').toUpperCase();
+      const avatarName = (state.selectedAvatar || 'master').toUpperCase().replace(/[^A-Z0-9_-]/g, '_');
       const fileName = `Crystal_Show_${avatarName}_${timeStr}.${opt.ext}`;
 
       const a = document.createElement('a');
@@ -4383,7 +5139,9 @@ function toggleScreenRecording() {
     state.isRecording = true;
     state.recordStartTime = Date.now();
 
-    $('#recordToggle').textContent = '录制中';
+    const faceIdle = $('#recordToggle .face-idle');
+    const faceRec = $('#recordToggle .face-rec');
+    if (faceIdle && faceRec) motionMorph(faceIdle, faceRec);
     $('#recordToggle').title = `停止录制并保存 ${opt.ext.toUpperCase()}`;
     $('#recordToggle').classList.add('recording');
     statusDot.classList.add('recording');
@@ -4397,17 +5155,29 @@ function toggleScreenRecording() {
       const mm = String(Math.floor(durSec / 60)).padStart(2, '0');
       const ss = String(durSec % 60).padStart(2, '0');
       statusText.textContent = `🔴 REC 60FPS [${opt.ext.toUpperCase()}] 正在录制 (${mm}:${ss})…`;
-      $('#recordToggle').textContent = `录制中 ${mm}:${ss}`;
+      const timerEl = $('#recordToggle .rec-timer');
+      if (timerEl) timerEl.textContent = `${mm}:${ss}`;
     }, 500);
 
   } else {
     if (recordTimerInterval) clearInterval(recordTimerInterval);
     state.mediaRecorder.stop();
     state.isRecording = false;
-    $('#recordToggle').innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4" fill="currentColor"></circle></svg> 录制`;
+    const faceIdle = $('#recordToggle .face-idle');
+    const faceRec = $('#recordToggle .face-rec');
+    const faceDone = $('#recordToggle .face-done');
+    if (faceRec && faceDone) {
+      motionMorph(faceRec, faceDone);
+      setTimeout(() => {
+        if (!state.isRecording && faceDone && faceIdle) {
+          motionMorph(faceDone, faceIdle);
+        }
+      }, 2200);
+    }
     $('#recordToggle').title = '开始 60FPS 录制';
     $('#recordToggle').classList.remove('recording');
     statusDot.classList.remove('recording');
+    showToast(`60FPS 母带录制完成，已开始导出下载`);
     rebuildMatrix();
   }
 }
@@ -4534,134 +5304,218 @@ const CHOREOGRAPHY_MOVEMENTS = [
 
 const SONG_LYRICS_MAP = {
   '《游京》- 星火社': [
-    { time: 0.0, text: '《游京》\n星火社' },
-    { time: 13.5, text: '悠悠的古城中\n听美人奏琴声' },
-    { time: 19.8, text: '朗朗夜色星空\n望孩童放花灯' },
-    { time: 26.2, text: '盼郎君几撩纱\n夜泊借宿酒家' },
-    { time: 32.5, text: '君载着黑骏马\n威风凛凛寻她' },
-    { time: 38.9, text: '我本一醉天涯\n游走京惜繁华' },
-    { time: 45.2, text: '不舍笑声离它' },
-    { time: 51.5, text: '悠长的街道上\n游走在故人巷' },
-    { time: 57.8, text: '长安的少年郎\n一幅姑娘模样' },
-    { time: 64.0, text: '怎知风花止在京城\n怎奈何缘浅相思长' },
-    { time: 70.5, text: '且听这游京人在唱' },
-    { time: 76.8, text: '我走在长街中\n听戏子唱京城' },
-    { time: 83.2, text: '人杂乱戏小丑\n叶黄退入长秋' },
-    { time: 89.5, text: '悠悠的古城中\n听美人奏琴声' },
-    { time: 95.8, text: '朗朗夜色星空\n望孩童放花灯' },
-    { time: 102.2, text: '盼郎君几撩纱\n夜泊借宿酒家' },
-    { time: 108.5, text: '君载着黑骏马\n威风凛凛寻她' },
-    { time: 114.8, text: '我本一醉天涯\n游走京惜繁华' },
-    { time: 121.2, text: '不舍笑声离它' }
+    { time: 0.0, text: '《游京》- 星火社' },
+    { time: 14.83, text: '悠悠的古城中' },
+    { time: 18.36, text: '听美人奏琴声' },
+    { time: 21.96, text: '朗朗夜色星空' },
+    { time: 25.79, text: '望孩童放花灯' },
+    { time: 29.47, text: '盼郎君几撩纱' },
+    { time: 32.95, text: '夜泊借宿酒家' },
+    { time: 36.80, text: '君载着黑骏马' },
+    { time: 40.34, text: '威风凛凛寻她' },
+    { time: 44.00, text: '我本一醉天涯' },
+    { time: 47.79, text: '游走京惜繁华' },
+    { time: 52.15, text: '不舍笑声离它' },
+    { time: 60.98, text: '悠长的街道上' },
+    { time: 64.39, text: '游走在故人巷' },
+    { time: 68.08, text: '长安的少年郎' },
+    { time: 71.75, text: '一幅姑娘模样' },
+    { time: 75.47, text: '怎知风花止在京城' },
+    { time: 79.02, text: '怎奈何缘浅相思长' },
+    { time: 82.69, text: '且听这游京人在唱' },
+    { time: 90.52, text: '我走在长街中' },
+    { time: 93.94, text: '听戏子唱京城' },
+    { time: 97.61, text: '人杂乱戏小丑' },
+    { time: 101.34, text: '叶黄退入长秋' },
+    { time: 104.84, text: '悠悠的古城中' },
+    { time: 108.63, text: '听美人奏琴声' },
+    { time: 112.23, text: '朗朗夜色星空' },
+    { time: 115.96, text: '望孩童放花灯' },
+    { time: 119.70, text: '盼郎君几撩纱' },
+    { time: 123.43, text: '夜泊借宿酒家' },
+    { time: 127.10, text: '君载着黑骏马' },
+    { time: 130.95, text: '威风凛凛寻他' },
+    { time: 134.61, text: '我本一醉天涯' },
+    { time: 138.14, text: '游走京惜繁华' },
+    { time: 141.86, text: '不舍笑声离它' }
   ],
   '《秋意浓》- 张学友': [
-    { time: 0.0, text: '《秋意浓》\n张学友' },
-    { time: 35.5, text: '秋意浓\n离人心上秋意浓' },
-    { time: 46.4, text: '一杯酒\n情绪万种' },
-    { time: 52.2, text: '离别多\n叶落的季节离别多' },
-    { time: 63.2, text: '握住你的手\n放在心头' },
-    { time: 68.5, text: '我要你记得\n无言的承诺' },
-    { time: 74.6, text: '啊 不怕相思苦\n只怕你伤痛' },
-    { time: 82.4, text: '怨只怨人在风中\n聚散都不由我' },
-    { time: 90.3, text: '啊 不怕我孤独\n只怕你寂寞' },
-    { time: 98.1, text: '无处说离愁' },
-    { time: 103.0, text: '舞秋风\n漫天回忆舞秋风' },
-    { time: 113.9, text: '叹一声\n黯然沉默' },
-    { time: 124.9, text: '不能说\n惹泪的话都不能说' },
-    { time: 130.5, text: '紧紧拥着你\n永远记得' },
-    { time: 134.0, text: '你曾经为我\n这样的哭过' },
-    { time: 185.0, text: '啊 不怕相思苦\n只怕你伤痛' },
-    { time: 193.0, text: '怨只怨人在风中\n聚散都不由我' },
-    { time: 201.0, text: '啊 不怕我孤独\n只怕你寂寞' },
-    { time: 209.0, text: '无处说离愁' }
+    { time: 0.0, text: '《秋意浓》- 张学友' },
+    { time: 36.85, text: '秋意浓' },
+    { time: 41.50, text: '离人心上秋意浓' },
+    { time: 49.19, text: '一杯酒' },
+    { time: 53.00, text: '情绪万种' },
+    { time: 61.52, text: '离别多' },
+    { time: 65.72, text: '叶落的季节离别多' },
+    { time: 72.95, text: '握住你的手' },
+    { time: 76.42, text: '放在心头' },
+    { time: 79.49, text: '我要你记得' },
+    { time: 82.55, text: '无言的承诺' },
+    { time: 86.07, text: '啊 不怕相思苦' },
+    { time: 96.08, text: '只怕你伤痛' },
+    { time: 102.57, text: '怨只怨人在风中' },
+    { time: 106.40, text: '聚散都不由我' },
+    { time: 110.63, text: '啊 不怕我孤独' },
+    { time: 120.64, text: '只怕你寂寞 无处说离愁' },
+    { time: 135.16, text: '舞秋风' },
+    { time: 139.87, text: '漫天回忆舞秋风' },
+    { time: 147.55, text: '叹一声' },
+    { time: 151.42, text: '黯然沉默' },
+    { time: 159.89, text: '不能说' },
+    { time: 164.10, text: '惹泪的话都不能说' },
+    { time: 171.38, text: '紧紧拥着你' },
+    { time: 174.86, text: '永远记得' },
+    { time: 177.82, text: '你曾经为我' },
+    { time: 180.91, text: '这样的哭过' },
+    { time: 184.32, text: '啊 不怕相思苦' },
+    { time: 194.32, text: '只怕你伤痛' },
+    { time: 200.86, text: '怨只怨人在风中' },
+    { time: 204.69, text: '聚散都不由我' },
+    { time: 208.92, text: '啊 不怕我孤独' },
+    { time: 218.82, text: '只怕你寂寞 无处说离愁' },
+    { time: 283.12, text: '啊 不怕相思苦' },
+    { time: 293.12, text: '只怕你伤痛' },
+    { time: 299.66, text: '怨只怨人在风中' },
+    { time: 303.49, text: '聚散都不由我' },
+    { time: 307.72, text: '啊 不怕我孤独' },
+    { time: 317.62, text: '只怕你寂寞 无处说离愁' },
+    { time: 351.50, text: '啊 不怕相思苦' },
+    { time: 381.50, text: '啊 不怕相思苦' }
   ],
   '《烂泥》- 草东没有派对': [
-    { time: 0.0, text: '《烂泥》\n草东没有派对' },
-    { time: 0.8, text: '噢多么美丽\n的一颗心' },
-    { time: 9.0, text: '怎么会\n变成了一滩烂泥' },
-    { time: 17.4, text: '噢多么单纯\n的一首诗' },
-    { time: 25.6, text: '怎么会\n都变成了讽刺' },
-    { time: 33.7, text: '我想要说的\n前人们都说过了' },
-    { time: 37.8, text: '我想要做的\n有钱人都做过了' },
-    { time: 42.0, text: '我想要的公平\n都是不公们虚构的' },
-    { time: 48.3, text: '噢多么干净\n的一幅画' },
-    { time: 56.4, text: '怎么会\n充满了悲伤' },
-    { time: 64.8, text: '噢多么天真\n的一句话' },
-    { time: 72.7, text: '怎么会\n像噩梦一样' },
-    { time: 81.0, text: '我想要说的\n前人们都说过了' },
-    { time: 85.0, text: '我想要做的\n有钱人都做过了' },
-    { time: 89.2, text: '我想要的公平\n都是不公们虚构的' }
+    { time: 0.0, text: '《烂泥》- 草东没有派对' },
+    { time: 0.88, text: '噢多么美丽的一颗心' },
+    { time: 9.03, text: '怎么会 怎么会' },
+    { time: 11.18, text: '就变成了一滩烂泥' },
+    { time: 17.47, text: '噢多么单纯的一首诗' },
+    { time: 25.62, text: '怎么会 怎么会' },
+    { time: 28.71, text: '都变成了讽刺' },
+    { time: 33.79, text: '我想要说的 前人们都说过了' },
+    { time: 37.85, text: '我想要做的 有钱人都做过了' },
+    { time: 42.01, text: '我想要的公平都是不公们虚构的' },
+    { time: 67.76, text: '噢多么干净的一幅画' },
+    { time: 75.70, text: '怎么会 怎么会' },
+    { time: 79.35, text: '充满了悲伤' },
+    { time: 84.29, text: '噢多么天真的一句话' },
+    { time: 92.42, text: '怎么会 怎么会' },
+    { time: 96.00, text: '像噩梦一样' },
+    { time: 100.48, text: '我想要说的 前人们都说过了' },
+    { time: 104.52, text: '我想要做的 有钱人都做过了' },
+    { time: 108.67, text: '我想要的公平都是不公们虚构的' }
   ],
   '《鬼》- 草东没有派对': [
-    { time: 0.0, text: '《鬼》\n草东没有派对' },
-    { time: 13.7, text: '从没想过\n要伤害谁' },
-    { time: 21.0, text: '对一切\n也都感到抱歉' },
-    { time: 27.8, text: '可是我的自卑\n胜过了一切爱我的' },
-    { time: 34.5, text: '于是我把爱人们\n都杀死了' },
-    { time: 41.5, text: '可是你的伤悲\n胜过了一切爱你的' },
-    { time: 48.2, text: '于是你把我\n给杀死了' },
-    { time: 68.0, text: '是为了什么\n而流着血' },
-    { time: 74.8, text: '是为了谁\n而流眼泪' },
-    { time: 81.5, text: '我躲在夜里\n取笑着黑' },
-    { time: 88.2, text: '因为没有人\n能杀死鬼' }
+    { time: 0.0, text: '《鬼》- 草东没有派对' },
+    { time: 13.70, text: '从没想过要伤害谁' },
+    { time: 19.03, text: '对一切也都感到抱歉' },
+    { time: 24.67, text: '可是我的自卑胜过了一切爱我的' },
+    { time: 29.76, text: '于是我把爱人们都杀死了' },
+    { time: 37.28, text: '可是你的伤悲胜过了一切爱你的' },
+    { time: 43.30, text: '于是你把我给杀死了' },
+    { time: 63.25, text: '是为了什么而流着血' },
+    { time: 67.39, text: '是为了谁而流眼泪' },
+    { time: 73.76, text: '我躲在夜里取笑着黑' },
+    { time: 79.74, text: '因为没有人能杀死鬼' },
+    { time: 122.50, text: '是为了什么而流着血' },
+    { time: 127.17, text: '是为了谁而流眼泪' },
+    { time: 133.38, text: '我躲在夜里取笑着黑' },
+    { time: 140.23, text: '因为没有人能杀死鬼' }
   ],
   '《偏爱》- 张芸京': [
-    { time: 0.0, text: '《偏爱》\n张芸京' },
-    { time: 5.4, text: '把昨天都作废\n现在你在我眼前' },
-    { time: 10.9, text: '我想爱\n请给我机会' },
-    { time: 15.5, text: '如果我错了也承担\n认定你就是答案' },
-    { time: 21.0, text: '我不怕谁\n嘲笑我极端' },
-    { time: 25.1, text: '相信自己的直觉\n顽固的人不喊累' },
-    { time: 30.9, text: '爱上你\n我不撤退' },
-    { time: 35.3, text: '我说过我不闪躲\n我非要这么做' },
-    { time: 40.4, text: '讲不听也偏要爱\n更努力爱让你明白' },
-    { time: 46.3, text: '没有别条路能走\n你决定要不要陪我' },
-    { time: 51.3, text: '讲不听\n偏爱' },
-    { time: 54.6, text: '看我感觉爱\n等你的依赖' },
-    { time: 59.1, text: '对你偏爱\n痛也很愉快' },
-    { time: 64.2, text: '把昨天都作废\n现在你在我眼前' },
-    { time: 69.9, text: '我想爱\n请给我机会' },
-    { time: 74.6, text: '如果我错了也承担\n认定你就是答案' },
-    { time: 80.0, text: '我不怕谁\n嘲笑我极端' },
-    { time: 84.2, text: '相信自己的直觉\n顽固的人不喊累' },
-    { time: 90.0, text: '爱上你\n我不撤退' },
-    { time: 94.4, text: '我说过我不闪躲\n我非要这么做' },
-    { time: 99.5, text: '讲不听也偏要爱\n更努力爱让你明白' },
-    { time: 105.3, text: '没有别条路能走\n你决定要不要陪我' },
-    { time: 110.3, text: '讲不听\n偏爱' },
-    { time: 113.6, text: '看我感觉爱\n等你的依赖' },
-    { time: 118.3, text: '不后悔\n有把握' }
+    { time: 0.0, text: '《偏爱》- 张芸京' },
+    { time: 15.50, text: '把昨天都作废' },
+    { time: 18.91, text: '现在你在我眼前' },
+    { time: 22.69, text: '我想爱 请给我机会' },
+    { time: 29.19, text: '如果我错了也承担' },
+    { time: 33.07, text: '认定你就是答案' },
+    { time: 37.76, text: '我不怕谁嘲笑我极端' },
+    { time: 42.92, text: '相信自己的直觉' },
+    { time: 46.78, text: '顽固的人不喊累' },
+    { time: 50.27, text: '爱上你 我不撤退' },
+    { time: 55.70, text: '我说过 我不闪躲' },
+    { time: 59.12, text: '我非要这么做' },
+    { time: 61.83, text: '讲不听 也偏要爱' },
+    { time: 64.27, text: '更努力爱 让你明白' },
+    { time: 69.37, text: '没有别条路能走' },
+    { time: 72.58, text: '你决定要不要陪我' },
+    { time: 75.50, text: '讲不听 偏爱' },
+    { time: 77.22, text: '靠我感觉爱' },
+    { time: 78.94, text: '等你的依赖' },
+    { time: 81.90, text: '对你偏爱' },
+    { time: 89.18, text: '痛也很愉快' },
+    { time: 97.82, text: '把昨天都作废' },
+    { time: 101.20, text: '现在你在我眼前' },
+    { time: 104.91, text: '我想爱 请给我机会' },
+    { time: 111.49, text: '如果我错了也承担' },
+    { time: 115.40, text: '认定你就是答案' },
+    { time: 120.14, text: '我不怕谁嘲笑我极端' },
+    { time: 125.18, text: '相信自己的直觉' },
+    { time: 129.05, text: '顽固的人不喊累' },
+    { time: 132.54, text: '爱上你 我不撤退' },
+    { time: 138.01, text: '我说过 我不闪躲' },
+    { time: 141.44, text: '我非要这么做' },
+    { time: 144.09, text: '讲不听 也偏要爱' },
+    { time: 146.55, text: '更努力爱 让你明白' },
+    { time: 151.79, text: '没有别条路能走' },
+    { time: 154.77, text: '你决定要不要陪我' },
+    { time: 157.80, text: '讲不听 偏爱' },
+    { time: 159.54, text: '靠我感觉爱' },
+    { time: 161.20, text: '等你的依赖' },
+    { time: 164.22, text: '不后悔 有把握' },
+    { time: 167.12, text: '我不闪躲 我非要这么做' },
+    { time: 171.46, text: '讲不听 也偏要爱' },
+    { time: 173.92, text: '更努力爱 让你明白' },
+    { time: 179.16, text: '没有别条路能走' },
+    { time: 182.17, text: '你决定要不要陪我' },
+    { time: 185.22, text: '讲不听 偏爱' },
+    { time: 186.95, text: '靠我感觉爱' },
+    { time: 188.74, text: '等你的依赖' },
+    { time: 191.64, text: '对你偏爱 爱' },
+    { time: 198.91, text: '痛也很愉快' }
   ],
   '《海鸥》- 逃跑计划': [
-    { time: 0.0, text: '《海鸥》\n逃跑计划' },
-    { time: 5.4, text: '昨夜的潮汐\n今晨已褪去' },
-    { time: 12.7, text: '归来的渔民\n叫卖着刚刚经历的风雨' },
-    { time: 20.3, text: '教堂里举行着婚礼\n我路过感到甜蜜' },
-    { time: 27.7, text: '也让我想到\n我和你' },
-    { time: 31.5, text: '天真的孩子\n偷听了恋人的情话' },
-    { time: 39.1, text: '羞红的脸像路人\n手中捧着的鲜花' },
-    { time: 46.5, text: '熟悉的城市\n已经变了模样' },
-    { time: 54.0, text: '不变的是依然\n没有你在身旁' },
-    { time: 61.5, text: '我知道所有的伤痛\n都会过去' },
-    { time: 69.0, text: '也明白有些遗憾\n会永远留在心里' },
-    { time: 76.5, text: '但愿那海风再起\n海鸥落在那礁石' },
-    { time: 84.0, text: '我终于对着大海\n放声喊出你的名字' }
+    { time: 0.0, text: '《海鸥》- 逃跑计划' },
+    { time: 18.46, text: '昨夜的潮汐' },
+    { time: 22.30, text: '今晨已褪去' },
+    { time: 25.24, text: '归来的渔民叫卖着刚刚经历的风雨' },
+    { time: 33.06, text: '教堂里举行着婚礼' },
+    { time: 37.14, text: '我路过感到甜蜜' },
+    { time: 40.54, text: '也让我想到我和你' },
+    { time: 65.42, text: '天真的孩子' },
+    { time: 67.86, text: '偷听了恋人的情话' },
+    { time: 71.42, text: '羞红的脸像路人手中捧着的鲜花' },
+    { time: 80.49, text: '熟悉的城市' },
+    { time: 83.38, text: '已经变了模样' },
+    { time: 87.27, text: '不变的是依然没有你在身旁' },
+    { time: 95.12, text: '我知道所有的伤痛都会过去' },
+    { time: 102.11, text: '也明白有些遗憾会永远留在心里' },
+    { time: 110.56, text: '但愿那海风再起' },
+    { time: 114.48, text: '海鸥落在那礁石' },
+    { time: 117.39, text: '我终于对着大海放声喊出你的名字' },
+    { time: 156.97, text: '我知道所有的伤痛都会过去' },
+    { time: 163.92, text: '也明白有些遗憾会永远留在心里' },
+    { time: 172.47, text: '但愿那海风再起' },
+    { time: 176.29, text: '海鸥落在那礁石' },
+    { time: 179.15, text: '我终于对着大海放声喊出你的名字' },
+    { time: 188.02, text: '但愿那海风再起' },
+    { time: 191.70, text: '海鸥落在那礁石' },
+    { time: 194.48, text: '我终于对着大海放声喊出你的名字' },
+    { time: 215.00, text: '我终于对着大海放声喊出你的名字' }
   ],
   'CYBER CRYSTAL FLOW': [
-    { time: 0.0, text: 'CYBER CRYSTAL\nFLOW WITH LIGHT' },
-    { time: 6.0, text: 'OPTICAL RESONANCE\nPURE FREQUENCY' },
-    { time: 12.0, text: 'SHINE IN MOTION\n3D CRYSTAL BEAT' },
-    { time: 18.0, text: 'LÜ AUDIO LAB\nDEEP HARMONICS' }
+    { time: 0.0, text: 'CYBER CRYSTAL FLOW WITH LIGHT' },
+    { time: 6.0, text: 'OPTICAL RESONANCE PURE FREQUENCY' },
+    { time: 12.0, text: 'SHINE IN MOTION 3D CRYSTAL BEAT' },
+    { time: 18.0, text: 'LÜ AUDIO LAB DEEP HARMONICS' }
   ],
   'NEO SYNTH WAVE 80S': [
-    { time: 0.0, text: 'NEO SYNTH\nRETRO HORIZON' },
-    { time: 6.0, text: 'ELECTRIC PULSE\nANALOG DREAMS' },
-    { time: 12.0, text: 'NEON SUNSET\nSYNTHWAVE 80S' }
+    { time: 0.0, text: 'NEO SYNTH RETRO HORIZON' },
+    { time: 6.0, text: 'ELECTRIC PULSE ANALOG DREAMS' },
+    { time: 12.0, text: 'NEON SUNSET SYNTHWAVE 80S' }
   ],
   'DEEP SUB BASS 808': [
-    { time: 0.0, text: '808 SUB BASS\nHEARTBEAT IMPACT' },
-    { time: 6.0, text: 'DEEP FREQUENCY\nSHAKE THE STAGE' },
-    { time: 12.0, text: 'LOW END IMPACT\nPURE 808 RESONANCE' }
+    { time: 0.0, text: '808 SUB BASS HEARTBEAT IMPACT' },
+    { time: 6.0, text: 'DEEP FREQUENCY SHAKE THE STAGE' },
+    { time: 12.0, text: 'LOW END IMPACT PURE 808 RESONANCE' }
   ]
 };
 
@@ -4700,11 +5554,37 @@ function parseLrcString(lrcContent) {
     }
 
     if (timestamps.length > 0) {
-      const text = line.replace(/\[\d{1,2}:\d{2}(?:[.:]\d{1,3})?\]/g, '').trim();
+      const body = line.replace(/\[\d{1,2}:\d{2}(?:[.:]\d{1,3})?\]/g, '').trim();
+      const inlineRegex = /<(\d{1,2}):(\d{2}(?:[.:]\d{1,3})?)>/g;
+      const inlineParts = [];
+      let marker, previousMarker = null, segmentStart = 0;
+      while ((marker = inlineRegex.exec(body)) !== null) {
+        if (previousMarker) {
+          inlineParts.push({ time: previousMarker.time, text: body.slice(segmentStart, marker.index) });
+        }
+        previousMarker = { time: Number(marker[1]) * 60 + Number(marker[2].replace(':', '.')) };
+        segmentStart = inlineRegex.lastIndex;
+      }
+      if (previousMarker) inlineParts.push({ time: previousMarker.time, text: body.slice(segmentStart) });
+      const text = body.replace(inlineRegex, '').trim();
       if (text) {
+        const inlineCues = [];
+        inlineParts.forEach((part, index) => {
+          const count = lyricCharacters(part.text).length;
+          if (!count) return;
+          const next = inlineParts[index + 1];
+          const span = next ? Math.max(0.05, next.time - part.time) : Math.max(0.3, count * 0.28);
+          for (let charIndex = 0; charIndex < count; charIndex++) {
+            inlineCues.push(part.time + span * charIndex / count);
+          }
+        });
+        const hasExactCues = inlineCues.length === lyricCharacters(text).length;
         for (const tSec of timestamps) {
           const adjustedSec = tSec + (fileOffsetMs / 1000.0);
-          result.push({ time: parseFloat(adjustedSec.toFixed(2)), text: text });
+          const item = { time: parseFloat(adjustedSec.toFixed(2)), text };
+          if (hasExactCues) item.charTimes = inlineCues.map(cue =>
+            Math.round((cue + tSec - timestamps[0] + fileOffsetMs / 1000) * 1000) / 1000);
+          result.push(item);
         }
       }
     }
@@ -4769,7 +5649,7 @@ function setCurrentTrackLyrics(lyricsList) {
   return normalized;
 }
 
-function getSynchronizedLyricPhrase() {
+function getSynchronizedLyricContext(explicitTime = null) {
   let lyricsList = null;
   const curTrack = state.playlist[state.currentTrackIndex];
 
@@ -4801,25 +5681,61 @@ function getSynchronizedLyricPhrase() {
     }
   }
 
-  if (!lyricsList || lyricsList.length === 0) return state.songTitle;
+  if (!lyricsList || lyricsList.length === 0) {
+    return {
+      activeText: state.songTitle,
+      prevText: '',
+      nextText: '',
+      progressInLine: 0,
+      lineKey: `${state.songTitle}:empty`,
+      characterCursor: 0
+    };
+  }
 
-  const currentPlaybackSec = getPlaybackTime();
+  const currentPlaybackSec = (explicitTime !== null && explicitTime !== undefined) ? explicitTime : getPlaybackTime();
   // Negative offset advances the lyric, matching standard LRC offset semantics.
   const lyricClockTime = currentPlaybackSec - (state.lyricOffsetMs / 1000.0);
 
-  let matchedText = typeof lyricsList[0] === 'object' ? lyricsList[0].text : lyricsList[0];
+  let matchIdx = 0;
   for (let i = 0; i < lyricsList.length; i++) {
     const item = lyricsList[i];
     const itemTime = typeof item === 'object' ? item.time : (i * 4.5);
-    const itemText = typeof item === 'object' ? item.text : item;
     if (lyricClockTime >= itemTime) {
-      matchedText = itemText;
+      matchIdx = i;
     } else {
       break;
     }
   }
-  return matchedText;
+
+  const curItem = lyricsList[matchIdx];
+  const activeText = typeof curItem === 'object' ? curItem.text : curItem;
+  const prevItem = matchIdx > 0 ? lyricsList[matchIdx - 1] : null;
+  const prevText = prevItem ? (typeof prevItem === 'object' ? prevItem.text : prevItem) : '';
+  const nextItem = matchIdx < lyricsList.length - 1 ? lyricsList[matchIdx + 1] : null;
+  const nextText = nextItem ? (typeof nextItem === 'object' ? nextItem.text : nextItem) : '';
+
+  const curTime = typeof curItem === 'object' ? curItem.time : (matchIdx * 4.5);
+  const nextTime = nextItem ? (typeof nextItem === 'object' ? nextItem.time : ((matchIdx + 1) * 4.5)) : getTrackDuration(curTrack);
+  const durationOfLine = Math.max(0.5, nextTime - curTime);
+  const progressInLine = THREE.MathUtils.clamp((lyricClockTime - curTime) / durationOfLine, 0, 1);
+  const cues = characterCues(typeof curItem === 'object' ? curItem : { time: curTime, text: activeText }, nextTime, getTrackDuration(curTrack));
+  const characterCursor = characterCursorAt(cues, lyricClockTime);
+
+  return {
+    activeText,
+    prevText,
+    nextText,
+    progressInLine,
+    lineKey: `${curTrack?.title || state.songTitle}:${matchIdx}`,
+    characterCursor
+  };
 }
+
+function getSynchronizedLyricPhrase() {
+  return getSynchronizedLyricContext().activeText;
+}
+window.getSynchronizedLyricContext = getSynchronizedLyricContext;
+window.getPlaybackTime = getPlaybackTime;
 
 const MATRIX_PROGRESSION_SEQUENCES = {
   standard: [
@@ -5000,6 +5916,22 @@ function formationRadius(mode) {
   return gridRadius;
 }
 
+function getGravityCameraTarget(camAspect = 1.6) {
+  const aspect = camAspect || 1.6;
+  // 基准可见半宽至少 4.35 空间单位（歌词 6 个方块横向跨度 [-3.45, 3.45]，留出充裕边距）
+  const tanHalfFov = 0.26794919243; // tan(15°)
+  const targetHalfWidth = 4.35;
+  const distForWidth = targetHalfWidth / (tanHalfFov * aspect);
+  // 桌面宽屏下基准距离为 11.5 (aspect >= 1.42 时 distForWidth <= 11.45)
+  const isNarrow = aspect < 1.42;
+  const targetZ = isNarrow ? Math.max(11.5, distForWidth) : 11.5;
+  const targetY = isNarrow ? -0.2 - 0.035 * (targetZ - 11.5) : -0.2;
+  return {
+    position: new THREE.Vector3(0, targetY, targetZ),
+    lookAt: new THREE.Vector3(0, targetY, 0)
+  };
+}
+
 function updateMasterChoreography(dt = 0.016) {
   if (!state.isPlayingMusic || !state.audioReady) return;
 
@@ -5091,24 +6023,22 @@ function updateMasterChoreography(dt = 0.016) {
   }
 
   // 1. 旋转视角运镜 (开/关/自动) 与 FOV 动态呼吸 (减少动效时禁止自动相机和动态 FOV)
-  // 待机静息态同样属于"装置正在演"，因此 auto 档在静息时也接管镜头；
-  // 静息用更慢的振幅与频率 (drift)，让镜头像呼吸而不是巡视。
-  const idleActive = state.idleBreath > 0.25;
-  const idleMix = idleActive ? state.idleBreath : 0;
-  const drift = 1 - 0.55 * idleMix;
-  const shouldMoveCam = !prefersReducedMotion && ((state.camMotionMode === 'on') ||
-    (state.camMotionMode === 'auto' && (state.isPlayingMusic || idleActive)));
+  // 物理反重力歌词模式下，默认严格关闭运镜与 FOV 动态呼吸，锁定纯正正面平视机位
+  const isGravityMode = kineticLyricsManager.mode === 'gravity';
+  const isLyricMode = kineticLyricsManager.mode !== 'off';
+  const shouldMoveCam = !isLyricMode && !prefersReducedMotion && ((state.camMotionMode === 'on') ||
+    (state.camMotionMode === 'auto' && state.isPlayingMusic));
   const maxDim = Math.max(state.gridCols, state.gridRows, state.gridLayers);
   let baseCamDist = framingDistance(formationRadius(state.activeFormation));
-  const baseFov = +ui.fov.value;
+  const baseFov = isGravityMode ? 30 : +ui.fov.value;
   let targetFov = baseFov;
   const tMul = state.tierMultiplier || 1.0;
 
-  if (state.enableDynamicFov && !prefersReducedMotion) {
+  if (!isLyricMode && state.enableDynamicFov && !prefersReducedMotion) {
     if (state.fovMode === 'bass') {
       // 重低音爆发冲击：踩点瞬间 FOV 骤紧特写，随后弹性回弹广角
       const kickImpulse = Math.pow(state.bassEnergy, 1.3) * state.fovPulseAmp * tMul;
-      const breath = Math.sin(state.time * 2.5) * (state.fovPulseAmp * 0.22 * tMul);
+      const breath = state.isPlayingMusic ? Math.sin(state.time * 2.5) * (state.fovPulseAmp * 0.22 * tMul) : 0;
       targetFov = baseFov - kickImpulse + breath;
     } else if (state.fovMode === 'dolly') {
       // 希区柯克滑动变焦 (Hitchcock Dolly Zoom): 空间透视剧烈扭曲，主体大小恒定
@@ -5130,70 +6060,64 @@ function updateMasterChoreography(dt = 0.016) {
     }
   }
 
-  // 平滑过渡 FOV (固定 0.18 插值改基于 dt 的指数平滑；减少动效时严格锁定基准 FOV)
-  if (prefersReducedMotion) {
+  // 平滑过渡 FOV (反重力模式或减少动效时严格锁定基准 FOV 30°)
+  if (isGravityMode) {
+    state.currentFov = 30;
+    if (Math.abs(camera.fov - 30) > 0.001) {
+      camera.fov = 30;
+      camera.updateProjectionMatrix();
+    }
+  } else if (prefersReducedMotion) {
     state.currentFov = baseFov;
   } else {
     const fovLerp = Math.min(1.0, 1.0 - Math.exp(-12.0 * dt));
     state.currentFov += (targetFov - state.currentFov) * fovLerp;
   }
   const clampedFov = Math.max(12, Math.min(85, state.currentFov));
-  if (Math.abs(camera.fov - clampedFov) > 0.001) {
+  if (!isGravityMode && Math.abs(camera.fov - clampedFov) > 0.001) {
     camera.fov = clampedFov;
     camera.updateProjectionMatrix();
   }
 
-  if (shouldMoveCam) {
-    const camDist = baseCamDist + Math.sin(state.time * 0.4) * 1.8 - (state.bassEnergy * 0.8 * tMul);
-
-    if (idleActive) {
-      // 静息构图：0.13 / 0.075 / 0.055 rad/s 三个互相不可通约的低频叠加，
-      // 在肉眼尺度上不呈现可预期的循环周期，避免用户学会机位之后注意力脱落。
-      let idleAngle;
-      if (state.orbitMode === 'arc') {
-        idleAngle = Math.sin(state.time * 0.09) * 0.42 * drift + Math.sin(state.time * 0.021) * 0.16;
-      } else {
-        idleAngle = state.time * 0.06;
-      }
-      const idleDist = camDist * 0.93 + Math.sin(state.time * 0.05) * 1.1;
-      const targetCamX = Math.sin(idleAngle) * idleDist;
-      const targetCamZ = Math.cos(idleAngle) * idleDist;
-      const targetCamY = (maxDim * 0.8) + Math.sin(state.time * 0.042) * 1.8;
-      const idleCamLerp = Math.min(1.0, 1.0 - Math.exp(-1.1 * dt));
-      camera.position.x += (targetCamX - camera.position.x) * idleCamLerp;
-      camera.position.y += (targetCamY - camera.position.y) * idleCamLerp;
-      camera.position.z += (targetCamZ - camera.position.z) * idleCamLerp;
-      const idleTargetLerp = Math.min(1.0, 1.0 - Math.exp(-1.6 * dt));
-      controls.target.x += (0 - controls.target.x) * idleTargetLerp;
-      controls.target.y += (0 - controls.target.y) * idleTargetLerp;
-      controls.target.z += (0 - controls.target.z) * idleTargetLerp;
-    } else {
+  if (isGravityMode) {
+    // 物理反重力模式下：平滑稳定锁定正面平视纯正视角与自适应全览构图
+    const camTarget = getGravityCameraTarget(camera.aspect);
+    const lockLerp = Math.min(1.0, 1.0 - Math.exp(-6.0 * dt));
+    camera.position.lerp(camTarget.position, lockLerp);
+    controls.target.lerp(camTarget.lookAt, lockLerp);
+    camera.lookAt(controls.target);
+  } else if (shouldMoveCam) {
+    const cameraMotionGain = THREE.MathUtils.clamp(state.waveAmpMultiplier, 0.2, 1)
+      * [0, 0.35, 0.7, 1][state.intensityTier];
+    cameraBassEnergy += (state.bassEnergy - cameraBassEnergy) * (1 - Math.exp(-3 * dt));
+    const camDist = baseCamDist + (Math.sin(state.time * 0.24) * 0.6 - cameraBassEnergy * 0.22 * tMul) * cameraMotionGain;
     let targetCamX = 0;
     let targetCamZ = camDist;
 
     if (state.orbitMode === 'arc') {
-      const camAngle = Math.sin(state.time * 0.45) * 0.72; // ±41.2°
+      const camAngle = Math.sin(state.time * 0.18) * 0.26 * cameraMotionGain;
       targetCamX = Math.sin(camAngle) * camDist;
       targetCamZ = Math.cos(camAngle) * camDist;
     } else {
-      const camAngle = state.time * 0.28;
+      cameraOrbitPhase += dt * 0.08 * cameraMotionGain;
+      const camAngle = cameraOrbitPhase;
       targetCamX = Math.sin(camAngle) * camDist;
       targetCamZ = Math.cos(camAngle) * camDist;
     }
 
-    const targetCamY = (maxDim * 0.8) + Math.sin(state.time * 0.3) * 1.6;
+    const targetCamY = (maxDim * 0.8) + Math.sin(state.time * 0.18) * 0.5 * cameraMotionGain;
 
     // 自动运镜平滑追目标机位与中心焦点
-    const camLerp = Math.min(1.0, 1.0 - Math.exp(-4.5 * dt));
+    const camLerp = Math.min(1.0, 1.0 - Math.exp(-2.2 * dt));
     camera.position.x += (targetCamX - camera.position.x) * camLerp;
     camera.position.y += (targetCamY - camera.position.y) * camLerp;
     camera.position.z += (targetCamZ - camera.position.z) * camLerp;
 
-    const targetLerp = Math.min(1.0, 1.0 - Math.exp(-6.0 * dt));
+    const targetLerp = Math.min(1.0, 1.0 - Math.exp(-2.2 * dt));
     controls.target.x += (0 - controls.target.x) * targetLerp;
     controls.target.y += (0 - controls.target.y) * targetLerp;
     controls.target.z += (0 - controls.target.z) * targetLerp;
-    }
+    camera.lookAt(controls.target);
   }
 
   // Music modulates illumination, never the material's physical identity or user sliders.
@@ -5213,6 +6137,9 @@ function updateMasterChoreography(dt = 0.016) {
 // 因此不会像轴对齐判据那样误判带旋转的方块、把它推出去再引发连锁反应。
 // 设计预算已约束常态运动，这里常态近乎零修正，只在阵型过渡的交叉路径上兜底。
 let lastFrameTimestamp = 0;
+let lastKineticCameraMode = null;
+let cameraBassEnergy = 0;
+let cameraOrbitPhase = 0;
 const separationStats = { frames: 0, pairs: 0, pushed: 0, maxPush: 0, totalPush: 0, active: false };
 const _sepHash = new Map();
 const _sepQuat = new THREE.Quaternion();
@@ -5404,7 +6331,75 @@ function animate(nowTimestamp) {
   const motionDt = dt;
 
   state.time += motionDt * state.speedMultiplier * tierCfg.timeScale * motionFactor;
-  controls.update();
+
+  // 3D 阻尼超调运镜驱动 (~1.5% Overshoot Spring)
+  const isGravityMode = (typeof kineticLyricsManager !== 'undefined' && kineticLyricsManager && kineticLyricsManager.mode === 'gravity');
+  if (kineticLyricsManager.mode !== lastKineticCameraMode) {
+    if (kineticLyricsManager.mode !== 'off') {
+      cameraTransition = null;
+      pendingFrameDistance = null;
+      focusBreath = null;
+    }
+    lastKineticCameraMode = kineticLyricsManager.mode;
+  }
+  if (isGravityMode) {
+    const camTarget = getGravityCameraTarget(camera.aspect);
+    const lockLerp = Math.min(1.0, 1.0 - Math.exp(-14.0 * dt));
+    camera.position.lerp(camTarget.position, lockLerp);
+    controls.target.lerp(camTarget.lookAt, lockLerp);
+    camera.lookAt(controls.target);
+    if (Math.abs(camera.fov - 30) > 0.01) {
+      camera.fov = 30;
+      camera.updateProjectionMatrix();
+    }
+  } else if (cameraTransition) {
+    const elapsed = frameNow - cameraTransition.startTime;
+    const t = Math.min(1.0, elapsed / cameraTransition.duration);
+    const s = 1.05;
+    const p = t >= 1.0 ? 1.0 : (1 + (s + 1) * Math.pow(t - 1, 3) + s * Math.pow(t - 1, 2));
+    camera.position.lerpVectors(cameraTransition.startPos, cameraTransition.targetPos, p);
+    controls.target.set(0, 0, 0);
+    controls.update();
+    if (t >= 1.0) {
+      camera.position.copy(cameraTransition.targetPos);
+      cameraTransition = null;
+    }
+  } else {
+    controls.update();
+  }
+
+  // 焦点呼吸驱动
+  if (focusBreath && !isGravityMode) {
+    const elapsed = frameNow - focusBreath.startTime;
+    const t = elapsed / focusBreath.duration;
+    if (t < 1.0) {
+      const fovOffset = Math.sin(t * Math.PI) * focusBreath.delta;
+      camera.fov = focusBreath.baseFov + fovOffset;
+      camera.updateProjectionMatrix();
+    } else {
+      camera.fov = focusBreath.baseFov;
+      camera.updateProjectionMatrix();
+      focusBreath = null;
+    }
+  }
+
+  // 材质更换柔光脉冲驱动
+  if (glowPulse) {
+    const elapsed = frameNow - glowPulse.startTime;
+    const t = elapsed / glowPulse.duration;
+    if (t < 1.0) {
+      const bloomOffset = Math.sin(t * Math.PI) * 0.15;
+      if (typeof bloomPass !== 'undefined' && bloomPass) {
+        bloomPass.strength = glowPulse.baseBloom + bloomOffset;
+      }
+    } else {
+      if (typeof bloomPass !== 'undefined' && bloomPass) {
+        bloomPass.strength = glowPulse.baseBloom;
+      }
+      glowPulse = null;
+    }
+  }
+
   updateProgressUI();
 
   if (state.analyser && state.audioDataArray && state.isPlayingMusic && state.audioReady) {
@@ -5474,6 +6469,23 @@ function animate(nowTimestamp) {
     state.trebleEnergy *= idleDecayFactor;
   }
 
+  // 灵动歌词双引擎时钟推进 (Kinetic Lyrics Dual-Engine Sync)
+  if (typeof kineticLyricsManager !== 'undefined' && kineticLyricsManager) {
+    const lyricCtx = getSynchronizedLyricContext();
+    kineticLyricsManager.update({
+      activeText: lyricCtx.activeText,
+      prevText: lyricCtx.prevText,
+      nextText: lyricCtx.nextText,
+      beatPeriod: state.beatPeriod || 0.5,
+      progressInLine: lyricCtx.progressInLine,
+      lineKey: lyricCtx.lineKey,
+      characterCursor: lyricCtx.characterCursor,
+      bassEnergy: state.bassEnergy || 0,
+      isKick: (state.beatPulse > 0.45),
+      dt
+    });
+  }
+
   // -------------------------------------------------------------
   // 13-b. 静息待机态 (Idle Rest State)
   // 装置的定义是"不通电也在散发气场"：未演奏时不允许画面完全静止，否则它退化成一台播放器。
@@ -5494,9 +6506,10 @@ function animate(nowTimestamp) {
   updateMasterChoreography(dt);
   if (matrixDirty) commitMatrixRebuild();
 
+  if (pendingFrameDistance !== null && kineticLyricsManager.mode !== 'off') pendingFrameDistance = null;
   if (pendingFrameDistance !== null) {
-    const autoCamera = !prefersReducedMotion && (state.camMotionMode === 'on' ||
-      (state.camMotionMode === 'auto' && (state.isPlayingMusic || state.idleBreath > 0.25)));
+    const autoCamera = kineticLyricsManager.mode !== 'gravity' && !prefersReducedMotion && (state.camMotionMode === 'on' ||
+      (state.camMotionMode === 'auto' && state.isPlayingMusic));
     if (autoCamera) {
       pendingFrameDistance = null;
     } else {
@@ -5760,27 +6773,15 @@ function animate(nowTimestamp) {
   let currentEmote = null;
   if (state.activeEmote && Date.now() < state.emoteEndTime) {
     currentEmote = state.activeEmote;
-  } else if (state.isPlayingMusic) {
-    const barIdx = Math.floor(state.beatCount / 4) % 8;
-    if (state.bassEnergy > 0.52) {
-      currentEmote = 'happy';
-    } else if (state.trebleEnergy > 0.40 && (barIdx === 2 || barIdx === 6)) {
-      currentEmote = 'wink';
-    } else if (state.midEnergy > 0.26) {
-      currentEmote = 'sing';
-    } else if (barIdx % 2 === 0) {
-      currentEmote = 'happy';
-    } else {
-      currentEmote = 'normal';
-    }
   }
 
-  if (state.contentMode === 'avatar' && (!state.isPlayingMusic || !state.isIntroPlaying)) {
-    const is30FpsFrame = (frameNow - lastAvatarRenderTime >= 33.3);
-    if (is30FpsFrame) {
+  if ((state.contentMode === 'avatar' || isGravityMode) && (!state.isPlayingMusic || !state.isIntroPlaying)) {
+    const avatarFrameInterval = isGravityMode ? 40.0 : (activeLiveTextureKeys.length > 4 ? 66.7 : 33.3);
+    if (frameNow - lastAvatarRenderTime >= avatarFrameInterval) {
       lastAvatarRenderTime = frameNow;
-      activeLiveTextureKeys.forEach(key => {
-        renderAvatarRig(key, frameNow / 1000, lookX, lookY, currentEmote, state.bassEnergy, state.midEnergy);
+      const keysToRender = isGravityMode ? AVATAR_KEYS : activeLiveTextureKeys;
+      keysToRender.forEach((key, index) => {
+        renderAvatarRig(key, frameNow / 1000 + index * 1.37, lookX, lookY, currentEmote);
       });
     }
   }
@@ -5804,7 +6805,7 @@ function animate(nowTimestamp) {
       isDraggingProgressSlider = true;
       const pct = parseFloat(e.target.value);
       const curTrack = state.playlist[state.currentTrackIndex];
-      const dur = (curTrack && curTrack.buffer && curTrack.buffer.duration) ? curTrack.buffer.duration : 180;
+      const dur = getTrackDuration(curTrack);
       const targetSec = (pct / 100) * dur;
       if ($('#timeDisplay')) {
         $('#timeDisplay').textContent = `${formatTime(targetSec)} / ${formatTime(dur)}`;
@@ -5813,9 +6814,10 @@ function animate(nowTimestamp) {
 
     progressSlider.addEventListener('change', (e) => {
       isDraggingProgressSlider = false;
+      state.mockPlaybackTime = null;
       const pct = parseFloat(e.target.value);
       const curTrack = state.playlist[state.currentTrackIndex];
-      const dur = (curTrack && curTrack.buffer && curTrack.buffer.duration) ? curTrack.buffer.duration : 180;
+      const dur = getTrackDuration(curTrack);
       const targetSec = (pct / 100) * dur;
       state.playbackOffset = targetSec;
       state.playbackStartTime = state.audioCtx ? state.audioCtx.currentTime : 0;
@@ -5838,7 +6840,7 @@ function animate(nowTimestamp) {
 
   $('#lyricOffsetInput')?.addEventListener('change', (e) => {
     const nextValue = parseInt(e.target.value, 10);
-    state.lyricOffsetMs = Number.isFinite(nextValue) ? Math.max(-5000, Math.min(5000, nextValue)) : -180;
+    state.lyricOffsetMs = Number.isFinite(nextValue) ? Math.max(-5000, Math.min(5000, nextValue)) : 0;
     e.target.value = state.lyricOffsetMs;
   });
 function syncSliderOutputs() {
@@ -6160,6 +7162,11 @@ function loadLandscapeBackground(url) {
   },undefined,()=>{if(request===backgroundRequest){setBackgroundColor('#727b88');$('#presetBgSelect').value='';}});
 }
 window.addEventListener('resize',()=>{if(scene.background?.isTexture)fitBackgroundTexture(scene.background);});
+window.loadLandscapeBackground = loadLandscapeBackground;
+window.setWallpaper = function(url) {
+  if ($('#presetBgSelect')) $('#presetBgSelect').value = url;
+  loadLandscapeBackground(url);
+};
 $('#presetBgSelect')?.addEventListener('change', e => {
   const url = e.target.value;
   if (!url) {
@@ -6195,6 +7202,38 @@ $('#textColorModeGroup').addEventListener('click', e => {
   state.textColorMode = btn.dataset.tcolor;
   rebuildMatrix();
 });
+
+// 灵动歌词双引擎风格切换 (HUD 与 面板联动)
+$$('.kinetic-mode-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const mode = btn.dataset.mode;
+    if (typeof kineticLyricsManager !== 'undefined' && kineticLyricsManager) {
+      kineticLyricsManager.setMode(mode);
+    }
+    $$('#kineticEngineModeGroup .pill-btn').forEach(pb => {
+      pb.classList.toggle('active', pb.dataset.kmode === mode);
+    });
+  });
+});
+
+$('#kineticEngineModeGroup')?.addEventListener('click', e => {
+  const btn = e.target.closest('.pill-btn');
+  if (!btn) return;
+  const mode = btn.dataset.kmode;
+  if (typeof kineticLyricsManager !== 'undefined' && kineticLyricsManager) {
+    kineticLyricsManager.setMode(mode);
+  }
+  $$('#kineticEngineModeGroup .pill-btn').forEach(pb => pb.classList.remove('active'));
+  btn.classList.add('active');
+});
+
+if (typeof kineticLyricsManager !== 'undefined' && kineticLyricsManager) {
+  const curMode = kineticLyricsManager.mode;
+  $$('#kineticEngineModeGroup .pill-btn').forEach(pb => {
+    pb.classList.toggle('active', pb.dataset.kmode === curMode);
+  });
+}
 
 // 动态 FOV 呼吸变焦开关
 $('#dynamicFovToggle').addEventListener('click', e => {
@@ -6266,7 +7305,7 @@ $('#orbitModeGroup').addEventListener('click', e => {
   state.orbitMode = btn.dataset.orbit;
 });
 
-// OneWorks 活体表情与注视眨眼控制
+// 实时角色表情、注视与眨眼控制
 $('#emoteHappyBtn').addEventListener('click', () => {
   state.activeEmote = 'happy';
   state.emoteEndTime = Date.now() + 2500;
@@ -6289,8 +7328,7 @@ $('#autoBlinkToggle').addEventListener('click', e => {
   e.currentTarget.textContent = `✨ 动态呼吸眨眼：${state.enableBlink ? '开' : '关'}`;
 });
 
-// Load the official SDK only when the role panel is requested, not on material-only visits.
-$('#avatarPanel').addEventListener('pointerenter',()=>AVATAR_KEYS.forEach(key=>renderAvatarRig(key,0)),{once:true});
+$('#avatarPanel').addEventListener('pointerenter',()=>renderAvatarRig(state.selectedAvatar,performance.now()/1000),{once:true});
 
 // 批量本地音频与歌词上传管理
 $('#audioUpload').addEventListener('change', e => {
@@ -6462,7 +7500,7 @@ $('#contentModeGroup').addEventListener('click', e => {
   }
 
   $('#avatarPanel').style.display = state.contentMode === 'avatar' ? 'block' : 'none';
-  if(state.contentMode==='avatar')AVATAR_KEYS.forEach((key,index)=>setTimeout(()=>renderAvatarRig(key,performance.now()/1000),index*150));
+  if(state.contentMode==='avatar')renderAvatarRig(state.selectedAvatar,performance.now()/1000);
   $('#textPanel').style.display = state.contentMode === 'text' ? 'block' : 'none';
   $('#imagePanel').style.display = state.contentMode === 'image' ? 'block' : 'none';
 
@@ -6475,22 +7513,46 @@ $('#contentModeGroup').addEventListener('click', e => {
   rebuildMatrix();
 });
 
-// Avatar 选择
-$('#officialAvatarEdit').addEventListener('click',()=>{
-  try{sessionStorage.setItem('lu-editor-stage-context',JSON.stringify({
-    controls:Object.fromEntries(Object.entries(ui).filter(([key])=>key!=='text').map(([key,input])=>[key,input.value])),
-    layer:state.layerMode,dist:state.avatarDist,lock:state.lockMaterial,
-    background:state.backgroundColor,preset:$('#presetBgSelect').value,
-    camera:camera.position.toArray(),target:controls.target.toArray()
-  }));}catch{}
+// 角色分组与选择：选中卡片共享舞台实时画布，其余卡片使用静态缩略图。
+let activeAvatarGroup = 'one-piece';
+function renderAvatarCards(){
+  const grid=$('#avatarPresetGrid');
+  const fragment=document.createDocumentFragment();
+  for(const character of AVATAR_MANIFEST.characters){
+    if(character.group!==activeAvatarGroup)continue;
+    const card=document.createElement('button');
+    card.type='button';card.className='avatar-card';card.dataset.avatar=character.id;
+    card.classList.toggle('active',character.id===state.selectedAvatar);
+    card.setAttribute('aria-pressed',String(character.id===state.selectedAvatar));
+    const thumbnail=character.id===state.selectedAvatar ? avatarCanvases[character.id] : document.createElement('img');
+    if (thumbnail.tagName === 'IMG') {
+      thumbnail.src=`./assets/live-avatars/${character.id}/still.png`;
+      thumbnail.alt='';thumbnail.loading='lazy';
+    }
+    const label=document.createElement('span');label.textContent=character.name;
+    card.append(thumbnail,label);fragment.append(card);
+  }
+  grid.replaceChildren(fragment);
+  $$('#avatarGroupTabs .pill-btn').forEach(button=>{
+    const active=button.dataset.group===activeAvatarGroup;
+    button.classList.toggle('active',active);
+    button.setAttribute('aria-pressed',String(active));
+  });
+}
+renderAvatarCards();
+$('#avatarGroupTabs').addEventListener('click',e=>{
+  const button=e.target.closest('button[data-group]');
+  if(!button||button.dataset.group===activeAvatarGroup)return;
+  activeAvatarGroup=button.dataset.group;
+  state.selectedAvatar=AVATAR_MANIFEST.characters.find(character=>character.group===activeAvatarGroup).id;
+  renderAvatarCards();renderAvatarRig(state.selectedAvatar,performance.now()/1000);rebuildMatrix();
 });
 $('#avatarPresetGrid').addEventListener('click', e => {
-  const card = e.target.closest('.avatar-card');
+  const card = e.target.closest('button.avatar-card');
   if (!card) return;
-  $$('#avatarPresetGrid .avatar-card').forEach(c => c.classList.remove('active'));
-  card.classList.add('active');
   state.selectedAvatar = card.dataset.avatar;
-  $('#officialAvatarEdit').href='./studio/avatar-editor.html?slot='+state.selectedAvatar;
+  renderAvatarCards();
+  renderAvatarRig(state.selectedAvatar,performance.now()/1000);
   rebuildMatrix();
 });
 
@@ -6552,12 +7614,9 @@ $$('.swatch[data-c]').forEach(btn => {
 $('#resetCam').addEventListener('click', () => {
   pendingFrameDistance = null;
   const targetCamDist = framingDistance(formationRadius(state.activeFormation));
-  camera.position.set(targetCamDist * 0.55, targetCamDist * 0.42, targetCamDist * 0.88);
-  camera.fov = 30;
-  ui.fov.value = 30;
-  controls.target.set(0, 0, 0);
+  const targetPos = new THREE.Vector3(targetCamDist * 0.55, targetCamDist * 0.42, targetCamDist * 0.88);
+  transitionCameraTo(targetPos, 800);
   matrixGroup.rotation.set(0, 0, 0);
-  controls.update();
   syncSliderOutputs();
 });
 
@@ -6566,15 +7625,19 @@ $$('.preset-cam-btn').forEach(btn => {
     pendingFrameDistance = null;
     const type = btn.dataset.cam;
     const targetCamDist = framingDistance(formationRadius(state.activeFormation));
-    if (type === 'front') camera.position.set(0, 0, targetCamDist);
-    else if (type === 'top') camera.position.set(0, targetCamDist * 1.2, 0.01);
-    else if (type === 'iso') camera.position.set(targetCamDist * 0.65, targetCamDist * 0.55, targetCamDist * 0.75);
-    controls.target.set(0, 0, 0);
-    controls.update();
+    let targetPos;
+    if (type === 'front') targetPos = new THREE.Vector3(0, 0, targetCamDist);
+    else if (type === 'top') targetPos = new THREE.Vector3(0, targetCamDist * 1.2, 0.01);
+    else if (type === 'iso') targetPos = new THREE.Vector3(targetCamDist * 0.65, targetCamDist * 0.55, targetCamDist * 0.75);
+    if (targetPos) {
+      transitionCameraTo(targetPos, 780);
+    }
   });
 });
+controls.addEventListener('start', () => { cameraTransition = null; });
 
 ui.material.addEventListener('change', () => {
+  triggerMaterialGlowPulse(380);
   rebuildMatrix();
 });
 
@@ -6585,13 +7648,42 @@ $$('.inspector-tab-btn').forEach(btn => {
     $$('.inspector-tab-pane').forEach(p => p.classList.remove('active'));
     btn.classList.add('active');
     const targetTab = btn.dataset.tab;
-    $(`#${targetTab}`)?.classList.add('active');
+    const targetPane = $(`#${targetTab}`);
+    if (targetPane) {
+      targetPane.classList.add('active');
+      motionTabSwitch(targetPane);
+      triggerCameraFocusBreath(0.55, 420);
+    }
   });
 });
 
 // 检查器面板折叠展开切换
 $('#inspectorToggleBtn')?.addEventListener('click', () => {
+  haptic.click('mechanical');
   $('#inspectorPanel')?.classList.toggle('collapsed');
+  syncInspectorAccessibility();
+});
+function setWorkbenchOpen(open) {
+  document.body.classList.toggle('workbench-open', open);
+  $('#workbenchHandle').setAttribute('aria-expanded', String(open));
+  $('#workbenchDock').inert = !open;
+  $('#workbenchDock').setAttribute('aria-hidden', String(!open));
+  if (!open) {
+    $('#inspectorPanel').classList.add('collapsed');
+    syncInspectorAccessibility();
+  }
+}
+$('#workbenchHandle').addEventListener('click', () => {
+  setWorkbenchOpen(!document.body.classList.contains('workbench-open'));
+});
+$('#inspectorDockButton').addEventListener('click', () => {
+  $('#inspectorPanel').classList.toggle('collapsed');
+  syncInspectorAccessibility();
+});
+$('#inspectorCloseBtn').addEventListener('click', () => {
+  $('#inspectorPanel').classList.add('collapsed');
+  syncInspectorAccessibility();
+  (document.body.classList.contains('workbench-open') ? $('#inspectorDockButton') : $('#inspectorToggleBtn')).focus();
 });
 
 $('#materialSamples').addEventListener('click', event => {
@@ -6611,7 +7703,12 @@ $('#formationSelect').addEventListener('change', event => {
 syncMaterialControls();
 $('#inspectorToggleBtn').setAttribute('aria-controls', 'inspectorPanel');
 function syncInspectorAccessibility() {
-  $('#inspectorToggleBtn').setAttribute('aria-expanded', String(!$('#inspectorPanel').classList.contains('collapsed')));
+  const expanded = !$('#inspectorPanel').classList.contains('collapsed');
+  document.body.classList.toggle('inspector-open', expanded);
+  $('#inspectorToggleBtn').setAttribute('aria-expanded', String(expanded));
+  $('#inspectorDockButton').setAttribute('aria-expanded', String(expanded));
+  $('#inspectorPanel').setAttribute('aria-hidden', String(!expanded));
+  $('#inspectorPanel').inert = !expanded;
   $$('.inspector-tab-btn').forEach(button => {
     button.setAttribute('aria-pressed', String(button.classList.contains('active')));
     button.setAttribute('aria-controls', button.dataset.tab);
@@ -6671,14 +7768,24 @@ $$('.inspector-tab-btn').forEach(button => button.addEventListener('click', () =
 
 function setImmersive(enabled) {
   document.body.classList.toggle('immersive', enabled);
-  $('#immersiveToggle').textContent = enabled ? '返回工作台' : '沉浸';
   $('#immersiveToggle').setAttribute('aria-pressed', String(enabled));
+  const faceNorm = $('#immersiveToggle .face-normal');
+  const faceAct = $('#immersiveToggle .face-active');
+  if (enabled && faceNorm && faceAct) {
+    motionMorph(faceNorm, faceAct);
+  } else if (!enabled && faceNorm && faceAct) {
+    motionMorph(faceAct, faceNorm);
+  }
   window.dispatchEvent(new Event('resize'));
 }
 $('#immersiveToggle').addEventListener('click', () => setImmersive(!document.body.classList.contains('immersive')));
 document.addEventListener('keydown', event => {
   if (event.target.closest('input, textarea, select, [contenteditable="true"]')) return;
-  if (event.key === 'Escape') setImmersive(false);
+  if (event.key === 'Escape') {
+    setImmersive(false);
+    setWorkbenchOpen(false);
+  }
+  else if (event.key.toLowerCase() === 'w') { event.preventDefault(); setWorkbenchOpen(!document.body.classList.contains('workbench-open')); }
   else if (event.key.toLowerCase() === 'f') { event.preventDefault(); setImmersive(!document.body.classList.contains('immersive')); }
   else if (event.code === 'Space' && document.body.classList.contains('immersive')) { event.preventDefault(); $('#playPauseBtn').click(); }
 });
@@ -6695,6 +7802,7 @@ window.luDiagnostics = {
   get renderer(){ return renderer; },
   get composer(){ return composer; },
   get camera(){ return camera; },
+  get lyricTracks(){ return SONG_LYRICS_MAP; },
   get scene(){ return scene; },
   get matrixGroup(){ return matrixGroup; },
   get geometry(){ return activeGeometry(); },
@@ -6704,41 +7812,38 @@ window.luDiagnostics = {
 
 // 初始化启动
 rebuildMatrix();
-// 角色贴图是启动时同步建的空画布，内容要等 avatar-bridge 动态 import 完成后才画上去。
-// 默认模式就是"角色在场"，所以这里必须先点一次火，否则首屏是一张空白脸。
-// 其余角色错时预热：既填满面板缩略图，又避免 8 个角色同时抢首帧。
-if (state.contentMode === 'avatar') {
-  renderAvatarRig(state.selectedAvatar, performance.now() / 1000);
-  AVATAR_KEYS.forEach((key, index) => {
-    if (key === state.selectedAvatar) return;
-    setTimeout(() => renderAvatarRig(key, performance.now() / 1000), 400 + index * 150);
+
+// 为灵动歌词系统挂载 3D 渲染上下文与全材质引擎
+if (typeof kineticLyricsManager !== 'undefined' && kineticLyricsManager) {
+  kineticLyricsManager.setThreeContext({
+    THREE,
+    scene,
+    camera,
+    controls,
+    matrixGroup,
+    createMaterialPreset,
+    createTypographyTexture,
+    activeGeometry,
+    currentRoundedGeo,
+    studioFloor,
+    transitionCameraTo,
+    framingDistance,
+    liveTextureMap,
+    renderAvatarRig,
+    AVATAR_KEYS
   });
 }
-if (window.matchMedia('(max-width: 1200px)').matches) {
-  $('#inspectorPanel')?.classList.add('collapsed');
+// 默认角色贴图先绘制首帧，再由动画循环持续更新。
+if (state.contentMode === 'avatar') {
+  renderAvatarRig(state.selectedAvatar, performance.now() / 1000);
 }
+$('#inspectorPanel')?.classList.add('collapsed');
+setWorkbenchOpen(false);
 updateProgressUI(true);
 syncInspectorAccessibility();
-// Same-tab editor return restores the stage without transferring data to the official website.
-const editorReturn=new URLSearchParams(location.search);
-if(editorReturn.get('from')==='editor'&&AVATAR_KEYS.includes(editorReturn.get('avatar'))){
-  try{
-    const saved=JSON.parse(sessionStorage.getItem('lu-editor-stage-context')||'null');
-    if(saved){
-      for(const [key,value] of Object.entries(saved.controls||{})){if(!ui[key]||key==='text')continue;ui[key].value=value;ui[key].dispatchEvent(new Event(key==='material'?'change':'input',{bubbles:true}));}
-      state.lockMaterial=!!saved.lock;syncMaterialControls();
-      if(saved.preset){$('#presetBgSelect').value=saved.preset;$('#presetBgSelect').dispatchEvent(new Event('change'));}else setBackgroundColor(saved.background||'#727b88');
-      if(Array.isArray(saved.camera)&&saved.camera.length===3)camera.position.fromArray(saved.camera);
-      if(Array.isArray(saved.target)&&saved.target.length===3)controls.target.fromArray(saved.target);
-      document.querySelector(`[data-layer="${saved.layer}"]`)?.click();
-      document.querySelector(`[data-dist="${saved.dist}"]`)?.click();
-    }
-  }catch{ /* A broken optional stage snapshot must not prevent the saved avatar loading. */ }
-  $('[data-tab=tab-content]').click();$('[data-mode=avatar]').click();
-  document.querySelector(`[data-avatar="${editorReturn.get('avatar')}"]`).click();
-  $('#officialAvatarStatus').textContent='工作室角色已载入 · 材质设置已保留';
-}
+motionTabSwitch($('#tab-optics'));
 requestAnimationFrame(animate);
 </script>
+<div id="toast" class="toast" role="status"></div>
 </body>
 </html>

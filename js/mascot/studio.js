@@ -13,7 +13,9 @@ import { CameraDirector } from './camera-director.js';
 import { SecondaryMotion } from './secondary-motion.js';
 import { ThemeBus } from './theme-bus.js';
 import { MascotVFX } from './vfx.js';
+import { motionRise, motionLeave, motionMorph, motionToast, motionTextMorph, haptic } from '../ui/motion-adapter.js';
 
+let studioFlashPulse = 0;
 const $ = id => document.getElementById(id);
 
 export const ACTION_GLYPHS = {
@@ -167,13 +169,8 @@ let reducedMotion = storage.get('reducedMotion', false);
 let speechEnabled = storage.get('speech', true);
 let busy = false, disposed = false;
 const actionTimers = new Map();
-let toastTimer;
-
 function toast(text) {
-  $('toast').textContent = text;
-  $('toast').classList.add('visible');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => $('toast').classList.remove('visible'), 3400);
+  motionToast($('toast'), text, 3200);
 }
 
 // 3D Scene Initialization
@@ -631,6 +628,8 @@ function renderColorways(variantId) {
 }
 
 function applyColorway(colorwayId) {
+  studioFlashPulse = 1.0;
+  haptic.click('soft');
   storage.set(`colorway_${currentMaterialId}`, colorwayId);
   Object.values(mascots).forEach(m => m.setColorway(colorwayId));
   syncTheme();
@@ -649,6 +648,7 @@ function applyColorway(colorwayId) {
 }
 
 function action(name) {
+  haptic.click('mechanical');
   if (name === 'lock_fruit') {
     setHoodieState('closed');
     return;
@@ -778,10 +778,10 @@ function setHoodieState(state) {
 
   if (state === 'closed') {
     toast('荔小卫锁进果实里啦，安静小憩中～');
-    $('mood-label').textContent = '锁进果壳小憩';
+    motionTextMorph($('mood-label'), '锁进果壳小憩');
   } else {
     toast('荔小卫探出头来啦，好心情绽放！');
-    $('mood-label').textContent = '安静陪伴';
+    motionTextMorph($('mood-label'), '安静陪伴');
   }
 }
 
@@ -800,8 +800,13 @@ function switchCompanion(role, initial = false) {
     b.setAttribute('aria-pressed', String(active));
   });
 
-  // Stage info
-  $('role-name').textContent = companion.name;
+  // Stage info with morph
+  if (!initial) {
+    motionTextMorph($('role-name'), companion.name);
+    haptic.click('mechanical');
+  } else {
+    $('role-name').textContent = companion.name;
+  }
   $('role-eyebrow').textContent = companion.eyebrow;
   $('role-description').textContent = companion.description;
   $('chat-state').textContent = `${companion.name}在这里`;
@@ -1013,10 +1018,15 @@ function appendMessage(text, type = 'mascot', author = COMPANIONS[currentRole].n
   p.textContent = text;
   item.append(label, p);
   $('transcript-list').append(item);
-  item.scrollIntoView({ block: 'nearest' });
+  motionRise(item);
+  item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
 
-$('clear-chat').addEventListener('click', () => {
+$('clear-chat').addEventListener('click', async () => {
+  const children = Array.from($('transcript-list').children);
+  if (children.length > 0) {
+    await motionLeave(children);
+  }
   $('transcript-list').replaceChildren();
   toast('对话手记已清空');
 });
@@ -1280,14 +1290,15 @@ function animate(now) {
   // 广播主题呼吸心跳
   theme.pulse(dt, playing ? ((r.beatPulse || 0) * 0.6 + (r.bass || 0) * 0.4) : 0);
 
-  scene.environmentIntensity = cmfLight.env * (1 + accent * 0.10);
-  key.intensity = BASE_KEY_INTENSITY * cmfLight.key * (1 + accent * 0.35);
-  fill.intensity = BASE_FILL_INTENSITY * cmfLight.fill * (1 + (r.mid || 0) * 0.15 * (playing ? 1 : 0));
-  rim.intensity = BASE_RIM_INTENSITY * cmfLight.rim * (1 + (r.treble || 0) * 0.20 * (playing ? 1 : 0));
+  scene.environmentIntensity = cmfLight.env * (1 + accent * 0.10 + studioFlashPulse * 0.25);
+  key.intensity = BASE_KEY_INTENSITY * cmfLight.key * (1 + accent * 0.35 + studioFlashPulse * 0.45);
+  fill.intensity = BASE_FILL_INTENSITY * cmfLight.fill * (1 + (r.mid || 0) * 0.15 * (playing ? 1 : 0) + studioFlashPulse * 0.20);
+  rim.intensity = BASE_RIM_INTENSITY * cmfLight.rim * (1 + (r.treble || 0) * 0.20 * (playing ? 1 : 0) + studioFlashPulse * 0.20);
 
-  bloom.strength = THREE.MathUtils.lerp(bloom.strength, cmfCfg.bloom.strength + accent * 0.05, 0.15);
+  bloom.strength = THREE.MathUtils.lerp(bloom.strength, cmfCfg.bloom.strength + accent * 0.05 + studioFlashPulse * 0.15, 0.15);
   bloom.radius = THREE.MathUtils.lerp(bloom.radius, cmfCfg.bloom.radius, 0.15);
   bloom.threshold = THREE.MathUtils.lerp(bloom.threshold, cmfCfg.bloom.threshold, 0.15);
+  studioFlashPulse = Math.max(0, studioFlashPulse - dt * 3.2);
 
   controls.update();
 

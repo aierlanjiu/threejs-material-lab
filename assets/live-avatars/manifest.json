@@ -1,0 +1,570 @@
+{
+  "size": 512,
+  "groups": [
+    {
+      "id": "one-piece",
+      "name": "海贼王"
+    },
+    {
+      "id": "dragon-ball",
+      "name": "龙珠"
+    },
+    {
+      "id": "naruto",
+      "name": "火影忍者"
+    }
+  ],
+  "characters": [
+    {
+      "id": "one-piece/luffy",
+      "group": "one-piece",
+      "name": "路飞",
+      "eyes": {
+        "left": {
+          "x": 85,
+          "y": 268,
+          "w": 45,
+          "h": 73
+        },
+        "right": {
+          "x": 224,
+          "y": 313,
+          "w": 46,
+          "h": 72
+        }
+      }
+    },
+    {
+      "id": "one-piece/zoro",
+      "group": "one-piece",
+      "name": "索隆",
+      "eyes": {
+        "left": {
+          "x": 74,
+          "y": 268,
+          "w": 51,
+          "h": 79
+        },
+        "right": {
+          "x": 232,
+          "y": 329,
+          "w": 51,
+          "h": 78
+        }
+      }
+    },
+    {
+      "id": "one-piece/nami",
+      "group": "one-piece",
+      "name": "娜美",
+      "eyes": {
+        "left": {
+          "x": 120,
+          "y": 260,
+          "w": 45,
+          "h": 74
+        },
+        "right": {
+          "x": 274,
+          "y": 315,
+          "w": 44,
+          "h": 72
+        }
+      }
+    },
+    {
+      "id": "one-piece/sanji",
+      "group": "one-piece",
+      "name": "山治",
+      "eyes": {
+        "left": {
+          "x": 71,
+          "y": 290,
+          "w": 43,
+          "h": 76
+        },
+        "right": {
+          "x": 249,
+          "y": 326,
+          "w": 43,
+          "h": 75
+        }
+      }
+    },
+    {
+      "id": "one-piece/chopper",
+      "group": "one-piece",
+      "name": "乔巴",
+      "eyes": {
+        "left": {
+          "x": 81,
+          "y": 327,
+          "w": 43,
+          "h": 65
+        },
+        "right": {
+          "x": 239,
+          "y": 371,
+          "w": 43,
+          "h": 65
+        }
+      }
+    },
+    {
+      "id": "one-piece/robin",
+      "group": "one-piece",
+      "name": "罗宾",
+      "eyes": {
+        "left": {
+          "x": 98,
+          "y": 296,
+          "w": 44,
+          "h": 75
+        },
+        "right": {
+          "x": 244,
+          "y": 342,
+          "w": 45,
+          "h": 73
+        }
+      }
+    },
+    {
+      "id": "one-piece/usopp",
+      "group": "one-piece",
+      "name": "乌索普",
+      "eyes": {
+        "left": {
+          "x": 98,
+          "y": 265,
+          "w": 60,
+          "h": 88
+        },
+        "right": {
+          "x": 235,
+          "y": 321,
+          "w": 59,
+          "h": 88
+        }
+      }
+    },
+    {
+      "id": "one-piece/ace",
+      "group": "one-piece",
+      "name": "艾斯",
+      "eyes": {
+        "left": {
+          "x": 103,
+          "y": 292,
+          "w": 50,
+          "h": 71
+        },
+        "right": {
+          "x": 234,
+          "y": 343,
+          "w": 48,
+          "h": 69
+        }
+      }
+    },
+    {
+      "id": "one-piece/law",
+      "group": "one-piece",
+      "name": "罗",
+      "eyes": {
+        "left": {
+          "x": 80,
+          "y": 292,
+          "w": 51,
+          "h": 73
+        },
+        "right": {
+          "x": 204,
+          "y": 347,
+          "w": 52,
+          "h": 73
+        }
+      }
+    },
+    {
+      "id": "one-piece/shanks",
+      "group": "one-piece",
+      "name": "香克斯",
+      "eyes": {
+        "left": {
+          "x": 109,
+          "y": 262,
+          "w": 42,
+          "h": 72
+        },
+        "right": {
+          "x": 245,
+          "y": 302,
+          "w": 41,
+          "h": 72
+        }
+      }
+    },
+    {
+      "id": "dragon-ball/goku",
+      "group": "dragon-ball",
+      "name": "悟空",
+      "eyes": {
+        "left": {
+          "x": 87,
+          "y": 293,
+          "w": 64,
+          "h": 91
+        },
+        "right": {
+          "x": 215,
+          "y": 358,
+          "w": 61,
+          "h": 85
+        }
+      }
+    },
+    {
+      "id": "dragon-ball/vegeta",
+      "group": "dragon-ball",
+      "name": "贝吉塔",
+      "eyes": {
+        "left": {
+          "x": 92,
+          "y": 308,
+          "w": 62,
+          "h": 84
+        },
+        "right": {
+          "x": 217,
+          "y": 370,
+          "w": 60,
+          "h": 81
+        }
+      }
+    },
+    {
+      "id": "dragon-ball/bulma",
+      "group": "dragon-ball",
+      "name": "布尔玛",
+      "eyes": {
+        "left": {
+          "x": 87,
+          "y": 313,
+          "w": 62,
+          "h": 84
+        },
+        "right": {
+          "x": 210,
+          "y": 368,
+          "w": 60,
+          "h": 81
+        }
+      }
+    },
+    {
+      "id": "dragon-ball/krillin",
+      "group": "dragon-ball",
+      "name": "克林",
+      "eyes": {
+        "left": {
+          "x": 116,
+          "y": 302,
+          "w": 71,
+          "h": 96
+        },
+        "right": {
+          "x": 249,
+          "y": 361,
+          "w": 67,
+          "h": 88
+        }
+      }
+    },
+    {
+      "id": "dragon-ball/piccolo",
+      "group": "dragon-ball",
+      "name": "比克",
+      "eyes": {
+        "left": {
+          "x": 100,
+          "y": 274,
+          "w": 66,
+          "h": 89
+        },
+        "right": {
+          "x": 228,
+          "y": 336,
+          "w": 67,
+          "h": 89
+        }
+      }
+    },
+    {
+      "id": "dragon-ball/frieza",
+      "group": "dragon-ball",
+      "name": "弗利萨",
+      "eyes": {
+        "left": {
+          "x": 108,
+          "y": 289,
+          "w": 64,
+          "h": 91
+        },
+        "right": {
+          "x": 252,
+          "y": 356,
+          "w": 62,
+          "h": 85
+        }
+      }
+    },
+    {
+      "id": "dragon-ball/cell",
+      "group": "dragon-ball",
+      "name": "沙鲁",
+      "eyes": {
+        "left": {
+          "x": 88,
+          "y": 303,
+          "w": 63,
+          "h": 85
+        },
+        "right": {
+          "x": 220,
+          "y": 372,
+          "w": 58,
+          "h": 78
+        }
+      }
+    },
+    {
+      "id": "dragon-ball/gohan",
+      "group": "dragon-ball",
+      "name": "悟饭",
+      "eyes": {
+        "left": {
+          "x": 115,
+          "y": 284,
+          "w": 73,
+          "h": 95
+        },
+        "right": {
+          "x": 254,
+          "y": 353,
+          "w": 70,
+          "h": 91
+        }
+      }
+    },
+    {
+      "id": "dragon-ball/buu",
+      "group": "dragon-ball",
+      "name": "布欧",
+      "eyes": {
+        "left": {
+          "x": 91,
+          "y": 292,
+          "w": 65,
+          "h": 92
+        },
+        "right": {
+          "x": 218,
+          "y": 358,
+          "w": 62,
+          "h": 85
+        }
+      }
+    },
+    {
+      "id": "dragon-ball/trunks",
+      "group": "dragon-ball",
+      "name": "特兰克斯",
+      "eyes": {
+        "left": {
+          "x": 89,
+          "y": 294,
+          "w": 66,
+          "h": 89
+        },
+        "right": {
+          "x": 221,
+          "y": 360,
+          "w": 62,
+          "h": 83
+        }
+      }
+    },
+    {
+      "id": "naruto/naruto",
+      "group": "naruto",
+      "name": "鸣人",
+      "eyes": {
+        "left": {
+          "x": 146,
+          "y": 238,
+          "w": 61,
+          "h": 85
+        },
+        "right": {
+          "x": 294,
+          "y": 316,
+          "w": 61,
+          "h": 82
+        }
+      }
+    },
+    {
+      "id": "naruto/sasuke",
+      "group": "naruto",
+      "name": "佐助",
+      "eyes": {
+        "left": {
+          "x": 190,
+          "y": 263,
+          "w": 59,
+          "h": 83
+        },
+        "right": {
+          "x": 326,
+          "y": 332,
+          "w": 59,
+          "h": 80
+        }
+      }
+    },
+    {
+      "id": "naruto/sakura",
+      "group": "naruto",
+      "name": "小樱",
+      "eyes": {
+        "left": {
+          "x": 162,
+          "y": 237,
+          "w": 64,
+          "h": 88
+        },
+        "right": {
+          "x": 309,
+          "y": 311,
+          "w": 65,
+          "h": 86
+        }
+      }
+    },
+    {
+      "id": "naruto/itachi",
+      "group": "naruto",
+      "name": "鼬",
+      "eyes": {
+        "left": {
+          "x": 178,
+          "y": 241,
+          "w": 59,
+          "h": 79
+        },
+        "right": {
+          "x": 312,
+          "y": 305,
+          "w": 59,
+          "h": 80
+        }
+      }
+    },
+    {
+      "id": "naruto/gaara",
+      "group": "naruto",
+      "name": "我爱罗",
+      "eyes": {
+        "left": {
+          "x": 145,
+          "y": 242,
+          "w": 61,
+          "h": 82
+        },
+        "right": {
+          "x": 293,
+          "y": 313,
+          "w": 63,
+          "h": 82
+        }
+      }
+    },
+    {
+      "id": "naruto/ninja-06",
+      "group": "naruto",
+      "name": "金发忍者",
+      "eyes": {
+        "left": {
+          "x": 146,
+          "y": 241,
+          "w": 62,
+          "h": 84
+        },
+        "right": {
+          "x": 292,
+          "y": 319,
+          "w": 62,
+          "h": 80
+        }
+      }
+    },
+    {
+      "id": "naruto/madara",
+      "group": "naruto",
+      "name": "斑",
+      "eyes": {
+        "left": {
+          "x": 163,
+          "y": 272,
+          "w": 53,
+          "h": 75
+        },
+        "right": {
+          "x": 289,
+          "y": 322,
+          "w": 55,
+          "h": 76
+        }
+      }
+    },
+    {
+      "id": "naruto/jiraiya",
+      "group": "naruto",
+      "name": "自来也",
+      "eyes": {
+        "left": {
+          "x": 158,
+          "y": 238,
+          "w": 59,
+          "h": 82
+        },
+        "right": {
+          "x": 294,
+          "y": 305,
+          "w": 60,
+          "h": 80
+        }
+      }
+    },
+    {
+      "id": "naruto/pain",
+      "group": "naruto",
+      "name": "佩恩",
+      "eyes": {
+        "left": {
+          "x": 153,
+          "y": 246,
+          "w": 64,
+          "h": 83
+        },
+        "right": {
+          "x": 295,
+          "y": 315,
+          "w": 61,
+          "h": 82
+        }
+      }
+    }
+  ]
+}
