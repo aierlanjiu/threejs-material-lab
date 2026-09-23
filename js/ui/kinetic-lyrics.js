@@ -665,6 +665,7 @@ export class Three3DGravityLyricsEngine {
     const bottomCount = layerDefs.reduce((sum, def) => sum + def.count, 0);
     this.bottomLayersCount = layerDefs.length;
     this.isMobileStack = isMobile;
+    this.dockY = isMobile ? 1.75 : 0.85;
     const bottomScale = 0.55;
 
     // 随机打乱全部 12 款材质与 20 款多样色调，以及 29 款日漫角色表情 (Fisher-Yates 洗牌算法)
@@ -727,7 +728,7 @@ export class Three3DGravityLyricsEngine {
         const x = -layerDef.spanX + colRatio * (layerDef.spanX * 2) + (Math.random() - 0.5) * 0.18;
         const z = -layerDef.spanZ + (Math.random() * 2 - 1) * layerDef.spanZ;
         const yFloor = this.getSafeFloorY(z, isMobile);
-        const moundThick = this.getMoundProfile(x, z) * (isMobile ? 3.9 : 1.0);
+        const moundThick = this.getMoundProfile(x, z) * (isMobile ? 3.0 : 1.0);
         const layerRatio = layerIdx / (layerDefs.length - 1);
         const yRest = yFloor + layerRatio * (moundThick - bottomScale * 0.5) + (Math.random() - 0.5) * 0.08;
 
@@ -942,11 +943,16 @@ export class Three3DGravityLyricsEngine {
       });
     }
 
+    // 换句时自适应视口更新移动端状态与悬浮基准高度
+    const isMobileNow = (typeof window !== 'undefined' && (window.innerWidth <= 768 || (this.camera && this.camera.aspect < 1.42)));
+    this.isMobileStack = isMobileNow;
+    this.dockY = isMobileNow ? 1.75 : 0.85;
+
     // 换句时触发山峰随机横向偏移与微幅重塑（约 0.6 秒落稳）
     this.peakCenterX = (Math.random() - 0.5) * 2.2;
     this.bottomCubes.forEach(cube => {
       const u = cube.userData;
-      const moundThick = this.getMoundProfile(u.baseColX, u.restZ, this.peakCenterX) * (this.isMobileStack ? 3.9 : 1.0);
+      const moundThick = this.getMoundProfile(u.baseColX, u.restZ, this.peakCenterX) * (this.isMobileStack ? 3.0 : 1.0);
       const totalLayers = Math.max(1, (this.bottomLayersCount || 6) - 1);
       const yRest = u.floorY + (u.layerIdx / totalLayers) * (moundThick - 0.55 * 0.5) + (Math.random() - 0.5) * 0.04;
       u.restY = yRest;
@@ -1175,11 +1181,12 @@ export class Three3DGravityLyricsEngine {
         slot.rotation.y += u.dropRotSpeedY * safeDt;
         slot.rotation.z += u.dropRotSpeedZ * safeDt;
 
-        // 空中飞行阶段（y > -0.1）保持完整尺寸 scale = 1.0，保留清晰可见的下降全过程！
-        if (slot.position.y > -0.1) {
+        // 空中飞行阶段保持完整尺寸 scale = 1.0，保留清晰可见的下降全过程！
+        const meltAltitude = this.isMobileStack ? 0.35 : -0.1;
+        if (slot.position.y > meltAltitude) {
           u.currentScale = u.dropScale || 1.0;
         } else {
-          // 接近并进入底部山体深度（y <= -0.1）时，缩小融入山体
+          // 接近并进入底部山体深度时，缩小融入山体
           u.currentScale = Math.max(0.0, u.currentScale - 3.8 * safeDt);
         }
         slot.scale.setScalar(u.currentScale);

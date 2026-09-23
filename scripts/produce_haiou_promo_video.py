@@ -166,28 +166,27 @@ def main():
                     }
                 };
 
-                // Continuous ticker for rich physical dynamics
+                // Continuous rhythm driver for bass energy & singing progress
                 window.__tickerActive = true;
-                window.__currentLyric = { active: '但愿那海风再起', prev: '也明白有些遗憾会永远留在心里', next: '海鸥落在那礁石' };
                 let tickCount = 0;
-                function runPromoTick() {
+                function runBassTick() {
                     if (!window.__tickerActive) return;
                     tickCount++;
-                    const beat = tickCount % 30 < 4;
-                    const bassEnergy = beat ? 0.95 : 0.45;
-                    window.kineticLyricsManager.update({
-                        activeText: window.__currentLyric.active,
-                        prevText: window.__currentLyric.prev,
-                        nextText: window.__currentLyric.next,
-                        beatPeriod: 0.5,
-                        progressInLine: 0.5 + Math.sin(tickCount * 0.05) * 0.4,
-                        bassEnergy: bassEnergy,
-                        isKick: beat,
-                        dt: 0.016
-                    });
-                    requestAnimationFrame(runPromoTick);
+                    const beat = (tickCount % 28 < 4);
+                    const bass = beat ? 0.95 : (0.35 + Math.sin(tickCount * 0.08) * 0.15);
+                    if (window.state) {
+                        window.state.bassEnergy = bass;
+                        window.state.beatPulse = beat ? 0.85 : 0.0;
+                    }
+                    if (window.__overrideLyricContext) {
+                        const cur = window.__overrideLyricContext;
+                        cur.progressInLine = Math.min(1.0, (cur.progressInLine || 0.15) + 0.0035);
+                        const totalChars = (cur.activeText || '').length;
+                        cur.characterCursor = Math.max(1, Math.min(totalChars, Math.floor(cur.progressInLine * (totalChars + 1))));
+                    }
+                    requestAnimationFrame(runBassTick);
                 }
-                requestAnimationFrame(runPromoTick);
+                requestAnimationFrame(runBassTick);
             }
         """)
 
@@ -196,9 +195,14 @@ def main():
                 ({ wallpaper, title, desc, active_lyric, prev_lyric, next_lyric, dot_color }) => {
                     window.setWallpaper(wallpaper);
                     window.updatePromoBanner(title, desc, dot_color);
-                    window.__currentLyric = { active: active_lyric, prev: prev_lyric, next: next_lyric };
-                    // Trigger dynamic phrase transition
-                    window.kineticLyricsManager.gravityEngine.handlePhraseTransition(active_lyric, 0.5);
+                    window.__overrideLyricContext = {
+                        activeText: active_lyric,
+                        prevText: prev_lyric,
+                        nextText: next_lyric,
+                        progressInLine: 0.15,
+                        lineKey: active_lyric,
+                        characterCursor: 1
+                    };
                 }
             """, {
                 'wallpaper': wallpaper,

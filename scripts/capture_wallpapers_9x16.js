@@ -63,29 +63,33 @@ async function run() {
         window.setWallpaper(file);
         window.kineticLyricsManager.setMode('gravity');
         const sel = document.getElementById('playlistSelect');
-        if (sel) {
-          sel.value = 'track_5';
-          sel.dispatchEvent(new Event('change'));
-        }
+        if (sel) sel.value = 'track_5';
         const nowPlaying = document.getElementById('nowPlayingText');
         if (nowPlaying) nowPlaying.textContent = '当前：《海鸥》- 逃跑计划';
 
-        // Simulate 40 ticks for settled position
-        for (let i = 0; i < 40; i++) {
-          window.kineticLyricsManager.update({
-            activeText: lyric,
-            prevText: prev,
-            nextText: next,
-            beatPeriod: 0.5,
-            progressInLine: 0.7,
-            bassEnergy: 0.75,
-            isKick: false,
-            dt: 0.016
-          });
-        }
+        window.__overrideLyricContext = {
+          activeText: lyric,
+          prevText: prev,
+          nextText: next,
+          progressInLine: 0.65,
+          lineKey: `wall_${lyric}`,
+          characterCursor: Math.max(1, Math.floor(lyric.length * 0.7))
+        };
       }, item);
 
-      await page.waitForTimeout(500);
+      // Active loop to pump RAF frames until all active lyric slots complete magnetic lifting
+      for (let i = 0; i < 35; i++) {
+        await page.waitForTimeout(100);
+        const settled = await page.evaluate(() => {
+          const eng = window.kineticLyricsManager?.gravityEngine;
+          if (!eng || eng.activeBankIndex < 0) return false;
+          const bank = eng.banks[eng.activeBankIndex];
+          const activeSlots = bank.filter(s => s.userData.targetScale > 0.5);
+          return activeSlots.length > 0 && activeSlots.every(s => !s.userData.isMagneticLifting);
+        });
+        if (settled) break;
+      }
+      await page.waitForTimeout(300);
       const outPath = path.join('test', item.screenshot);
       await page.screenshot({ path: outPath });
       console.log(`Saved: ${outPath}`);
