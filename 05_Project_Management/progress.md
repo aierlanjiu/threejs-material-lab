@@ -5,10 +5,11 @@
 - 『律』主入口为 `index.html`：3D 物理材质与声波工作台、歌词同步、29 位角色实时表情；页面继续提供桌面与移动端操作。
 - 『荔』主入口为 `mascot_studio.html`，快捷入口为 `li.html`；『弈律』主入口为 `xiangqi.html`，三者共用当前仓库。
 - 角色来源为用户提供的透明头像。运行资产在 `assets/live-avatars/`，实时渲染模块在 `js/avatar/live.js`，29 张独立 GIF 在本地 `output/live-avatar-gifs/`。
-- 当前工作树包含本次交付和此前未提交的其他工作；不要用整体重置覆盖用户改动。
+- 主视窗与录制修复、剩余的文档／依赖更新和旧 OneWorks 资源清退已同步至 `master` 与 `gh-pages`，Pages 线上入口已更新。
 
 ## Active Assets
 
+- [律的远端同步与 Pages 发布报告](Reports/2026-10-01-lu-remote-pages-release.md)
 - [律的主视窗与视频录制修复报告](Reports/2026-10-01-lu-main-ui-recording.md)
 - [律的界面、歌词、镜头与表情修复报告](Reports/2026-09-23-lu-ui-lyrics-camera-expression.md)
 - [律的运镜与实时表情修复报告](Reports/2026-09-23-lu-camera-avatar-motion.md)
@@ -19,6 +20,7 @@
 
 ## Recent Results
 
+- Action: 将律的主视窗与录制修复、4 个文档／依赖更新、441 个旧 OneWorks 文件删除同步至远端与 Pages。Validation: 测试与语法检查通过，Pages 构建成功，线上主页面与录制模块 HTTP 200 且新控件存在。Report: `Reports/2026-10-01-lu-remote-pages-release.md`。Agent: codex · 2026-10-01。
 - Action: 修复律的默认歌词显示、竖横屏画幅、录制歌词合成与编辑控件显隐，并按实际容器命名导出文件。Validation: 196 句歌词时钟、桌面/手机布局、双画幅 MP4 视频及有声视频流实测通过；帧率依浏览器。Report: `Reports/2026-10-01-lu-main-ui-recording.md`。Agent: codex · 2026-10-01。
 - Action: 修复律的界面遮挡、歌词模式镜头抖动、逐字进度、实时表情及底部魔方稳态动作；工作台改为可唤出的抽屉并统一苍耳今楷。Validation: 九条曲目 196 句、桌面/手机布局、头像动效、双歌词引擎与几何快速回归通过；逐字时间为行内估计。Report: `Reports/2026-09-23-lu-ui-lyrics-camera-expression.md`。Agent: codex · 2026-09-23。
 - Action: 平滑律的自动运镜并接通振幅/运动档位控制，修复角色眼神跟随、呼吸可见度与选中卡片实时预览。Validation: 头像与镜头回归、歌词双引擎、象棋测试及移动触控检查通过。Report: `Reports/2026-09-23-lu-camera-avatar-motion.md`。Agent: codex · 2026-09-23。
