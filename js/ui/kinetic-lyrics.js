@@ -133,9 +133,9 @@ export class SlotTextLyricsEngine {
 
       this.slots.push({ el: slot, inner, char, revealed: isSpace });
       if (!isReducedMotion() && !isSpace) {
-        inner.style.transform = 'rotateX(-90deg) scale(0.92)';
-        inner.style.opacity = '0';
-        inner.style.filter = 'blur(4px)';
+        inner.style.transform = 'rotateX(-6deg) scale(0.98)';
+        inner.style.opacity = '0.84';
+        inner.style.filter = 'none';
       }
     });
 
@@ -156,18 +156,20 @@ export class SlotTextLyricsEngine {
       const isCurrent = logicalIndex === activeCount;
       slot.el.classList.toggle('char-sung', isPast);
       slot.el.classList.toggle('char-active', isCurrent);
-      if (isPast && !slot.revealed) {
+      if ((isPast || isCurrent) && !slot.revealed) {
         slot.revealed = true;
         slot.inner.style.transition = 'transform 360ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 240ms ease-out, filter 300ms ease-out';
         slot.inner.style.transform = 'rotateX(0deg) scale(1)';
         slot.inner.style.opacity = '1';
         slot.inner.style.filter = 'blur(0px)';
-        if (oneNewCharacter && !isReducedMotion()) haptic.click(logicalIndex % 4 === 0 ? 'mechanical' : 'soft');
-      } else if (!isPast && slot.revealed && logicalIndex >= 0 && !isReducedMotion()) {
+      } else if (!isPast && !isCurrent && slot.revealed && logicalIndex >= 0 && !isReducedMotion()) {
         slot.revealed = false;
-        slot.inner.style.transition = 'none';
-        slot.inner.style.transform = 'rotateX(-90deg) scale(0.92)';
-        slot.inner.style.opacity = '0';
+        slot.inner.style.transition = 'transform 240ms ease-out, opacity 240ms ease-out';
+        slot.inner.style.transform = 'rotateX(-6deg) scale(0.98)';
+        slot.inner.style.opacity = '0.84';
+      }
+      if (isPast && logicalIndex === activeCount - 1 && oneNewCharacter && !isReducedMotion()) {
+        haptic.click(logicalIndex % 4 === 0 ? 'mechanical' : 'soft');
       }
     });
     this.previousCursor = activeCount;
@@ -249,6 +251,7 @@ export class Three3DGravityLyricsEngine {
     this.dockY = 0.85; // 歌词区域中心高度基准
 
     this.initCubes();
+    this.lastFramingAspect = this.camera?.aspect || 1.6;
     this.onEnterMode();
   }
 
@@ -262,7 +265,7 @@ export class Three3DGravityLyricsEngine {
     // 2. 摄像机与控制器锁定纯正正面平视机位 (Front View，自适应宽窄视口)
     const aspect = this.camera ? (this.camera.aspect || 1.6) : 1.6;
     const tanHalfFov = 0.26794919243;
-    const targetHalfWidth = 4.35;
+    const targetHalfWidth = aspect < 1.42 ? 5.6 : 4.35;
     const distForWidth = targetHalfWidth / (tanHalfFov * aspect);
     const isNarrow = aspect < 1.42;
     const targetZ = isNarrow ? Math.max(11.5, distForWidth) : 11.5;
@@ -282,6 +285,7 @@ export class Three3DGravityLyricsEngine {
     if (this.transitionCameraTo) {
       this.transitionCameraTo(new this.THREE.Vector3(0, targetY, targetZ), 300);
     }
+    this.onAspectChange();
   }
 
   onLeaveMode() {
@@ -308,7 +312,7 @@ export class Three3DGravityLyricsEngine {
     const tan15 = 0.26794919243;
     if (isMobile) {
       const aspect = this.camera ? (this.camera.aspect || 0.56) : 0.56;
-      const targetHalfWidth = 4.35;
+      const targetHalfWidth = 5.6;
       const distForWidth = targetHalfWidth / (tan15 * aspect);
       const camZ = Math.max(11.5, distForWidth);
       const camY = -0.2 - 0.035 * (camZ - 11.5);
@@ -319,6 +323,33 @@ export class Three3DGravityLyricsEngine {
     const viewportBottomAtZ = -0.2 - (11.5 - z) * tan15;
     // 0.55 * 0.5 为方块半高，+0.24 确保屏幕投影底边至少距画布底边缘拥有 18px~25px 安全呼吸带，100% 杜绝底边裁切
     return viewportBottomAtZ + 0.55 * 0.5 + 0.24;
+  }
+
+  onAspectChange() {
+    const aspect = this.camera?.aspect || 1.6;
+    if (Math.abs(aspect - (this.lastFramingAspect || aspect)) < 0.02) return;
+    const isNarrow = aspect < 1.42;
+    const oldDockY = this.dockY;
+    this.isMobileStack = isNarrow;
+    this.dockY = isNarrow ? 1.75 : 0.85;
+    const layerCount = Math.max(1, (this.bottomLayersCount || 6) - 1);
+    this.bottomCubes.forEach(cube => {
+      const u = cube.userData;
+      const floorY = this.getSafeFloorY(u.restZ, isNarrow);
+      const mound = this.getMoundProfile(u.baseColX, u.restZ, this.peakCenterX) * (isNarrow ? 3.0 : 1.0);
+      u.floorY = floorY;
+      u.restY = floorY + (u.layerIdx / layerCount) * (mound - 0.55 * 0.5);
+      if (!u.isDropping) cube.position.y = u.restY;
+    });
+    const dockDelta = this.dockY - oldDockY;
+    this.lyricCubes.forEach(slot => {
+      const u = slot.userData;
+      if (u.targetScale > 0.5) {
+        u.targetY += dockDelta;
+        if (!u.isMagneticLifting && !u.isDropping) slot.position.y = u.targetY;
+      }
+    });
+    this.lastFramingAspect = aspect;
   }
 
   getMoundProfile(x, z, peakCenterX = 0) {
@@ -640,20 +671,17 @@ export class Three3DGravityLyricsEngine {
     }
 
     // =========================================================================
-    // 1. 底部方块堆：桌面 252 枚 / 移动端 334 枚 0.55 尺寸交错山形宝石堆 (占下半部 35~40%)
-    // 移动模式下增加层级与方块堆叠，画面更饱满生动
+    // 1. 底部方块堆：桌面 252 枚 / 窄画幅 198 枚。
+    // 窄画幅为歌词和角色保留清晰的视觉层级。
     // =========================================================================
-    const isMobile = (typeof window !== 'undefined' && (window.innerWidth <= 768 || (this.camera && this.camera.aspect < 1.42)));
+    const isMobile = (this.camera?.aspect || 1.6) < 1.42;
     const layerDefs = isMobile ? [
-      { count: 76, spanX: 5.8, spanZ: 2.5 },
-      { count: 70, spanX: 5.3, spanZ: 2.3 },
-      { count: 64, spanX: 4.8, spanZ: 2.1 },
-      { count: 56, spanX: 4.2, spanZ: 1.8 },
-      { count: 48, spanX: 3.6, spanZ: 1.6 },
-      { count: 42, spanX: 3.1, spanZ: 1.4 },
-      { count: 36, spanX: 2.6, spanZ: 1.2 },
-      { count: 30, spanX: 2.1, spanZ: 1.0 },
-      { count: 24, spanX: 1.6, spanZ: 0.8 }
+      { count: 48, spanX: 5.2, spanZ: 2.2 },
+      { count: 42, spanX: 4.6, spanZ: 2.0 },
+      { count: 36, spanX: 4.0, spanZ: 1.8 },
+      { count: 30, spanX: 3.4, spanZ: 1.5 },
+      { count: 24, spanX: 2.8, spanZ: 1.2 },
+      { count: 18, spanX: 2.2, spanZ: 0.9 }
     ] : [
       { count: 60, spanX: 5.6, spanZ: 2.0 },
       { count: 52, spanX: 4.8, spanZ: 1.8 },
@@ -944,7 +972,7 @@ export class Three3DGravityLyricsEngine {
     }
 
     // 换句时自适应视口更新移动端状态与悬浮基准高度
-    const isMobileNow = (typeof window !== 'undefined' && (window.innerWidth <= 768 || (this.camera && this.camera.aspect < 1.42)));
+    const isMobileNow = (this.camera?.aspect || 1.6) < 1.42;
     this.isMobileStack = isMobileNow;
     this.dockY = isMobileNow ? 1.75 : 0.85;
 
@@ -1288,7 +1316,9 @@ export class KineticLyricsManager {
     this.stage = stageContainerEl;
     this.threeCtx = threeContext;
 
-    this.mode = 'off';
+    // A fresh visitor sees the slot button selected in the markup. Keep the
+    // engine in that same state; an explicit saved "off" still wins below.
+    this.mode = 'slot';
     this.slotEngine = null;
     this.gravityEngine = null;
     this.mountEl = null;
@@ -1302,9 +1332,7 @@ export class KineticLyricsManager {
 
     this.initMount();
     this.initUIButtons();
-    if (this.mode !== 'off') {
-      this.setMode(this.mode, true);
-    }
+    this.setMode(this.mode, true);
   }
 
   initMount() {
@@ -1395,7 +1423,10 @@ export class KineticLyricsManager {
 
     // 更新 UI 按钮激活状态
     document.querySelectorAll('.kinetic-mode-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.mode === mode);
+      const selected = btn.dataset.mode === mode;
+      btn.classList.toggle('active', selected);
+      btn.setAttribute('role', 'radio');
+      btn.setAttribute('aria-checked', String(selected));
     });
 
     if (!silent) {

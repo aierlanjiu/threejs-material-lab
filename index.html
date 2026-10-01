@@ -1987,6 +1987,56 @@ body.immersive #workbenchHandle, body.immersive #inspectorDockButton { display: 
 @media (prefers-reduced-motion: reduce) {
   .bottom-dynamic-dock, .modular-inspector, #workbenchHandle, #inspectorDockButton { transition-duration: 1ms; }
 }
+/* The stage itself is the export framing guide. The grid cell keeps the
+   available space while the stage takes the chosen 16:9 or 9:16 shape. */
+.stage-cell { grid-row: 2; grid-column: 1; min-width: 0; min-height: 0; display: flex; align-items: center; justify-content: center; }
+.stage-cell > .stageWrap { grid-row: auto; grid-column: auto; flex: none; width: 100%; height: 100%; }
+@media (min-width: 761px) {
+  .stageWrap[data-aspect="landscape"] .stage-hud-left { top: 14px; bottom: auto; }
+}
+.stageWrap[data-aspect="portrait"] .stage-hud-left,
+.stageWrap[data-aspect="portrait"] .stage-hud-left.mode-gravity {
+  top: 62px; bottom: auto; left: 8px; right: 8px; max-width: none;
+}
+.stageWrap[data-aspect="portrait"] .stage-hud-left #status,
+.stageWrap[data-aspect="portrait"] .preset-cam-group,
+.stageWrap[data-aspect="portrait"] .legend { display: none !important; }
+.stageWrap[data-aspect="portrait"] .kinetic-mode-switcher { width: 100%; box-sizing: border-box; justify-content: space-between; }
+.stageWrap[data-aspect="portrait"] .kinetic-mode-btn { flex: 1; justify-content: center; white-space: nowrap; padding: 6px 4px; }
+.stageWrap[data-aspect="portrait"] .cube-slot { width: 26px; height: 34px; }
+.stageWrap[data-aspect="portrait"] .cube-slot-space { width: 10px; }
+.stageWrap[data-aspect="portrait"] .cube-face { font-size: 17px; }
+#immersiveToggle {
+  background: #1b2a43 !important; color: #fff !important; border: 1px solid #fff !important;
+  min-height: 44px; min-width: 52px; padding: 6px 10px; font-size: 12px; font-weight: 700;
+}
+#recordingPreviewCanvas { position: absolute; inset: 0; z-index: 13; display: none; pointer-events: none; }
+body.recording-preview #recordingPreviewCanvas { display: block; }
+body.recording-preview:not(.immersive) .stage-hud-left,
+body.recording-preview:not(.immersive) .stage-hud-right { display: none !important; }
+body.immersive .stage-cell { width: 100vw; height: 100dvh; }
+body.immersive .stage-hud-left, body.immersive .preset-cam-group { display: none !important; }
+body.immersive .stage-hud-right { top: 16px; right: 16px; }
+body.immersive #immersiveToggle {
+  background: #1b2a43 !important; color: #fff !important; border: 1px solid #fff !important;
+  min-height: 44px; min-width: 96px; opacity: 1; box-shadow: none !important;
+}
+.deck-info { flex: 0 0 220px; min-width: 220px; max-width: 260px; }
+.deck-title { min-width: 0; }
+.cube-lyrics-deck { box-sizing: border-box; max-width: calc(100% - 24px); background: rgba(252, 252, 253, 0.96); border-color: #b2bdce; backdrop-filter: none; -webkit-backdrop-filter: none; }
+.cube-slots-track { max-width: 100%; }
+.cube-line-past, .cube-line-next { color: #505e72; opacity: 1; filter: none; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 760px) {
+  .stage-cell { grid-row: 2; grid-column: 1; }
+  .deck-info { flex: auto; min-width: 0; max-width: none; }
+  .deck-controls button, .deck-controls #recordToggle, .deck-controls #playPauseBtn,
+  .deck-controls #prevTrackBtn, .deck-controls #nextTrackBtn, .deck-controls #stopTrackBtn {
+    width: 44px !important; min-width: 44px !important; max-width: 44px !important;
+    height: 44px !important; min-height: 44px !important;
+  }
+  .deck-controls { gap: 8px; }
+  body.immersive .stage-hud-right { top: 12px; right: 12px; }
+}
     </style>
 </head>
 <body>
@@ -2034,7 +2084,7 @@ body.immersive #workbenchHandle, body.immersive #inspectorDockButton { display: 
             暂停
           </span>
         </button>
-        <button class="btn morph-btn" id="recordToggle" style="min-width: 96px; font-weight: 700; position: relative;" title="开始 60FPS 母带录制">
+        <button class="btn morph-btn" id="recordToggle" style="min-width: 96px; font-weight: 700; position: relative;" title="录制所选画幅的视频">
           <span class="face face-idle" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;">
             <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4" fill="currentColor"></circle></svg> 录制
           </span>
@@ -2101,10 +2151,12 @@ body.immersive #workbenchHandle, body.immersive #inspectorDockButton { display: 
     </div>
   </header>
 
-  <!-- 3D 舞台视口区域 -->
+  <!-- 3D 舞台视口区域：外层提供可用空间，内层按母带画幅取景 -->
+  <div class="stage-cell" id="stageCell">
   <section class="stageWrap" id="stageWrap">
     <div id="stage"></div>
     <div id="kineticLyricsStage" class="kinetic-lyrics-stage"></div>
+    <canvas id="recordingPreviewCanvas" aria-hidden="true"></canvas>
 
     <div class="stage-hud-left" id="stageHudLeft">
       <div class="badge" id="status">
@@ -2127,10 +2179,7 @@ body.immersive #workbenchHandle, body.immersive #inspectorDockButton { display: 
     </div>
 
     <div class="stage-hud-right">
-      <button type="button" class="morph-btn" id="immersiveToggle" aria-pressed="false" title="沉浸模式 (F)，Esc 返回" style="position: relative; min-width: 60px;">
-        <span class="face face-normal" style="display:inline-block;">沉浸</span>
-        <span class="face face-active" style="display:inline-block;opacity:0;" aria-hidden="true" inert>返回工作台</span>
-      </button>
+      <button type="button" id="immersiveToggle" aria-pressed="false" title="沉浸模式 (F)，Esc 返回">沉浸</button>
       <div class="legend">
         <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
         通透水晶 / 6大声波形态 / 物理色散 / 影棚柔光
@@ -2148,6 +2197,7 @@ body.immersive #workbenchHandle, body.immersive #inspectorDockButton { display: 
       </div>
     </div>
   </section>
+  </div>
 
   <button type="button" id="workbenchHandle" aria-controls="workbenchDock" aria-expanded="false" aria-label="唤出调律工作台" title="显示工作台，也可按 W">调律</button>
   <button type="button" id="inspectorDockButton" aria-controls="inspectorPanel" aria-expanded="false">参数面板</button>
@@ -2737,16 +2787,21 @@ BEAT</textarea>
           <span><svg class="svg-icon" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line></svg> 视频母带直出配置</span>
         </div>
         <div class="card-block">
+          <label for="videoAspectSelect"><span>画幅与成片尺寸</span></label>
+          <select id="videoAspectSelect" style="width: 100%; margin-top: 4px; margin-bottom: 12px;">
+            <option value="landscape">横屏 16:9 · 1920×1080</option>
+            <option value="portrait">竖屏 9:16 · 1080×1920</option>
+          </select>
           <label><span>导出通用格式</span></label>
           <select id="videoFormatSelect" style="width: 100%; margin-top: 4px;">
-            <option value="mp4" selected>MP4 格式 (通用全兼容 H.264/AAC)</option>
-            <option value="webm">WebM 格式 (VP9 网页高清原生)</option>
+            <option value="mp4" selected>优先 MP4（浏览器支持时）</option>
+            <option value="webm">优先 WebM（浏览器支持时）</option>
           </select>
 
           <div style="font-size: 12px; color: var(--muted); line-height: 1.5; margin-top: 8px;">
-            ✦ 采样率: 60 FPS 母带级无损渲染<br>
-            ✦ 编码器: WebCodecs + MP4 Muxer (16Mbps)<br>
-            ✦ 音画同步: Web Audio API 毫秒级直连
+            ✦ 页面舞台按所选画幅预览；录制固定输出上述尺寸。<br>
+            ✦ MediaRecorder 以 60 FPS、16 Mbps 为目标，实际帧率与编码由浏览器决定。<br>
+            ✦ 浏览器不支持所选格式时自动使用可用格式，文件后缀与真实编码一致。
           </div>
         </div>
       </div>
@@ -2791,6 +2846,7 @@ import { UnrealBloomPass } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/exam
 import { OutputPass } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/postprocessing/OutputPass.js/+esm';
 import { motionRise, motionLeave, motionMorph, motionTabSwitch, motionToast, motionTextMorph, haptic } from './js/ui/motion-adapter.js';
 import { KineticLyricsManager } from './js/ui/kinetic-lyrics.js';
+import { VIDEO_PRESETS, drawPerformanceFrame } from './js/ui/recording-compositor.js';
 import { lyricCharacters, characterCues, characterCursorAt } from './js/ui/lyric-timing.js';
 import { AVATAR_MANIFEST } from './assets/live-avatars/manifest.js';
 
@@ -3096,6 +3152,7 @@ const state = {
   emoteEndTime: 0,
 
   // 录制与音频分析
+  videoAspect: window.innerWidth <= 760 ? 'portrait' : 'landscape',
   videoFormat: 'mp4', // mp4 | webm
   isRecording: false,
   mediaRecorder: null,
@@ -3157,6 +3214,7 @@ stage.appendChild(renderer.domElement);
 
 // 初始化双引擎灵动歌词系统 (Dual-Engine Kinetic Lyrics Display)
 const stageWrapEl = document.getElementById('stageWrap');
+const stageCellEl = document.getElementById('stageCell');
 const kineticLyricsManager = new KineticLyricsManager(stageWrapEl);
 window.kineticLyricsManager = kineticLyricsManager;
 
@@ -5046,23 +5104,12 @@ function stopMusic() {
 }
 
 function getOptimalMimeType(format) {
-  if (format === 'mp4') {
-    const mp4Mimes = [
-      'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
-      'video/mp4;codecs=avc1,mp4a.40.2',
-      'video/mp4;codecs=avc1',
-      'video/mp4;codecs=h264,aac',
-      'video/mp4;codecs=h264',
-      'video/mp4'
-    ];
-    for (const m of mp4Mimes) {
-      if (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported(m)) {
-        return { mimeType: m, ext: 'mp4', containerMime: 'video/mp4' };
-      }
-    }
-  }
-
-  // WebM 优质编码退化
+  const mp4Mimes = [
+    'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
+    'video/mp4;codecs=avc1,mp4a.40.2',
+    'video/mp4;codecs=avc1',
+    'video/mp4'
+  ];
   const webmMimes = [
     'video/webm;codecs=vp9,opus',
     'video/webm;codecs=vp9',
@@ -5070,82 +5117,159 @@ function getOptimalMimeType(format) {
     'video/webm;codecs=vp8',
     'video/webm'
   ];
-  for (const m of webmMimes) {
-    if (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported(m)) {
-      return { mimeType: m, ext: format === 'mp4' ? 'mp4' : 'webm', containerMime: format === 'mp4' ? 'video/mp4' : 'video/webm' };
+  const candidates = format === 'webm' ? [...webmMimes, ...mp4Mimes] : [...mp4Mimes, ...webmMimes];
+  for (const mimeType of candidates) {
+    if (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported(mimeType)) {
+      return { mimeType, ext: mimeType.startsWith('video/mp4') ? 'mp4' : 'webm' };
     }
   }
-
-  return { mimeType: '', ext: format === 'mp4' ? 'mp4' : 'webm', containerMime: format === 'mp4' ? 'video/mp4' : 'video/webm' };
+  return { mimeType: '', ext: '' };
 }
 
 let recordTimerInterval = null;
+let activeRecording = null;
+
+async function detectedVideoMime(chunks, recorderMime) {
+  const head = new Uint8Array(await new Blob(chunks).slice(0, 12).arrayBuffer());
+  const mp4 = head.length >= 8 && String.fromCharCode(...head.slice(4, 8)) === 'ftyp';
+  const webm = head.length >= 4 && head[0] === 0x1a && head[1] === 0x45 && head[2] === 0xdf && head[3] === 0xa3;
+  if (mp4) return 'video/mp4';
+  if (webm) return 'video/webm';
+  if (recorderMime?.startsWith('video/mp4')) return 'video/mp4';
+  if (recorderMime?.startsWith('video/webm')) return 'video/webm';
+  return '';
+}
 
 function toggleScreenRecording() {
   if (!state.isRecording) {
-    const canvas = stage.querySelector('canvas');
-    if (!canvas) return;
-    const stream = canvas.captureStream(60);
-
-    if (state.audioCtx) {
-      const dest = state.audioCtx.createMediaStreamDestination();
-      state.analyser.connect(dest);
-      const audioTracks = dest.stream.getAudioTracks();
-      if (audioTracks.length > 0) stream.addTrack(audioTracks[0]);
+    if (activeRecording) return;
+    const sceneCanvas = stage.querySelector('canvas');
+    const outputCanvas = $('#recordingPreviewCanvas');
+    const outputContext = outputCanvas?.getContext('2d', { alpha: false });
+    if (!sceneCanvas || !outputContext || typeof MediaRecorder === 'undefined') {
+      showToast('当前浏览器无法录制视频');
+      return;
     }
-
+    const preset = VIDEO_PRESETS[state.videoAspect] || VIDEO_PRESETS.landscape;
+    outputCanvas.width = preset.width;
+    outputCanvas.height = preset.height;
+    drawPerformanceFrame(outputContext, sceneCanvas, stageWrapEl, kineticLyricsManager.mode);
+    let stream;
+    try { stream = outputCanvas.captureStream(60); }
+    catch (error) { console.error('Video capture unavailable:', error); showToast('视频画布无法录制'); return; }
+    let audioDestination = null;
+    if (state.audioCtx && state.analyser) {
+      audioDestination = state.audioCtx.createMediaStreamDestination();
+      state.analyser.connect(audioDestination);
+      const audioTrack = audioDestination.stream.getAudioTracks()[0];
+      if (audioTrack) stream.addTrack(audioTrack);
+    }
     const format = state.videoFormat || 'mp4';
     const opt = getOptimalMimeType(format);
-
     state.recordedChunks = [];
     const options = {
-      videoBitsPerSecond: 16000000, // 16Mbps 超高清 60FPS 母带级码率
+      videoBitsPerSecond: 16000000,
       audioBitsPerSecond: 192000
     };
     if (opt.mimeType) options.mimeType = opt.mimeType;
-
+    let recorder;
     try {
-      state.mediaRecorder = new MediaRecorder(stream, options);
+      recorder = new MediaRecorder(stream, options);
     } catch (e) {
-      console.warn('Fallback to basic MediaRecorder:', e);
-      state.mediaRecorder = new MediaRecorder(stream);
+      console.warn('Preferred MediaRecorder options unavailable:', e);
+      try { recorder = new MediaRecorder(stream); }
+      catch (fallbackError) {
+        console.error('MediaRecorder unavailable:', fallbackError);
+        stream.getTracks().forEach(track => track.stop());
+        if (audioDestination) state.analyser.disconnect(audioDestination);
+        showToast('当前浏览器没有可用的视频编码器');
+        return;
+      }
     }
-
-    state.mediaRecorder.ondataavailable = e => {
+    state.mediaRecorder = recorder;
+    const session = { recorder, stream, audioDestination, frameId: 0 };
+    activeRecording = session;
+    const drawNextFrame = () => {
+      if (activeRecording !== session) return;
+      drawPerformanceFrame(outputContext, sceneCanvas, stageWrapEl, kineticLyricsManager.mode);
+      session.frameId = requestAnimationFrame(drawNextFrame);
+    };
+    session.frameId = requestAnimationFrame(drawNextFrame);
+    recorder.ondataavailable = e => {
       if (e.data && e.data.size > 0) state.recordedChunks.push(e.data);
     };
-
-    state.mediaRecorder.onstop = () => {
+    recorder.onstop = async () => {
       if (recordTimerInterval) clearInterval(recordTimerInterval);
-      const blob = new Blob(state.recordedChunks, { type: opt.containerMime });
-      const url = URL.createObjectURL(blob);
-      const now = new Date();
-      const timeStr = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}${String(now.getSeconds()).padStart(2,'0')}`;
-      const avatarName = (state.selectedAvatar || 'master').toUpperCase().replace(/[^A-Z0-9_-]/g, '_');
-      const fileName = `Crystal_Show_${avatarName}_${timeStr}.${opt.ext}`;
-
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = fileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-
-      setTimeout(() => URL.revokeObjectURL(url), 5000);
-      statusText.textContent = `已成功导出 [${opt.ext.toUpperCase()}] 格式超清视频！`;
+      cancelAnimationFrame(session.frameId);
+      document.body.classList.remove('recording-preview');
+      $('#videoAspectSelect').disabled = false;
+      $('#videoFormatSelect').disabled = false;
+      stream.getTracks().forEach(track => track.stop());
+      if (audioDestination) state.analyser.disconnect(audioDestination);
+      activeRecording = null;
+      state.isRecording = false;
+      state.mediaRecorder = null;
+      $('#recordToggle').classList.remove('recording');
+      $('#recordToggle').title = '开始录制';
+      statusDot.classList.remove('recording');
+      const chunks = state.recordedChunks;
+      state.recordedChunks = [];
+      try {
+        if (session.failed) throw session.failed;
+        if (!chunks.length) throw new Error('No video data was produced');
+        const mime = await detectedVideoMime(chunks, recorder.mimeType || opt.mimeType);
+        if (!mime) throw new Error('Unrecognized video container');
+        const ext = mime === 'video/mp4' ? 'mp4' : 'webm';
+        const blob = new Blob(chunks, { type: mime });
+        const url = URL.createObjectURL(blob);
+        const now = new Date();
+        const timeStr = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}${String(now.getSeconds()).padStart(2,'0')}`;
+        const avatarName = (state.selectedAvatar || 'master').toUpperCase().replace(/[^A-Z0-9_-]/g, '_');
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Crystal_Show_${avatarName}_${preset.label.replace(':', 'x')}_${timeStr}.${ext}`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 30000);
+        statusText.textContent = `已导出 ${preset.width}×${preset.height} ${ext.toUpperCase()} 视频`;
+        showToast(`已导出 ${ext.toUpperCase()} 视频`);
+      } catch (error) {
+        console.error('Recording export failed:', error);
+        const faceIdle = $('#recordToggle .face-idle');
+        const faceRec = $('#recordToggle .face-rec');
+        if (faceRec && faceIdle) motionMorph(faceRec, faceIdle);
+        statusText.textContent = '录制失败，请查看浏览器控制台';
+        showToast('录制失败，未生成有效视频');
+      }
     };
-
-    state.mediaRecorder.start(100); // 100ms 切片收集
+    recorder.onerror = event => {
+      console.error('MediaRecorder failed:', event.error || event);
+      session.failed = event.error || new Error('MediaRecorder failed');
+      if (recorder.state !== 'inactive') recorder.stop();
+    };
+    try { recorder.start(250); }
+    catch (error) {
+      console.error('MediaRecorder could not start:', error);
+      cancelAnimationFrame(session.frameId);
+      stream.getTracks().forEach(track => track.stop());
+      if (audioDestination) state.analyser.disconnect(audioDestination);
+      activeRecording = null;
+      showToast('视频录制启动失败');
+      return;
+    }
+    document.body.classList.add('recording-preview');
+    $('#videoAspectSelect').disabled = true;
+    $('#videoFormatSelect').disabled = true;
     state.isRecording = true;
     state.recordStartTime = Date.now();
-
     const faceIdle = $('#recordToggle .face-idle');
     const faceRec = $('#recordToggle .face-rec');
     if (faceIdle && faceRec) motionMorph(faceIdle, faceRec);
-    $('#recordToggle').title = `停止录制并保存 ${opt.ext.toUpperCase()}`;
+    $('#recordToggle').title = '停止录制并保存视频';
     $('#recordToggle').classList.add('recording');
     statusDot.classList.add('recording');
-
+    if (opt.ext && opt.ext !== format) showToast(`当前浏览器将以 ${opt.ext.toUpperCase()} 格式导出`);
     recordTimerInterval = setInterval(() => {
       if (!state.isRecording) {
         clearInterval(recordTimerInterval);
@@ -5154,14 +5278,14 @@ function toggleScreenRecording() {
       const durSec = Math.floor((Date.now() - state.recordStartTime) / 1000);
       const mm = String(Math.floor(durSec / 60)).padStart(2, '0');
       const ss = String(durSec % 60).padStart(2, '0');
-      statusText.textContent = `🔴 REC 60FPS [${opt.ext.toUpperCase()}] 正在录制 (${mm}:${ss})…`;
+      statusText.textContent = `● 正在录制 ${preset.width}×${preset.height} (${mm}:${ss})`;
       const timerEl = $('#recordToggle .rec-timer');
       if (timerEl) timerEl.textContent = `${mm}:${ss}`;
     }, 500);
 
   } else {
     if (recordTimerInterval) clearInterval(recordTimerInterval);
-    state.mediaRecorder.stop();
+    if (state.mediaRecorder?.state !== 'inactive') state.mediaRecorder.stop();
     state.isRecording = false;
     const faceIdle = $('#recordToggle .face-idle');
     const faceRec = $('#recordToggle .face-rec');
@@ -5174,11 +5298,10 @@ function toggleScreenRecording() {
         }
       }, 2200);
     }
-    $('#recordToggle').title = '开始 60FPS 录制';
+    $('#recordToggle').title = '开始录制';
     $('#recordToggle').classList.remove('recording');
     statusDot.classList.remove('recording');
-    showToast(`60FPS 母带录制完成，已开始导出下载`);
-    rebuildMatrix();
+    statusText.textContent = '正在封装录制视频…';
   }
 }
 
@@ -5274,6 +5397,19 @@ $('#cropConfirm').addEventListener('click', () => {
   rebuildMatrix();
 });
 
+function fitStagePreview() {
+  const preset = VIDEO_PRESETS[state.videoAspect] || VIDEO_PRESETS.landscape;
+  stageWrapEl.dataset.aspect = state.videoAspect;
+  const availableWidth = stageCellEl.clientWidth;
+  const availableHeight = stageCellEl.clientHeight;
+  if (!availableWidth || !availableHeight) return;
+  const aspect = preset.width / preset.height;
+  const width = Math.min(availableWidth, availableHeight * aspect);
+  const height = width / aspect;
+  stageWrapEl.style.width = `${width}px`;
+  stageWrapEl.style.height = `${height}px`;
+}
+
 function onResize() {
   const rect = stage.getBoundingClientRect();
   const width = Math.max(1, rect.width);
@@ -5284,9 +5420,15 @@ function onResize() {
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
   if(scene.background?.isTexture)fitBackgroundTexture(scene.background);
+  if (typeof kineticLyricsManager !== 'undefined' && kineticLyricsManager?.mode === 'gravity') {
+    kineticLyricsManager.gravityEngine?.onAspectChange();
+  }
 }
 new ResizeObserver(onResize).observe(stage);
+new ResizeObserver(fitStagePreview).observe(stageCellEl);
 window.addEventListener('resize', onResize);
+window.addEventListener('resize', fitStagePreview);
+fitStagePreview();
 onResize();
 
 // -------------------------------------------------------------
@@ -5921,9 +6063,9 @@ function formationRadius(mode) {
 
 function getGravityCameraTarget(camAspect = 1.6) {
   const aspect = camAspect || 1.6;
-  // 基准可见半宽至少 4.35 空间单位（歌词 6 个方块横向跨度 [-3.45, 3.45]，留出充裕边距）
+  // 窄画幅扩大可见半宽，避免歌词和角色堆在竖屏边缘被裁切。
   const tanHalfFov = 0.26794919243; // tan(15°)
-  const targetHalfWidth = 4.35;
+  const targetHalfWidth = aspect < 1.42 ? 5.6 : 4.35;
   const distForWidth = targetHalfWidth / (tanHalfFov * aspect);
   // 桌面宽屏下基准距离为 11.5 (aspect >= 1.42 时 distForWidth <= 11.45)
   const isNarrow = aspect < 1.42;
@@ -7486,6 +7628,18 @@ $('#presetImageSelect')?.addEventListener('change', e => {
 
 $('#recordToggle').addEventListener('click', toggleScreenRecording);
 
+try {
+  const savedAspect = localStorage.getItem('lu_video_aspect');
+  if (VIDEO_PRESETS[savedAspect]) state.videoAspect = savedAspect;
+} catch (_) {}
+$('#videoAspectSelect').value = state.videoAspect;
+fitStagePreview();
+$('#videoAspectSelect').addEventListener('change', e => {
+  if (!VIDEO_PRESETS[e.target.value] || state.isRecording) return;
+  state.videoAspect = e.target.value;
+  try { localStorage.setItem('lu_video_aspect', state.videoAspect); } catch (_) {}
+  fitStagePreview();
+});
 $('#videoFormatSelect').addEventListener('change', e => {
   state.videoFormat = e.target.value;
 });
@@ -7771,14 +7925,10 @@ $$('.inspector-tab-btn').forEach(button => button.addEventListener('click', () =
 
 function setImmersive(enabled) {
   document.body.classList.toggle('immersive', enabled);
-  $('#immersiveToggle').setAttribute('aria-pressed', String(enabled));
-  const faceNorm = $('#immersiveToggle .face-normal');
-  const faceAct = $('#immersiveToggle .face-active');
-  if (enabled && faceNorm && faceAct) {
-    motionMorph(faceNorm, faceAct);
-  } else if (!enabled && faceNorm && faceAct) {
-    motionMorph(faceAct, faceNorm);
-  }
+  const toggle = $('#immersiveToggle');
+  toggle.setAttribute('aria-pressed', String(enabled));
+  toggle.textContent = enabled ? '返回工作台' : '沉浸';
+  toggle.setAttribute('aria-label', toggle.textContent);
   window.dispatchEvent(new Event('resize'));
 }
 $('#immersiveToggle').addEventListener('click', () => setImmersive(!document.body.classList.contains('immersive')));

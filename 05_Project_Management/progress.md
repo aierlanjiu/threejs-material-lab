@@ -9,6 +9,7 @@
 
 ## Active Assets
 
+- [律的主视窗与视频录制修复报告](Reports/2026-10-01-lu-main-ui-recording.md)
 - [律的界面、歌词、镜头与表情修复报告](Reports/2026-09-23-lu-ui-lyrics-camera-expression.md)
 - [律的运镜与实时表情修复报告](Reports/2026-09-23-lu-camera-avatar-motion.md)
 - [29 角色实时渲染与 GIF 交付报告](Reports/2026-09-23-lu-live-avatars.md)
@@ -18,6 +19,7 @@
 
 ## Recent Results
 
+- Action: 修复律的默认歌词显示、竖横屏画幅、录制歌词合成与编辑控件显隐，并按实际容器命名导出文件。Validation: 196 句歌词时钟、桌面/手机布局、双画幅 MP4 视频及有声视频流实测通过；帧率依浏览器。Report: `Reports/2026-10-01-lu-main-ui-recording.md`。Agent: codex · 2026-10-01。
 - Action: 修复律的界面遮挡、歌词模式镜头抖动、逐字进度、实时表情及底部魔方稳态动作；工作台改为可唤出的抽屉并统一苍耳今楷。Validation: 九条曲目 196 句、桌面/手机布局、头像动效、双歌词引擎与几何快速回归通过；逐字时间为行内估计。Report: `Reports/2026-09-23-lu-ui-lyrics-camera-expression.md`。Agent: codex · 2026-09-23。
 - Action: 平滑律的自动运镜并接通振幅/运动档位控制，修复角色眼神跟随、呼吸可见度与选中卡片实时预览。Validation: 头像与镜头回归、歌词双引擎、象棋测试及移动触控检查通过。Report: `Reports/2026-09-23-lu-camera-avatar-motion.md`。Agent: codex · 2026-09-23。
 - Action: 用 29 位透明角色实时层替换律的 OneWorks 角色链路，保留 3D 排布、音乐表情触发、注视及眨眼，并制作独立透明循环 GIF；旧运行资源隔离在 `/Users/papazed/Downloads/lu-oneworks-quarantine-20260923-075633/`。Validation: 29/29 实时绘制与 GIF 检查通过，桌面和手机页面无错误，歌词与象棋回归通过。Report: `Reports/2026-09-23-lu-live-avatars.md`。Agent: codex · 2026-09-23。
