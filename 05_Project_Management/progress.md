@@ -9,6 +9,7 @@
 
 ## Active Assets
 
+- [律的音乐编排、镜头与表情回归修复报告](Reports/2026-10-02-lu-music-choreography-regression.md)
 - [律的机械魔方编排与手机反重力山体修复报告](Reports/2026-10-01-lu-motion-mound-fix.md)
 - [律的远端同步与 Pages 发布报告](Reports/2026-10-01-lu-remote-pages-release.md)
 - [律的主视窗与视频录制修复报告](Reports/2026-10-01-lu-main-ui-recording.md)
@@ -21,6 +22,7 @@
 
 ## Recent Results
 
+- Action: 重新接通机械魔方与关闭模式的音乐节拍动作、乐章 FOV 镜头谱和音乐表情，并为窄镜头预留画幅。Validation: 先复现原版静态镜头，再通过新增回归测试、实际歌曲的手机视口播放、头像测试与几何检查；实体手机未验。Report: `Reports/2026-10-02-lu-music-choreography-regression.md`。Agent: codex · 2026-10-02。
 - Action: 恢复机械魔方和关闭歌词模式的可见运动与乐章材质切换；将手机反重力山体加高到 12 层／270 枚，并让旧歌词贴合山脊融入。Validation: 桌面与手机浏览器实景、乐章切换、歌词端到端和现有测试通过；实体手机未验。Report: `Reports/2026-10-01-lu-motion-mound-fix.md`。Agent: codex · 2026-10-01。
 - Action: 将律的主视窗与录制修复、4 个文档／依赖更新、441 个旧 OneWorks 文件删除同步至远端与 Pages。Validation: 测试与语法检查通过，Pages 构建成功，线上主页面与录制模块 HTTP 200 且新控件存在。Report: `Reports/2026-10-01-lu-remote-pages-release.md`。Agent: codex · 2026-10-01。
 - Action: 修复律的默认歌词显示、竖横屏画幅、录制歌词合成与编辑控件显隐，并按实际容器命名导出文件。Validation: 196 句歌词时钟、桌面/手机布局、双画幅 MP4 视频及有声视频流实测通过；帧率依浏览器。Report: `Reports/2026-10-01-lu-main-ui-recording.md`。Agent: codex · 2026-10-01。

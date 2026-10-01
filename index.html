@@ -2727,7 +2727,7 @@ BEAT</textarea>
 
           <div class="grid2" style="margin-top: 8px;">
             <button class="btn active" id="dynamicFovToggle">FOV 变焦：开</button>
-            <div class="range" style="margin:0; grid-template-columns: 36px 1fr 30px;"><span>幅度</span><input id="fovAmpSlider" type="range" min="0" max="26" step="1" value="3"><output>3°</output></div>
+            <div class="range" style="margin:0; grid-template-columns: 36px 1fr 30px;"><span>幅度</span><input id="fovAmpSlider" type="range" min="0" max="26" step="1" value="8"><output>8°</output></div>
           </div>
         </div>
 
@@ -2871,7 +2871,7 @@ function transitionCameraTo(targetPos, duration = 800) {
 // 检查器 Tab 焦点微呼吸 (Spatial Focus Pulling)
 let focusBreath = null;
 function triggerCameraFocusBreath(intensity = 0.5, duration = 400) {
-  if (prefersReducedMotion || kineticLyricsManager.mode !== 'off') return;
+  if (prefersReducedMotion || kineticLyricsManager.mode === 'gravity') return;
   const baseFov = Number(ui.fov.value) || 30;
   focusBreath = {
     baseFov,
@@ -3028,13 +3028,13 @@ function projectedEnvelope(rotX, rotY, rotZ) {
   );
 }
 
-// 取景距离：整体由阵型实际外接半径推导，格距变化后再也不会出现"方阵顶出画面"
-function framingDistance(radius) {
-  const verticalHalf = THREE.MathUtils.degToRad(camera.fov * 0.5);
+// 取景距离按阵型外接半径推导；演出机位另外预留窄 FOV 与旋转扫掠的边界。
+const PERFORMANCE_FRAME_FIT = 1.14;
+function framingDistance(radius, fov = camera.fov, fitFactor = 0.74) {
+  const verticalHalf = THREE.MathUtils.degToRad(fov * 0.5);
   const horizontalHalf = Math.atan(Math.tan(verticalHalf) * camera.aspect);
-  // 取景系数：数值越小主体越大（距离 ∝ 系数）。1.12 是几何契约落地时为"方阵绝不出画"取的保守值，
-  // 代价是主体在画面里偏小、氛围被背景吞掉。可用 ?framek= 覆盖以便实测调参。
-  const k = Number(window.__FRAME_K) > 0 ? Number(window.__FRAME_K) : 0.74;
+  // 默认静态构图偏近；演出时使用 PERFORMANCE_FRAME_FIT。可用 ?framek= 实测覆盖。
+  const k = Number(window.__FRAME_K) > 0 ? Number(window.__FRAME_K) : fitFactor;
   return radius * k / Math.sin(Math.min(verticalHalf, horizontalHalf));
 }
 
@@ -3174,7 +3174,7 @@ const state = {
   // 动态 FOV 呼吸变焦律动
   enableDynamicFov: true,
   fovMode: 'bass', // bass | dolly | sine | snap
-  fovPulseAmp: 3.0, // degrees: lens breathing stays secondary to the sculpture
+  fovPulseAmp: 8.0, // degrees: audible beat hits also register in the lens
   currentFov: 30.0
 };
 
@@ -3771,6 +3771,7 @@ if (typeof reducedMotionQuery.addEventListener === 'function') {
 // 场景实际引用的 liveTextureMap key 集合与节流记录
 let activeLiveTextureKeys = [];
 let lastAvatarRenderTime = 0;
+let lastAvatarEmote = 'cycle';
 let isFirstCameraInit = true;
 let lastMatrixShape = '';
 let pendingFrameDistance = null;
@@ -4798,7 +4799,7 @@ function commitMatrixRebuild() {
 
   // 仅尺寸/阵型变化时补足取景空间；材质重建不改用户角度或缩放。
   const matrixShape = `${cols}:${rows}:${layers}:${state.activeFormation}`;
-  if (lastMatrixShape && matrixShape !== lastMatrixShape && kineticLyricsManager.mode === 'off') {
+  if (lastMatrixShape && matrixShape !== lastMatrixShape && kineticLyricsManager.mode !== 'gravity') {
     const fitDistance = framingDistance(formationRadius(isMosaicLayout ? 'grid' : state.activeFormation));
     pendingFrameDistance = Math.max(camera.position.distanceTo(controls.target), fitDistance);
     controls.maxDistance = Math.max(controls.maxDistance, fitDistance * 1.1);
@@ -6164,25 +6165,36 @@ function updateMasterChoreography(dt = 0.016) {
       });
     }
 
+    // 乐章镜头谱与阵型、材质同步推进；原编排的 FOV 形态不再丢失。
+    if (mov.fov) {
+      state.fovMode = mov.fov;
+      $$('#fovModeGroup [data-fmode]').forEach(b => {
+        const active = b.dataset.fmode === mov.fov;
+        b.classList.toggle('active', active);
+        b.setAttribute('aria-pressed', String(active));
+      });
+    }
+
     rebuildMatrix();
   }
 
   // 1. 旋转视角运镜 (开/关/自动) 与 FOV 动态呼吸 (减少动效时禁止自动相机和动态 FOV)
   // 物理反重力歌词模式下，默认严格关闭运镜与 FOV 动态呼吸，锁定纯正正面平视机位
   const isGravityMode = kineticLyricsManager.mode === 'gravity';
-  const isLyricMode = kineticLyricsManager.mode !== 'off';
-  const shouldMoveCam = !isLyricMode && !prefersReducedMotion && ((state.camMotionMode === 'on') ||
+  const shouldMoveCam = !isGravityMode && !prefersReducedMotion && ((state.camMotionMode === 'on') ||
     (state.camMotionMode === 'auto' && state.isPlayingMusic));
   const maxDim = Math.max(state.gridCols, state.gridRows, state.gridLayers);
-  let baseCamDist = framingDistance(formationRadius(state.activeFormation));
+  const activeRadius = formationRadius(state.activeFormation);
+  let baseCamDist = framingDistance(activeRadius);
   const baseFov = isGravityMode ? 30 : +ui.fov.value;
   let targetFov = baseFov;
   const tMul = state.tierMultiplier || 1.0;
 
-  if (!isLyricMode && state.enableDynamicFov && !prefersReducedMotion) {
+  if (!isGravityMode && state.enableDynamicFov && !prefersReducedMotion) {
     if (state.fovMode === 'bass') {
       // 重低音爆发冲击：踩点瞬间 FOV 骤紧特写，随后弹性回弹广角
-      const kickImpulse = Math.pow(state.bassEnergy, 1.3) * state.fovPulseAmp * tMul;
+      const kickImpulse = THREE.MathUtils.clamp(state.beatPulse * 0.82 + state.bassEnergy * 0.18, 0, 1)
+        * state.fovPulseAmp * tMul;
       const breath = state.isPlayingMusic ? Math.sin(state.time * 2.5) * (state.fovPulseAmp * 0.22 * tMul) : 0;
       targetFov = baseFov - kickImpulse + breath;
     } else if (state.fovMode === 'dolly') {
@@ -6203,6 +6215,17 @@ function updateMasterChoreography(dt = 0.016) {
       const snapOffset = (beatCycle === 0 ? -1 : 1) * state.fovPulseAmp * tMul;
       targetFov = baseFov + snapOffset;
     }
+  }
+
+  // 扩阵与窄 FOV 同时发生时，以即将使用的最窄视角推导安全机位。
+  // 整体律动与俯视角会再占一点画幅；这里留出的边界防止圆环、球面被裁切。
+  if (shouldMoveCam) {
+    // 抽搐切镜会瞬间变窄：提前按下一拍窄角取景，避免 FOV 比运镜先到位。
+    const sequenceNarrowFov = state.enableDynamicFov && state.fovMode === 'snap'
+      ? baseFov - state.fovPulseAmp * tMul : targetFov;
+    const fitFov = THREE.MathUtils.clamp(Math.min(camera.fov, targetFov, sequenceNarrowFov), 12, 85);
+    baseCamDist = Math.max(baseCamDist,
+      framingDistance(activeRadius, fitFov, PERFORMANCE_FRAME_FIT));
   }
 
   // 平滑过渡 FOV (反重力模式或减少动效时严格锁定基准 FOV 30°)
@@ -6235,30 +6258,30 @@ function updateMasterChoreography(dt = 0.016) {
     const cameraMotionGain = THREE.MathUtils.clamp(state.waveAmpMultiplier, 0.2, 1)
       * [0, 0.35, 0.7, 1][state.intensityTier];
     cameraBassEnergy += (state.bassEnergy - cameraBassEnergy) * (1 - Math.exp(-3 * dt));
-    const camDist = baseCamDist + (Math.sin(state.time * 0.24) * 0.6 - cameraBassEnergy * 0.22 * tMul) * cameraMotionGain;
+    const camDist = baseCamDist + (Math.sin(state.time * 0.38) * 1.15 - cameraBassEnergy * 0.45 * tMul - state.beatPulse * 0.24) * cameraMotionGain;
     let targetCamX = 0;
     let targetCamZ = camDist;
 
     if (state.orbitMode === 'arc') {
-      const camAngle = Math.sin(state.time * 0.18) * 0.26 * cameraMotionGain;
+      const camAngle = Math.sin(state.time * 0.30) * 0.58 * cameraMotionGain;
       targetCamX = Math.sin(camAngle) * camDist;
       targetCamZ = Math.cos(camAngle) * camDist;
     } else {
-      cameraOrbitPhase += dt * 0.08 * cameraMotionGain;
+      cameraOrbitPhase += dt * 0.20 * cameraMotionGain;
       const camAngle = cameraOrbitPhase;
       targetCamX = Math.sin(camAngle) * camDist;
       targetCamZ = Math.cos(camAngle) * camDist;
     }
 
-    const targetCamY = (maxDim * 0.8) + Math.sin(state.time * 0.18) * 0.5 * cameraMotionGain;
+    const targetCamY = (maxDim * 0.8) + Math.sin(state.time * 0.25) * 0.9 * cameraMotionGain;
 
     // 自动运镜平滑追目标机位与中心焦点
-    const camLerp = Math.min(1.0, 1.0 - Math.exp(-2.2 * dt));
+    const camLerp = Math.min(1.0, 1.0 - Math.exp(-3.2 * dt));
     camera.position.x += (targetCamX - camera.position.x) * camLerp;
     camera.position.y += (targetCamY - camera.position.y) * camLerp;
     camera.position.z += (targetCamZ - camera.position.z) * camLerp;
 
-    const targetLerp = Math.min(1.0, 1.0 - Math.exp(-2.2 * dt));
+    const targetLerp = Math.min(1.0, 1.0 - Math.exp(-3.2 * dt));
     controls.target.x += (0 - controls.target.x) * targetLerp;
     controls.target.y += (0 - controls.target.y) * targetLerp;
     controls.target.z += (0 - controls.target.z) * targetLerp;
@@ -6480,7 +6503,7 @@ function animate(nowTimestamp) {
   // 3D 阻尼超调运镜驱动 (~1.5% Overshoot Spring)
   const isGravityMode = (typeof kineticLyricsManager !== 'undefined' && kineticLyricsManager && kineticLyricsManager.mode === 'gravity');
   if (kineticLyricsManager.mode !== lastKineticCameraMode) {
-    if (kineticLyricsManager.mode !== 'off') {
+    if (kineticLyricsManager.mode === 'gravity') {
       cameraTransition = null;
       pendingFrameDistance = null;
       focusBreath = null;
@@ -6651,18 +6674,21 @@ function animate(nowTimestamp) {
   updateMasterChoreography(dt);
   if (matrixDirty) commitMatrixRebuild();
 
-  // 方阵整体缓慢摆动：机械歌词与关闭歌词时都保留可见的舞台运动。
-  // 整体旋转不改变方块间距；歌词方块仍由各自的引擎独立驱动。
-  const matrixCanMove = state.waveMotion && !prefersReducedMotion &&
-    kineticLyricsManager.mode !== 'gravity' && state.contentMode !== 'text';
+  // 整体刚性动作落在真实节拍上，单块波形仍由几何预算独立控制。
+  const matrixCanMove = state.waveMotion && !prefersReducedMotion && kineticLyricsManager.mode !== 'gravity';
   const rigPhase = state.time * (state.isPlayingMusic ? 0.68 : 0.48);
-  const targetRigYaw = matrixCanMove ? Math.sin(rigPhase) * (state.isPlayingMusic ? 0.16 : 0.12) : 0;
-  const targetRigLift = matrixCanMove ? Math.sin(rigPhase * 1.35) * (state.isPlayingMusic ? 0.075 : 0.055) : 0;
-  const rigBlend = 1 - Math.exp(-4 * dt);
+  const rigBeat = matrixCanMove && state.isPlayingMusic && state.audioReady ? THREE.MathUtils.clamp(state.beatPulse, 0, 1) : 0;
+  const rigTier = [0, 0.55, 1, 1.35][state.intensityTier];
+  const beatSide = state.beatCount % 2 ? -1 : 1;
+  const targetRigYaw = matrixCanMove ? Math.sin(rigPhase) * (state.isPlayingMusic ? 0.16 : 0.12) + beatSide * rigBeat * 0.10 * rigTier : 0;
+  const targetRigLift = matrixCanMove ? Math.sin(rigPhase * 1.35) * (state.isPlayingMusic ? 0.075 : 0.055) + rigBeat * 0.30 * rigTier : 0;
+  const targetRigRoll = matrixCanMove ? beatSide * rigBeat * 0.045 * rigTier : 0;
+  const rigBlend = 1 - Math.exp(-(state.isPlayingMusic ? 11 : 4) * dt);
   matrixGroup.rotation.y += (targetRigYaw - matrixGroup.rotation.y) * rigBlend;
+  matrixGroup.rotation.z += (targetRigRoll - matrixGroup.rotation.z) * rigBlend;
   matrixGroup.position.y += (targetRigLift - matrixGroup.position.y) * rigBlend;
 
-  if (pendingFrameDistance !== null && kineticLyricsManager.mode !== 'off') pendingFrameDistance = null;
+  if (pendingFrameDistance !== null && kineticLyricsManager.mode === 'gravity') pendingFrameDistance = null;
   if (pendingFrameDistance !== null) {
     const autoCamera = kineticLyricsManager.mode !== 'gravity' && !prefersReducedMotion && (state.camMotionMode === 'on' ||
       (state.camMotionMode === 'auto' && state.isPlayingMusic));
@@ -6929,7 +6955,13 @@ function animate(nowTimestamp) {
   let currentEmote = null;
   if (state.activeEmote && Date.now() < state.emoteEndTime) {
     currentEmote = state.activeEmote;
+  } else if (state.isPlayingMusic && state.audioReady && !state.isIntroPlaying) {
+    const beatInBar = state.beatCount % 4;
+    if (state.beatPulse > 0.35 && beatInBar === 0) currentEmote = 'happy';
+    else if (state.beatPulse > 0.35 && beatInBar === 2) currentEmote = 'wink';
+    else if (state.midEnergy > 0.24 && beatInBar % 2 === 1) currentEmote = 'sing';
   }
+  lastAvatarEmote = currentEmote || 'cycle';
 
   if ((state.contentMode === 'avatar' || isGravityMode) && (!state.isPlayingMusic || !state.isIntroPlaying)) {
     const avatarFrameInterval = isGravityMode ? 40.0 : (activeLiveTextureKeys.length > 4 ? 66.7 : 33.3);
@@ -7969,6 +8001,7 @@ window.luDiagnostics = {
   get lyricTracks(){ return SONG_LYRICS_MAP; },
   get scene(){ return scene; },
   get matrixGroup(){ return matrixGroup; },
+  get avatarEmote(){ return lastAvatarEmote; },
   get geometry(){ return activeGeometry(); },
   get separation(){ return matrixGroup.userData.separation || null; },
   get pitch(){ return activeGeometry().pitch; }
