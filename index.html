@@ -2338,7 +2338,7 @@ body.immersive #immersiveToggle {
         <select id="material" aria-label="材质类型" hidden><option value="prism" >棱镜</option><option value="crystal" selected>水晶</option><option value="ice" >冰晶</option><option value="frosted" >磨砂</option><option value="smoke" >烟晶</option><option value="silk" >真丝</option><option value="wool" >羊绒</option><option value="cloud" >云绒</option><option value="sand" >流沙</option><option value="shell" >母贝</option><option value="alloy" >合金</option><option value="jade" >翡翠</option></select>
         <div class="tone-heading"><span>色调</span><label class="custom-tone" title="自定义色调"><span>自定义</span><input id="color" aria-label="自定义色调" type="color" value="#c94f64"></label></div>
         <div class="swatches" id="materialTones"><button class="swatch" title="无色" aria-label="无色" style="--c:#e7ebee" data-c="#e7ebee"><canvas width="80" height="80" aria-hidden="true"></canvas></button><button class="swatch" title="冰蓝" aria-label="冰蓝" style="--c:#7e9fb9" data-c="#7e9fb9"><canvas width="80" height="80" aria-hidden="true"></canvas></button><button class="swatch" title="钴蓝" aria-label="钴蓝" style="--c:#405677" data-c="#405677"><canvas width="80" height="80" aria-hidden="true"></canvas></button><button class="swatch" title="石榴" aria-label="石榴" style="--c:#b94250" data-c="#b94250"><canvas width="80" height="80" aria-hidden="true"></canvas></button><button class="swatch" title="琥珀" aria-label="琥珀" style="--c:#b68a50" data-c="#b68a50"><canvas width="80" height="80" aria-hidden="true"></canvas></button><button class="swatch" title="苔绿" aria-label="苔绿" style="--c:#768d80" data-c="#768d80"><canvas width="80" height="80" aria-hidden="true"></canvas></button><button class="swatch" title="烟灰" aria-label="烟灰" style="--c:#424752" data-c="#424752"><canvas width="80" height="80" aria-hidden="true"></canvas></button></div>
-        <div class="material-lock"><span>固定材质</span><button type="button" id="lockMaterialToggle" role="switch" aria-checked="true" aria-label="固定材质"></button></div>
+        <div class="material-lock"><span>固定材质</span><button type="button" id="lockMaterialToggle" role="switch" aria-checked="false" aria-label="固定材质"></button></div>
         <div class="studio-lighting"><span>影棚</span><div role="group" aria-label="影棚背景"><button data-studio="soft" aria-pressed="true">柔光</button><button data-studio="light" aria-pressed="false">珍珠白</button><button data-studio="dark" aria-pressed="false">石墨黑</button></div></div>
         <details class="material-details"><summary>精细调整</summary>
 
@@ -3091,7 +3091,7 @@ const state = {
   baseBevelRadius: 0.20,
 
   // 材质固定控制
-  lockMaterial: true,
+  lockMaterial: false,
 
   // 乐章流变与动态控制
   isChoreographyShow: true,
@@ -6651,6 +6651,17 @@ function animate(nowTimestamp) {
   updateMasterChoreography(dt);
   if (matrixDirty) commitMatrixRebuild();
 
+  // 方阵整体缓慢摆动：机械歌词与关闭歌词时都保留可见的舞台运动。
+  // 整体旋转不改变方块间距；歌词方块仍由各自的引擎独立驱动。
+  const matrixCanMove = state.waveMotion && !prefersReducedMotion &&
+    kineticLyricsManager.mode !== 'gravity' && state.contentMode !== 'text';
+  const rigPhase = state.time * (state.isPlayingMusic ? 0.68 : 0.48);
+  const targetRigYaw = matrixCanMove ? Math.sin(rigPhase) * (state.isPlayingMusic ? 0.16 : 0.12) : 0;
+  const targetRigLift = matrixCanMove ? Math.sin(rigPhase * 1.35) * (state.isPlayingMusic ? 0.075 : 0.055) : 0;
+  const rigBlend = 1 - Math.exp(-4 * dt);
+  matrixGroup.rotation.y += (targetRigYaw - matrixGroup.rotation.y) * rigBlend;
+  matrixGroup.position.y += (targetRigLift - matrixGroup.position.y) * rigBlend;
+
   if (pendingFrameDistance !== null && kineticLyricsManager.mode !== 'off') pendingFrameDistance = null;
   if (pendingFrameDistance !== null) {
     const autoCamera = kineticLyricsManager.mode !== 'gravity' && !prefersReducedMotion && (state.camMotionMode === 'on' ||
@@ -6696,7 +6707,7 @@ function animate(nowTimestamp) {
     // 静息缩放：2% 量级、12 秒一个来回，是"被托住"的起伏而不是变焦。
     // 位移与单块缩放都由上一个分支统一处理；这里只用整面等比缩放，不占用任何位移预算。
     // 关闭波浪总开关时静息态也一起静止——用户关掉律动是明确意图，装置不应该继续自己动。
-    const idleLevel = (state.waveMotion && state.idleBreath > 0.004) ? state.idleBreath : 0;
+    const idleLevel = (!state.isPlayingMusic && state.waveMotion && state.idleBreath > 0.004) ? state.idleBreath : 0;
     const breatheIdle = 1 + Math.sin(state.time * 0.17) * 0.020 * idleLevel;
     const [scaleLow, scaleHigh] = tierCfg.matrixScaleRange;
 

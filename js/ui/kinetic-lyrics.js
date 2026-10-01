@@ -336,7 +336,7 @@ export class Three3DGravityLyricsEngine {
     this.bottomCubes.forEach(cube => {
       const u = cube.userData;
       const floorY = this.getSafeFloorY(u.restZ, isNarrow);
-      const mound = this.getMoundProfile(u.baseColX, u.restZ, this.peakCenterX) * (isNarrow ? 3.0 : 1.0);
+      const mound = this.getMoundProfile(u.baseColX, u.restZ, this.peakCenterX) * this.getMoundHeightScale(isNarrow);
       u.floorY = floorY;
       u.restY = floorY + (u.layerIdx / layerCount) * (mound - 0.55 * 0.5);
       if (!u.isDropping) cube.position.y = u.restY;
@@ -359,6 +359,31 @@ export class Three3DGravityLyricsEngine {
     const bell = Math.exp(-(dx * dx) / (2 * sigmaX * sigmaX) - (z * z) / (2 * sigmaZ * sigmaZ));
     // 中心厚度 2.05 (占黑色舞台高度 36%~39%)，两侧边缘自然降至 0.37 (15%~18%)
     return 2.05 * (0.18 + 0.82 * bell);
+  }
+
+  getMoundHeightScale(isMobile = this.isMobileStack) {
+    // 手机初始十二层撑起山体；从桌面旋转进入手机时仍按现有六层密度限制高度。
+    return isMobile ? (this.bottomLayersCount >= 10 ? 3.5 : 1.48) : 1.0;
+  }
+
+  getMoundSurfaceY(x, z = 0) {
+    let nearbyTop = -Infinity;
+    let nearestCube = null;
+    let nearestDistance = Infinity;
+    for (const cube of this.bottomCubes) {
+      const dx = Math.abs(cube.position.x - x);
+      const dz = Math.abs(cube.position.z - z);
+      const distance = dx * dx + dz * dz * 0.35;
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestCube = cube;
+      }
+      if (dx < 0.68 && dz < 1.05) {
+        nearbyTop = Math.max(nearbyTop, cube.position.y);
+      }
+    }
+    const top = Number.isFinite(nearbyTop) ? nearbyTop : nearestCube?.position.y;
+    return Number.isFinite(top) ? top + 0.55 * 0.5 : this.getSafeFloorY(z);
   }
 
   createAvatarFaceTexture(faceType, matType, tone) {
@@ -671,17 +696,23 @@ export class Three3DGravityLyricsEngine {
     }
 
     // =========================================================================
-    // 1. 底部方块堆：桌面 252 枚 / 窄画幅 198 枚。
-    // 窄画幅为歌词和角色保留清晰的视觉层级。
+    // 1. 底部方块堆：桌面 252 枚 / 窄画幅 270 枚。
+    // 手机端增加密排层数，同时抬高山脊而不拉开相邻方块。
     // =========================================================================
     const isMobile = (this.camera?.aspect || 1.6) < 1.42;
     const layerDefs = isMobile ? [
-      { count: 48, spanX: 5.2, spanZ: 2.2 },
-      { count: 42, spanX: 4.6, spanZ: 2.0 },
-      { count: 36, spanX: 4.0, spanZ: 1.8 },
-      { count: 30, spanX: 3.4, spanZ: 1.5 },
-      { count: 24, spanX: 2.8, spanZ: 1.2 },
-      { count: 18, spanX: 2.2, spanZ: 0.9 }
+      { count: 44, spanX: 5.2, spanZ: 2.2 },
+      { count: 40, spanX: 4.7, spanZ: 2.0 },
+      { count: 36, spanX: 4.2, spanZ: 1.8 },
+      { count: 32, spanX: 3.7, spanZ: 1.6 },
+      { count: 28, spanX: 3.2, spanZ: 1.4 },
+      { count: 24, spanX: 2.7, spanZ: 1.2 },
+      { count: 20, spanX: 2.2, spanZ: 1.0 },
+      { count: 16, spanX: 1.7, spanZ: 0.8 },
+      { count: 12, spanX: 1.2, spanZ: 0.6 },
+      { count: 8, spanX: 0.7, spanZ: 0.5 },
+      { count: 6, spanX: 0.5, spanZ: 0.4 },
+      { count: 4, spanX: 0.3, spanZ: 0.3 }
     ] : [
       { count: 60, spanX: 5.6, spanZ: 2.0 },
       { count: 52, spanX: 4.8, spanZ: 1.8 },
@@ -751,18 +782,27 @@ export class Three3DGravityLyricsEngine {
         unit.add(decalMesh);
         unit.scale.setScalar(bottomScale);
 
-        // 经纬交错排布，从两侧完整铺满（-spanX 至 +spanX）
-        const colRatio = (j + (layerIdx % 2) * 0.5) / LCount;
-        const x = -layerDef.spanX + colRatio * (layerDef.spanX * 2) + (Math.random() - 0.5) * 0.18;
-        const z = -layerDef.spanZ + (Math.random() * 2 - 1) * layerDef.spanZ;
+        // 手机端用两条近距错缝行形成连续山脊；横向间距略小于一个方块。
+        const columns = Math.ceil(LCount / 2);
+        const row = Math.floor(j / columns);
+        const rowLength = Math.min(columns, LCount - row * columns);
+        const column = j % columns;
+        const colRatio = rowLength > 1 ? column / (rowLength - 1) : 0.5;
+        const x = isMobile
+          ? this.THREE.MathUtils.clamp((colRatio * 2 - 1) * layerDef.spanX + ((layerIdx + row) % 2 ? 0.07 : -0.07), -layerDef.spanX, layerDef.spanX)
+          : -layerDef.spanX + ((j + (layerIdx % 2) * 0.5) / LCount) * (layerDef.spanX * 2) + (Math.random() - 0.5) * 0.18;
+        const z = isMobile
+          ? (row === 0 ? -0.45 : 0.45) * layerDef.spanZ + Math.sin(j * 2.17 + layerIdx) * 0.02
+          : -layerDef.spanZ + (Math.random() * 2 - 1) * layerDef.spanZ;
         const yFloor = this.getSafeFloorY(z, isMobile);
-        const moundThick = this.getMoundProfile(x, z) * (isMobile ? 3.0 : 1.0);
+        const moundThick = this.getMoundProfile(x, z) * this.getMoundHeightScale(isMobile);
         const layerRatio = layerIdx / (layerDefs.length - 1);
-        const yRest = yFloor + layerRatio * (moundThick - bottomScale * 0.5) + (Math.random() - 0.5) * 0.08;
+        const yRest = yFloor + layerRatio * (moundThick - bottomScale * 0.5) + (isMobile ? 0 : (Math.random() - 0.5) * 0.08);
 
-        const rx = (Math.random() - 0.5) * 0.42;
-        const ry = (Math.random() - 0.5) * 0.42;
-        const rz = (Math.random() - 0.5) * 0.42;
+        const rotationRange = isMobile ? 0.12 : 0.42;
+        const rx = (Math.random() - 0.5) * rotationRange;
+        const ry = (Math.random() - 0.5) * rotationRange;
+        const rz = (Math.random() - 0.5) * rotationRange;
 
         unit.position.set(x, yRest, z);
         unit.rotation.set(rx, ry, rz);
@@ -946,6 +986,7 @@ export class Three3DGravityLyricsEngine {
       oldBank.forEach(slot => {
         const u = slot.userData;
         if (u.targetScale > 0.5 || u.currentScale > 0.5) {
+          u.meltY = this.getMoundSurfaceY(slot.position.x, slot.position.z);
           u.dropScale = Math.max(0.55, u.currentScale);
           u.isDropping = true;
           u.isMagneticLifting = false;
@@ -976,13 +1017,13 @@ export class Three3DGravityLyricsEngine {
     this.isMobileStack = isMobileNow;
     this.dockY = isMobileNow ? 1.75 : 0.85;
 
-    // 换句时触发山峰随机横向偏移与微幅重塑（约 0.6 秒落稳）
-    this.peakCenterX = (Math.random() - 0.5) * 2.2;
+    // 山脊只做小幅平滑偏移，避免换句时突然变成另一座不规则山峰。
+    this.peakCenterX = Math.sin((this.phraseCount || 0) * 0.65) * 0.32;
     this.bottomCubes.forEach(cube => {
       const u = cube.userData;
-      const moundThick = this.getMoundProfile(u.baseColX, u.restZ, this.peakCenterX) * (this.isMobileStack ? 3.0 : 1.0);
+      const moundThick = this.getMoundProfile(u.baseColX, u.restZ, this.peakCenterX) * this.getMoundHeightScale();
       const totalLayers = Math.max(1, (this.bottomLayersCount || 6) - 1);
-      const yRest = u.floorY + (u.layerIdx / totalLayers) * (moundThick - 0.55 * 0.5) + (Math.random() - 0.5) * 0.04;
+      const yRest = u.floorY + (u.layerIdx / totalLayers) * (moundThick - 0.55 * 0.5);
       u.restY = yRest;
       const distFromPeak = Math.abs(u.baseColX - this.peakCenterX);
       const wave = Math.max(0, 0.45 - distFromPeak * 0.12);
@@ -1162,7 +1203,7 @@ export class Three3DGravityLyricsEngine {
       const reduced = isReducedMotion();
       const rhythmDrive = (this.lastBassEnergy || 0) * 1.8 + (this.lastIsKick ? 0.85 : 0);
       const totalLayers = Math.max(1, (this.bottomLayersCount || 6) - 1);
-      const motionScale = reduced ? 0 : (this.isMobileStack ? 3.6 : 0.18);
+      const motionScale = reduced ? 0 : (this.isMobileStack ? 0.8 : 0.18);
 
       // 时钟累加器随节拍动态推进
       this.stackTime += safeDt * (1.15 + rhythmDrive * 0.75);
@@ -1202,6 +1243,12 @@ export class Three3DGravityLyricsEngine {
         // 旧歌词解除磁吸约束，向底部山丘有力下坠（重力加速度随节奏加强）
         const gAcc = 10.0 + Math.min(1.4, u.burstPower || 1.0) * 4.0;
         u.dropVy = Math.max(-5.5, u.dropVy - gAcc * safeDt);
+        // 接近堆体时受磁场拖拽减速，给缩小融入留出可见的过渡时间。
+        const surfaceDistance = slot.position.y - u.meltY;
+        if (surfaceDistance < 1.25) {
+          const approach = this.THREE.MathUtils.clamp(surfaceDistance / 1.25, 0, 1);
+          u.dropVy = Math.max(u.dropVy, -3.0 - 2.5 * approach);
+        }
         slot.position.x += u.dropVx * safeDt;
         slot.position.y += u.dropVy * safeDt;
         slot.position.z += u.dropVz * safeDt;
@@ -1209,18 +1256,15 @@ export class Three3DGravityLyricsEngine {
         slot.rotation.y += u.dropRotSpeedY * safeDt;
         slot.rotation.z += u.dropRotSpeedZ * safeDt;
 
-        // 空中飞行阶段保持完整尺寸 scale = 1.0，保留清晰可见的下降全过程！
-        const meltAltitude = this.isMobileStack ? 0.35 : -0.1;
-        if (slot.position.y > meltAltitude) {
-          u.currentScale = u.dropScale || 1.0;
-        } else {
-          // 接近并进入底部山体深度时，缩小融入山体
-          u.currentScale = Math.max(0.0, u.currentScale - 3.8 * safeDt);
-        }
+        // 按当前位置的真实堆体表面淡出，不在空中固定高度突然消失。
+        const surfaceY = this.getMoundSurfaceY(slot.position.x, slot.position.z);
+        u.meltY += (surfaceY - u.meltY) * (1 - Math.exp(-8 * safeDt));
+        const depthIntoMound = this.THREE.MathUtils.clamp((u.meltY + 0.45 - slot.position.y) / 0.9, 0, 1);
+        u.currentScale = (u.dropScale || 1.0) * (1 - depthIntoMound);
         slot.scale.setScalar(u.currentScale);
 
-        // 触及深层山体或缩小完全融入后注销
-        if (slot.position.y < -3.5 || u.currentScale <= 0.01) {
+        // 穿入山体半个方块后注销，淡出终点随山脊高度变化。
+        if (slot.position.y < u.meltY - 0.45 || u.currentScale <= 0.01) {
           u.isDropping = false;
           u.currentScale = 0.0;
           slot.scale.set(0, 0, 0);
