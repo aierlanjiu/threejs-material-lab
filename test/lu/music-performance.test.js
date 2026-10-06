@@ -122,6 +122,7 @@ try {
         }
       }
     }
+    window.__testFrameNow = start + 400 * 50;
     return { slot, off, maxCornerNdcY, formation: state.activeFormation,
       fovMode: choreographedFovMode, wavePattern: choreographedWave,
       snapFovRange: maxSnapFov - minSnapFov, snapCornerNdcY };
@@ -139,6 +140,41 @@ try {
   assert.equal(result.wavePattern, 'equalizer', 'The movement sequence did not switch its wave pattern');
   assert.ok(result.snapFovRange > 8, 'The choreographed snap FOV did not switch between lens widths');
   assert.ok(result.snapCornerNdcY < 1, `The snap FOV cropped the ring: ${result.snapCornerNdcY}`);
+
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const reducedButton = page.locator('#motionPreferenceBtn');
+  await reducedButton.waitFor({ state: 'visible' });
+  const sampleReducedSetting = () => page.evaluate(() => {
+    state.fovMode = 'bass';
+    const frames = [];
+    for (let i = 0; i < 80; i++) {
+      state.beatCount = 48 + Math.floor(i / 5);
+      state.beatPhase = (i % 5) / 5;
+      state.beatPulse = i % 5 === 0 ? 0.95 : 0.1;
+      state.bassEnergy = i % 5 === 0 ? 0.85 : 0.28;
+      state.midEnergy = 0.42;
+      window.__nextLuFrame(window.__testFrameNow += 50);
+      if (i >= 60) frames.push({ fov: luDiagnostics.camera.fov,
+        camX: luDiagnostics.camera.position.x, rigY: luDiagnostics.matrixGroup.position.y });
+    }
+    const range = key => Math.max(...frames.map(frame => frame[key])) - Math.min(...frames.map(frame => frame[key]));
+    return { fovRange: range('fov'), camXRange: range('camX'), rigYRange: range('rigY'),
+      cssTransition: getComputedStyle(document.querySelector('.kinetic-mode-btn')).transitionDuration };
+  });
+  const systemReduced = await sampleReducedSetting();
+  assert.ok(systemReduced.fovRange < 0.01 && systemReduced.camXRange < 0.01 && systemReduced.rigYRange < 0.01,
+    'System reduced-motion preference should suppress the music performance');
+  await reducedButton.click();
+  const optedIn = await sampleReducedSetting();
+  assert.ok(optedIn.fovRange > 2.5 && optedIn.camXRange > 0.7 && optedIn.rigYRange > 0.1,
+    'The visible opt-in did not restore camera, FOV, and cube motion');
+  assert.notEqual(optedIn.cssTransition, '0s', 'The opt-in did not restore CSS lyric motion');
+  await page.evaluate(() => kineticLyricsManager.setMode('off'));
+  const optedInOff = await sampleReducedSetting();
+  assert.ok(optedInOff.fovRange > 2.5 && optedInOff.camXRange > 0.7 && optedInOff.rigYRange > 0.1,
+    'The reduced-motion opt-in did not animate cubes with lyrics hidden');
+  assert.equal(await page.evaluate(() => localStorage.getItem('lu_full_motion_override')), 'true');
+  console.log({ systemReduced, optedIn, optedInOff });
   assert.deepEqual(errors, [], 'The page reported JavaScript errors');
   console.log('Music choreography, camera, FOV, and avatar expressions: PASS');
 } finally {

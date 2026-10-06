@@ -17,6 +17,7 @@ import { AVATAR_MANIFEST } from '../../assets/live-avatars/manifest.js';
 
 const isReducedMotion = () => {
   if (typeof window === 'undefined' || !window.matchMedia) return false;
+  if (window.luAllowFullMotion) return false;
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 };
 

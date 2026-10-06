@@ -1294,7 +1294,9 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      *, ::before, ::after {
+      html:not(.lu-full-motion) *,
+      html:not(.lu-full-motion) *::before,
+      html:not(.lu-full-motion) *::after {
         animation: none !important;
         transition: none !important;
         scroll-behavior: auto !important;
@@ -1542,6 +1544,25 @@
   background: var(--accent);
   box-shadow: 0 2px 8px var(--accent-glow);
 }
+#motionPreferenceBtn {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  max-width: min(340px, calc(100vw - 32px));
+  padding: 9px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  background: rgba(33, 48, 71, 0.94);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.22);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: left;
+  pointer-events: auto;
+  cursor: pointer;
+}
+#motionPreferenceBtn[hidden] { display: none; }
 
 /* --- 版本一：Daniel White 风格 3D Slot-Text --- */
 .cube-lyrics-deck {
@@ -2176,6 +2197,7 @@ body.immersive #immersiveToggle {
           关闭
         </button>
       </div>
+      <button type="button" id="motionPreferenceBtn" hidden aria-pressed="false"></button>
     </div>
 
     <div class="stage-hud-right">
@@ -3751,22 +3773,43 @@ window.liveTextureMap = liveTextureMap;
 window.renderAvatarRig = renderAvatarRig;
 window.AVATAR_KEYS = AVATAR_KEYS;
 
-// 缓存 prefers-reduced-motion 媒体查询并响应动态变化
+// 系统减少动效保持默认生效；用户可在主画面明确选择完整音乐演出。
 const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-let prefersReducedMotion = reducedMotionQuery.matches;
-const onReducedMotionChange = (e) => {
-  prefersReducedMotion = !!e.matches;
+let systemReducedMotion = reducedMotionQuery.matches;
+let fullMotionOverride = false;
+try { fullMotionOverride = localStorage.getItem('lu_full_motion_override') === 'true'; } catch (_) {}
+let prefersReducedMotion = systemReducedMotion && !fullMotionOverride;
+function syncMotionPreference() {
+  prefersReducedMotion = systemReducedMotion && !fullMotionOverride;
+  window.luAllowFullMotion = fullMotionOverride;
+  document.documentElement.classList.toggle('lu-full-motion', fullMotionOverride);
+  const button = $('#motionPreferenceBtn');
+  button.hidden = !systemReducedMotion;
+  button.setAttribute('aria-pressed', String(fullMotionOverride));
+  button.textContent = fullMotionOverride
+    ? '完整音乐演出已开启 · 点击跟随系统设置'
+    : '系统已减少动态效果 · 点击开启完整音乐演出';
   if (prefersReducedMotion && typeof state !== 'undefined' && ui?.fov) {
     state.currentFov = +ui.fov.value;
     camera.fov = state.currentFov;
     camera.updateProjectionMatrix();
   }
+}
+$('#motionPreferenceBtn').addEventListener('click', () => {
+  fullMotionOverride = !fullMotionOverride;
+  try { localStorage.setItem('lu_full_motion_override', String(fullMotionOverride)); } catch (_) {}
+  syncMotionPreference();
+});
+const onReducedMotionChange = (event) => {
+  systemReducedMotion = !!event.matches;
+  syncMotionPreference();
 };
 if (typeof reducedMotionQuery.addEventListener === 'function') {
   reducedMotionQuery.addEventListener('change', onReducedMotionChange);
 } else if (typeof reducedMotionQuery.addListener === 'function') {
   reducedMotionQuery.addListener(onReducedMotionChange);
 }
+syncMotionPreference();
 
 // 场景实际引用的 liveTextureMap key 集合与节流记录
 let activeLiveTextureKeys = [];
