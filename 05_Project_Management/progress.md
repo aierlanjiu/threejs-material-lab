@@ -9,6 +9,7 @@
 
 ## Active Assets
 
+- [律的手机沉浸模式全屏修复与推文动效核对报告](Reports/2026-10-08-lu-mobile-immersive.md)
 - [律的对决海报界面与桌面超宽屏壁纸报告](Reports/2026-10-08-lu-battle-poster-ui.md)
 - [律的 15 秒竖屏动效样片报告](Reports/2026-10-07-lu-vertical-motion-study.md)
 - [律的手机减少动效静止路径修复报告](Reports/2026-10-06-lu-mobile-motion-preference.md)
@@ -25,6 +26,7 @@
 
 ## Recent Results
 
+- Action: 修复海报模式覆盖手机沉浸状态的顶部 UI 隐藏和全屏尺寸；支持原生全屏与视口全屏退化，并核对线上动效与推文提示词的实际符合范围。Validation: 390×844 实景、342px 原生／退化全屏及退出回归、1440px 桌面布局通过；实体手机待验。Report: `Reports/2026-10-08-lu-mobile-immersive.md`。Agent: codex · 2026-10-08。
 - Action: 用五张既有对决海报统一律的界面语言，并生成对应桌面横幅；桌面 21:9、手机 9:16 按视口切换，歌词与操作控件避让原画。Validation: AGY 3.8 Flash High 只读审查、四种视口实景、双画幅录制与音乐编排回归通过；原生 21:9 录制性能及实体手机待验。Report: `Reports/2026-10-08-lu-battle-poster-ui.md`。Agent: codex · 2026-10-08。
 - Action: 基于《游京》手机实景制作 15 秒竖屏动效样片，让同一状态胶囊贯穿播放、节拍、歌词与录制，并交付封面。Validation: 1080×1920、30 fps、450 帧、有声视频与关键画面检查通过；源录制采用 540×960，实体手机及原生高分辨率性能待验。Report: `Reports/2026-10-07-lu-vertical-motion-study.md`。Agent: codex · 2026-10-07。
 - Action: 修复手机系统“减少动态效果”会无提示关停机械魔方及关闭歌词模式全部音乐编排的路径；主画面提供可持久保存的一键完整演出入口。Validation: 手机视口复现静止并通过真实点击恢复《游京》的 FOV、运镜和表情；两模式自动化回归通过，实体手机待验。Report: `Reports/2026-10-06-lu-mobile-motion-preference.md`。Agent: codex · 2026-10-06。

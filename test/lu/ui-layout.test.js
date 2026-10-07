@@ -36,6 +36,36 @@ try {
     await page.keyboard.press('Escape');
     assert.equal(await page.locator('#workbenchDock').evaluate(element => element.inert), true);
     assert.equal(await page.locator('#inspectorPanel').evaluate(element => element.inert), true);
+    if (width === 342) {
+      for (const nativeFullscreen of [true, false]) {
+        if (!nativeFullscreen) await page.locator('#stageCell').evaluate(element => { element.requestFullscreen = undefined; });
+        await page.locator('#immersiveToggle').click();
+        await page.waitForFunction(() => document.body.classList.contains('immersive'));
+        const immersive = await page.evaluate(() => {
+          const rect = document.querySelector('#stageWrap').getBoundingClientRect();
+          return {
+            header: getComputedStyle(document.querySelector('.master-deck-hud')).display,
+            dock: getComputedStyle(document.querySelector('.bottom-dynamic-dock')).display,
+            bodyPadding: getComputedStyle(document.body).padding,
+            stage: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
+            viewport: { width: innerWidth, height: innerHeight }
+          };
+        });
+        assert.equal(immersive.header, 'none', 'top controls should hide in immersive mode');
+        assert.equal(immersive.dock, 'none', 'workspace dock should hide in immersive mode');
+        assert.equal(immersive.bodyPadding, '0px');
+        assert.deepEqual(immersive.stage, { x: 0, y: 0, ...immersive.viewport }, 'stage should fill the mobile viewport');
+        assert.equal(await page.locator('#immersiveToggle').isVisible(), true, 'return button should stay visible');
+        await page.locator('#immersiveToggle').click();
+        await page.waitForFunction(() => !document.body.classList.contains('immersive'));
+        assert.equal(await page.locator('.master-deck-hud').isVisible(), true, 'top controls should return');
+        const aspect = await page.locator('#stageWrap').evaluate(element => {
+          const rect = element.getBoundingClientRect();
+          return rect.width / rect.height;
+        });
+        assert(Math.abs(aspect - 9 / 16) < 0.01, 'portrait preview should return after immersive mode');
+      }
+    }
     assert.deepEqual(errors, [], `${width}px browser errors: ${errors.join('; ')}`);
     console.log(`UI layout and drawer controls ${width}px PASS`);
     await page.close();
