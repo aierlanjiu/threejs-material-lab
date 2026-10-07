@@ -2058,6 +2058,256 @@ body.immersive #immersiveToggle {
   .deck-controls { gap: 8px; }
   body.immersive .stage-hud-right { top: 12px; right: 12px; }
 }
+
+/* Battle poster layout: portrait originals on phones, wide companions on desktop. */
+.performance-capsule, .poster-mode-host, .poster-side { display: none; }
+body.poster-mode {
+  --poster-ink: #111116;
+  --poster-paper: #ede2cf;
+  --poster-accent: #ce342d;
+  --poster-secondary: #303c70;
+  --poster-rule: #6a625e;
+  background: var(--poster-ink);
+  color: var(--poster-paper);
+}
+body.poster-mode .app { background: var(--poster-ink); }
+body.poster-mode .master-deck-hud {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  background: var(--poster-ink);
+  border: 1px solid var(--poster-rule);
+  border-radius: 4px;
+  box-shadow: none;
+  padding: 8px 12px;
+  gap: 10px;
+}
+body.poster-mode .brand-section { display: none; }
+body.poster-mode .performance-capsule {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  width: 206px;
+  max-width: 100%;
+  height: 46px;
+  padding: 5px 9px;
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--poster-paper);
+  background: #202026;
+  border: 1px solid var(--poster-paper);
+  border-radius: 4px;
+  transition: width 320ms cubic-bezier(.2,.8,.2,1), border-color 220ms ease, background-color 220ms ease;
+}
+body.poster-mode .performance-capsule[data-state="beat"],
+body.poster-mode .performance-capsule[data-state="lyric"] { width: 248px; }
+body.poster-mode .performance-capsule[data-state="record"] { width: 200px; border-color: var(--poster-accent); }
+.performance-capsule-mark {
+  display: grid;
+  place-items: center;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  color: var(--poster-paper);
+  background: var(--poster-accent);
+  font-family: "TsangerJinKai02", "PingFang SC", sans-serif;
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1;
+}
+.performance-capsule-copy { display: flex; flex-direction: column; justify-content: center; min-width: 0; opacity: 1; transition: opacity 120ms ease, transform 180ms ease; }
+.performance-capsule-copy.is-changing { opacity: 0; transform: translateY(4px); }
+.performance-capsule-copy strong { font-size: 12px; line-height: 16px; font-weight: 750; overflow: hidden; text-overflow: ellipsis; }
+.performance-capsule-copy small { font-size: 10px; line-height: 13px; color: #c8bcaa; overflow: hidden; text-overflow: ellipsis; }
+.performance-capsule-bars { display: flex; align-items: center; gap: 3px; height: 20px; margin-left: auto; flex: 0 0 auto; }
+.performance-capsule-bars i { display: block; width: 3px; height: 14px; background: var(--poster-accent); transform: scaleY(.25); transform-origin: center; transition: transform 100ms linear; }
+body.poster-mode .performance-capsule[data-state="idle"] .performance-capsule-bars,
+body.poster-mode .performance-capsule[data-state="paused"] .performance-capsule-bars,
+body.poster-mode .performance-capsule[data-state="record"] .performance-capsule-bars { display: none; }
+body.poster-mode .deck-player {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--poster-paper);
+  background: #1d1d24;
+  border: 1px solid var(--poster-rule);
+  border-radius: 4px;
+  box-shadow: none;
+  gap: 6px;
+  padding: 5px 7px;
+}
+body.poster-mode .deck-info { flex: 0 1 150px; min-width: 0; max-width: 150px; }
+body.poster-mode .audio-visualizer { display: none; }
+body.poster-mode .time-rail-wrap { min-width: 100px; }
+body.poster-mode #playlistSelect { min-width: 96px !important; max-width: 115px !important; }
+body.poster-mode .top-actions { flex: 0 0 auto; margin-left: auto; }
+body.poster-mode .deck-title, body.poster-mode #timeDisplay { color: var(--poster-paper); }
+body.poster-mode .deck-badge { color: var(--poster-paper); background: var(--poster-secondary); border-radius: 2px; }
+body.poster-mode .deck-controls button,
+body.poster-mode .deck-player > .file-upload-wrap .btn {
+  background: #26252c !important;
+  border: 1px solid var(--poster-rule) !important;
+  color: var(--poster-paper) !important;
+  box-shadow: none !important;
+  border-radius: 4px !important;
+}
+body.poster-mode .deck-controls #playPauseBtn { background: var(--poster-paper) !important; border-color: var(--poster-paper) !important; color: var(--poster-ink) !important; }
+body.poster-mode .deck-controls #recordToggle { color: var(--poster-accent) !important; }
+body.poster-mode .deck-controls #recordToggle.recording { background: var(--poster-accent) !important; border-color: var(--poster-accent) !important; color: #fff !important; }
+body.poster-mode #playlistSelect { color: var(--poster-paper); background: #26252c; border-color: var(--poster-rule); border-radius: 4px; }
+body.poster-mode #timeProgressSlider { accent-color: var(--poster-accent); }
+body.poster-mode .top-actions .btn, body.poster-mode #immersiveToggle {
+  color: var(--poster-paper) !important;
+  background: #26252c !important;
+  border: 1px solid var(--poster-rule) !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+body.poster-mode .poster-mode-host { display: flex; flex: 0 0 auto; min-width: 0; }
+body.poster-mode .poster-mode-host .kinetic-mode-switcher {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2px;
+  width: 252px;
+  max-width: 100%;
+  padding: 3px;
+  background: #24232a !important;
+  border: 1px solid var(--poster-rule) !important;
+  border-radius: 4px;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+body.poster-mode .poster-mode-host .kinetic-mode-btn { justify-content: center; min-width: 0; min-height: 40px; padding: 5px 3px; color: #d4c9b9; border-radius: 2px; font-size: 10px; line-height: 1.25; white-space: nowrap; }
+body.poster-mode .poster-mode-host .kinetic-mode-btn.active { color: #fff; background: var(--poster-accent); box-shadow: none; }
+body.poster-mode .poster-mode-host .kinetic-mode-btn:hover:not(.active) { color: var(--poster-paper); background: #3a3740; }
+body.poster-mode :is(.performance-capsule, .kinetic-mode-btn, #immersiveToggle, .deck-controls button):focus-visible { outline: 2px solid var(--poster-accent); outline-offset: 2px; }
+body.poster-mode .stage-cell { display: flex; align-items: stretch; justify-content: center; gap: 12px; min-width: 0; overflow: hidden; }
+@media (min-width: 761px) {
+  body.poster-mode .stage-cell { align-items: center; gap: 0; }
+  body.poster-mode .poster-side { display: none; }
+}
+body.poster-mode .poster-side {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px 18px;
+  border: 1px solid var(--poster-rule);
+  color: var(--poster-paper);
+  background: #17171d;
+  overflow: hidden;
+}
+.poster-side-index, .poster-side-note { color: #b6a997; font-size: 10px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+.poster-side-rule { display: block; width: 44px; height: 3px; margin-bottom: 16px; background: var(--poster-accent); transform: skewX(-24deg); }
+.poster-side strong { display: block; max-width: 100%; overflow: hidden; font-family: Impact, "Arial Narrow", sans-serif; font-size: clamp(38px, 5.2vw, 104px); font-weight: 900; line-height: .9; letter-spacing: -.04em; color: var(--poster-paper); text-overflow: clip; }
+.poster-side-right strong { color: var(--poster-secondary); }
+.poster-side small { display: block; margin-top: 18px; color: #c8bcaa; font-size: 13px; }
+body.poster-mode .stageWrap {
+  flex: 0 0 auto;
+  border: 1px solid #8e8175;
+  border-radius: 3px;
+  box-shadow: none;
+  background: var(--poster-ink);
+}
+body.poster-mode .stage-hud-left { top: 8px !important; left: 8px !important; right: auto !important; bottom: auto !important; max-width: calc(100% - 72px) !important; }
+body.poster-mode .stage-hud-left #status { display: none !important; }
+body.poster-mode #motionPreferenceBtn { position: static; border-color: var(--poster-paper); border-radius: 3px; background: var(--poster-ink); box-shadow: none; }
+body.poster-mode .stage-hud-right .legend, body.poster-mode .stage-hud-right .preset-cam-group { display: none !important; }
+body.poster-mode .cube-lyrics-deck {
+  width: 100%;
+  max-width: none;
+  min-height: 66px;
+  margin: 0;
+  padding: 8px 10px;
+  gap: 0;
+  color: var(--poster-paper);
+  background: rgba(17, 17, 22, .96);
+  border: 0;
+  border-top: 1px solid var(--poster-paper);
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+body.poster-mode .cube-line-past, body.poster-mode .cube-line-next { display: none; }
+body.poster-mode .cube-line-active { min-height: 46px; }
+body.poster-mode .cube-slots-track { max-width: 100%; gap: 3px; }
+body.poster-mode .cube-face-front { color: var(--poster-ink); background: var(--poster-paper); border-color: var(--poster-paper); border-radius: 3px; box-shadow: none; }
+body.poster-mode .cube-face-top { color: #fff; background: var(--poster-accent); border-color: var(--poster-accent); border-radius: 3px; }
+body.poster-mode .cube-slot.char-sung .cube-face-front { color: var(--poster-accent); border-color: var(--poster-accent); }
+body.poster-mode .cube-slot.char-active .cube-face-front { color: #fff; background: var(--poster-accent); border-color: var(--poster-accent); box-shadow: none; }
+@media (min-width: 761px) {
+  body.poster-mode .cube-lyrics-deck { min-height: 54px; padding: 4px 10px; }
+  body.poster-mode .cube-line-active { min-height: 44px; }
+}
+body.poster-mode #workbenchHandle, body.poster-mode #inspectorDockButton { background: var(--poster-ink); border-color: var(--poster-paper); color: var(--poster-paper); border-radius: 3px; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
+body.poster-mode .bottom-dynamic-dock, body.poster-mode .modular-inspector { backdrop-filter: none; -webkit-backdrop-filter: none; border-color: var(--poster-rule); box-shadow: none; }
+
+@media (min-width: 761px) and (max-width: 1439px) {
+  body.poster-mode .app { grid-template-rows: 124px minmax(0, 1fr); }
+  body.poster-mode .master-deck-hud {
+    display: grid;
+    grid-template-columns: 206px minmax(0, 1fr) auto;
+    grid-template-rows: 48px 52px;
+    grid-template-areas: "capsule modes actions" "player player player";
+    align-content: center;
+    height: auto;
+    padding: 6px 10px;
+    gap: 6px;
+  }
+  body.poster-mode .performance-capsule { grid-area: capsule; }
+  body.poster-mode .poster-mode-host { grid-area: modes; justify-content: center; }
+  body.poster-mode .top-actions { grid-area: actions; }
+  body.poster-mode .deck-player { grid-area: player; width: 100%; }
+  body.poster-mode .deck-info { flex: 0 0 190px; max-width: 190px; }
+  body.poster-mode .time-rail-wrap { flex: 1 1 auto; min-width: 120px; }
+}
+
+@media (max-width: 760px) {
+  body.poster-mode .app { grid-template-rows: auto minmax(0, 1fr); padding: 6px; gap: 6px; }
+  body.poster-mode .master-deck-hud {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: 46px auto 48px;
+    grid-template-areas: "capsule actions" "player player" "modes modes";
+    height: auto;
+    min-height: 0;
+    padding: 5px;
+    gap: 5px;
+  }
+  body.poster-mode .performance-capsule { grid-area: capsule; width: min(206px, 100%); min-width: 0; height: 44px; }
+  body.poster-mode .performance-capsule[data-state="beat"], body.poster-mode .performance-capsule[data-state="lyric"] { width: min(248px, 100%); }
+  body.poster-mode .top-actions { grid-area: actions; }
+  body.poster-mode .deck-player { grid-area: player; grid-column: 1 / -1; grid-row: auto; min-height: 114px; border-radius: 3px; }
+  body.poster-mode .poster-mode-host { grid-area: modes; min-height: 48px; gap: 5px; }
+  body.poster-mode .poster-mode-host .kinetic-mode-switcher { flex: 1 1 auto; width: auto; min-width: 0; }
+  body.poster-mode .poster-mode-host .kinetic-mode-btn { min-height: 40px; font-size: 11px; }
+  body.poster-mode #posterModeHost #workbenchHandle { position: static; flex: 0 0 52px; min-height: 40px; height: 48px; padding: 5px 3px; font-size: 11px; transform: none; }
+  body.poster-mode.workbench-open #posterModeHost #workbenchHandle { bottom: auto; }
+  body.poster-mode .top-actions #immersiveToggle { display: flex; align-items: center; justify-content: center; width: 44px; min-width: 44px; height: 44px; min-height: 44px !important; padding: 0; font-size: 10px; }
+  body.poster-mode .poster-side { display: none; }
+  body.poster-mode .stage-cell { display: flex; grid-row: 2; grid-column: 1; gap: 0; }
+  body.poster-mode .stageWrap { border-radius: 2px; }
+  body.poster-mode .deck-controls #recordToggle,
+  body.poster-mode .deck-controls #prevTrackBtn,
+  body.poster-mode .deck-controls #nextTrackBtn,
+  body.poster-mode .deck-controls #stopTrackBtn,
+  body.poster-mode .deck-controls #playPauseBtn { border-radius: 3px !important; }
+  body.poster-mode #immersiveToggle { min-width: 44px; min-height: 44px; padding: 4px 7px; font-size: 11px; }
+  body.poster-mode .cube-slot { width: 24px; height: 32px; }
+  body.poster-mode .cube-slot-space { width: 9px; }
+  body.poster-mode .cube-face { font-size: 17px; }
+  body.poster-mode .cube-lyrics-deck { min-height: 58px; padding: 6px 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html:not(.lu-full-motion) body.poster-mode .performance-capsule,
+  html:not(.lu-full-motion) body.poster-mode .performance-capsule-copy,
+  html:not(.lu-full-motion) body.poster-mode .performance-capsule-bars i { transition: none !important; }
+}
     </style>
 </head>
 <body>
@@ -2074,6 +2324,15 @@ body.immersive #immersiveToggle {
         </div>
         <div class="brand-sub">物理材质 / 声波矩阵 / 动效母带工作台</div>
       </div>
+    </div>
+
+    <div class="performance-capsule" id="performanceCapsule" data-state="idle" aria-label="演出状态：就绪">
+      <span class="performance-capsule-mark" aria-hidden="true">律</span>
+      <span class="performance-capsule-copy">
+        <strong id="performanceCapsuleLabel">律 · 就绪</strong>
+        <small id="performanceCapsuleDetail">选择音乐开始</small>
+      </span>
+      <span class="performance-capsule-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
     </div>
 
     <!-- 中央母带播放中枢 -->
@@ -2153,6 +2412,8 @@ body.immersive #immersiveToggle {
       </div>
     </div>
 
+    <div class="poster-mode-host" id="posterModeHost" aria-label="歌词演出模式"></div>
+
     <!-- 顶部快捷工具组 -->
     <div class="top-actions">
       <button class="btn active" id="toggleAutoChoreo" title="全变量乐章编排流变总开关">
@@ -2174,6 +2435,11 @@ body.immersive #immersiveToggle {
 
   <!-- 3D 舞台视口区域：外层提供可用空间，内层按母带画幅取景 -->
   <div class="stage-cell" id="stageCell">
+  <div class="poster-side poster-side-left" aria-hidden="true">
+    <span class="poster-side-index">LÜ / PERFORMANCE</span>
+    <div><span class="poster-side-rule"></span><strong id="posterSideLeftTitle">LUFFY</strong><small id="posterTrackLabel">《游京》- 星火社</small></div>
+    <span class="poster-side-note">图像、音乐与角色同场演出</span>
+  </div>
   <section class="stageWrap" id="stageWrap">
     <div id="stage"></div>
     <div id="kineticLyricsStage" class="kinetic-lyrics-stage"></div>
@@ -2219,6 +2485,11 @@ body.immersive #immersiveToggle {
       </div>
     </div>
   </section>
+  <div class="poster-side poster-side-right" aria-hidden="true">
+    <span class="poster-side-index">POSTER / 01—05</span>
+    <div><span class="poster-side-rule"></span><strong id="posterSideRightTitle">KAIDO</strong><small id="posterSideCaption">路飞 vs 凯多</small></div>
+    <span class="poster-side-note">完整海报画幅</span>
+  </div>
   </div>
 
   <button type="button" id="workbenchHandle" aria-controls="workbenchDock" aria-expanded="false" aria-label="唤出调律工作台" title="显示工作台，也可按 W">调律</button>
@@ -2474,9 +2745,9 @@ body.immersive #immersiveToggle {
           <div style="margin-top: 8px;">
             <label><span>项目内置高清背景环境</span></label>
             <select id="presetBgSelect">
-              <option value="studio/alpine-light-background-v1.png" selected>山湖晨光 · 风景壁纸</option>
+              <option value="studio/alpine-light-background-v1.png">山湖晨光 · 风景壁纸</option>
               <optgroup label="航海王海报壁纸 (9:16 极速匹配)">
-                <option value="images/wallpapers/op_luffy_kaido.jpg">路飞 vs 凯多 (Luffy x Kaido)</option>
+                <option value="images/wallpapers/op_luffy_kaido.jpg" selected>路飞 vs 凯多 (Luffy x Kaido)</option>
                 <option value="images/wallpapers/op_zoro_mihawk.jpg">索隆 vs 鹰眼 (Zoro x Mihawk)</option>
                 <option value="images/wallpapers/op_shanks_blackbeard.jpg">红发 vs 黑胡子 (Shanks x Blackbeard)</option>
                 <option value="images/wallpapers/op_law_doflamingo.jpg">罗 vs 明哥 (Law x Doflamingo)</option>
@@ -2812,6 +3083,7 @@ BEAT</textarea>
           <label for="videoAspectSelect"><span>画幅与成片尺寸</span></label>
           <select id="videoAspectSelect" style="width: 100%; margin-top: 4px; margin-bottom: 12px;">
             <option value="landscape">横屏 16:9 · 1920×1080</option>
+            <option value="ultrawide">超宽屏 21:9 · 2560×1080</option>
             <option value="portrait">竖屏 9:16 · 1080×1920</option>
           </select>
           <label><span>导出通用格式</span></label>
@@ -4916,6 +5188,83 @@ function formatTime(sec) {
 
 let isDraggingProgressSlider = false;
 let lastProgressUiUpdate = 0;
+let capsuleLineKey = null;
+let capsuleLyricUntil = 0;
+let capsuleBeatCount = -1;
+let capsuleBeatUntil = 0;
+let capsuleState = '';
+let capsuleChangeTimer = 0;
+function updatePerformanceCapsule(now, track) {
+  if (!document.body.classList.contains('poster-mode')) return;
+  const playing = state.isPlayingMusic && state.audioReady;
+  const trackTitle = track?.title || state.songTitle || '';
+  const line = kineticLyricsManager.mode === 'slot' ? kineticLyricsManager.slotEngine : null;
+  const lineKey = line?.currentText ? `${state.currentTrackIndex}:${line.currentLineKey}` : null;
+  if (playing && lineKey && lineKey !== capsuleLineKey) {
+    capsuleLineKey = lineKey;
+    capsuleLyricUntil = now + 1100;
+  }
+  if (!playing) capsuleLineKey = null;
+  if (playing && state.beatCount !== capsuleBeatCount) {
+    capsuleBeatCount = state.beatCount;
+    if (!prefersReducedMotion && state.beatCount > 0 && state.beatCount % 4 === 0) capsuleBeatUntil = now + 440;
+  }
+
+  let nextState = 'idle';
+  let label = '律 · 就绪';
+  let detail = '选择音乐开始';
+  if (state.isRecording) {
+    nextState = 'record';
+    label = '正在录制';
+    detail = formatTime(Math.floor((Date.now() - state.recordStartTime) / 1000));
+  } else if (state.isPlayingMusic && !state.audioReady) {
+    label = '正在载入';
+    detail = trackTitle;
+  } else if (!state.isPlayingMusic && getPlaybackTime() > 0) {
+    nextState = 'paused';
+    label = '已暂停';
+    detail = trackTitle;
+  } else if (playing && now < capsuleLyricUntil && line?.currentText) {
+    nextState = 'lyric';
+    label = '歌词同步';
+    detail = line.currentText;
+  } else if (playing && now < capsuleBeatUntil) {
+    nextState = 'beat';
+    label = '节拍驱动';
+    detail = '镜头 · 魔方 · 表情';
+  } else if (playing) {
+    nextState = 'playing';
+    label = '正在播放';
+    detail = trackTitle;
+  }
+
+  const capsule = $('#performanceCapsule');
+  const copy = capsule.querySelector('.performance-capsule-copy');
+  const setText = () => {
+    $('#performanceCapsuleLabel').textContent = label;
+    $('#performanceCapsuleDetail').textContent = detail;
+    capsule.setAttribute('aria-label', `演出状态：${label}${detail ? `，${detail}` : ''}`);
+    copy.classList.remove('is-changing');
+  };
+  if (nextState !== capsuleState) {
+    capsuleState = nextState;
+    capsule.dataset.state = nextState;
+    clearTimeout(capsuleChangeTimer);
+    if (prefersReducedMotion) setText();
+    else {
+      copy.classList.add('is-changing');
+      capsuleChangeTimer = setTimeout(setText, 120);
+    }
+  } else if ($('#performanceCapsuleLabel').textContent !== label || $('#performanceCapsuleDetail').textContent !== detail) {
+    clearTimeout(capsuleChangeTimer);
+    setText();
+  }
+  const values = [state.bassEnergy, state.midEnergy, state.trebleEnergy, (state.bassEnergy + state.midEnergy) / 2];
+  capsule.querySelectorAll('.performance-capsule-bars i').forEach((bar, index) => {
+    const amplitude = playing && !prefersReducedMotion ? values[index] : 0;
+    bar.style.transform = `scaleY(${(0.22 + Math.min(1, amplitude) * 0.78).toFixed(2)})`;
+  });
+}
 function updateProgressUI(force = false) {
   const now = performance.now();
   if (!force && now - lastProgressUiUpdate < 100) return;
@@ -4930,6 +5279,8 @@ function updateProgressUI(force = false) {
     const pct = dur > 0 ? (curTime / dur) * 100 : 0;
     $('#timeProgressSlider').value = pct.toFixed(1);
   }
+  $('#posterTrackLabel').textContent = curTrack?.title || state.songTitle;
+  updatePerformanceCapsule(now, curTrack);
 }
 
 function initAudioEngine() {
@@ -5463,6 +5814,9 @@ function onResize() {
   composer.setSize(width, height);
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
+  if (document.body.classList.contains('poster-mode') && !state.isPlayingMusic && kineticLyricsManager.mode !== 'gravity' && matrixGroup.children.length) {
+    pendingFrameDistance = framingDistance(formationRadius(state.activeFormation), camera.fov, PERFORMANCE_FRAME_FIT);
+  }
   if(scene.background?.isTexture)fitBackgroundTexture(scene.background);
   if (typeof kineticLyricsManager !== 'undefined' && kineticLyricsManager?.mode === 'gravity') {
     kineticLyricsManager.gravityEngine?.onAspectChange();
@@ -7347,6 +7701,7 @@ $('#albumClearBtn')?.addEventListener('click', () => {
 // 背景颜色与图片控制
 function setBackgroundColor(hex) {
   backgroundRequest++;
+  applyPosterWallpaper('');
   $('#presetBgSelect').value='';
   keyLight.color.set(0xffffff);hemiLight.color.set(0xffffff);
   state.backgroundColor = hex;
@@ -7375,6 +7730,50 @@ $('#resetBgBtn').addEventListener('click', () => {
   if ($('#presetBgSelect')) $('#presetBgSelect').value = '';
 });
 
+// 对战海报只改变界面外壳；角色、歌词时钟和舞台录制继续共用现有状态。
+const POSTER_WALLPAPERS = Object.freeze({
+  'images/wallpapers/op_luffy_kaido.jpg': { left: 'LUFFY', right: 'KAIDO', caption: '路飞 vs 凯多', accent: '#ce342d', secondary: '#5869a8', wide: 'images/wallpapers/op_luffy_kaido_wide.jpg' },
+  'images/wallpapers/op_zoro_mihawk.jpg': { left: 'ZORO', right: 'MIHAWK', caption: '索隆 vs 鹰眼', accent: '#275347', secondary: '#b79a63', wide: 'images/wallpapers/op_zoro_mihawk_wide.jpg' },
+  'images/wallpapers/op_shanks_blackbeard.jpg': { left: 'SHANKS', right: 'BLACKBEARD', caption: '红发 vs 黑胡子', accent: '#bd342e', secondary: '#e9dfcb', wide: 'images/wallpapers/op_shanks_blackbeard_wide.jpg' },
+  'images/wallpapers/op_law_doflamingo.jpg': { left: 'LAW', right: 'DOFLAMINGO', caption: '罗 vs 明哥', accent: '#4477b4', secondary: '#c1406e', wide: 'images/wallpapers/op_law_doflamingo_wide.jpg' },
+  'images/wallpapers/op_luffy_crocodile.jpg': { left: 'LUFFY', right: 'CROCODILE', caption: '路飞 vs 克洛克达尔', accent: '#ad4434', secondary: '#31534b', wide: 'images/wallpapers/op_luffy_crocodile_wide.jpg' }
+});
+function placePosterControls() {
+  const mobilePoster = document.body.classList.contains('poster-mode') && window.innerWidth <= 760;
+  const workbenchButton = $('#workbenchHandle');
+  const immersiveButton = $('#immersiveToggle');
+  if (mobilePoster) $('#posterModeHost').appendChild(workbenchButton);
+  else stageCellEl.after(workbenchButton);
+  if (mobilePoster && !document.body.classList.contains('immersive')) $('.top-actions').appendChild(immersiveButton);
+  else $('.stage-hud-right').prepend(immersiveButton);
+}
+function applyPosterWallpaper(url) {
+  const poster = POSTER_WALLPAPERS[url];
+  const enabled = Boolean(poster);
+  document.body.classList.toggle('poster-mode', enabled);
+  stageWrapEl.classList.toggle('poster-mode', enabled);
+  const modeSwitcher = $('#kineticModeSwitcher');
+  if (enabled) {
+    $('#posterModeHost').appendChild(modeSwitcher);
+    document.body.style.setProperty('--poster-accent', poster.accent);
+    document.body.style.setProperty('--poster-secondary', poster.secondary);
+    $('#posterSideLeftTitle').textContent = poster.left;
+    $('#posterSideRightTitle').textContent = poster.right;
+    $('#posterSideCaption').textContent = poster.caption;
+    const posterAspect = window.innerWidth > 760 ? 'ultrawide' : 'portrait';
+    if (!state.isRecording && state.videoAspect !== posterAspect) {
+      state.videoAspect = posterAspect;
+      $('#videoAspectSelect').value = posterAspect;
+    }
+  } else {
+    $('#stageHudLeft').insertBefore(modeSwitcher, $('#motionPreferenceBtn'));
+    document.body.style.removeProperty('--poster-accent');
+    document.body.style.removeProperty('--poster-secondary');
+  }
+  placePosterControls();
+  fitStagePreview();
+}
+
 // 项目内置背景图选择
 let backgroundRequest=0;
 function fitBackgroundTexture(tex) {
@@ -7383,8 +7782,10 @@ function fitBackgroundTexture(tex) {
   tex.offset.set((1-tex.repeat.x)/2,(1-tex.repeat.y)/2);
 }
 function loadLandscapeBackground(url) {
+  applyPosterWallpaper(url);
   const request=++backgroundRequest;
-  new THREE.TextureLoader().load(url,tex=>{
+  const textureUrl = window.innerWidth > 760 ? (POSTER_WALLPAPERS[url]?.wide || url) : url;
+  new THREE.TextureLoader().load(textureUrl,tex=>{
     if(request!==backgroundRequest){tex.dispose();return;}
     tex.colorSpace=THREE.SRGBColorSpace;fitBackgroundTexture(tex);
     state.bgImageTexture=tex;scene.background=tex;scene.fog=null;studioFloor.visible=false;
@@ -7393,6 +7794,10 @@ function loadLandscapeBackground(url) {
   },undefined,()=>{if(request===backgroundRequest){setBackgroundColor('#727b88');$('#presetBgSelect').value='';}});
 }
 window.addEventListener('resize',()=>{if(scene.background?.isTexture)fitBackgroundTexture(scene.background);});
+window.matchMedia('(min-width: 761px)').addEventListener('change', () => {
+  const selected = $('#presetBgSelect')?.value;
+  if (POSTER_WALLPAPERS[selected]) loadLandscapeBackground(selected);
+});
 window.loadLandscapeBackground = loadLandscapeBackground;
 window.setWallpaper = function(url) {
   if ($('#presetBgSelect')) $('#presetBgSelect').value = url;
@@ -7406,11 +7811,12 @@ $('#presetBgSelect')?.addEventListener('change', e => {
   }
   loadLandscapeBackground(url);
 });
-loadLandscapeBackground('studio/alpine-light-background-v1.png');
+loadLandscapeBackground('images/wallpapers/op_luffy_kaido.jpg');
 
 $('#bgImgUpload').addEventListener('change', e => {
   const file = e.target.files[0];
   if (!file) return;
+  applyPosterWallpaper('');
   const reader = new FileReader();
   reader.onload = ev => {
     new THREE.TextureLoader().load(ev.target.result, tex => {
@@ -7716,7 +8122,7 @@ $('#recordToggle').addEventListener('click', toggleScreenRecording);
 
 try {
   const savedAspect = localStorage.getItem('lu_video_aspect');
-  if (VIDEO_PRESETS[savedAspect]) state.videoAspect = savedAspect;
+  if (VIDEO_PRESETS[savedAspect] && !document.body.classList.contains('poster-mode')) state.videoAspect = savedAspect;
 } catch (_) {}
 $('#videoAspectSelect').value = state.videoAspect;
 fitStagePreview();
@@ -8011,6 +8417,7 @@ $$('.inspector-tab-btn').forEach(button => button.addEventListener('click', () =
 
 function setImmersive(enabled) {
   document.body.classList.toggle('immersive', enabled);
+  placePosterControls();
   const toggle = $('#immersiveToggle');
   toggle.setAttribute('aria-pressed', String(enabled));
   toggle.textContent = enabled ? '返回工作台' : '沉浸';

@@ -3,6 +3,7 @@
 // with the same stage-relative geometry. Editing controls are never drawn.
 export const VIDEO_PRESETS = Object.freeze({
   landscape: { width: 1920, height: 1080, label: '16:9' },
+  ultrawide: { width: 2560, height: 1080, label: '21:9' },
   portrait: { width: 1080, height: 1920, label: '9:16' }
 });
 
@@ -44,19 +45,31 @@ export function drawPerformanceFrame(ctx, sceneCanvas, stageElement, lyricMode) 
   };
 
   const panel = box(deck);
+  const posterMode = stageElement.classList.contains('poster-mode');
+  const posterAccent = posterMode
+    ? (getComputedStyle(document.body).getPropertyValue('--poster-accent').trim() || '#ce342d')
+    : '#3158a6';
   ctx.save();
-  ctx.fillStyle = 'rgba(252, 252, 253, 0.96)';
-  ctx.strokeStyle = 'rgba(178, 189, 206, 0.95)';
+  ctx.fillStyle = posterMode ? 'rgba(17, 17, 22, 0.96)' : 'rgba(252, 252, 253, 0.96)';
+  ctx.strokeStyle = posterMode ? '#ede2cf' : 'rgba(178, 189, 206, 0.95)';
   ctx.lineWidth = Math.max(1, averageScale);
-  roundedRect(ctx, panel.x, panel.y, panel.width, panel.height, 18 * averageScale);
-  ctx.fill();
-  ctx.stroke();
+  if (posterMode) {
+    ctx.fillRect(panel.x, panel.y, panel.width, panel.height);
+    ctx.beginPath();
+    ctx.moveTo(panel.x, panel.y + ctx.lineWidth / 2);
+    ctx.lineTo(panel.x + panel.width, panel.y + ctx.lineWidth / 2);
+    ctx.stroke();
+  } else {
+    roundedRect(ctx, panel.x, panel.y, panel.width, panel.height, 18 * averageScale);
+    ctx.fill();
+    ctx.stroke();
+  }
 
   for (const [selector, color] of [['.cube-line-past', '#505e72'], ['.cube-line-next', '#505e72']]) {
     const line = deck.querySelector(selector);
-    if (!line?.textContent?.trim()) continue;
+    if (!line?.textContent?.trim() || getComputedStyle(line).display === 'none') continue;
     const lineBox = box(line);
-    ctx.fillStyle = color;
+    ctx.fillStyle = posterMode ? '#ede2cf' : color;
     ctx.font = `600 ${Math.max(12, lineBox.height * 0.72)}px sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -73,12 +86,12 @@ export function drawPerformanceFrame(ctx, sceneCanvas, stageElement, lyricMode) 
     const inner = slot.querySelector('.cube-slot-inner');
     const opacity = inner ? Number.parseFloat(getComputedStyle(inner).opacity) : 1;
     ctx.globalAlpha = Number.isFinite(opacity) ? Math.max(0.35, opacity) : 1;
-    ctx.fillStyle = isCurrent ? '#3158a6' : '#ffffff';
-    ctx.strokeStyle = isCurrent ? '#3158a6' : '#cad4e3';
-    roundedRect(ctx, tile.x, tile.y, tile.width, tile.height, 6 * averageScale);
+    ctx.fillStyle = isCurrent ? posterAccent : (posterMode ? '#ede2cf' : '#ffffff');
+    ctx.strokeStyle = isCurrent ? posterAccent : (posterMode ? '#ede2cf' : '#cad4e3');
+    roundedRect(ctx, tile.x, tile.y, tile.width, tile.height, (posterMode ? 3 : 6) * averageScale);
     ctx.fill();
     ctx.stroke();
-    ctx.fillStyle = isCurrent ? '#ffffff' : (isSung ? '#3158a6' : '#243448');
+    ctx.fillStyle = isCurrent ? '#ffffff' : (isSung ? posterAccent : (posterMode ? '#111116' : '#243448'));
     const fontSize = Math.min(tile.height * 0.62, tile.width * 0.68);
     ctx.font = `700 ${Math.max(12, fontSize)}px sans-serif`;
     ctx.textAlign = 'center';

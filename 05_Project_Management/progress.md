@@ -9,6 +9,8 @@
 
 ## Active Assets
 
+- [律的对决海报界面与桌面超宽屏壁纸报告](Reports/2026-10-08-lu-battle-poster-ui.md)
+- [律的 15 秒竖屏动效样片报告](Reports/2026-10-07-lu-vertical-motion-study.md)
 - [律的手机减少动效静止路径修复报告](Reports/2026-10-06-lu-mobile-motion-preference.md)
 - [律的音乐编排、镜头与表情回归修复报告](Reports/2026-10-02-lu-music-choreography-regression.md)
 - [律的机械魔方编排与手机反重力山体修复报告](Reports/2026-10-01-lu-motion-mound-fix.md)
@@ -23,6 +25,8 @@
 
 ## Recent Results
 
+- Action: 用五张既有对决海报统一律的界面语言，并生成对应桌面横幅；桌面 21:9、手机 9:16 按视口切换，歌词与操作控件避让原画。Validation: AGY 3.8 Flash High 只读审查、四种视口实景、双画幅录制与音乐编排回归通过；原生 21:9 录制性能及实体手机待验。Report: `Reports/2026-10-08-lu-battle-poster-ui.md`。Agent: codex · 2026-10-08。
+- Action: 基于《游京》手机实景制作 15 秒竖屏动效样片，让同一状态胶囊贯穿播放、节拍、歌词与录制，并交付封面。Validation: 1080×1920、30 fps、450 帧、有声视频与关键画面检查通过；源录制采用 540×960，实体手机及原生高分辨率性能待验。Report: `Reports/2026-10-07-lu-vertical-motion-study.md`。Agent: codex · 2026-10-07。
 - Action: 修复手机系统“减少动态效果”会无提示关停机械魔方及关闭歌词模式全部音乐编排的路径；主画面提供可持久保存的一键完整演出入口。Validation: 手机视口复现静止并通过真实点击恢复《游京》的 FOV、运镜和表情；两模式自动化回归通过，实体手机待验。Report: `Reports/2026-10-06-lu-mobile-motion-preference.md`。Agent: codex · 2026-10-06。
 - Action: 重新接通机械魔方与关闭模式的音乐节拍动作、乐章 FOV 镜头谱和音乐表情，并为窄镜头预留画幅。Validation: 先复现原版静态镜头，再通过新增回归测试、实际歌曲的手机视口播放、头像测试与几何检查；实体手机未验。Report: `Reports/2026-10-02-lu-music-choreography-regression.md`。Agent: codex · 2026-10-02。
 - Action: 恢复机械魔方和关闭歌词模式的可见运动与乐章材质切换；将手机反重力山体加高到 12 层／270 枚，并让旧歌词贴合山脊融入。Validation: 桌面与手机浏览器实景、乐章切换、歌词端到端和现有测试通过；实体手机未验。Report: `Reports/2026-10-01-lu-motion-mound-fix.md`。Agent: codex · 2026-10-01。
