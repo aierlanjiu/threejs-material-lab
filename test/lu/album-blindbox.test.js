@@ -106,7 +106,7 @@ const run = async () => {
   const errors = [];
   page.on('pageerror', e => errors.push(String(e)));
   page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
-  await page.goto(BASE + 'index.html', { waitUntil: 'domcontentloaded' });
+  await page.goto(BASE + 'index.html?intro=skip', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.luDiagnostics && window.state
     && window.luDiagnostics.matrixGroup && window.luDiagnostics.matrixGroup.children.length > 0, { timeout: 30000 });
   // 刻意不启用 CDP 虚拟时钟：createImageBitmap 在 'advance' 策略下不会 resolve，

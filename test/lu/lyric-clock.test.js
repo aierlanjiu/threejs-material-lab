@@ -17,7 +17,7 @@ try {
       return schedule(callback);
     };
   });
-  await page.goto('http://localhost:8000/index.html', { waitUntil: 'domcontentloaded' });
+  await page.goto('http://localhost:8000/index.html?intro=skip', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => Boolean(window.luDiagnostics && window.__luFrame));
   const result = await page.evaluate(() => {
     window.luDiagnostics.composer.render = () => {};

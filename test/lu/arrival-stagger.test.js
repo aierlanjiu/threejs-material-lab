@@ -70,7 +70,7 @@ const run = async () => {
   const errors = [];
   page.on('pageerror', e => errors.push(String(e)));
   page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
-  await page.goto(BASE + 'index.html', { waitUntil: 'domcontentloaded' });
+  await page.goto(BASE + 'index.html?intro=skip', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.luDiagnostics && window.state
     && window.luDiagnostics.matrixGroup && window.luDiagnostics.matrixGroup.children.length > 0, { timeout: 30000 });
   const cdp = await page.context().newCDPSession(page);

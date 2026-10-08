@@ -2327,6 +2327,7 @@ body.poster-mode.immersive .stageWrap { flex: 1 1 auto; width: 100%; height: 100
 body.immersive .stage-hud-right { top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); }
 </style>
 <link rel="stylesheet" href="./css/lu-control-motion.css">
+<link rel="stylesheet" href="./css/lu-cube-intro.css">
 </head>
 <body>
 <div class="app">
@@ -2345,7 +2346,7 @@ body.immersive .stage-hud-right { top: max(12px, env(safe-area-inset-top)); righ
     </div>
 
     <button type="button" class="performance-capsule" id="performanceCapsule" data-state="idle" aria-label="打开律核工作台" aria-expanded="false" aria-controls="lueCoreDrawer">
-      <span class="performance-capsule-mark" aria-hidden="true">律</span>
+      <span class="performance-capsule-mark" aria-hidden="true"><span class="lu-core-mark-fallback">律</span></span>
       <span class="performance-capsule-copy">
         <strong id="performanceCapsuleLabel">律 · 就绪</strong>
         <small id="performanceCapsuleDetail">选择音乐开始</small>
@@ -2618,6 +2619,10 @@ body.immersive .stage-hud-right { top: max(12px, env(safe-area-inset-top)); righ
                 <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="15" y1="3" x2="15" y2="21"></line></svg>
                 打开完整检查器面板 (深度编辑)
               </button>
+            </div>
+            <div class="lue-create-intro-actions">
+              <button type="button" class="btn" id="luCoreReplay">重看表情魔方入场</button>
+              <button type="button" class="btn" id="luCoreMute" aria-pressed="true">入场音效：开</button>
             </div>
             <a href="./mascot_studio.html" class="btn lue-related-link" id="navToLiBtn" title="前往『 荔 』(LI) 3D 陪伴工作室">
               <span aria-hidden="true">🌰</span> 荔 / LI 工作室
@@ -3217,6 +3222,22 @@ BEAT</textarea>
 
 </div>
 
+<section class="lu-intro-overlay" id="luIntroOverlay" role="dialog" aria-modal="true" aria-labelledby="luIntroHeading">
+  <div class="lu-intro-curtain" aria-hidden="true"><i></i><i></i></div>
+  <div class="lu-intro-tools">
+    <button type="button" id="luIntroMute" aria-pressed="true" aria-label="关闭入场音效" title="关闭入场音效"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path class="lu-sound-on" d="M16 9a4 4 0 0 1 0 6m2-9a8 8 0 0 1 0 12"/><path class="lu-sound-off" d="m16 9 5 6m0-6-5 6"/></svg></button>
+  </div>
+  <div class="lu-intro-stage">
+    <h1 id="luIntroHeading" class="lu-intro-sr-only" tabindex="-1">律，表情魔方入场</h1>
+    <button type="button" class="lu-intro-activate" id="luIntroActivate" aria-label="点击表情魔方，唤醒律并展开舞台">
+      <span class="lu-intro-fallback" aria-hidden="true">律</span>
+    </button>
+    <p class="lu-intro-hint" aria-hidden="true">轻触魔方</p>
+    <p class="lu-intro-sr-only" id="luIntroStatus" role="status">点击魔方，唤醒律</p>
+  </div>
+  <button type="button" class="lu-intro-skip" id="luIntroSkip">跳过</button>
+</section>
+
 <!-- 图像裁剪模态弹窗 -->
 <div class="modal-backdrop" id="cropperModal">
   <div class="modal-card">
@@ -3255,6 +3276,7 @@ import { KineticLyricsManager } from './js/ui/kinetic-lyrics.js?v=20261006-motio
 import { VIDEO_PRESETS, drawPerformanceFrame } from './js/ui/recording-compositor.js';
 import { lyricCharacters, characterCues, characterCursorAt } from './js/ui/lyric-timing.js';
 import { AVATAR_MANIFEST } from './assets/live-avatars/manifest.js';
+import { createLuCubeIntro } from './js/ui/lu-cube-intro.js';
 
 function showToast(msg, duration = 3000) {
   motionToast($('#toast'), msg, duration);
@@ -8549,6 +8571,7 @@ const lueCore = {
       $('#workbenchDock').inert = !choreoActive;
       $('#workbenchDock').setAttribute('aria-hidden', String(!choreoActive));
     }
+    window.luCubeIntro?.turnToFacet(facet);
   }
 };
 window.lueCore = lueCore;
@@ -8877,6 +8900,17 @@ updateProgressUI(true);
 syncInspectorAccessibility();
 motionTabSwitch($('#tab-optics'));
 requestAnimationFrame(animate);
+window.luCubeIntro = createLuCubeIntro({
+  THREE,
+  manifest: AVATAR_MANIFEST,
+  stageState: state,
+  cubeGeometry: currentRoundedGeo.clone(),
+  cubeMaterial: createMaterialPreset(ui.material.value, ui.color.value),
+  environment: scene.environment,
+  getStageCells: () => matrixGroup.children.map(mesh => ({
+    x: mesh.position.x, y: mesh.position.y, z: mesh.position.z
+  }))
+});
 </script>
 <div id="toast" class="toast" role="status"></div>
 </body>

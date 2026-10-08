@@ -261,7 +261,7 @@ async function run() {
   const errors = [];
   page.on('pageerror', error => errors.push(String(error)));
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
-  await page.goto(BASE, { waitUntil: 'domcontentloaded' });
+  await page.goto(BASE + (BASE.includes('?') ? '&' : '?') + 'intro=skip', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.luDiagnostics && window.state);
   if (process.env.LU_DUMP === '1') await page.evaluate(() => { window.__luDump = true; });
   const cdp = await page.context().newCDPSession(page);

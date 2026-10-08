@@ -7,7 +7,7 @@ try {
     const page = await browser.newPage({ viewport: { width, height: 900 } });
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
-    await page.goto('http://localhost:8000/index.html', { waitUntil: 'domcontentloaded' });
+    await page.goto('http://localhost:8000/index.html?intro=skip', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => Boolean(window.luDiagnostics));
 
     console.log(`[${width}px] page loaded`);

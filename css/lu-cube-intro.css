@@ -1,0 +1,211 @@
+/* A quiet, tactile entrance. The opening renderer continues as the LÜ Core. */
+.lu-intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: #f2e8da;
+  background: #101014;
+  perspective: 1400px;
+}
+.lu-intro-overlay[hidden] { display: none !important; }
+.lu-intro-overlay.is-revealing { background: transparent; }
+.lu-intro-overlay::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse min(35vw, 280px) min(32vw, 260px) at 50% 52%, rgba(206, 130, 99, .17), transparent 82%);
+  opacity: .76;
+  transition: opacity 650ms ease, transform 650ms cubic-bezier(.16, 1, .3, 1);
+}
+.lu-intro-overlay.is-solved::before { opacity: 1; transform: scale(1.22); }
+.lu-intro-overlay.is-revealing::before { opacity: 0; }
+.lu-intro-curtain {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  display: flex;
+  pointer-events: none;
+}
+.lu-intro-curtain i {
+  position: relative;
+  display: block;
+  width: 50%;
+  height: 100%;
+  background: #101014;
+  transition: transform 1180ms cubic-bezier(.16, 1, .3, 1);
+  will-change: transform;
+}
+.lu-intro-curtain i:first-child { transform-origin: right center; }
+.lu-intro-curtain i:last-child { transform-origin: left center; }
+.lu-intro-curtain i:first-child::after,
+.lu-intro-curtain i:last-child::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(transparent 15%, rgba(241, 194, 151, .48), transparent 85%);
+  box-shadow: 0 0 24px 5px rgba(241, 194, 151, .12);
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+.lu-intro-curtain i:first-child::after { right: 0; }
+.lu-intro-curtain i:last-child::before { left: 0; }
+.lu-intro-overlay.is-revealing .lu-intro-curtain i:first-child { transform: translateX(-104%) rotateY(-8deg); }
+.lu-intro-overlay.is-revealing .lu-intro-curtain i:last-child { transform: translateX(104%) rotateY(8deg); }
+.lu-intro-overlay.is-revealing .lu-intro-curtain i:first-child::after,
+.lu-intro-overlay.is-revealing .lu-intro-curtain i:last-child::before { opacity: 1; }
+body.lu-intro-active .stageWrap {
+  transform: scale(1.07);
+  transform-origin: center;
+  transition: transform 1180ms cubic-bezier(.16, 1, .3, 1);
+}
+body.lu-intro-revealing .stageWrap { transform: scale(1); }
+.lu-intro-tools {
+  position: absolute;
+  z-index: 3;
+  top: max(20px, env(safe-area-inset-top));
+  right: max(20px, env(safe-area-inset-right));
+}
+.lu-intro-tools button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: rgba(242, 232, 218, .76);
+  background: rgba(255, 255, 255, .045);
+  cursor: pointer;
+  transition: background 180ms ease, color 180ms ease, transform 180ms ease;
+}
+.lu-intro-tools button:hover { background: rgba(255, 255, 255, .10); color: #f2e8da; }
+.lu-intro-tools button:active,
+.lu-intro-skip:active,
+.lue-create-intro-actions button:active { transform: scale(.94); }
+.lu-intro-tools svg {
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.6;
+}
+.lu-intro-tools button[aria-pressed="true"] .lu-sound-off,
+.lu-intro-tools button[aria-pressed="false"] .lu-sound-on { display: none; }
+.lu-intro-stage {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100dvh;
+  padding: 64px 20px 76px;
+  box-sizing: border-box;
+  text-align: center;
+}
+.lu-intro-activate {
+  display: grid;
+  place-items: center;
+  width: min(430px, max(260px, 86vw));
+  height: min(430px, max(260px, 86vw));
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #f2e8da;
+  cursor: pointer;
+  transform-origin: center;
+  transition: transform 1180ms cubic-bezier(.16, 1, .3, 1), opacity 470ms ease 610ms;
+}
+.lu-intro-activate:disabled { cursor: wait; }
+.lu-intro-activate .lu-cube-canvas { display: block; max-width: 100%; }
+.lu-intro-activate:has(.lu-cube-canvas) .lu-intro-fallback { display: none; }
+.lu-intro-fallback {
+  display: grid;
+  place-items: center;
+  width: 154px;
+  height: 154px;
+  color: #f2e8da;
+  background: #c94f64;
+  border: 12px solid #211b21;
+  border-radius: 16px;
+  font-family: 'TsangerJinKai02', sans-serif;
+  font-size: 82px;
+  transform: rotate(-14deg);
+}
+.lu-intro-hint {
+  margin: 8px 0 0;
+  color: rgba(242, 232, 218, .56);
+  font: 500 12px/1.5 'PingFang SC', 'Noto Sans CJK SC', sans-serif;
+  letter-spacing: .2em;
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+.lu-intro-skip {
+  position: absolute;
+  z-index: 3;
+  right: max(27px, env(safe-area-inset-right));
+  bottom: max(22px, env(safe-area-inset-bottom));
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 4px;
+  border: 0;
+  color: rgba(242, 232, 218, .52);
+  background: transparent;
+  font: 500 12px/1 'PingFang SC', 'Noto Sans CJK SC', sans-serif;
+  cursor: pointer;
+  transition: color 180ms ease, transform 180ms ease;
+}
+.lu-intro-skip:hover { color: #f2e8da; }
+.lu-intro-sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+.lu-intro-tools button:focus-visible,
+.lu-intro-skip:focus-visible,
+.lu-intro-activate:focus-visible { outline: 2px solid #f1c297; outline-offset: 4px; }
+.lu-intro-overlay.is-revealing .lu-intro-activate { transform: scale(1.78); opacity: 0; }
+.lu-intro-overlay.is-revealing :is(.lu-intro-hint, .lu-intro-tools, .lu-intro-skip) {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
+}
+.performance-capsule-mark.has-lu-cube {
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  background: #16151b;
+  overflow: hidden;
+}
+.performance-capsule-mark.has-lu-cube .lu-core-mark-fallback { display: none; }
+.performance-capsule-mark .lu-cube-canvas { display: block; pointer-events: none; }
+.lue-create-intro-actions { display: flex; gap: 8px; margin-top: 10px; }
+.lue-create-intro-actions .btn { flex: 1 1 50%; min-width: 0; }
+@media (max-width: 760px) {
+  .lu-intro-stage { padding-top: 76px; }
+  .lu-intro-hint { margin-top: 8px; }
+  .performance-capsule-mark.has-lu-cube { flex-basis: 38px; width: 38px; height: 38px; }
+  .performance-capsule-mark .lu-cube-canvas { width: 38px !important; height: 38px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html:not(.lu-full-motion) .lu-intro-curtain i,
+  html:not(.lu-full-motion) .lu-intro-overlay::before,
+  html:not(.lu-full-motion) .lu-intro-activate,
+  html:not(.lu-full-motion) body.lu-intro-active .stageWrap,
+  html:not(.lu-full-motion) .lu-intro-hint { transition: none !important; }
+}

@@ -9,6 +9,7 @@
 
 ## Active Assets
 
+- [律的表情魔方入场与律核接续报告](Reports/2026-10-08-lu-expression-cube-intro.md)
 - [律核单入口四面工作台接手交付报告](Reports/2026-10-08-lu-core-handoff-completion.md)
 - [律核关键状态设计稿](Reports/2026-10-08-lu-core-key-states.md)
 - [律的控件动效与调律工作台改造报告](Reports/2026-10-08-lu-control-motion-adaptation.md)
@@ -29,6 +30,7 @@
 
 ## Recent Results
 
+- Action: 用现有圆角 cube 材质和角色表情制作真实分层魔方入场；按极简设计收敛界面，归位后由中心展开画布并散开小 cube，同一画布缩为常驻律核；保留音效、重播、静音、跳过与减少动效。Validation: 桌面/手机实景、1440/390px 入场回归、既有工作台及双画幅录制通过；实体手机待验。Report: `Reports/2026-10-08-lu-expression-cube-intro.md`。Agent: codex · 2026-10-09。
 - Action: AGY 中断后接手律核单入口，将播放、演出、创作、录制控件集中到四面工作台，修复移动布局、非海报入口、录制状态与键盘焦点。Validation: 1440/390/342px 布局、双画幅真实录制、音乐编排与主画面几何回归通过；实体手机待验。Report: `Reports/2026-10-08-lu-core-handoff-completion.md`。Agent: codex · 2026-10-08。
 - Action: 将推文的原位状态切换与直接操控迁移到律的播放器、录制按钮、状态胶囊、工作台及检查器，保持对决海报和 WebGL 演出；手机抽屉限制在 35dvh 内并避让歌词。Validation: 双画幅真实录制、342px/1440px 布局、390px 控件及音乐编排回归通过；AGY 3.8 Flash High 方案审阅已参考，本次代码复核超时未取得结论。Report: `Reports/2026-10-08-lu-control-motion-adaptation.md`。Agent: codex · 2026-10-08。
 - Action: 修复海报模式覆盖手机沉浸状态的顶部 UI 隐藏和全屏尺寸；支持原生全屏与视口全屏退化，并核对线上动效与推文提示词的实际符合范围。Validation: 390×844 实景、342px 原生／退化全屏及退出回归、1440px 桌面布局通过；实体手机待验。Report: `Reports/2026-10-08-lu-mobile-immersive.md`。Agent: codex · 2026-10-08。

@@ -36,7 +36,7 @@ try {
       return 1;
     };
   });
-  await page.goto(`http://127.0.0.1:${server.address().port}/index.html`, { waitUntil: 'domcontentloaded' });
+  await page.goto(`http://127.0.0.1:${server.address().port}/index.html?intro=skip`, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => Boolean(window.luDiagnostics && window.__nextLuFrame));
 
   const result = await page.evaluate(() => {
