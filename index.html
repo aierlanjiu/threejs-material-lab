@@ -2327,6 +2327,7 @@ body.immersive .stageWrap,
 body.poster-mode.immersive .stageWrap { flex: 1 1 auto; width: 100%; height: 100%; border: 0; border-radius: 0; }
 body.immersive .stage-hud-right { top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); }
 </style>
+<link rel="stylesheet" href="./css/lu-control-motion.css">
 </head>
 <body>
 <div class="app">
@@ -2390,10 +2391,13 @@ body.immersive .stage-hud-right { top: max(12px, env(safe-area-inset-top)); righ
             <span class="rec-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;box-shadow:0 0 8px #ef4444;"></span>
             <span class="rec-label">录制中</span> <span class="rec-timer" style="font-variant-numeric:tabular-nums;font-size:11px;">00:00</span>
           </span>
+          <span class="face face-exporting" aria-hidden="true" inert><span class="export-spinner" aria-hidden="true"></span>封装</span>
           <span class="face face-done" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;opacity:0;" aria-hidden="true" inert>
             <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> 已导出
           </span>
+          <span class="face face-error" aria-hidden="true" inert>导出失败</span>
         </button>
+        <span id="recordStatusAnnouncement" class="lu-sr-only" role="status" aria-live="polite"></span>
         <button class="btn" id="nextTrackBtn" title="下一首">
           <svg class="svg-icon" viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19"></line></svg>
         </button>
@@ -3156,7 +3160,7 @@ import { EffectComposer } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examp
 import { RenderPass } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/postprocessing/RenderPass.js/+esm';
 import { UnrealBloomPass } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/postprocessing/UnrealBloomPass.js/+esm';
 import { OutputPass } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/postprocessing/OutputPass.js/+esm';
-import { motionRise, motionLeave, motionMorph, motionTabSwitch, motionToast, motionTextMorph, haptic } from './js/ui/motion-adapter.js';
+import { motionRise, motionLeave, motionTabSwitch, motionToast, motionTextMorph, haptic } from './js/ui/motion-adapter.js';
 import { KineticLyricsManager } from './js/ui/kinetic-lyrics.js?v=20261006-motion';
 import { VIDEO_PRESETS, drawPerformanceFrame } from './js/ui/recording-compositor.js';
 import { lyricCharacters, characterCues, characterCursorAt } from './js/ui/lyric-timing.js';
@@ -3205,24 +3209,22 @@ function triggerMaterialGlowPulse(duration = 360) {
   };
 }
 
+function showControlFace(button, faceName) {
+  button.querySelectorAll('.face').forEach(face => {
+    const selected = face.classList.contains(faceName);
+    face.toggleAttribute('inert', !selected);
+    face.setAttribute('aria-hidden', String(!selected));
+    face.style.opacity = selected ? '1' : '0';
+  });
+}
+
 function setPlayPauseButtonState(isPlaying) {
   const btn = $('#playPauseBtn');
   if (!btn) return;
-  const facePlay = btn.querySelector('.face-play');
-  const facePause = btn.querySelector('.face-pause');
-  if (isPlaying) {
-    btn.classList.add('choreography-active');
-    btn.setAttribute('aria-label', '暂停');
-    if (facePlay && facePause) {
-      motionMorph(facePlay, facePause);
-    }
-  } else {
-    btn.classList.remove('choreography-active');
-    btn.setAttribute('aria-label', '播放');
-    if (facePlay && facePause) {
-      motionMorph(facePause, facePlay);
-    }
-  }
+  btn.classList.toggle('choreography-active', isPlaying);
+  btn.dataset.playState = isPlaying ? 'playing' : 'paused';
+  btn.setAttribute('aria-label', isPlaying ? '暂停' : '播放');
+  showControlFace(btn, isPlaying ? 'face-pause' : 'face-play');
 }
 
 
@@ -5212,6 +5214,7 @@ let capsuleBeatCount = -1;
 let capsuleBeatUntil = 0;
 let capsuleState = '';
 let capsuleChangeTimer = 0;
+let recordUiState = 'idle';
 function updatePerformanceCapsule(now, track) {
   if (!document.body.classList.contains('poster-mode')) return;
   const playing = state.isPlayingMusic && state.audioReady;
@@ -5231,11 +5234,24 @@ function updatePerformanceCapsule(now, track) {
   let nextState = 'idle';
   let label = '律 · 就绪';
   let detail = '选择音乐开始';
-  if (state.isRecording) {
+  if (recordUiState === 'recording' || state.isRecording) {
     nextState = 'record';
     label = '正在录制';
     detail = formatTime(Math.floor((Date.now() - state.recordStartTime) / 1000));
+  } else if (recordUiState === 'exporting') {
+    nextState = 'exporting';
+    label = '正在封装';
+    detail = '生成演出视频';
+  } else if (recordUiState === 'success') {
+    nextState = 'success';
+    label = '导出完成';
+    detail = '视频已保存';
+  } else if (recordUiState === 'error') {
+    nextState = 'error';
+    label = '录制失败';
+    detail = '请重试';
   } else if (state.isPlayingMusic && !state.audioReady) {
+    nextState = 'loading';
     label = '正在载入';
     detail = trackTitle;
   } else if (!state.isPlayingMusic && getPlaybackTime() > 0) {
@@ -5541,6 +5557,32 @@ function getOptimalMimeType(format) {
 
 let recordTimerInterval = null;
 let activeRecording = null;
+let recordUiResetTimer = 0;
+function setRecordUiState(next) {
+  clearTimeout(recordUiResetTimer);
+  recordUiState = next;
+  const button = $('#recordToggle');
+  const label = {
+    idle: '开始录制视频',
+    recording: '停止录制并保存视频',
+    exporting: '正在封装录制视频',
+    success: '视频已导出',
+    error: '录制失败，点击重试'
+  }[next];
+  button.dataset.recordState = next;
+  button.setAttribute('aria-label', label);
+  button.title = label;
+  showControlFace(button, {
+    idle: 'face-idle', recording: 'face-rec', exporting: 'face-exporting',
+    success: 'face-done', error: 'face-error'
+  }[next]);
+  $('#recordStatusAnnouncement').textContent = next === 'idle' ? '' : label;
+  if (next === 'success' || next === 'error') {
+    recordUiResetTimer = setTimeout(() => {
+      if (!state.isRecording && !activeRecording) setRecordUiState('idle');
+    }, 2600);
+  }
+}
 
 async function detectedVideoMime(chunks, recorderMime) {
   const head = new Uint8Array(await new Blob(chunks).slice(0, 12).arrayBuffer());
@@ -5555,12 +5597,13 @@ async function detectedVideoMime(chunks, recorderMime) {
 
 function toggleScreenRecording() {
   if (!state.isRecording) {
-    if (activeRecording) return;
+    if (activeRecording || recordUiState === 'exporting') return;
     const sceneCanvas = stage.querySelector('canvas');
     const outputCanvas = $('#recordingPreviewCanvas');
     const outputContext = outputCanvas?.getContext('2d', { alpha: false });
     if (!sceneCanvas || !outputContext || typeof MediaRecorder === 'undefined') {
       showToast('当前浏览器无法录制视频');
+      setRecordUiState('error');
       return;
     }
     const preset = VIDEO_PRESETS[state.videoAspect] || VIDEO_PRESETS.landscape;
@@ -5569,7 +5612,7 @@ function toggleScreenRecording() {
     drawPerformanceFrame(outputContext, sceneCanvas, stageWrapEl, kineticLyricsManager.mode);
     let stream;
     try { stream = outputCanvas.captureStream(60); }
-    catch (error) { console.error('Video capture unavailable:', error); showToast('视频画布无法录制'); return; }
+    catch (error) { console.error('Video capture unavailable:', error); showToast('视频画布无法录制'); setRecordUiState('error'); return; }
     let audioDestination = null;
     if (state.audioCtx && state.analyser) {
       audioDestination = state.audioCtx.createMediaStreamDestination();
@@ -5596,6 +5639,7 @@ function toggleScreenRecording() {
         stream.getTracks().forEach(track => track.stop());
         if (audioDestination) state.analyser.disconnect(audioDestination);
         showToast('当前浏览器没有可用的视频编码器');
+        setRecordUiState('error');
         return;
       }
     }
@@ -5612,6 +5656,7 @@ function toggleScreenRecording() {
       if (e.data && e.data.size > 0) state.recordedChunks.push(e.data);
     };
     recorder.onstop = async () => {
+      if (recordUiState === 'recording') setRecordUiState(session.failed ? 'error' : 'exporting');
       if (recordTimerInterval) clearInterval(recordTimerInterval);
       cancelAnimationFrame(session.frameId);
       document.body.classList.remove('recording-preview');
@@ -5623,7 +5668,6 @@ function toggleScreenRecording() {
       state.isRecording = false;
       state.mediaRecorder = null;
       $('#recordToggle').classList.remove('recording');
-      $('#recordToggle').title = '开始录制';
       statusDot.classList.remove('recording');
       const chunks = state.recordedChunks;
       state.recordedChunks = [];
@@ -5647,18 +5691,18 @@ function toggleScreenRecording() {
         setTimeout(() => URL.revokeObjectURL(url), 30000);
         statusText.textContent = `已导出 ${preset.width}×${preset.height} ${ext.toUpperCase()} 视频`;
         showToast(`已导出 ${ext.toUpperCase()} 视频`);
+        setRecordUiState('success');
       } catch (error) {
         console.error('Recording export failed:', error);
-        const faceIdle = $('#recordToggle .face-idle');
-        const faceRec = $('#recordToggle .face-rec');
-        if (faceRec && faceIdle) motionMorph(faceRec, faceIdle);
         statusText.textContent = '录制失败，请查看浏览器控制台';
         showToast('录制失败，未生成有效视频');
+        setRecordUiState('error');
       }
     };
     recorder.onerror = event => {
       console.error('MediaRecorder failed:', event.error || event);
       session.failed = event.error || new Error('MediaRecorder failed');
+      setRecordUiState('error');
       if (recorder.state !== 'inactive') recorder.stop();
     };
     try { recorder.start(250); }
@@ -5668,7 +5712,9 @@ function toggleScreenRecording() {
       stream.getTracks().forEach(track => track.stop());
       if (audioDestination) state.analyser.disconnect(audioDestination);
       activeRecording = null;
+      state.mediaRecorder = null;
       showToast('视频录制启动失败');
+      setRecordUiState('error');
       return;
     }
     document.body.classList.add('recording-preview');
@@ -5676,10 +5722,7 @@ function toggleScreenRecording() {
     $('#videoFormatSelect').disabled = true;
     state.isRecording = true;
     state.recordStartTime = Date.now();
-    const faceIdle = $('#recordToggle .face-idle');
-    const faceRec = $('#recordToggle .face-rec');
-    if (faceIdle && faceRec) motionMorph(faceIdle, faceRec);
-    $('#recordToggle').title = '停止录制并保存视频';
+    setRecordUiState('recording');
     $('#recordToggle').classList.add('recording');
     statusDot.classList.add('recording');
     if (opt.ext && opt.ext !== format) showToast(`当前浏览器将以 ${opt.ext.toUpperCase()} 格式导出`);
@@ -5698,20 +5741,9 @@ function toggleScreenRecording() {
 
   } else {
     if (recordTimerInterval) clearInterval(recordTimerInterval);
-    if (state.mediaRecorder?.state !== 'inactive') state.mediaRecorder.stop();
     state.isRecording = false;
-    const faceIdle = $('#recordToggle .face-idle');
-    const faceRec = $('#recordToggle .face-rec');
-    const faceDone = $('#recordToggle .face-done');
-    if (faceRec && faceDone) {
-      motionMorph(faceRec, faceDone);
-      setTimeout(() => {
-        if (!state.isRecording && faceDone && faceIdle) {
-          motionMorph(faceDone, faceIdle);
-        }
-      }, 2200);
-    }
-    $('#recordToggle').title = '开始录制';
+    setRecordUiState('exporting');
+    if (state.mediaRecorder?.state !== 'inactive') state.mediaRecorder.stop();
     $('#recordToggle').classList.remove('recording');
     statusDot.classList.remove('recording');
     statusText.textContent = '正在封装录制视频…';
@@ -7868,13 +7900,23 @@ $$('.kinetic-mode-btn').forEach(btn => {
   btn.addEventListener('click', (e) => {
     e.stopPropagation();
     const mode = btn.dataset.mode;
-    if (typeof kineticLyricsManager !== 'undefined' && kineticLyricsManager) {
-      kineticLyricsManager.setMode(mode);
-    }
     $$('#kineticEngineModeGroup .pill-btn').forEach(pb => {
       pb.classList.toggle('active', pb.dataset.kmode === mode);
     });
   });
+});
+
+$('#kineticModeSwitcher').addEventListener('keydown', event => {
+  const direction = ['ArrowRight', 'ArrowDown'].includes(event.key) ? 1
+    : ['ArrowLeft', 'ArrowUp'].includes(event.key) ? -1 : 0;
+  if (!direction) return;
+  const buttons = [...$$('#kineticModeSwitcher .kinetic-mode-btn')];
+  const current = buttons.indexOf(document.activeElement);
+  if (current < 0) return;
+  event.preventDefault();
+  const next = buttons[(current + direction + buttons.length) % buttons.length];
+  next.focus();
+  next.click();
 });
 
 $('#kineticEngineModeGroup')?.addEventListener('click', e => {
@@ -8345,6 +8387,53 @@ function setWorkbenchOpen(open) {
     syncInspectorAccessibility();
   }
 }
+function setupLuSelection(group, underline = false) {
+  if (!group) return;
+  const surface = document.createElement('span');
+  surface.className = 'lu-selection-surface';
+  surface.setAttribute('aria-hidden', 'true');
+  surface.style.transition = 'none';
+  group.prepend(surface);
+  let frame = 0;
+  const update = () => {
+    cancelAnimationFrame(frame);
+    frame = requestAnimationFrame(() => {
+      const selected = group.querySelector(':scope > button.active');
+      if (!selected) return;
+      const groupRect = group.getBoundingClientRect();
+      const rect = selected.getBoundingClientRect();
+      group.style.setProperty('--lu-selection-x', `${(rect.left - groupRect.left).toFixed(2)}px`);
+      group.style.setProperty('--lu-selection-y', `${(rect.top - groupRect.top + (underline ? rect.height - 2 : 0)).toFixed(2)}px`);
+      group.style.setProperty('--lu-selection-width', `${rect.width.toFixed(2)}px`);
+      group.style.setProperty('--lu-selection-height', `${underline ? 2 : rect.height.toFixed(2)}px`);
+      if (!group.dataset.luSelectionReady) {
+        group.dataset.luSelectionReady = 'true';
+        requestAnimationFrame(() => { surface.style.removeProperty('transition'); });
+      }
+    });
+  };
+  new MutationObserver(update).observe(group, { subtree: true, attributes: true, attributeFilter: ['class'] });
+  if (window.ResizeObserver) {
+    const resizeObserver = new ResizeObserver(update);
+    resizeObserver.observe(group);
+    group.querySelectorAll(':scope > button').forEach(button => resizeObserver.observe(button));
+  }
+  group.addEventListener('keydown', () => { group.dataset.luKeyboard = 'true'; });
+  group.addEventListener('pointerdown', () => { group.dataset.luKeyboard = 'false'; });
+  window.addEventListener('resize', update);
+  update();
+}
+[
+  '#kineticModeSwitcher', '#wavePatternGroup', '#intensityTierGroup',
+  '#morphFreqGroup', '.inspector-tabs'
+].forEach(selector => setupLuSelection($(selector), selector === '.inspector-tabs'));
+
+for (const slider of [$('#timeProgressSlider'), $('#waveAmpSlider')]) {
+  slider.addEventListener('pointerdown', () => slider.classList.add('is-scrubbing'));
+  for (const name of ['pointerup', 'pointercancel', 'blur', 'change']) {
+    slider.addEventListener(name, () => slider.classList.remove('is-scrubbing'));
+  }
+}
 $('#workbenchHandle').addEventListener('click', () => {
   setWorkbenchOpen(!document.body.classList.contains('workbench-open'));
 });
@@ -8517,6 +8606,7 @@ if (state.contentMode === 'avatar') {
 }
 $('#inspectorPanel')?.classList.add('collapsed');
 setWorkbenchOpen(false);
+setRecordUiState('idle');
 updateProgressUI(true);
 syncInspectorAccessibility();
 motionTabSwitch($('#tab-optics'));

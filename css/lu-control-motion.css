@@ -1,0 +1,228 @@
+/* Poster-control motion. The stage and its recording canvas use their existing layout. */
+.lu-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+body.poster-mode .performance-capsule,
+body.poster-mode .performance-capsule[data-state="beat"],
+body.poster-mode .performance-capsule[data-state="lyric"],
+body.poster-mode .performance-capsule[data-state="record"] {
+  width: 206px;
+  flex-basis: 206px;
+  transition: border-color 180ms ease-out, background-color 180ms ease-out;
+}
+body.poster-mode .performance-capsule[data-state="record"],
+body.poster-mode .performance-capsule[data-state="exporting"] { border-color: var(--poster-accent); }
+body.poster-mode .performance-capsule[data-state="error"] { border-color: #f07870; }
+body.poster-mode .performance-capsule[data-state="success"] { border-color: var(--poster-paper); }
+body.poster-mode .performance-capsule-copy { transition: opacity 100ms ease-out, transform 160ms cubic-bezier(.2,.8,.2,1); }
+body.poster-mode .performance-capsule-copy.is-changing { transform: translateY(3px); }
+
+/* A face changes inside its original button; the transport does not reflow. */
+body.poster-mode .deck-controls .morph-btn { position: relative; overflow: hidden; }
+body.poster-mode .deck-controls .morph-btn > .face,
+body.poster-mode .deck-controls .morph-btn > .face[aria-hidden="true"] {
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  opacity: 0 !important;
+  transform: translate(-50%, -42%) scale(.97) !important;
+  transition: opacity 95ms ease-out, transform 180ms cubic-bezier(.2,.8,.2,1);
+  pointer-events: none !important;
+}
+body.poster-mode .deck-controls .morph-btn > .face:not([aria-hidden="true"]) {
+  opacity: 1 !important;
+  transform: translate(-50%, -50%) scale(1) !important;
+}
+body.poster-mode .deck-controls #recordToggle {
+  width: 96px;
+  min-width: 96px !important;
+  height: 40px;
+  min-height: 40px;
+  font-variant-numeric: tabular-nums;
+}
+body.poster-mode .deck-controls #recordToggle[data-record-state="exporting"] { color: var(--poster-paper) !important; }
+body.poster-mode .deck-controls #recordToggle[data-record-state="error"] { border-color: #f07870 !important; color: #f07870 !important; }
+body.poster-mode .deck-controls #recordToggle.recording .rec-dot { background: #fff !important; box-shadow: none !important; }
+body.poster-mode .deck-controls #recordToggle .rec-dot { box-shadow: none !important; }
+.export-spinner {
+  width: 11px;
+  height: 11px;
+  border: 1.5px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: lu-export-spin 700ms linear infinite;
+}
+@keyframes lu-export-spin { to { transform: rotate(360deg); } }
+body.poster-mode #timeProgressSlider,
+body.poster-mode #waveAmpSlider { cursor: pointer; touch-action: none; }
+body.poster-mode #timeProgressSlider::-webkit-slider-thumb,
+body.poster-mode #waveAmpSlider::-webkit-slider-thumb { transition: transform 120ms cubic-bezier(.2,.8,.2,1); }
+body.poster-mode #timeProgressSlider.is-scrubbing::-webkit-slider-thumb,
+body.poster-mode #waveAmpSlider.is-scrubbing::-webkit-slider-thumb { transform: scale(1.16); }
+
+/* One moving selection surface per real control group. */
+body.poster-mode :is(#kineticModeSwitcher, #wavePatternGroup, #intensityTierGroup, #morphFreqGroup, .inspector-tabs) {
+  position: relative;
+  isolation: isolate;
+}
+.lu-selection-surface { display: none; }
+body.poster-mode .lu-selection-surface {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  left: 0;
+  display: block;
+  width: var(--lu-selection-width, 0px);
+  height: var(--lu-selection-height, 0px);
+  border-radius: 2px;
+  background: var(--poster-accent);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(var(--lu-selection-x, 0px), var(--lu-selection-y, 0px), 0);
+  transition: transform 220ms cubic-bezier(.2,1.06,.32,1), opacity 100ms ease-out;
+}
+body.poster-mode [data-lu-selection-ready="true"] > .lu-selection-surface { opacity: 1; }
+body.poster-mode [data-lu-keyboard="true"] > .lu-selection-surface { transition-duration: 1ms; }
+body.poster-mode .deck-controls .morph-btn:focus-visible > .face { transition-duration: 1ms !important; }
+body.poster-mode :is(#kineticModeSwitcher, #wavePatternGroup, #intensityTierGroup, #morphFreqGroup, .inspector-tabs) > button {
+  position: relative;
+  z-index: 1;
+}
+body.poster-mode #kineticModeSwitcher .kinetic-mode-btn,
+body.poster-mode #kineticModeSwitcher .kinetic-mode-btn.active,
+body.poster-mode #intensityTierGroup .motion-card,
+body.poster-mode #intensityTierGroup .motion-card.active,
+body.poster-mode #wavePatternGroup .waveform-board,
+body.poster-mode #wavePatternGroup .waveform-board.active,
+body.poster-mode #morphFreqGroup .pill-btn,
+body.poster-mode #morphFreqGroup .pill-btn.active {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+body.poster-mode :is(#kineticModeSwitcher .active, #wavePatternGroup .active, #intensityTierGroup .active, #morphFreqGroup .active) { color: #fff !important; }
+body.poster-mode #wavePatternGroup .active .svg-icon { color: #fff !important; }
+
+/* The existing poster palette reaches the real workbench controls. */
+body.poster-mode .bottom-dynamic-dock {
+  color: var(--poster-paper);
+  /* A near-opaque surface keeps the mobile WebGL canvas from clipping in Chromium. */
+  background: rgba(24, 24, 30, .96);
+  border: 1px solid var(--poster-rule);
+  border-radius: 4px;
+  box-shadow: none;
+  transform: translateY(calc(100% + 12px)) scale(.985);
+  transform-origin: calc(100% - 24px) 100%;
+  transition: transform 250ms cubic-bezier(.2,.8,.2,1), opacity 150ms ease-out;
+}
+body.poster-mode.workbench-open .bottom-dynamic-dock { transform: translateY(0) scale(1); }
+body.poster-mode .bottom-dynamic-dock .dock-section {
+  color: var(--poster-paper);
+  background: #222127;
+  border: 1px solid #575157;
+  border-radius: 3px;
+  box-shadow: none;
+}
+body.poster-mode .bottom-dynamic-dock .dock-label { color: #c7bbaa; }
+body.poster-mode .bottom-dynamic-dock :is(.waveform-board, .motion-card, .pill-btn, #waveMotionToggle) {
+  color: var(--poster-paper);
+  background: #302e34;
+  border: 1px solid #575157;
+  border-radius: 2px;
+  box-shadow: none;
+}
+body.poster-mode .bottom-dynamic-dock .waveform-board .svg-icon { color: var(--poster-paper); }
+body.poster-mode .bottom-dynamic-dock .motion-card-desc { color: #c7bbaa; }
+body.poster-mode .bottom-dynamic-dock .motion-card.active .motion-card-desc { color: #fff; }
+body.poster-mode .bottom-dynamic-dock .motion-cards { background: #302e34; border-radius: 2px; }
+body.poster-mode .bottom-dynamic-dock #waveAmpSlider { accent-color: var(--poster-accent); }
+body.poster-mode .bottom-dynamic-dock #waveMotionToggle.active { background: #302e34 !important; color: var(--poster-paper) !important; border-color: var(--poster-accent) !important; }
+body.poster-mode .bottom-dynamic-dock #beatDialGraphic { color: var(--poster-paper); background: #302e34; border-color: #575157; }
+body.poster-mode .bottom-dynamic-dock #beatDialGraphic::after { color: var(--poster-paper); }
+body.poster-mode .bottom-dynamic-dock #beatDialIndicator { background: var(--poster-accent); }
+body.poster-mode .bottom-dynamic-dock output { color: var(--poster-paper); font-variant-numeric: tabular-nums; }
+body.poster-mode #workbenchHandle[aria-expanded="true"] { color: #fff; background: var(--poster-accent); border-color: var(--poster-accent); }
+body.poster-mode.workbench-open:not(.immersive) .cube-lyrics-deck { transform: translateY(-56px); }
+@media (hover: hover) and (pointer: fine) {
+  body.poster-mode .bottom-dynamic-dock :is(.waveform-board, .motion-card, .pill-btn):hover:not(.active) { background: #3b383f; }
+}
+
+/* Inspector remains a secondary tool, but follows the same local surface language. */
+body.poster-mode .modular-inspector { color: var(--poster-paper); background: #19191f; border-radius: 4px; }
+body.poster-mode .inspector-heading,
+body.poster-mode .inspector-tabs { color: var(--poster-paper); background: #222127; border-color: #575157; }
+body.poster-mode .inspector-tab-btn,
+body.poster-mode .inspector-tab-btn.active { color: var(--poster-paper); background: transparent; border-color: transparent; box-shadow: none; }
+body.poster-mode .inspector-tab-btn.active { color: #fff; }
+body.poster-mode .inspector-tabs > .lu-selection-surface { border-radius: 0; }
+body.poster-mode #inspectorCloseBtn { color: var(--poster-paper); }
+body.poster-mode #inspectorCloseBtn:hover { background: #3b383f; }
+body.poster-mode .modular-inspector :is(.section-title, .material-heading, .tone-heading, .material-lock, .studio-lighting, .custom-tone, .material-details summary, #materialName, .official-avatar-tools, #officialAvatarStatus) { color: var(--poster-paper); }
+body.poster-mode .modular-inspector :is(.material-families button, .studio-lighting button) { color: #c7bbaa; border-radius: 2px; }
+body.poster-mode .modular-inspector :is(.material-families button, .studio-lighting button)[aria-pressed="true"] { color: #fff; background: var(--poster-accent); }
+body.poster-mode #tab-optics .material-samples button { color: var(--poster-paper); border-radius: 2px; }
+body.poster-mode #tab-optics .material-samples button[aria-pressed="true"] { background: #302e34; border-color: var(--poster-accent); }
+body.poster-mode .modular-inspector :is(.pill-btn, .mini-grid-btn, select, input:not([type="color"]), textarea) { color: var(--poster-paper); background-color: #302e34; border-color: #575157; }
+body.poster-mode .modular-inspector :is(.pill-btn, .mini-grid-btn).active { color: #fff; background-color: var(--poster-accent); border-color: var(--poster-accent); }
+body.poster-mode .modular-inspector input[type="range"] { accent-color: var(--poster-accent); }
+
+@media (max-width: 760px) {
+  body.poster-mode .performance-capsule,
+  body.poster-mode .performance-capsule[data-state="beat"],
+  body.poster-mode .performance-capsule[data-state="lyric"],
+  body.poster-mode .performance-capsule[data-state="record"] {
+    width: min(206px, 100%);
+    flex-basis: auto;
+  }
+  body.poster-mode .deck-controls #recordToggle {
+    width: 68px !important;
+    min-width: 68px !important;
+    max-width: 68px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    font-size: 10px !important;
+  }
+  body.poster-mode .deck-controls #recordToggle .face-idle { gap: 4px !important; }
+  body.poster-mode .deck-controls #recordToggle .rec-timer { display: inline !important; }
+  body.poster-mode .deck-controls #recordToggle .rec-label { display: none !important; }
+  body.poster-mode .deck-controls #recordToggle .face-done svg { display: none; }
+  body.poster-mode .bottom-dynamic-dock {
+    bottom: max(6px, env(safe-area-inset-bottom));
+    height: min(166px, 35dvh);
+    max-height: 35dvh;
+    box-sizing: border-box;
+  }
+  body.poster-mode .bottom-dynamic-dock .dock-section,
+  body.poster-mode .bottom-dynamic-dock .dock-section:first-child,
+  body.poster-mode .bottom-dynamic-dock .dock-section:nth-child(2) {
+    height: 100%;
+    box-sizing: border-box;
+  }
+  body.poster-mode.workbench-open:not(.immersive) .cube-lyrics-deck { transform: translateY(calc(-1 * min(166px, 35dvh))); }
+  body.poster-mode #wavePatternGroup .waveform-board { min-height: 44px; }
+  body.poster-mode #morphFreqGroup .pill-btn { min-height: 44px; }
+  body.poster-mode #waveAmpSlider { min-height: 44px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.poster-mode .performance-capsule,
+  body.poster-mode .performance-capsule-copy,
+  body.poster-mode .deck-controls .morph-btn > .face,
+  body.poster-mode .lu-selection-surface,
+  body.poster-mode .bottom-dynamic-dock,
+  body.poster-mode #timeProgressSlider::-webkit-slider-thumb,
+  body.poster-mode #waveAmpSlider::-webkit-slider-thumb { transition-duration: 1ms !important; }
+  body.poster-mode .export-spinner { animation: none; border-right-color: currentColor; }
+}

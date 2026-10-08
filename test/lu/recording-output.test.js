@@ -36,6 +36,7 @@ try {
   await page.waitForFunction(() => document.querySelectorAll('#cubeSlotsTrack .cube-slot').length > 0);
   await page.locator('#recordToggle').click();
   await page.waitForFunction(() => document.body.classList.contains('recording-preview'));
+  assert.equal(await page.locator('#recordToggle').getAttribute('data-record-state'), 'recording');
   const frame = await page.evaluate(() => {
     const output = document.querySelector('#recordingPreviewCanvas');
     const stage = document.querySelector('#stageWrap');
@@ -65,10 +66,14 @@ try {
   assert.equal(await page.locator('#stageHudLeft').isVisible(), false, 'editor controls should hide while previewing a recording');
 
   await page.waitForTimeout(1100);
-  const [download] = await Promise.all([
-    page.waitForEvent('download', { timeout: 30000 }),
-    page.locator('#recordToggle').click()
-  ]);
+  const downloadPromise = page.waitForEvent('download', { timeout: 30000 });
+  const stopState = await page.locator('#recordToggle').evaluate(button => {
+    button.click();
+    return button.dataset.recordState;
+  });
+  assert.equal(stopState, 'exporting', 'record button must wait for a real export result');
+  const download = await downloadPromise;
+  await page.waitForFunction(() => document.querySelector('#recordToggle').dataset.recordState === 'success');
   const name = download.suggestedFilename();
   const videoPath = await download.path();
   const probe = JSON.parse(execFileSync('ffprobe', [
