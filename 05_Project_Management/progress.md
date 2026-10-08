@@ -30,6 +30,7 @@
 
 ## Recent Results
 
+- Action: 用用户最终提供的透明底烟晶律核图统一替换旧图标，并将入场后的左上角迷你魔方改为该图标，保留魔方入场与重播。Validation: 图片 Alpha 通道、桌面/手机实景及 390/1440px/减少动效入场回归通过。Report: `Reports/2026-10-08-lu-expression-cube-intro.md`。Agent: codex · 2026-10-09。
 - Action: 用现有圆角 cube 材质和角色表情制作分层魔方入场；双画幅烟晶黑色背景与随魔方运动的 WebGL 暖光、地面反射联动，按参考材质设计魔方格面＋声波律核标记，归位后展开画布并散开小 cube。Validation: 桌面/手机实景、1440/390px 入场回归、既有工作台及双画幅录制通过；实体手机待验。Report: `Reports/2026-10-08-lu-expression-cube-intro.md`。Agent: codex · 2026-10-09。
 - Action: AGY 中断后接手律核单入口，将播放、演出、创作、录制控件集中到四面工作台，修复移动布局、非海报入口、录制状态与键盘焦点。Validation: 1440/390/342px 布局、双画幅真实录制、音乐编排与主画面几何回归通过；实体手机待验。Report: `Reports/2026-10-08-lu-core-handoff-completion.md`。Agent: codex · 2026-10-08。
 - Action: 将推文的原位状态切换与直接操控迁移到律的播放器、录制按钮、状态胶囊、工作台及检查器，保持对决海报和 WebGL 演出；手机抽屉限制在 35dvh 内并避让歌词。Validation: 双画幅真实录制、342px/1440px 布局、390px 控件及音乐编排回归通过；AGY 3.8 Flash High 方案审阅已参考，本次代码复核超时未取得结论。Report: `Reports/2026-10-08-lu-control-motion-adaptation.md`。Agent: codex · 2026-10-08。

@@ -182,7 +182,6 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
   let frame = 0;
   let activeTurn = null;
   let scramble = [];
-  let miniTurn = 0;
   let lastLightFrame = 0;
   let lightImpulse = 0;
 
@@ -363,18 +362,6 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
     introMute.setAttribute('aria-pressed', String(sound.enabled));
     coreMute.setAttribute('aria-pressed', String(sound.enabled));
   }
-  function mountMini() {
-    if (!renderer) return;
-    setSize(42);
-    mark.prepend(renderer.domElement);
-    mark.classList.add('has-lu-cube');
-    root.rotation.set(-.27, .54, -.05);
-    light.intensity = 2.35;
-    rim.intensity = 2.3;
-    glassBounceLeft.intensity = 1.55;
-    glassBounceRight.intensity = 1.55;
-    draw();
-  }
   function complete() {
     if (phase === 'complete') return;
     operation++;
@@ -387,7 +374,7 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
     app.inert = false;
     document.body.classList.remove('lu-intro-active');
     document.body.classList.remove('lu-intro-revealing');
-    mountMini();
+    mark.dataset.facet = 'play';
     document.querySelector('#performanceCapsule')?.focus({ preventScroll: true });
     onComplete?.();
   }
@@ -441,25 +428,10 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
     return true;
   }
   function turnToFacet(facet) {
-    if (phase !== 'complete' || !renderer) return;
-    const targets = { play: .54, choreo: .54 + TURN, create: .54 + TURN * 2, record: .54 + TURN * 3 };
-    if (!(facet in targets)) return;
-    const token = ++miniTurn;
-    const from = root.rotation.y;
-    const to = targets[facet];
+    if (phase !== 'complete' || !['play', 'choreo', 'create', 'record'].includes(facet)) return;
     sound.unlock();
     sound.tap();
-    if (reduced()) { root.rotation.y = to; draw(); return; }
-    let start;
-    const step = now => {
-      if (token !== miniTurn || phase !== 'complete') return;
-      start ??= now;
-      const t = Math.min(1, (now - start) / 210);
-      root.rotation.y = from + (to - from) * ease(t);
-      draw();
-      if (t < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
+    mark.dataset.facet = facet;
   }
   const controller = {
     get phase() { return phase; },

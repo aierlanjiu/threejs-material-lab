@@ -51,11 +51,15 @@ try {
     assert.equal(await page.evaluate(() => window.luCubeIntro.solved), true);
     assert.equal(await page.locator('#luIntroOverlay').isVisible(), false);
     assert.equal(await page.evaluate(() => document.querySelector('.app').inert), false);
-    assert.equal(await page.locator('#performanceCapsule .lu-cube-canvas').count(), 1);
+    const coreIcon = page.locator('#performanceCapsule .lu-core-mark-fallback img');
+    assert.equal(await coreIcon.isVisible(), true, 'the supplied logo should replace the top-left mini cube');
+    assert.match(await coreIcon.getAttribute('src'), /lu-core-emblem\.png$/);
+    assert.equal(await coreIcon.evaluate(image => image.complete && image.naturalWidth > 0), true);
+    assert.equal(await page.locator('#performanceCapsule .lu-cube-canvas').count(), 0);
     assert.equal(await page.evaluate(() => document.activeElement?.id), 'performanceCapsule',
-      'keyboard focus should land on the persistent cube control');
-    assert.equal(await page.evaluate(() => window.introCanvas === document.querySelector('#performanceCapsule canvas')), true,
-      'the same cube canvas should continue as the LÜ Core');
+      'keyboard focus should land on the persistent core control');
+    assert.equal(await page.evaluate(() => window.introCanvas === document.querySelector('#luIntroActivate canvas')), true,
+      'the entrance canvas should remain available for replay');
     assert((await page.evaluate(() => window.introOscillatorCount)) >= 20,
       'the wake, layer turns, solved cue and unfold should schedule real sound nodes');
 
