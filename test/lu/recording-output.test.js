@@ -12,28 +12,50 @@ try {
   await page.waitForFunction(() => Boolean(window.luDiagnostics));
 
   assert.equal(await page.locator('.kinetic-mode-btn[data-mode="slot"]').getAttribute('aria-checked'), 'true');
+
+  // 打开律核胶囊 -> 创作面 -> 验证检查器开关
+  await page.locator('#performanceCapsule').click();
+  await page.locator('#lueTabCreate').click();
   await page.locator('#inspectorToggleBtn').click();
-  await page.locator('.inspector-tab-btn[data-tab="tab-export"]').click();
+  assert.equal(await page.locator('#inspectorPanel').evaluate(el => !el.classList.contains('collapsed')), true);
+  await page.locator('#inspectorCloseBtn').click();
+  assert.equal(await page.locator('#inspectorPanel').evaluate(el => el.classList.contains('collapsed')), true);
+
+  // 切换录制面 -> 调整成片画幅为竖屏 9:16
+  await page.locator('#performanceCapsule').click();
+  await page.locator('#lueTabRecord').click();
   await page.locator('#videoAspectSelect').selectOption('portrait');
   await page.waitForFunction(() => {
     const stage = document.querySelector('#stageWrap').getBoundingClientRect();
     return Math.abs(stage.width / stage.height - 9 / 16) < 0.01;
   });
-  await page.locator('#inspectorCloseBtn').click();
+
+  // 切换演出面 -> 进入沉浸模式 -> 点击极简胶囊退出
+  await page.locator('#lueTabChoreo').click();
   await page.locator('#immersiveToggle').click();
-  assert.equal(await page.locator('#immersiveToggle').innerText(), '返回工作台');
+  await page.waitForFunction(() => document.body.classList.contains('immersive'));
+  assert.equal(await page.locator('#performanceCapsuleLabel').innerText(), '退出沉浸');
   assert.equal(await page.locator('#stageHudLeft').isVisible(), false);
-  await page.locator('#immersiveToggle').click();
+  await page.waitForTimeout(200);
+  await page.locator('#performanceCapsule').click();
+  await page.waitForFunction(() => !document.body.classList.contains('immersive'));
 
   if (testAudio) {
+    await page.locator('#performanceCapsule').click();
+    await page.locator('#lueTabPlay').click();
     await page.locator('#playPauseBtn').click();
     await page.waitForFunction(() => {
       const title = document.querySelector('#nowPlayingText')?.textContent || '';
       const elapsed = document.querySelector('#timeDisplay')?.textContent?.split(' / ')[0] || '';
       return title.startsWith('当前：') && elapsed !== '00:00';
     });
+    await page.keyboard.press('Escape');
   }
   await page.waitForFunction(() => document.querySelectorAll('#cubeSlotsTrack .cube-slot').length > 0);
+
+  // 打开律核胶囊 -> 录制面 -> 点击开始录制
+  await page.locator('#performanceCapsule').click();
+  await page.locator('#lueTabRecord').click();
   await page.locator('#recordToggle').click();
   await page.waitForFunction(() => document.body.classList.contains('recording-preview'));
   assert.equal(await page.locator('#recordToggle').getAttribute('data-record-state'), 'recording');
@@ -65,15 +87,25 @@ try {
   assert(frame.difference > 25, `slot lyrics absent from video canvas: ${frame.difference}`);
   assert.equal(await page.locator('#stageHudLeft').isVisible(), false, 'editor controls should hide while previewing a recording');
 
+  await page.locator('#performanceCapsule').click();
   await page.waitForTimeout(1100);
-  const downloadPromise = page.waitForEvent('download', { timeout: 30000 });
-  const stopState = await page.locator('#recordToggle').evaluate(button => {
-    button.click();
-    return button.dataset.recordState;
+  assert.equal(await page.locator('#performanceCapsule').getAttribute('data-state'), 'record');
+  assert.equal(await page.locator('#performanceCapsule .rec-dot-pill').count(), 1);
+  assert.match(await page.locator('#performanceCapsuleDetail').innerText(), /^\d{2}:\d{2}$/);
+  await page.locator('#performanceCapsule').click();
+  assert.equal(await page.locator('#lueTabRecord').getAttribute('aria-selected'), 'true');
+  await page.evaluate(() => {
+    const button = document.querySelector('#recordToggle');
+    window.recordStateHistory = [button.dataset.recordState];
+    new MutationObserver(() => window.recordStateHistory.push(button.dataset.recordState))
+      .observe(button, { attributes: true, attributeFilter: ['data-record-state'] });
   });
-  assert.equal(stopState, 'exporting', 'record button must wait for a real export result');
+  const downloadPromise = page.waitForEvent('download', { timeout: 30000 });
+  await page.locator('#recordToggle').click();
   const download = await downloadPromise;
   await page.waitForFunction(() => document.querySelector('#recordToggle').dataset.recordState === 'success');
+  assert.deepEqual((await page.evaluate(() => window.recordStateHistory)).slice(0, 3),
+    ['recording', 'exporting', 'success'], 'record button must export before reporting success');
   const name = download.suggestedFilename();
   const videoPath = await download.path();
   const probe = JSON.parse(execFileSync('ffprobe', [
@@ -92,16 +124,16 @@ try {
   }
   console.log(`Recording portrait slot lyrics ${testAudio ? 'with audio ' : ''}PASS: ${name}, ${video.width}x${video.height}, ${probe.format.duration}s, canvas difference ${frame.difference.toFixed(1)}`);
   if (!testAudio) {
-    await page.evaluate(() => {
-      const select = document.querySelector('#videoAspectSelect');
-      select.value = 'landscape';
-      select.dispatchEvent(new Event('change', { bubbles: true }));
-    });
+    if (await page.locator('#lueCoreDrawer').evaluate(el => el.hidden)) {
+      await page.locator('#performanceCapsule').click();
+    }
+    await page.locator('#lueTabRecord').click();
+    await page.locator('#videoAspectSelect').selectOption('landscape');
     await page.waitForFunction(() => document.querySelector('#stageWrap').dataset.aspect === 'landscape');
     await page.locator('#recordToggle').click();
     await page.waitForFunction(() => document.body.classList.contains('recording-preview'));
     assert.deepEqual(await page.locator('#recordingPreviewCanvas').evaluate(canvas => [canvas.width, canvas.height]), [1920, 1080]);
-    await page.waitForTimeout(650);
+    await page.waitForTimeout(1200);
     const [landscapeDownload] = await Promise.all([
       page.waitForEvent('download', { timeout: 30000 }),
       page.locator('#recordToggle').click()

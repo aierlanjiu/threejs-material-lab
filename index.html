@@ -2317,7 +2317,6 @@ body.immersive .master-deck-hud,
 body.immersive .bottom-dynamic-dock,
 body.immersive .modular-inspector,
 body.immersive .poster-side,
-body.poster-mode.immersive .master-deck-hud,
 body.poster-mode.immersive .bottom-dynamic-dock,
 body.poster-mode.immersive .modular-inspector,
 body.poster-mode.immersive .poster-side { display: none !important; }
@@ -2345,114 +2344,334 @@ body.immersive .stage-hud-right { top: max(12px, env(safe-area-inset-top)); righ
       </div>
     </div>
 
-    <div class="performance-capsule" id="performanceCapsule" data-state="idle" aria-label="演出状态：就绪">
+    <button type="button" class="performance-capsule" id="performanceCapsule" data-state="idle" aria-label="打开律核工作台" aria-expanded="false" aria-controls="lueCoreDrawer">
       <span class="performance-capsule-mark" aria-hidden="true">律</span>
       <span class="performance-capsule-copy">
         <strong id="performanceCapsuleLabel">律 · 就绪</strong>
         <small id="performanceCapsuleDetail">选择音乐开始</small>
       </span>
       <span class="performance-capsule-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-    </div>
+      <span class="performance-capsule-cue" aria-hidden="true">▾</span>
+    </button>
 
-    <!-- 中央母带播放中枢 -->
-    <div class="deck-player">
-      <div class="deck-info">
-        <span class="deck-title" id="nowPlayingText">当前：《游京》- 星火社</span>
-        <span class="deck-badge" id="movementBadge">乐章 1/7</span>
+    <!-- 律核四面展开工作台 (LÜ Core Expanded Workbench) -->
+    <div class="lue-core-drawer" id="lueCoreDrawer" role="region" aria-label="律核工作台" hidden>
+      <div class="lue-facet-tabs" role="tablist" aria-label="律核功能面">
+        <button type="button" class="lue-facet-tab active" id="lueTabPlay" role="tab" aria-selected="true" aria-controls="lueFacetPlay" data-facet="play">
+          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          <span>播放</span>
+        </button>
+        <button type="button" class="lue-facet-tab" id="lueTabChoreo" role="tab" aria-selected="false" aria-controls="lueFacetChoreo" data-facet="choreo" tabindex="-1">
+          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M2 12c2.5-4 5.5-4 8 0s5.5 4 8 0 5.5-4 8 0"></path></svg>
+          <span>演出</span>
+        </button>
+        <button type="button" class="lue-facet-tab" id="lueTabCreate" role="tab" aria-selected="false" aria-controls="lueFacetCreate" data-facet="create" tabindex="-1">
+          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+          <span>创作</span>
+        </button>
+        <button type="button" class="lue-facet-tab" id="lueTabRecord" role="tab" aria-selected="false" aria-controls="lueFacetRecord" data-facet="record" tabindex="-1">
+          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4" fill="currentColor"></circle></svg>
+          <span>录制</span>
+        </button>
+        <button type="button" class="lue-facet-close" id="lueDrawerCloseBtn" aria-label="关闭律核工作台">收起 ✕</button>
       </div>
 
-      <div class="audio-visualizer" id="audioVisualizer" title="音频实时频谱">
-        <div class="audio-bar" style="height: 4px;"></div>
-        <div class="audio-bar" style="height: 8px;"></div>
-        <div class="audio-bar" style="height: 14px;"></div>
-        <div class="audio-bar" style="height: 6px;"></div>
-        <div class="audio-bar" style="height: 10px;"></div>
-      </div>
+      <div class="lue-facet-panels">
+        <!-- 面 1: 播放面 -->
+        <div class="lue-facet-panel" id="lueFacetPlay" role="tabpanel" aria-labelledby="lueTabPlay">
+          <div class="deck-player">
+            <div class="deck-info">
+              <span class="deck-title" id="nowPlayingText">当前：《游京》- 星火社</span>
+              <span class="deck-badge" id="movementBadge">乐章 1/7</span>
+            </div>
 
-      <div class="deck-controls">
-        <button class="btn" id="prevTrackBtn" title="上一首">
-          <svg class="svg-icon" viewBox="0 0 24 24"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5"></line></svg>
-        </button>
-        <button class="btn morph-btn" id="playPauseBtn" style="min-width: 96px; font-weight: 700; position: relative;" aria-label="播放">
-          <span class="face face-play" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;">
-            <svg class="svg-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-            播放
-          </span>
-          <span class="face face-pause" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;opacity:0;" aria-hidden="true" inert>
-            <svg class="svg-icon" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
-            暂停
-          </span>
-        </button>
-        <button class="btn morph-btn" id="recordToggle" style="min-width: 96px; font-weight: 700; position: relative;" title="录制所选画幅的视频">
-          <span class="face face-idle" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;">
-            <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4" fill="currentColor"></circle></svg> 录制
-          </span>
-          <span class="face face-rec" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;opacity:0;" aria-hidden="true" inert>
-            <span class="rec-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;box-shadow:0 0 8px #ef4444;"></span>
-            <span class="rec-label">录制中</span> <span class="rec-timer" style="font-variant-numeric:tabular-nums;font-size:11px;">00:00</span>
-          </span>
-          <span class="face face-exporting" aria-hidden="true" inert><span class="export-spinner" aria-hidden="true"></span>封装</span>
-          <span class="face face-done" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;opacity:0;" aria-hidden="true" inert>
-            <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> 已导出
-          </span>
-          <span class="face face-error" aria-hidden="true" inert>导出失败</span>
-        </button>
-        <span id="recordStatusAnnouncement" class="lu-sr-only" role="status" aria-live="polite"></span>
-        <button class="btn" id="nextTrackBtn" title="下一首">
-          <svg class="svg-icon" viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19"></line></svg>
-        </button>
-        <button class="btn" id="stopTrackBtn" title="停止">
-          <svg class="svg-icon" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"></rect></svg>
-        </button>
-      </div>
+            <div class="audio-visualizer" id="audioVisualizer" title="音频实时频谱">
+              <div class="audio-bar" style="height: 4px;"></div>
+              <div class="audio-bar" style="height: 8px;"></div>
+              <div class="audio-bar" style="height: 14px;"></div>
+              <div class="audio-bar" style="height: 6px;"></div>
+              <div class="audio-bar" style="height: 10px;"></div>
+            </div>
 
-      <!-- 统一顶部时间显示与可拖动进度轨 -->
-      <div class="time-rail-wrap">
-        <span class="time-display" id="timeDisplay">00:00 / 00:00</span>
-        <input type="range" id="timeProgressSlider" min="0" max="100" value="0" step="0.1" title="拖动跳转播放进度">
-      </div>
+            <div class="deck-controls">
+              <button class="btn" id="prevTrackBtn" title="上一首">
+                <svg class="svg-icon" viewBox="0 0 24 24"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5"></line></svg>
+              </button>
+              <button class="btn morph-btn" id="playPauseBtn" style="min-width: 96px; font-weight: 700; position: relative;" aria-label="播放">
+                <span class="face face-play" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;">
+                  <svg class="svg-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                  播放
+                </span>
+                <span class="face face-pause" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;opacity:0;" aria-hidden="true" inert>
+                  <svg class="svg-icon" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+                  暂停
+                </span>
+              </button>
+              <button class="btn" id="nextTrackBtn" title="下一首">
+                <svg class="svg-icon" viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19"></line></svg>
+              </button>
+              <button class="btn" id="stopTrackBtn" title="停止">
+                <svg class="svg-icon" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"></rect></svg>
+              </button>
+            </div>
 
-      <!-- 快捷导入与播放下拉 -->
-      <select id="playlistSelect" style="width: auto; min-width: 140px; max-width: 200px;">
-        <option value="track_0">1: 《游京》- 星火社 (Hi-Res)</option>
-        <option value="track_1">2: 《秋意浓》- 张学友 (经典无损)</option>
-        <option value="track_2">3: 《烂泥》- 草东没有派对 (无损)</option>
-        <option value="track_3">4: 《鬼》- 草东没有派对 (无损)</option>
-        <option value="track_4">5: 《偏爱》- 张芸京 (Hi-Res)</option>
-        <option value="track_5">6: 《海鸥》- 逃跑计划 (Hi-Res)</option>
-        <option value="preset_1">7: CYBER CRYSTAL (合成)</option>
-        <option value="preset_2">8: NEO SYNTH 80S (合成)</option>
-        <option value="preset_3">9: DEEP SUB BASS (合成)</option>
-      </select>
+            <!-- 统一顶部时间显示与可拖动进度轨 -->
+            <div class="time-rail-wrap">
+              <span class="time-display" id="timeDisplay">00:00 / 00:00</span>
+              <input type="range" id="timeProgressSlider" min="0" max="100" value="0" step="0.1" title="拖动跳转播放进度">
+            </div>
 
-      <div class="file-upload-wrap" style="width: auto;">
-        <button class="btn" title="批量导入本地音乐">
-          <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-          导入
-        </button>
-        <input type="file" id="audioUpload" accept="audio/*" multiple>
+            <!-- 快捷导入与播放下拉 -->
+            <select id="playlistSelect" style="width: auto; min-width: 140px; max-width: 200px;">
+              <option value="track_0">1: 《游京》- 星火社 (Hi-Res)</option>
+              <option value="track_1">2: 《秋意浓》- 张学友 (经典无损)</option>
+              <option value="track_2">3: 《烂泥》- 草东没有派对 (无损)</option>
+              <option value="track_3">4: 《鬼》- 草东没有派对 (无损)</option>
+              <option value="track_4">5: 《偏爱》- 张芸京 (Hi-Res)</option>
+              <option value="track_5">6: 《海鸥》- 逃跑计划 (Hi-Res)</option>
+              <option value="preset_1">7: CYBER CRYSTAL (合成)</option>
+              <option value="preset_2">8: NEO SYNTH 80S (合成)</option>
+              <option value="preset_3">9: DEEP SUB BASS (合成)</option>
+            </select>
+
+            <div class="file-upload-wrap" style="width: auto;">
+              <button class="btn" title="批量导入本地音乐">
+                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                导入
+              </button>
+              <input type="file" id="audioUpload" accept="audio/*" multiple>
+            </div>
+          </div>
+        </div>
+
+        <!-- 面 2: 演出面 -->
+        <div class="lue-facet-panel" id="lueFacetChoreo" role="tabpanel" aria-labelledby="lueTabChoreo" hidden>
+          <div class="lue-choreo-container">
+            <div class="lue-choreo-header">
+              <div class="kinetic-mode-switcher" id="kineticModeSwitcher" role="radiogroup" aria-label="灵动歌词模式">
+                <button type="button" class="kinetic-mode-btn active" data-mode="slot" title="Daniel White 机械魔方 3D 轴心翻转模式">
+                  <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                  机械魔方
+                </button>
+                <button type="button" class="kinetic-mode-btn" data-mode="gravity" title="aaayandev 物理重力沙盒与反重力升空模式">
+                  <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v6l4 2"></path></svg>
+                  物理反重力
+                </button>
+                <button type="button" class="kinetic-mode-btn" data-mode="off" title="隐藏灵动歌词">
+                  关闭
+                </button>
+              </div>
+
+              <div class="preset-cam-group">
+                <button class="preset-cam-btn" data-cam="front">
+                  <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg> 正面
+                </button>
+                <button class="preset-cam-btn" data-cam="iso">
+                  <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg> 等轴
+                </button>
+                <button class="preset-cam-btn" data-cam="top">
+                  <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle></svg> 俯视
+                </button>
+              </div>
+            </div>
+
+            <!-- 底部 Dynamic Flow Dock (六个波形样本板、三张运动样本卡、节拍旋钮视觉、振幅精度轨) -->
+            <nav class="bottom-dynamic-dock" id="workbenchDock" aria-label="调律工作台">
+              <!-- 六个波形样本板 -->
+              <div class="dock-section">
+                <div class="dock-label">
+                  <svg class="svg-icon" viewBox="0 0 24 24"><path d="M2 12c2.5-4 5.5-4 8 0s5.5 4 8 0 5.5-4 8 0"></path></svg>
+                  波形样本板
+                </div>
+                <div class="waveform-boards" id="wavePatternGroup">
+                  <button type="button" class="waveform-board active" data-pattern="ripple" aria-pressed="true" title="同心圆环水波">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4"></circle></svg>
+                    <span>水波</span>
+                  </button>
+                  <button type="button" class="waveform-board" data-pattern="diagonal" aria-pressed="false" title="对角翻滚巨浪">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M2 17c3-3 6-3 9 0s6 3 9 0M2 12c3-3 6-3 9 0s6 3 9 0"></path></svg>
+                    <span>巨浪</span>
+                  </button>
+                  <button type="button" class="waveform-board" data-pattern="equalizer" aria-pressed="false" title="声学均衡针雕">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><line x1="6" y1="20" x2="6" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="18" y1="20" x2="18" y2="14"></line></svg>
+                    <span>针雕</span>
+                  </button>
+                  <button type="button" class="waveform-board" data-pattern="spiral" aria-pressed="false" title="极速螺旋涡流">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 1 10 10 7.5 7.5 0 0 1-7.5 7.5A5 5 0 0 1 9.5 14.5 2.5 2.5 0 0 1 12 12"></path></svg>
+                    <span>涡流</span>
+                  </button>
+                  <button type="button" class="waveform-board" data-pattern="heartbeat" aria-pressed="false" title="重低音心跳共振">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="2 12 6 12 9 4 13 20 17 10 20 12 22 12"></polyline></svg>
+                    <span>心跳</span>
+                  </button>
+                  <button type="button" class="waveform-board" data-pattern="glitch" aria-pressed="false" title="棋盘错拍脉冲">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="3 4 8 4 8 12 13 12 13 8 18 8 18 20 21 20"></polyline></svg>
+                    <span>脉冲</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 三张运动样本卡 (1挡沉静, 2挡律动, 3挡冲击) -->
+              <div class="dock-section">
+                <div class="dock-label">
+                  <svg class="svg-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                  运动样本卡
+                </div>
+                <div class="motion-cards" id="intensityTierGroup">
+                  <button type="button" class="motion-card" data-tier="1" aria-pressed="false">
+                    <div class="motion-card-title">1档 · 沉静</div>
+                    <div class="motion-card-desc">慢速 / 窄幅 / 长回落</div>
+                  </button>
+                  <button type="button" class="motion-card active" data-tier="2" aria-pressed="true">
+                    <div class="motion-card-title">2档 · 律动</div>
+                    <div class="motion-card-desc">大范围 / 错拍 / 中高速</div>
+                  </button>
+                  <button type="button" class="motion-card" data-tier="3" aria-pressed="false">
+                    <div class="motion-card-title">3档 · 冲击</div>
+                    <div class="motion-card-desc">最大范围 / 爆发 / 微停</div>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 节拍旋钮视觉 -->
+              <div class="dock-section">
+                <div class="dock-label">
+                  <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                  节拍旋钮
+                </div>
+                <div class="beat-knob-wrap">
+                  <div class="beat-dial-graphic" id="beatDialGraphic" data-label="16拍">
+                    <div class="beat-dial-indicator" id="beatDialIndicator"></div>
+                  </div>
+                  <div class="pill-group" id="morphFreqGroup">
+                    <button class="pill-btn" data-freq="4">4拍</button>
+                    <button class="pill-btn" data-freq="8">8拍</button>
+                    <button class="pill-btn active" data-freq="16">16拍</button>
+                    <button class="pill-btn" data-freq="32">32拍</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 振幅精度轨 -->
+              <div class="dock-section">
+                <div class="dock-label">
+                  <svg class="svg-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line></svg>
+                  振幅精度轨
+                </div>
+                <div class="amp-rail-group">
+                  <div class="range" style="grid-template-columns: 36px 100px 36px; margin:0;">
+                    <span>振幅</span>
+                    <input id="waveAmpSlider" type="range" min="0.2" max="1.0" step="0.05" value="1.0" title="同时调整方阵波形与自动运镜幅度">
+                    <output>1.0x</output>
+                  </div>
+                  <button class="btn active" id="waveMotionToggle" title="音频声波矩阵总开关">
+                    <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M2 12c2.5-4 5.5-4 8 0s5.5 4 8 0 5.5-4 8 0"></path></svg>
+                    声波：开
+                  </button>
+                </div>
+              </div>
+            </nav>
+
+            <div class="lue-choreo-footer">
+              <button class="btn active" id="toggleAutoChoreo" title="全变量乐章编排流变总开关">
+                <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                流变
+              </button>
+              <button type="button" class="btn btn-sm" id="resetCam" title="重置视角中心">
+                <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                重置视角
+              </button>
+              <button type="button" class="btn btn-sm" id="immersiveToggle" aria-pressed="false" title="沉浸模式 (F)，Esc 返回">
+                沉浸模式
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 面 3: 创作面 -->
+        <div class="lue-facet-panel" id="lueFacetCreate" role="tabpanel" aria-labelledby="lueTabCreate" hidden>
+          <div class="lue-create-container">
+            <div class="lue-create-grid">
+              <div class="lue-create-card">
+                <div class="lue-sublabel">材质与光学</div>
+                <div style="font-size:12px;color:#c7bbaa;margin-bottom:6px;">通透水晶 / 金属 / 织物 / 矿物</div>
+                <button type="button" class="btn btn-sm" id="lueOpenOpticsBtn" style="width:100%;">调律材质 (Tab 1)</button>
+              </div>
+              <div class="lue-create-card">
+                <div class="lue-sublabel">矩阵与空间</div>
+                <div style="font-size:12px;color:#c7bbaa;margin-bottom:6px;">方阵规模 / 间距 / 色散</div>
+                <button type="button" class="btn btn-sm" id="lueOpenMatrixBtn" style="width:100%;">调律矩阵 (Tab 2)</button>
+              </div>
+              <div class="lue-create-card">
+                <div class="lue-sublabel">活体与内容</div>
+                <div style="font-size:12px;color:#c7bbaa;margin-bottom:6px;">角色表情 / 动力学 / 贴图</div>
+                <button type="button" class="btn btn-sm" id="lueOpenContentBtn" style="width:100%;">调律内容 (Tab 3)</button>
+              </div>
+              <div class="lue-create-card">
+                <div class="lue-sublabel">运镜与导演</div>
+                <div style="font-size:12px;color:#c7bbaa;margin-bottom:6px;">全景运镜 / 导演编排 / 钟摆</div>
+                <button type="button" class="btn btn-sm" id="lueOpenCameraBtn" style="width:100%;">调律师运镜 (Tab 4)</button>
+              </div>
+            </div>
+            <div class="lue-create-inspector-cta">
+              <button type="button" class="btn" id="inspectorToggleBtn" title="切换检查器面板">
+                <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="15" y1="3" x2="15" y2="21"></line></svg>
+                打开完整检查器面板 (深度编辑)
+              </button>
+            </div>
+            <a href="./mascot_studio.html" class="btn lue-related-link" id="navToLiBtn" title="前往『 荔 』(LI) 3D 陪伴工作室">
+              <span aria-hidden="true">🌰</span> 荔 / LI 工作室
+            </a>
+          </div>
+        </div>
+
+        <!-- 面 4: 录制面 -->
+        <div class="lue-facet-panel" id="lueFacetRecord" role="tabpanel" aria-labelledby="lueTabRecord" hidden>
+          <div class="lue-record-container">
+            <div class="lue-record-controls">
+              <div class="lue-record-field">
+                <label for="videoAspectSelect">画幅与成片尺寸</label>
+                <select id="videoAspectSelect" style="width: 100%;">
+                  <option value="landscape">横屏 16:9 · 1920×1080</option>
+                  <option value="ultrawide">超宽屏 21:9 · 2560×1080</option>
+                  <option value="portrait">竖屏 9:16 · 1080×1920</option>
+                </select>
+              </div>
+              <div class="lue-record-field">
+                <label for="videoFormatSelect">导出通用格式</label>
+                <select id="videoFormatSelect" style="width: 100%;">
+                  <option value="mp4" selected>优先 MP4（浏览器支持时）</option>
+                  <option value="webm">优先 WebM（浏览器支持时）</option>
+                </select>
+              </div>
+              <div class="lue-record-action">
+                <button class="btn morph-btn" id="recordToggle" style="min-width: 120px; font-weight: 700; position: relative;" title="录制所选画幅的视频">
+                  <span class="face face-idle" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4" fill="currentColor"></circle></svg> 录制
+                  </span>
+                  <span class="face face-rec" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;opacity:0;" aria-hidden="true" inert>
+                    <span class="rec-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;box-shadow:0 0 8px #ef4444;"></span>
+                    <span class="rec-label">录制中</span> <span class="rec-timer" style="font-variant-numeric:tabular-nums;font-size:11px;">00:00</span>
+                  </span>
+                  <span class="face face-exporting" aria-hidden="true" inert><span class="export-spinner" aria-hidden="true"></span>封装</span>
+                  <span class="face face-done" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;opacity:0;" aria-hidden="true" inert>
+                    <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> 已导出
+                  </span>
+                  <span class="face face-error" aria-hidden="true" inert>导出失败</span>
+                </button>
+                <span id="recordStatusAnnouncement" class="lu-sr-only" role="status" aria-live="polite"></span>
+              </div>
+            </div>
+            <div class="lue-record-notes">
+              <strong>母带级原生录制</strong>：录制捕获 WebGL 纯净舞台画布与音频流，录制画面不含任何 UI 交互按钮。录制期间胶囊维持红点与计时，可安全收起或展开。
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
     <div class="poster-mode-host" id="posterModeHost" aria-label="歌词演出模式"></div>
 
-    <!-- 顶部快捷工具组 -->
-    <div class="top-actions">
-      <button class="btn active" id="toggleAutoChoreo" title="全变量乐章编排流变总开关">
-        <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-        流变
-      </button>
-
-      <button class="btn" id="inspectorToggleBtn" title="切换检查器面板">
-        <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="15" y1="3" x2="15" y2="21"></line></svg>
-        参数
-      </button>
-
-      <a href="./mascot_studio.html" class="btn" id="navToLiBtn" title="前往『 荔 』(LI) 3D 陪伴工作室" style="background: rgba(183, 67, 67, 0.12); border-color: rgba(183, 67, 67, 0.35); color: #b74343; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
-        <span style="font-size: 14px;">🌰</span>
-        <span>荔 / LI 工作室</span>
-      </a>
-    </div>
   </header>
 
   <!-- 3D 舞台视口区域：外层提供可用空间，内层按母带画幅取景 -->
@@ -2472,38 +2691,13 @@ body.immersive .stage-hud-right { top: max(12px, env(safe-area-inset-top)); righ
         <div class="dot choreographing" id="statusDot"></div>
         <span id="statusText">全变量声波电台演出中…</span>
       </div>
-      <div class="kinetic-mode-switcher" id="kineticModeSwitcher" role="radiogroup" aria-label="灵动歌词模式">
-        <button type="button" class="kinetic-mode-btn active" data-mode="slot" title="Daniel White 机械魔方 3D 轴心翻转模式">
-          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-          机械魔方
-        </button>
-        <button type="button" class="kinetic-mode-btn" data-mode="gravity" title="aaayandev 物理重力沙盒与反重力升空模式">
-          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v6l4 2"></path></svg>
-          物理反重力
-        </button>
-        <button type="button" class="kinetic-mode-btn" data-mode="off" title="隐藏灵动歌词">
-          关闭
-        </button>
-      </div>
       <button type="button" id="motionPreferenceBtn" hidden aria-pressed="false"></button>
     </div>
 
     <div class="stage-hud-right">
-      <button type="button" id="immersiveToggle" aria-pressed="false" title="沉浸模式 (F)，Esc 返回">沉浸</button>
       <div class="legend">
         <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
         通透水晶 / 6大声波形态 / 物理色散 / 影棚柔光
-      </div>
-      <div class="preset-cam-group">
-        <button class="preset-cam-btn" data-cam="front">
-          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg> 正面
-        </button>
-        <button class="preset-cam-btn" data-cam="iso">
-          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg> 等轴
-        </button>
-        <button class="preset-cam-btn" data-cam="top">
-          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle></svg> 俯视
-        </button>
       </div>
     </div>
   </section>
@@ -2516,102 +2710,6 @@ body.immersive .stage-hud-right { top: max(12px, env(safe-area-inset-top)); righ
 
   <button type="button" id="workbenchHandle" aria-controls="workbenchDock" aria-expanded="false" aria-label="唤出调律工作台" title="显示工作台，也可按 W">调律</button>
   <button type="button" id="inspectorDockButton" aria-controls="inspectorPanel" aria-expanded="false">参数面板</button>
-  <!-- 底部 Dynamic Flow Dock (改版: 六个波形样本板、三张运动样本卡、节拍旋钮视觉、振幅精度轨) -->
-  <nav class="bottom-dynamic-dock" id="workbenchDock" aria-label="调律工作台">
-    <!-- 六个波形样本板 -->
-    <div class="dock-section">
-      <div class="dock-label">
-        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M2 12c2.5-4 5.5-4 8 0s5.5 4 8 0 5.5-4 8 0"></path></svg>
-        波形样本板
-      </div>
-      <div class="waveform-boards" id="wavePatternGroup">
-        <button type="button" class="waveform-board active" data-pattern="ripple" aria-pressed="true" title="同心圆环水波">
-          <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4"></circle></svg>
-          <span>水波</span>
-        </button>
-        <button type="button" class="waveform-board" data-pattern="diagonal" aria-pressed="false" title="对角翻滚巨浪">
-          <svg class="svg-icon" viewBox="0 0 24 24"><path d="M2 17c3-3 6-3 9 0s6 3 9 0M2 12c3-3 6-3 9 0s6 3 9 0"></path></svg>
-          <span>巨浪</span>
-        </button>
-        <button type="button" class="waveform-board" data-pattern="equalizer" aria-pressed="false" title="声学均衡针雕">
-          <svg class="svg-icon" viewBox="0 0 24 24"><line x1="6" y1="20" x2="6" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="18" y1="20" x2="18" y2="14"></line></svg>
-          <span>针雕</span>
-        </button>
-        <button type="button" class="waveform-board" data-pattern="spiral" aria-pressed="false" title="极速螺旋涡流">
-          <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 1 10 10 7.5 7.5 0 0 1-7.5 7.5A5 5 0 0 1 9.5 14.5 2.5 2.5 0 0 1 12 12"></path></svg>
-          <span>涡流</span>
-        </button>
-        <button type="button" class="waveform-board" data-pattern="heartbeat" aria-pressed="false" title="重低音心跳共振">
-          <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="2 12 6 12 9 4 13 20 17 10 20 12 22 12"></polyline></svg>
-          <span>心跳</span>
-        </button>
-        <button type="button" class="waveform-board" data-pattern="glitch" aria-pressed="false" title="棋盘错拍脉冲">
-          <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="3 4 8 4 8 12 13 12 13 8 18 8 18 20 21 20"></polyline></svg>
-          <span>脉冲</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- 三张运动样本卡 (1挡沉静, 2挡律动, 3挡冲击) -->
-    <div class="dock-section">
-      <div class="dock-label">
-        <svg class="svg-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-        运动样本卡
-      </div>
-      <div class="motion-cards" id="intensityTierGroup">
-        <button type="button" class="motion-card" data-tier="1" aria-pressed="false">
-          <div class="motion-card-title">1档 · 沉静</div>
-          <div class="motion-card-desc">慢速 / 窄幅 / 长回落</div>
-        </button>
-        <button type="button" class="motion-card active" data-tier="2" aria-pressed="true">
-          <div class="motion-card-title">2档 · 律动</div>
-          <div class="motion-card-desc">大范围 / 错拍 / 中高速</div>
-        </button>
-        <button type="button" class="motion-card" data-tier="3" aria-pressed="false">
-          <div class="motion-card-title">3档 · 冲击</div>
-          <div class="motion-card-desc">最大范围 / 爆发 / 微停</div>
-        </button>
-      </div>
-    </div>
-
-    <!-- 节拍旋钮视觉 -->
-    <div class="dock-section">
-      <div class="dock-label">
-        <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-        节拍旋钮
-      </div>
-      <div class="beat-knob-wrap">
-        <div class="beat-dial-graphic" id="beatDialGraphic" data-label="16拍">
-          <div class="beat-dial-indicator" id="beatDialIndicator"></div>
-        </div>
-        <div class="pill-group" id="morphFreqGroup">
-          <button class="pill-btn" data-freq="4">4拍</button>
-          <button class="pill-btn" data-freq="8">8拍</button>
-          <button class="pill-btn active" data-freq="16">16拍</button>
-          <button class="pill-btn" data-freq="32">32拍</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 振幅精度轨 -->
-    <div class="dock-section">
-      <div class="dock-label">
-        <svg class="svg-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line></svg>
-        振幅精度轨
-      </div>
-      <div class="amp-rail-group">
-        <div class="range" style="grid-template-columns: 36px 100px 36px; margin:0;">
-          <span>振幅</span>
-          <input id="waveAmpSlider" type="range" min="0.2" max="1.0" step="0.05" value="1.0" title="同时调整方阵波形与自动运镜幅度">
-          <output>1.0x</output>
-        </div>
-        <button class="btn active" id="waveMotionToggle" title="音频声波矩阵总开关">
-          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M2 12c2.5-4 5.5-4 8 0s5.5 4 8 0 5.5-4 8 0"></path></svg>
-          声波：开
-        </button>
-      </div>
-    </div>
-  </nav>
 
   <!-- 右侧/移动端模块化检查器 (Tab 下划线, 矩阵预设微缩网格) -->
   <aside class="modular-inspector" id="inspectorPanel">
@@ -3064,7 +3162,7 @@ BEAT</textarea>
             </div>
           </div>
 
-          <button class="btn" id="resetCam" style="width: 100%; margin-top: 8px;">
+          <button class="btn" id="inspectorResetCam" style="width: 100%; margin-top: 8px;">
             <svg class="svg-icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
             重置视角中心
           </button>
@@ -3102,19 +3200,11 @@ BEAT</textarea>
           <span><svg class="svg-icon" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line></svg> 视频母带直出配置</span>
         </div>
         <div class="card-block">
-          <label for="videoAspectSelect"><span>画幅与成片尺寸</span></label>
-          <select id="videoAspectSelect" style="width: 100%; margin-top: 4px; margin-bottom: 12px;">
-            <option value="landscape">横屏 16:9 · 1920×1080</option>
-            <option value="ultrawide">超宽屏 21:9 · 2560×1080</option>
-            <option value="portrait">竖屏 9:16 · 1080×1920</option>
-          </select>
-          <label><span>导出通用格式</span></label>
-          <select id="videoFormatSelect" style="width: 100%; margin-top: 4px;">
-            <option value="mp4" selected>优先 MP4（浏览器支持时）</option>
-            <option value="webm">优先 WebM（浏览器支持时）</option>
-          </select>
-
-          <div style="font-size: 12px; color: var(--muted); line-height: 1.5; margin-top: 8px;">
+          <p style="font-size: 13px; color: var(--poster-paper); margin-bottom: 10px;">画幅选择与母带录制已统一收拢至「律核 · 录制面」。</p>
+          <button type="button" class="btn" id="lueInspectorToRecordBtn" style="width: 100%; margin-bottom: 12px; background: var(--poster-accent); color: #fff; font-weight: 700;">
+            前往律核 · 录制面
+          </button>
+          <div style="font-size: 12px; color: var(--muted); line-height: 1.5;">
             ✦ 页面舞台按所选画幅预览；录制固定输出上述尺寸。<br>
             ✦ MediaRecorder 以 60 FPS、16 Mbps 为目标，实际帧率与编码由浏览器决定。<br>
             ✦ 浏览器不支持所选格式时自动使用可用格式，文件后缀与真实编码一致。
@@ -5216,9 +5306,9 @@ let capsuleState = '';
 let capsuleChangeTimer = 0;
 let recordUiState = 'idle';
 function updatePerformanceCapsule(now, track) {
-  if (!document.body.classList.contains('poster-mode')) return;
   const playing = state.isPlayingMusic && state.audioReady;
   const trackTitle = track?.title || state.songTitle || '';
+  const compactTrackTitle = trackTitle.match(/《[^》]+》/)?.[0] || trackTitle.split(/\s+[-—]\s+/)[0] || '';
   const line = kineticLyricsManager.mode === 'slot' ? kineticLyricsManager.slotEngine : null;
   const lineKey = line?.currentText ? `${state.currentTrackIndex}:${line.currentLineKey}` : null;
   if (playing && lineKey && lineKey !== capsuleLineKey) {
@@ -5232,8 +5322,8 @@ function updatePerformanceCapsule(now, track) {
   }
 
   let nextState = 'idle';
-  let label = '律 · 就绪';
-  let detail = '选择音乐开始';
+  let label = compactTrackTitle || '律 · 就绪';
+  let detail = compactTrackTitle ? '就绪 · 点击打开' : '选择音乐开始';
   if (recordUiState === 'recording' || state.isRecording) {
     nextState = 'record';
     label = '正在录制';
@@ -5250,34 +5340,49 @@ function updatePerformanceCapsule(now, track) {
     nextState = 'error';
     label = '录制失败';
     detail = '请重试';
+  } else if (document.body.classList.contains('immersive')) {
+    nextState = 'immersive';
+    label = '退出沉浸';
+    detail = '点击或按 Esc';
   } else if (state.isPlayingMusic && !state.audioReady) {
     nextState = 'loading';
-    label = '正在载入';
-    detail = trackTitle;
+    label = compactTrackTitle || '正在载入';
+    detail = '正在载入';
   } else if (!state.isPlayingMusic && getPlaybackTime() > 0) {
     nextState = 'paused';
-    label = '已暂停';
-    detail = trackTitle;
+    label = compactTrackTitle || '已暂停';
+    detail = '已暂停';
   } else if (playing && now < capsuleLyricUntil && line?.currentText) {
     nextState = 'lyric';
-    label = '歌词同步';
-    detail = line.currentText;
+    label = compactTrackTitle || '歌词同步';
+    detail = '歌词同步';
   } else if (playing && now < capsuleBeatUntil) {
     nextState = 'beat';
-    label = '节拍驱动';
-    detail = '镜头 · 魔方 · 表情';
+    label = compactTrackTitle || '节拍驱动';
+    detail = '节拍驱动';
   } else if (playing) {
     nextState = 'playing';
-    label = '正在播放';
-    detail = trackTitle;
+    label = compactTrackTitle || '正在播放';
+    detail = '正在播放';
   }
 
   const capsule = $('#performanceCapsule');
   const copy = capsule.querySelector('.performance-capsule-copy');
+  const getActionLabel = () => {
+    const action = document.body.classList.contains('immersive')
+      ? '退出沉浸模式'
+      : document.body.classList.contains('lue-core-open') ? '收起律核工作台' : '打开律核工作台';
+    const status = nextState === 'record' ? '，正在录制' : (compactTrackTitle ? `，当前${compactTrackTitle}` : '');
+    return action + status;
+  };
   const setText = () => {
-    $('#performanceCapsuleLabel').textContent = label;
+    if (nextState === 'record') {
+      $('#performanceCapsuleLabel').innerHTML = '<span class="rec-dot-pill" aria-hidden="true"></span>正在录制';
+    } else {
+      $('#performanceCapsuleLabel').textContent = label;
+    }
     $('#performanceCapsuleDetail').textContent = detail;
-    capsule.setAttribute('aria-label', `演出状态：${label}${detail ? `，${detail}` : ''}`);
+    capsule.setAttribute('aria-label', getActionLabel());
     copy.classList.remove('is-changing');
   };
   if (nextState !== capsuleState) {
@@ -5289,7 +5394,7 @@ function updatePerformanceCapsule(now, track) {
       copy.classList.add('is-changing');
       capsuleChangeTimer = setTimeout(setText, 120);
     }
-  } else if ($('#performanceCapsuleLabel').textContent !== label || $('#performanceCapsuleDetail').textContent !== detail) {
+  } else if ($('#performanceCapsuleLabel').textContent.replace(/[\s\u200B]/g, '') !== label.replace(/[\s\u200B]/g, '') || $('#performanceCapsuleDetail').textContent !== detail || capsule.getAttribute('aria-label') !== getActionLabel()) {
     clearTimeout(capsuleChangeTimer);
     setText();
   }
@@ -7794,22 +7899,14 @@ const POSTER_WALLPAPERS = Object.freeze({
   'images/wallpapers/op_luffy_crocodile.jpg': { left: 'LUFFY', right: 'CROCODILE', caption: '路飞 vs 克洛克达尔', accent: '#ad4434', secondary: '#31534b', wide: 'images/wallpapers/op_luffy_crocodile_wide.jpg' }
 });
 function placePosterControls() {
-  const mobilePoster = document.body.classList.contains('poster-mode') && window.innerWidth <= 760;
-  const workbenchButton = $('#workbenchHandle');
-  const immersiveButton = $('#immersiveToggle');
-  if (mobilePoster) $('#posterModeHost').appendChild(workbenchButton);
-  else stageCellEl.after(workbenchButton);
-  if (mobilePoster && !document.body.classList.contains('immersive')) $('.top-actions').appendChild(immersiveButton);
-  else $('.stage-hud-right').prepend(immersiveButton);
+  // All controls live permanently in their respective facets in lueCoreDrawer
 }
 function applyPosterWallpaper(url) {
   const poster = POSTER_WALLPAPERS[url];
   const enabled = Boolean(poster);
   document.body.classList.toggle('poster-mode', enabled);
   stageWrapEl.classList.toggle('poster-mode', enabled);
-  const modeSwitcher = $('#kineticModeSwitcher');
   if (enabled) {
-    $('#posterModeHost').appendChild(modeSwitcher);
     document.body.style.setProperty('--poster-accent', poster.accent);
     document.body.style.setProperty('--poster-secondary', poster.secondary);
     $('#posterSideLeftTitle').textContent = poster.left;
@@ -7818,14 +7915,12 @@ function applyPosterWallpaper(url) {
     const posterAspect = window.innerWidth > 760 ? 'ultrawide' : 'portrait';
     if (!state.isRecording && state.videoAspect !== posterAspect) {
       state.videoAspect = posterAspect;
-      $('#videoAspectSelect').value = posterAspect;
+      if ($('#videoAspectSelect')) $('#videoAspectSelect').value = posterAspect;
     }
   } else {
-    $('#stageHudLeft').insertBefore(modeSwitcher, $('#motionPreferenceBtn'));
     document.body.style.removeProperty('--poster-accent');
     document.body.style.removeProperty('--poster-secondary');
   }
-  placePosterControls();
   fitStagePreview();
 }
 
@@ -8371,20 +8466,175 @@ $$('.inspector-tab-btn').forEach(btn => {
   });
 });
 
+// 律核四面中枢控制器 (LÜ Core Controller)
+const lueCore = {
+  isOpen: false,
+  activeFacet: 'play',
+  open(facet) {
+    if (document.body.classList.contains('immersive')) {
+      setImmersive(false);
+    }
+    if (facet) this.setFacet(facet);
+    if (this.isOpen) return;
+    this.isOpen = true;
+    document.body.classList.add('lue-core-open');
+    const drawer = $('#lueCoreDrawer');
+    if (drawer) {
+      drawer.hidden = false;
+      drawer.removeAttribute('inert');
+    }
+    const capsule = $('#performanceCapsule');
+    if (capsule) {
+      capsule.setAttribute('aria-expanded', 'true');
+    }
+    const facetName = this.activeFacet.charAt(0).toUpperCase() + this.activeFacet.slice(1);
+    const tab = $(`#lueTab${facetName}`);
+    if (tab) tab.focus();
+  },
+  close() {
+    if (!this.isOpen) return;
+    this.isOpen = false;
+    document.body.classList.remove('lue-core-open');
+    const drawer = $('#lueCoreDrawer');
+    if (drawer) {
+      drawer.hidden = true;
+      drawer.setAttribute('inert', '');
+    }
+    const capsule = $('#performanceCapsule');
+    if (capsule) {
+      capsule.setAttribute('aria-expanded', 'false');
+      capsule.focus();
+    }
+    if ($('#workbenchDock')) {
+      $('#workbenchDock').inert = true;
+      $('#workbenchDock').setAttribute('aria-hidden', 'true');
+    }
+  },
+  toggle(facet) {
+    if (document.body.classList.contains('immersive')) {
+      setImmersive(false);
+      return;
+    }
+    if (this.isOpen) {
+      if (facet && facet !== this.activeFacet) {
+        this.setFacet(facet);
+      } else {
+        this.close();
+      }
+    } else {
+      this.open(facet);
+    }
+  },
+  setFacet(facet) {
+    if (!['play', 'choreo', 'create', 'record'].includes(facet)) return;
+    this.activeFacet = facet;
+    $$('.lue-facet-tab').forEach(tab => {
+      const isSelected = tab.dataset.facet === facet;
+      tab.classList.toggle('active', isSelected);
+      tab.setAttribute('aria-selected', String(isSelected));
+      tab.tabIndex = isSelected ? 0 : -1;
+    });
+    const facetCapitalized = facet.charAt(0).toUpperCase() + facet.slice(1);
+    $$('.lue-facet-panel').forEach(panel => {
+      const isTarget = panel.id === `lueFacet${facetCapitalized}`;
+      panel.hidden = !isTarget;
+      if (isTarget) {
+        panel.removeAttribute('inert');
+      } else {
+        panel.setAttribute('inert', '');
+      }
+    });
+    if ($('#workbenchDock')) {
+      const choreoActive = facet === 'choreo';
+      $('#workbenchDock').inert = !choreoActive;
+      $('#workbenchDock').setAttribute('aria-hidden', String(!choreoActive));
+    }
+  }
+};
+window.lueCore = lueCore;
+
+// 绑定律核入口与四面交互
+const perfCapsuleEl = $('#performanceCapsule');
+if (perfCapsuleEl) {
+  perfCapsuleEl.addEventListener('click', () => {
+    if (document.body.classList.contains('immersive')) {
+      setImmersive(false);
+    } else {
+      lueCore.toggle();
+    }
+  });
+}
+
+$$('.lue-facet-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    lueCore.setFacet(tab.dataset.facet);
+  });
+  tab.addEventListener('keydown', e => {
+    const tabs = [...$$('.lue-facet-tab')];
+    const index = tabs.indexOf(tab);
+    if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      const next = tabs[(index + 1) % tabs.length];
+      next.focus();
+      lueCore.setFacet(next.dataset.facet);
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      const prev = tabs[(index - 1 + tabs.length) % tabs.length];
+      prev.focus();
+      lueCore.setFacet(prev.dataset.facet);
+    }
+  });
+});
+$('#lueDrawerCloseBtn')?.addEventListener('click', () => lueCore.close());
+
+function openInspectorFromCore(tabName) {
+  lueCore.close();
+  $('#inspectorPanel')?.classList.remove('collapsed');
+  const tab = $(`.inspector-tab-btn[data-tab="${tabName}"]`);
+  tab?.click();
+  syncInspectorAccessibility();
+  tab?.focus();
+}
+for (const [buttonId, tabName] of [
+  ['lueOpenOpticsBtn', 'tab-optics'],
+  ['lueOpenMatrixBtn', 'tab-matrix'],
+  ['lueOpenContentBtn', 'tab-content'],
+  ['lueOpenCameraBtn', 'tab-camera']
+]) {
+  $(`#${buttonId}`)?.addEventListener('click', () => openInspectorFromCore(tabName));
+}
+$('#lueInspectorToRecordBtn')?.addEventListener('click', () => {
+  $('#inspectorPanel')?.classList.add('collapsed');
+  syncInspectorAccessibility();
+  lueCore.open('record');
+});
+$('#inspectorResetCam')?.addEventListener('click', () => {
+  $('#resetCam')?.click();
+});
+
 // 检查器面板折叠展开切换
 $('#inspectorToggleBtn')?.addEventListener('click', () => {
   haptic.click('mechanical');
   $('#inspectorPanel')?.classList.toggle('collapsed');
   syncInspectorAccessibility();
+  if (!$('#inspectorPanel').classList.contains('collapsed')) {
+    lueCore.close();
+    $('.inspector-tab-btn.active')?.focus();
+  }
 });
 function setWorkbenchOpen(open) {
+  if (open) {
+    lueCore.open('choreo');
+  } else {
+    if (lueCore.isOpen && lueCore.activeFacet === 'choreo') {
+      lueCore.close();
+    }
+  }
   document.body.classList.toggle('workbench-open', open);
-  $('#workbenchHandle').setAttribute('aria-expanded', String(open));
-  $('#workbenchDock').inert = !open;
-  $('#workbenchDock').setAttribute('aria-hidden', String(!open));
-  if (!open) {
-    $('#inspectorPanel').classList.add('collapsed');
-    syncInspectorAccessibility();
+  $('#workbenchHandle')?.setAttribute('aria-expanded', String(open));
+  if ($('#workbenchDock')) {
+    $('#workbenchDock').inert = !open;
+    $('#workbenchDock').setAttribute('aria-hidden', String(!open));
   }
 }
 function setupLuSelection(group, underline = false) {
@@ -8425,8 +8675,8 @@ function setupLuSelection(group, underline = false) {
 }
 [
   '#kineticModeSwitcher', '#wavePatternGroup', '#intensityTierGroup',
-  '#morphFreqGroup', '.inspector-tabs'
-].forEach(selector => setupLuSelection($(selector), selector === '.inspector-tabs'));
+  '#morphFreqGroup', '.inspector-tabs', '.lue-facet-tabs'
+].forEach(selector => setupLuSelection($(selector), selector === '.inspector-tabs' || selector === '.lue-facet-tabs'));
 
 for (const slider of [$('#timeProgressSlider'), $('#waveAmpSlider')]) {
   slider.addEventListener('pointerdown', () => slider.classList.add('is-scrubbing'));
@@ -8434,17 +8684,17 @@ for (const slider of [$('#timeProgressSlider'), $('#waveAmpSlider')]) {
     slider.addEventListener(name, () => slider.classList.remove('is-scrubbing'));
   }
 }
-$('#workbenchHandle').addEventListener('click', () => {
+$('#workbenchHandle')?.addEventListener('click', () => {
   setWorkbenchOpen(!document.body.classList.contains('workbench-open'));
 });
-$('#inspectorDockButton').addEventListener('click', () => {
+$('#inspectorDockButton')?.addEventListener('click', () => {
   $('#inspectorPanel').classList.toggle('collapsed');
   syncInspectorAccessibility();
 });
-$('#inspectorCloseBtn').addEventListener('click', () => {
+$('#inspectorCloseBtn')?.addEventListener('click', () => {
   $('#inspectorPanel').classList.add('collapsed');
   syncInspectorAccessibility();
-  (document.body.classList.contains('workbench-open') ? $('#inspectorDockButton') : $('#inspectorToggleBtn')).focus();
+  $('#performanceCapsule')?.focus();
 });
 
 $('#materialSamples').addEventListener('click', event => {
@@ -8521,7 +8771,6 @@ ui.color.addEventListener('input',scheduleMaterialSamples);
 $('#tab-optics').addEventListener('input',e=>{if(e.target.matches('input[type=range]'))scheduleMaterialSamples();});
 $('#materialTones').addEventListener('click',scheduleMaterialSamples);
 scheduleMaterialSamples();
-$('#inspectorToggleBtn').addEventListener('click', syncInspectorAccessibility);
 $$('.inspector-tab-btn').forEach(button => button.addEventListener('click', () => {
   if (window.innerWidth <= 760) $('#inspectorPanel').classList.remove('collapsed');
   syncInspectorAccessibility();
@@ -8529,29 +8778,46 @@ $$('.inspector-tab-btn').forEach(button => button.addEventListener('click', () =
 
 function setImmersive(enabled) {
   document.body.classList.toggle('immersive', enabled);
+  if (enabled && lueCore.isOpen) {
+    lueCore.close();
+  }
   placePosterControls();
   const toggle = $('#immersiveToggle');
-  toggle.setAttribute('aria-pressed', String(enabled));
-  toggle.textContent = enabled ? '返回工作台' : '沉浸';
-  toggle.setAttribute('aria-label', toggle.textContent);
+  if (toggle) {
+    toggle.setAttribute('aria-pressed', String(enabled));
+    toggle.textContent = enabled ? '返回工作台' : '沉浸模式';
+    toggle.setAttribute('aria-label', toggle.textContent);
+  }
   window.dispatchEvent(new Event('resize'));
-  if (enabled && !document.fullscreenElement && stageCellEl.requestFullscreen) {
-    try { Promise.resolve(stageCellEl.requestFullscreen({ navigationUI: 'hide' })).catch(() => {}); } catch (_) {}
+  updateProgressUI(true);
+  if (enabled && !document.fullscreenElement) {
+    const fsEl = document.documentElement.requestFullscreen ? document.documentElement : stageCellEl;
+    if (fsEl && fsEl.requestFullscreen) {
+      try { Promise.resolve(fsEl.requestFullscreen({ navigationUI: 'hide' })).catch(() => {}); } catch (_) {}
+    }
   } else if (!enabled && document.fullscreenElement) {
     try { Promise.resolve(document.exitFullscreen()).catch(() => {}); } catch (_) {}
   }
 }
-$('#immersiveToggle').addEventListener('click', () => setImmersive(!document.body.classList.contains('immersive')));
+$('#immersiveToggle')?.addEventListener('click', () => setImmersive(!document.body.classList.contains('immersive')));
 document.addEventListener('fullscreenchange', () => {
   if (!document.fullscreenElement && document.body.classList.contains('immersive')) setImmersive(false);
 });
 document.addEventListener('keydown', event => {
   if (event.target.closest('input, textarea, select, [contenteditable="true"]')) return;
   if (event.key === 'Escape') {
-    setImmersive(false);
-    setWorkbenchOpen(false);
+    if (document.body.classList.contains('immersive')) {
+      setImmersive(false);
+    } else if (lueCore.isOpen) {
+      lueCore.close();
+    } else if (!$('#inspectorPanel').classList.contains('collapsed')) {
+      $('#inspectorPanel').classList.add('collapsed');
+      syncInspectorAccessibility();
+    } else if (document.body.classList.contains('workbench-open')) {
+      setWorkbenchOpen(false);
+    }
   }
-  else if (event.key.toLowerCase() === 'w') { event.preventDefault(); setWorkbenchOpen(!document.body.classList.contains('workbench-open')); }
+  else if (event.key.toLowerCase() === 'w') { event.preventDefault(); lueCore.toggle('choreo'); }
   else if (event.key.toLowerCase() === 'f') { event.preventDefault(); setImmersive(!document.body.classList.contains('immersive')); }
   else if (event.code === 'Space' && document.body.classList.contains('immersive')) { event.preventDefault(); $('#playPauseBtn').click(); }
 });

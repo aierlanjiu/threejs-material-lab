@@ -11,30 +11,43 @@ try {
 
   const capsule = page.locator('#performanceCapsule');
   const originalWidth = await capsule.evaluate(element => element.getBoundingClientRect().width);
-  const recordLabel = await page.locator('#recordToggle .face-idle').evaluate(face => {
-    const textNode = [...face.childNodes].find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
-    const range = document.createRange();
-    range.selectNodeContents(textNode);
-    const label = range.getBoundingClientRect();
-    const button = face.closest('button').getBoundingClientRect();
-    return { width: label.width, right: label.right, buttonRight: button.right };
-  });
-  assert(recordLabel.width > 15 && recordLabel.right <= recordLabel.buttonRight, 'mobile record label is hidden or clipped');
+
+  // 打开四面律核抽屉
+  await capsule.click();
+
+  // 1. 播放面：测试播放/暂停切换与进度条拖拽
   await page.locator('#playPauseBtn').click();
   await page.waitForFunction(() => document.querySelector('#playPauseBtn').dataset.playState === 'playing');
+  await page.waitForFunction(() => document.querySelector('#performanceCapsuleLabel')?.textContent.includes('《游京》'));
+  assert.match(await capsule.getAttribute('aria-label'), /^收起律核工作台/);
   assert.equal(await page.locator('#playPauseBtn .face-pause').getAttribute('aria-hidden'), 'false');
-  assert.equal(await capsule.evaluate(element => element.getBoundingClientRect().width), originalWidth);
   await page.locator('#playPauseBtn').click();
   assert.equal(await page.locator('#playPauseBtn .face-play').getAttribute('aria-hidden'), 'false');
 
-  await page.locator('#workbenchHandle').click();
-  const geometry = await page.evaluate(() => {
-    const dock = document.querySelector('#workbenchDock').getBoundingClientRect();
-    const lyric = document.querySelector('#cubeLyricsDeck').getBoundingClientRect();
-    return { dockHeight: dock.height, viewportHeight: innerHeight, dockTop: dock.top, lyricBottom: lyric.bottom };
+  const seek = await page.evaluate(() => {
+    const slider = document.querySelector('#timeProgressSlider');
+    const before = window.state.playbackOffset;
+    slider.value = '50';
+    slider.dispatchEvent(new Event('input', { bubbles: true }));
+    const preview = { offset: window.state.playbackOffset, label: document.querySelector('#timeDisplay').textContent };
+    slider.dispatchEvent(new Event('change', { bubbles: true }));
+    return { before, preview, committed: window.state.playbackOffset };
   });
-  assert(geometry.dockHeight / geometry.viewportHeight <= .35, 'mobile workbench exceeds 35dvh');
-  assert(geometry.lyricBottom <= geometry.dockTop + 2, 'workbench covers the lyric rail');
+  assert.equal(seek.preview.offset, seek.before, 'drag preview must not repeatedly seek the audio buffer');
+  const seconds = value => value.split(':').reduce((total, part) => total * 60 + Number(part), 0);
+  const [previewTime, totalTime] = seek.preview.label.split(' / ');
+  assert(Math.abs(seconds(previewTime) - seconds(totalTime) / 2) < 1.5, 'scrub preview shows the wrong time');
+  assert(Math.abs(seek.committed - seconds(totalTime) / 2) < 1.5, 'seek was not committed on change');
+
+  // 2. 演出面：测试抽屉高度 <= 35dvh、波形选择与歌词模式
+  await page.locator('#lueTabChoreo').click();
+  const geometry = await page.evaluate(() => {
+    const drawer = document.querySelector('#lueCoreDrawer').getBoundingClientRect();
+    const lyric = document.querySelector('#cubeLyricsDeck').getBoundingClientRect();
+    return { drawerHeight: drawer.height, viewportHeight: innerHeight, drawerBottom: drawer.bottom, lyricTop: lyric.top };
+  });
+  assert(geometry.drawerHeight / geometry.viewportHeight <= .35, 'mobile drawer exceeds 35dvh');
+  assert(geometry.drawerBottom <= geometry.lyricTop, 'drawer covers the lyric rail');
   await page.locator('#wavePatternGroup [data-pattern="heartbeat"]').click();
   assert.equal(await page.locator('#wavePatternGroup [data-pattern="heartbeat"]').getAttribute('aria-pressed'), 'true');
   await page.waitForFunction(() => {
@@ -58,20 +71,21 @@ try {
   assert.equal(await page.locator('#kineticModeSwitcher [data-mode="off"]').getAttribute('aria-checked'), 'true');
   await page.locator('#kineticModeSwitcher [data-mode="slot"]').click();
 
-  const seek = await page.evaluate(() => {
-    const slider = document.querySelector('#timeProgressSlider');
-    const before = window.state.playbackOffset;
-    slider.value = '50';
-    slider.dispatchEvent(new Event('input', { bubbles: true }));
-    const preview = { offset: window.state.playbackOffset, label: document.querySelector('#timeDisplay').textContent };
-    slider.dispatchEvent(new Event('change', { bubbles: true }));
-    return { before, preview, committed: window.state.playbackOffset };
+  // 3. 录制面：测试录制按钮尺寸与文案未被裁剪
+  await page.locator('#lueTabRecord').click();
+  const recordLabel = await page.locator('#recordToggle .face-idle').evaluate(face => {
+    const textNode = [...face.childNodes].find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
+    const range = document.createRange();
+    range.selectNodeContents(textNode);
+    const label = range.getBoundingClientRect();
+    const button = face.closest('button').getBoundingClientRect();
+    return { width: label.width, right: label.right, buttonRight: button.right };
   });
-  assert.equal(seek.preview.offset, seek.before, 'drag preview must not repeatedly seek the audio buffer');
-  const seconds = value => value.split(':').reduce((total, part) => total * 60 + Number(part), 0);
-  const [previewTime, totalTime] = seek.preview.label.split(' / ');
-  assert(Math.abs(seconds(previewTime) - seconds(totalTime) / 2) < 1.5, 'scrub preview shows the wrong time');
-  assert(Math.abs(seek.committed - seconds(totalTime) / 2) < 1.5, 'seek was not committed on change');
+  assert(recordLabel.width > 15 && recordLabel.right <= recordLabel.buttonRight, 'mobile record label is hidden or clipped');
+
+  // 收起抽屉，验证胶囊尺寸恢复
+  await page.keyboard.press('Escape');
+  assert.equal(await capsule.evaluate(element => element.getBoundingClientRect().width), originalWidth);
 
   await page.emulateMedia({ reducedMotion: 'reduce' });
   const duration = await page.locator('#wavePatternGroup .lu-selection-surface').evaluate(element => getComputedStyle(element).transitionDuration);

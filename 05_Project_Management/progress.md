@@ -9,6 +9,8 @@
 
 ## Active Assets
 
+- [律核单入口四面工作台接手交付报告](Reports/2026-10-08-lu-core-handoff-completion.md)
+- [律核关键状态设计稿](Reports/2026-10-08-lu-core-key-states.md)
 - [律的控件动效与调律工作台改造报告](Reports/2026-10-08-lu-control-motion-adaptation.md)
 - [律的手机沉浸模式全屏修复与推文动效核对报告](Reports/2026-10-08-lu-mobile-immersive.md)
 - [律的对决海报界面与桌面超宽屏壁纸报告](Reports/2026-10-08-lu-battle-poster-ui.md)
@@ -27,6 +29,7 @@
 
 ## Recent Results
 
+- Action: AGY 中断后接手律核单入口，将播放、演出、创作、录制控件集中到四面工作台，修复移动布局、非海报入口、录制状态与键盘焦点。Validation: 1440/390/342px 布局、双画幅真实录制、音乐编排与主画面几何回归通过；实体手机待验。Report: `Reports/2026-10-08-lu-core-handoff-completion.md`。Agent: codex · 2026-10-08。
 - Action: 将推文的原位状态切换与直接操控迁移到律的播放器、录制按钮、状态胶囊、工作台及检查器，保持对决海报和 WebGL 演出；手机抽屉限制在 35dvh 内并避让歌词。Validation: 双画幅真实录制、342px/1440px 布局、390px 控件及音乐编排回归通过；AGY 3.8 Flash High 方案审阅已参考，本次代码复核超时未取得结论。Report: `Reports/2026-10-08-lu-control-motion-adaptation.md`。Agent: codex · 2026-10-08。
 - Action: 修复海报模式覆盖手机沉浸状态的顶部 UI 隐藏和全屏尺寸；支持原生全屏与视口全屏退化，并核对线上动效与推文提示词的实际符合范围。Validation: 390×844 实景、342px 原生／退化全屏及退出回归、1440px 桌面布局通过；实体手机待验。Report: `Reports/2026-10-08-lu-mobile-immersive.md`。Agent: codex · 2026-10-08。
 - Action: 用五张既有对决海报统一律的界面语言，并生成对应桌面横幅；桌面 21:9、手机 9:16 按视口切换，歌词与操作控件避让原画。Validation: AGY 3.8 Flash High 只读审查、四种视口实景、双画幅录制与音乐编排回归通过；原生 21:9 录制性能及实体手机待验。Report: `Reports/2026-10-08-lu-battle-poster-ui.md`。Agent: codex · 2026-10-08。
