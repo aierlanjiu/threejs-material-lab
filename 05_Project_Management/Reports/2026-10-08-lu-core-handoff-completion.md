@@ -22,3 +22,8 @@ Agent: codex · 2026-10-08
 ## 设计与状态规范
 
 四面映射、收起/展开/录制/沉浸状态与 DOM 复用约束见 [关键状态设计稿](2026-10-08-lu-core-key-states.md)。AGY 中断后没有最终代码复核结论；上述交付由 codex 直接完成并验证。
+
+## 远端发布
+
+- 功能提交 `7285730` 已同步到 `master` 和 `gh-pages`，两条远端分支均核对为 `72857303379a0b60c2540c23c5f2b89090559033`。
+- [GitHub Pages 主页面](https://aierlanjiu.github.io/threejs-material-lab/) 返回 HTTP 200；线上 HTML 已包含律核入口和播放、演出、创作、录制四面节点。线上未进行实体手机录制实测。

@@ -5,7 +5,7 @@
 - 『律』主入口为 `index.html`：3D 物理材质与声波工作台、歌词同步、29 位角色实时表情；页面继续提供桌面与移动端操作。
 - 『荔』主入口为 `mascot_studio.html`，快捷入口为 `li.html`；『弈律』主入口为 `xiangqi.html`，三者共用当前仓库。
 - 角色来源为用户提供的透明头像。运行资产在 `assets/live-avatars/`，实时渲染模块在 `js/avatar/live.js`，29 张独立 GIF 在本地 `output/live-avatar-gifs/`。
-- 主视窗与录制修复、剩余的文档／依赖更新和旧 OneWorks 资源清退已同步至 `master` 与 `gh-pages`，Pages 线上入口已更新。
+- 律核单入口四面工作台和此前主视窗、录制修复已同步至 `master` 与 `gh-pages`，Pages 线上入口已更新。
 
 ## Active Assets
 
