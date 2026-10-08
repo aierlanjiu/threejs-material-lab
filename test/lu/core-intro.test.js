@@ -25,8 +25,11 @@ try {
     assert.equal(await page.locator('#luIntroOverlay').isVisible(), true);
     assert.equal(await page.locator('.lu-intro-hint').innerText(), '轻触魔方');
     assert.equal(await page.locator('#luIntroSkip').innerText(), '跳过');
-    assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('#luIntroOverlay')).backgroundColor), 'rgb(16, 16, 20)',
+    assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('#luIntroOverlay')).backgroundColor), 'rgb(7, 9, 11)',
       'the opening scene should hide the stage until the canvas unfolds');
+    const plate = await page.evaluate(() => getComputedStyle(document.querySelector('.lu-intro-curtain i'), '::before').backgroundImage);
+    assert.match(plate, width <= 760 ? /lu-intro-smoke-portrait\.png/ : /lu-intro-smoke-desktop\.png/,
+      'the smoke-glass backdrop should match the viewport');
     assert.equal(await page.evaluate(() => document.querySelector('.app').inert), true);
     assert.deepEqual(await page.evaluate(() => [window.luCubeIntro.cubieCount, window.luCubeIntro.scrambleMoves]), [27, 8]);
     const shell = await page.evaluate(() => ({
@@ -40,7 +43,10 @@ try {
     assert.equal(await page.locator('#luIntroActivate canvas').count(), 1, 'the opening cube needs a real canvas');
     await page.evaluate(() => { window.introCanvas = document.querySelector('#luIntroActivate canvas'); });
 
+    const idleGlow = await page.evaluate(() => parseFloat(document.querySelector('#luIntroOverlay').style.getPropertyValue('--lu-light-opacity')));
     await page.locator('#luIntroActivate').click();
+    await page.waitForFunction(base => parseFloat(document.querySelector('#luIntroOverlay').style.getPropertyValue('--lu-light-opacity')) > base + .08,
+      idleGlow, { timeout: 12000 });
     await page.waitForFunction(() => window.luCubeIntro.phase === 'complete', null, { timeout: 45000 });
     assert.equal(await page.evaluate(() => window.luCubeIntro.solved), true);
     assert.equal(await page.locator('#luIntroOverlay').isVisible(), false);

@@ -6,8 +6,13 @@
   display: grid;
   place-items: center;
   overflow: hidden;
-  color: #f2e8da;
-  background: #101014;
+  --lu-light-shift: 0px;
+  --lu-light-scale: 1;
+  --lu-light-opacity: .5;
+  --lu-floor-opacity: .38;
+  --lu-floor-spread: 1;
+  color: #e9dccb;
+  background: #07090b;
   perspective: 1400px;
 }
 .lu-intro-overlay[hidden] { display: none !important; }
@@ -18,12 +23,36 @@
   z-index: 1;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(ellipse min(35vw, 280px) min(32vw, 260px) at 50% 52%, rgba(206, 130, 99, .17), transparent 82%);
-  opacity: .76;
-  transition: opacity 650ms ease, transform 650ms cubic-bezier(.16, 1, .3, 1);
+  background: radial-gradient(ellipse min(42vw, 350px) min(42vw, 350px) at 50% 51%, rgba(255, 174, 72, .37), rgba(199, 95, 27, .11) 40%, transparent 76%);
+  opacity: var(--lu-light-opacity);
+  transform: translateX(var(--lu-light-shift)) scale(var(--lu-light-scale));
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+  transition: opacity 650ms ease;
 }
-.lu-intro-overlay.is-solved::before { opacity: 1; transform: scale(1.22); }
+.lu-intro-overlay::after {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  top: 65%;
+  left: 50%;
+  width: min(62vw, 620px);
+  height: 27vh;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 0%, rgba(255, 181, 78, .58), rgba(184, 88, 31, .19) 34%, transparent 73%),
+    linear-gradient(73deg, transparent 35%, rgba(255, 162, 59, .12) 50%, transparent 62%),
+    linear-gradient(107deg, transparent 35%, rgba(255, 162, 59, .12) 50%, transparent 62%);
+  opacity: var(--lu-floor-opacity);
+  transform: translateX(calc(-50% + var(--lu-light-shift))) scaleX(var(--lu-floor-spread));
+  transform-origin: center top;
+  mix-blend-mode: screen;
+  filter: blur(11px);
+  will-change: transform, opacity;
+  transition: opacity 650ms ease;
+}
+.lu-intro-overlay.is-solved::before { opacity: .94; }
 .lu-intro-overlay.is-revealing::before { opacity: 0; }
+.lu-intro-overlay.is-revealing::after { opacity: 0; }
 .lu-intro-curtain {
   position: absolute;
   z-index: 0;
@@ -36,30 +65,41 @@
   display: block;
   width: 50%;
   height: 100%;
-  background: #101014;
+  overflow: hidden;
+  background: #07090b;
   transition: transform 1180ms cubic-bezier(.16, 1, .3, 1);
   will-change: transform;
 }
+.lu-intro-curtain i::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 100vw;
+  height: 100%;
+  background: #07090b url('../assets/backgrounds/lu-intro-smoke-desktop.png') center / cover no-repeat;
+}
+.lu-intro-curtain i:first-child::before { left: 0; }
+.lu-intro-curtain i:last-child::before { right: 0; }
 .lu-intro-curtain i:first-child { transform-origin: right center; }
 .lu-intro-curtain i:last-child { transform-origin: left center; }
 .lu-intro-curtain i:first-child::after,
-.lu-intro-curtain i:last-child::before {
+.lu-intro-curtain i:last-child::after {
   content: '';
   position: absolute;
   top: 0;
   bottom: 0;
   width: 1px;
-  background: linear-gradient(transparent 15%, rgba(241, 194, 151, .48), transparent 85%);
-  box-shadow: 0 0 24px 5px rgba(241, 194, 151, .12);
+  background: linear-gradient(transparent 15%, rgba(255, 191, 94, .72), transparent 85%);
+  box-shadow: 0 0 24px 5px rgba(255, 157, 48, .2);
   opacity: 0;
   transition: opacity 300ms ease;
 }
 .lu-intro-curtain i:first-child::after { right: 0; }
-.lu-intro-curtain i:last-child::before { left: 0; }
+.lu-intro-curtain i:last-child::after { left: 0; }
 .lu-intro-overlay.is-revealing .lu-intro-curtain i:first-child { transform: translateX(-104%) rotateY(-8deg); }
 .lu-intro-overlay.is-revealing .lu-intro-curtain i:last-child { transform: translateX(104%) rotateY(8deg); }
 .lu-intro-overlay.is-revealing .lu-intro-curtain i:first-child::after,
-.lu-intro-overlay.is-revealing .lu-intro-curtain i:last-child::before { opacity: 1; }
+.lu-intro-overlay.is-revealing .lu-intro-curtain i:last-child::after { opacity: 1; }
 body.lu-intro-active .stageWrap {
   transform: scale(1.07);
   transform-origin: center;
@@ -80,12 +120,12 @@ body.lu-intro-revealing .stageWrap { transform: scale(1); }
   padding: 0;
   border: 0;
   border-radius: 50%;
-  color: rgba(242, 232, 218, .76);
-  background: rgba(255, 255, 255, .045);
+  color: #e9dccb;
+  background: rgba(9, 11, 13, .44);
   cursor: pointer;
   transition: background 180ms ease, color 180ms ease, transform 180ms ease;
 }
-.lu-intro-tools button:hover { background: rgba(255, 255, 255, .10); color: #f2e8da; }
+.lu-intro-tools button:hover { background: rgba(255, 202, 133, .12); color: #fff1d8; }
 .lu-intro-tools button:active,
 .lu-intro-skip:active,
 .lue-create-intro-actions button:active { transform: scale(.94); }
@@ -113,7 +153,25 @@ body.lu-intro-revealing .stageWrap { transform: scale(1); }
   box-sizing: border-box;
   text-align: center;
 }
+.lu-intro-stage::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  top: calc(50% + 155px);
+  left: 50%;
+  width: min(44vw, 490px);
+  height: 92px;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(0, 0, 0, .82) 7%, rgba(20, 11, 7, .6) 40%, rgba(222, 116, 31, .18) 64%, transparent 78%);
+  opacity: .72;
+  filter: blur(11px);
+  transform: translateX(calc(-50% + var(--lu-light-shift))) scaleX(var(--lu-floor-spread));
+  will-change: transform;
+}
 .lu-intro-activate {
+  position: relative;
+  z-index: 1;
   display: grid;
   place-items: center;
   width: min(430px, max(260px, 86vw));
@@ -121,7 +179,7 @@ body.lu-intro-revealing .stageWrap { transform: scale(1); }
   padding: 0;
   border: 0;
   background: transparent;
-  color: #f2e8da;
+  color: #e9dccb;
   cursor: pointer;
   transform-origin: center;
   transition: transform 1180ms cubic-bezier(.16, 1, .3, 1), opacity 470ms ease 610ms;
@@ -134,17 +192,13 @@ body.lu-intro-revealing .stageWrap { transform: scale(1); }
   place-items: center;
   width: 154px;
   height: 154px;
-  color: #f2e8da;
-  background: #c94f64;
-  border: 12px solid #211b21;
-  border-radius: 16px;
-  font-family: 'TsangerJinKai02', sans-serif;
-  font-size: 82px;
-  transform: rotate(-14deg);
 }
+.lu-intro-fallback img { display: block; width: 100%; height: 100%; }
 .lu-intro-hint {
+  position: relative;
+  z-index: 1;
   margin: 8px 0 0;
-  color: rgba(242, 232, 218, .56);
+  color: #c8b6a0;
   font: 500 12px/1.5 'PingFang SC', 'Noto Sans CJK SC', sans-serif;
   letter-spacing: .2em;
   transition: opacity 200ms ease, transform 200ms ease;
@@ -158,13 +212,13 @@ body.lu-intro-revealing .stageWrap { transform: scale(1); }
   min-height: 44px;
   padding: 0 4px;
   border: 0;
-  color: rgba(242, 232, 218, .52);
+  color: #b5a591;
   background: transparent;
   font: 500 12px/1 'PingFang SC', 'Noto Sans CJK SC', sans-serif;
   cursor: pointer;
   transition: color 180ms ease, transform 180ms ease;
 }
-.lu-intro-skip:hover { color: #f2e8da; }
+.lu-intro-skip:hover { color: #fff1d8; }
 .lu-intro-sr-only {
   position: absolute !important;
   width: 1px !important;
@@ -185,6 +239,11 @@ body.lu-intro-revealing .stageWrap { transform: scale(1); }
   pointer-events: none;
   transition: opacity 180ms ease;
 }
+.brand-glyph-box { box-sizing: border-box; overflow: hidden; padding: 2px; background: #151b21; border: 1px solid rgba(255, 197, 100, .4); box-shadow: none; }
+.brand-glyph-box img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.performance-capsule-mark:not(.has-lu-cube) { background: #151b21; }
+.lu-core-mark-fallback { display: grid; place-items: center; width: 100%; height: 100%; }
+.lu-core-mark-fallback img { display: block; width: 92%; height: 92%; }
 .performance-capsule-mark.has-lu-cube {
   flex: 0 0 42px;
   width: 42px;
@@ -197,7 +256,9 @@ body.lu-intro-revealing .stageWrap { transform: scale(1); }
 .lue-create-intro-actions { display: flex; gap: 8px; margin-top: 10px; }
 .lue-create-intro-actions .btn { flex: 1 1 50%; min-width: 0; }
 @media (max-width: 760px) {
+  .lu-intro-curtain i::before { background-image: url('../assets/backgrounds/lu-intro-smoke-portrait.png'); }
   .lu-intro-stage { padding-top: 76px; }
+  .lu-intro-stage::before { top: calc(50% + 125px); width: min(76vw, 330px); height: 74px; }
   .lu-intro-hint { margin-top: 8px; }
   .performance-capsule-mark.has-lu-cube { flex-basis: 38px; width: 38px; height: 38px; }
   .performance-capsule-mark .lu-cube-canvas { width: 38px !important; height: 38px !important; }

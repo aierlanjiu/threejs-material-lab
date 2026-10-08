@@ -116,6 +116,11 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
   const rim = new THREE.DirectionalLight(0xe5c5aa, 2.3);
   rim.position.set(-5, -1, -4);
   scene.add(rim);
+  const glassBounceLeft = new THREE.PointLight(0xffaa51, 1.55, 12, 2);
+  const glassBounceRight = new THREE.PointLight(0xffaa51, 1.55, 12, 2);
+  glassBounceLeft.position.set(-4.2, -1.6, 3.6);
+  glassBounceRight.position.set(4.2, -1.6, 3.6);
+  scene.add(glassBounceLeft, glassBounceRight);
   const root = new THREE.Group();
   root.rotation.set(-.27, .54, -.05);
   scene.add(root);
@@ -178,6 +183,8 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
   let activeTurn = null;
   let scramble = [];
   let miniTurn = 0;
+  let lastLightFrame = 0;
+  let lightImpulse = 0;
 
   function setSize(size) {
     if (!renderer) return;
@@ -186,9 +193,32 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
     renderer.domElement.style.height = `${size}px`;
   }
   function draw() { if (renderer) renderer.render(scene, camera); }
+  function syncLighting(now) {
+    if (now - lastLightFrame < 32) return;
+    lastLightFrame = now;
+    const turnEnergy = Math.abs(Math.sin(pivot.rotation.x))
+      + Math.abs(Math.sin(pivot.rotation.y)) + Math.abs(Math.sin(pivot.rotation.z));
+    const energy = Math.min(1, lightImpulse + turnEnergy * .34);
+    const shift = Math.sin(root.rotation.y) * 27
+      + Math.sin(pivot.rotation.x + pivot.rotation.y + pivot.rotation.z) * 13;
+    const glow = .38 + energy * .34;
+    overlay.style.setProperty('--lu-light-shift', `${Math.round(shift)}px`);
+    overlay.style.setProperty('--lu-light-scale', (1.02 + energy * .33).toFixed(3));
+    overlay.style.setProperty('--lu-light-opacity', glow.toFixed(3));
+    overlay.style.setProperty('--lu-floor-opacity', (.38 + energy * .27).toFixed(3));
+    overlay.style.setProperty('--lu-floor-spread', (1 + energy * .32).toFixed(3));
+    light.position.x = 2 + shift * .035;
+    light.intensity = 2.35 + energy * .75;
+    rim.intensity = 2.3 + energy * .55;
+    const sideBias = Math.max(-1, Math.min(1, shift / 40));
+    glassBounceLeft.intensity = 1.55 + energy * .45 - sideBias * .35;
+    glassBounceRight.intensity = 1.55 + energy * .45 + sideBias * .35;
+    lightImpulse *= .82;
+  }
   function loop(now) {
     if (phase === 'complete') return;
     if (phase === 'waiting' && !reduced()) root.rotation.y = .54 + Math.sin(now * .00055) * .21;
+    syncLighting(now);
     draw();
     frame = requestAnimationFrame(loop);
   }
@@ -237,6 +267,9 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
       lastAxis = axis;
     }
     root.rotation.set(-.27, .54, -.05);
+    lightImpulse = 0;
+    lastLightFrame = 0;
+    syncLighting(performance.now());
     draw();
   }
   function animateTurn(move, duration, token) {
@@ -336,6 +369,10 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
     mark.prepend(renderer.domElement);
     mark.classList.add('has-lu-cube');
     root.rotation.set(-.27, .54, -.05);
+    light.intensity = 2.35;
+    rim.intensity = 2.3;
+    glassBounceLeft.intensity = 1.55;
+    glassBounceRight.intensity = 1.55;
     draw();
   }
   function complete() {
@@ -369,9 +406,11 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
     const solution = [...scramble].reverse().map(move => ({ ...move, quarter: -move.quarter }));
     for (let i = 0; i < solution.length; i++) {
       sound.turn(i);
+      lightImpulse = .4;
       if (!await animateTurn(solution[i], i === solution.length - 1 ? 210 : 155, token)) return;
     }
     sound.solved();
+    lightImpulse = 1;
     label.textContent = '魔方归位';
     hint.textContent = '';
     overlay.classList.add('is-solved');
