@@ -4,6 +4,11 @@ const MOODS = ['calm', 'happy', 'wink', 'curious', 'surprised', 'sleepy'];
 const FACE_COLORS = ['#ce342d', '#dcc4a0', '#b96450', '#aab5ad', '#b88c6d', '#a7a1af'];
 const PITCH = 0.97;
 const TURN = Math.PI / 2;
+const TURN_RECORDINGS = [
+  { file: '../../assets/sfx/lu-cube-turn-4.mp3', offset: .39, length: .27, gain: 2.0 },
+  { file: '../../assets/sfx/lu-cube-turn-5.mp3', offset: .38, length: .29, gain: 2.4 },
+  { file: '../../assets/sfx/lu-cube-turn-6.mp3', offset: .38, length: .27, gain: 1.5 }
+];
 const ease = t => t * t * (3 - 2 * t);
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -52,13 +57,41 @@ function makeSticker(THREE, character, mood, accent) {
 function createSound() {
   let context;
   let enabled = true;
+  let recordingBytes;
+  let recordingPromise;
+  let recordings;
+  let fallbackNoise;
+  let mediaFallback;
   try { enabled = localStorage.getItem('luIntroSound') !== 'off'; } catch {}
+  function preloadMediaFallback() {
+    mediaFallback ||= TURN_RECORDINGS.map(({ file }) => {
+      const player = new Audio(new URL(file, import.meta.url).href);
+      player.preload = 'auto';
+      return player;
+    });
+  }
+  function preload() {
+    recordingBytes ||= Promise.all(TURN_RECORDINGS.map(async ({ file }) => {
+      const response = await fetch(new URL(file, import.meta.url));
+      if (!response.ok) throw new Error(`Cube turn recording unavailable: ${response.status}`);
+      return response.arrayBuffer();
+    })).catch(() => { preloadMediaFallback(); return null; });
+    return recordingBytes;
+  }
+  if (enabled) preload();
   function unlock() {
     if (!enabled) return;
     try {
       context ||= new (window.AudioContext || window.webkitAudioContext)();
       if (context.state === 'suspended') context.resume().catch(() => {});
     } catch {}
+  }
+  function prepare() {
+    if (!enabled || !context || context.state === 'closed' || recordings) return Promise.resolve();
+    recordingPromise ||= preload().then(bytes => bytes
+      ? Promise.all(bytes.map(data => context.decodeAudioData(data.slice(0))))
+      : null).then(decoded => { recordings = decoded; }).catch(() => {});
+    return recordingPromise;
   }
   function tone(frequency, length = 0.09, gain = 0.05, type = 'sine', delay = 0) {
     if (!enabled || !context || context.state === 'closed') return;
@@ -76,16 +109,79 @@ function createSound() {
     osc.start(at);
     osc.stop(at + length + .025);
   }
+  function fallbackClack(duration) {
+    if (!context || context.state === 'closed') return;
+    const rate = context.sampleRate;
+    fallbackNoise ||= (() => {
+      const buffer = context.createBuffer(1, Math.floor(rate * .035), rate);
+      const samples = buffer.getChannelData(0);
+      for (let i = 0; i < samples.length; i++) {
+        const decay = Math.pow(1 - i / samples.length, 3);
+        samples[i] = (Math.random() * 2 - 1) * decay;
+      }
+      return buffer;
+    })();
+    const at = context.currentTime;
+    for (const delay of [0, Math.max(.065, duration / 1000 - .045)]) {
+      const source = context.createBufferSource();
+      const filter = context.createBiquadFilter();
+      const amp = context.createGain();
+      source.buffer = fallbackNoise;
+      filter.type = 'bandpass';
+      filter.frequency.value = delay ? 1900 : 1250;
+      filter.Q.value = .72;
+      amp.gain.value = delay ? .09 : .065;
+      source.connect(filter).connect(amp).connect(context.destination);
+      source.start(at + delay);
+    }
+  }
+  function recordedClack(index, move, duration) {
+    if (!enabled || !context || context.state === 'closed') return;
+    const choice = index % TURN_RECORDINGS.length;
+    const config = TURN_RECORDINGS[choice];
+    const at = context.currentTime;
+    const length = Math.min(.26, duration / 1000 + .055);
+    if (!recordings) {
+      const player = mediaFallback?.[choice];
+      if (!player || player.readyState < 2) { fallbackClack(duration); return; }
+      player.pause();
+      player.currentTime = config.offset;
+      player.playbackRate = config.length / length;
+      player.preservesPitch = false;
+      player.volume = 1;
+      player.play().catch(() => fallbackClack(duration));
+      setTimeout(() => player.pause(), length * 1000);
+      return;
+    }
+    const source = context.createBufferSource();
+    const amp = context.createGain();
+    source.buffer = recordings[choice];
+    source.playbackRate.setValueAtTime(config.length / length, at);
+    amp.gain.setValueAtTime(.0001, at);
+    amp.gain.linearRampToValueAtTime(config.gain, at + .007);
+    amp.gain.setValueAtTime(config.gain, at + length - .026);
+    amp.gain.linearRampToValueAtTime(0, at + length);
+    if (context.createStereoPanner) {
+      const pan = context.createStereoPanner();
+      pan.pan.value = (move?.layer || 0) * .16;
+      source.connect(pan).connect(amp);
+    } else source.connect(amp);
+    amp.connect(context.destination);
+    source.start(at, config.offset, config.length);
+    source.stop(at + length + .01);
+  }
   return {
     get enabled() { return enabled; },
     set enabled(value) {
       enabled = Boolean(value);
       try { localStorage.setItem('luIntroSound', enabled ? 'on' : 'off'); } catch {}
+      if (enabled) preload();
     },
     unlock,
+    prepare,
     wake() { tone(196, .20, .05, 'sine'); tone(294, .26, .035, 'triangle', .07); },
-    turn(index) { tone(310 + index * 24, .085, .036, 'triangle'); tone(132, .045, .018, 'square', .12); },
-    solved() { [392, 494, 587].forEach((hz, i) => tone(hz, .28 + i * .06, .032, 'sine', i * .07)); },
+    turn: recordedClack,
+    solved() { recordedClack(1, { layer: 0 }, 200); tone(118, .13, .018, 'triangle'); },
     unfold() { tone(220, .48, .028, 'sine'); tone(440, .42, .018, 'triangle', .11); },
     tap() { tone(296, .06, .018, 'triangle'); }
   };
@@ -388,11 +484,11 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
     label.textContent = '正在唤醒律';
     hint.textContent = '正在归位';
     if (!renderer || reduced()) { complete(); return; }
-    await Promise.allSettled(stickers.flat().map(item => item.ready));
+    await Promise.allSettled([...stickers.flat().map(item => item.ready), sound.prepare()]);
     if (token !== operation) return;
     const solution = [...scramble].reverse().map(move => ({ ...move, quarter: -move.quarter }));
     for (let i = 0; i < solution.length; i++) {
-      sound.turn(i);
+      sound.turn(i, solution[i], i === solution.length - 1 ? 210 : 155);
       lightImpulse = .4;
       if (!await animateTurn(solution[i], i === solution.length - 1 ? 210 : 155, token)) return;
     }

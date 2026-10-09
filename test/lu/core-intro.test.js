@@ -12,11 +12,21 @@ try {
     await page.addInitScript(() => {
       const NativeAudioContext = window.AudioContext;
       window.introOscillatorCount = 0;
+      window.introDecodedAudioCount = 0;
+      window.introBufferSourceCount = 0;
       if (!NativeAudioContext) return;
       window.AudioContext = class extends NativeAudioContext {
         createOscillator() {
           window.introOscillatorCount++;
           return super.createOscillator();
+        }
+        createBufferSource() {
+          window.introBufferSourceCount++;
+          return super.createBufferSource();
+        }
+        decodeAudioData(...args) {
+          window.introDecodedAudioCount++;
+          return super.decodeAudioData(...args);
         }
       };
     });
@@ -60,8 +70,10 @@ try {
       'keyboard focus should land on the persistent core control');
     assert.equal(await page.evaluate(() => window.introCanvas === document.querySelector('#luIntroActivate canvas')), true,
       'the entrance canvas should remain available for replay');
-    assert((await page.evaluate(() => window.introOscillatorCount)) >= 20,
-      'the wake, layer turns, solved cue and unfold should schedule real sound nodes');
+    assert((await page.evaluate(() => window.introDecodedAudioCount)) >= 3,
+      'the three physical cube recordings should decode before the turn animation');
+    assert((await page.evaluate(() => window.introBufferSourceCount)) >= 9,
+      'each layer turn and the final lock should play recorded material');
 
     await page.locator('#performanceCapsule').click();
     await page.locator('#lueTabCreate').click();

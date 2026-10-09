@@ -30,6 +30,7 @@
 
 ## Recent Results
 
+- Action: 将律的魔方转层电子短音换为三段 CC0 真实魔方录音，按旋转时长播放齿位与落锁声；保留静音和素材失败降级。Validation: 390/1440px 与减少动效回归通过，三段录音解码及九次物理声音触发得到浏览器验证。Report: `Reports/2026-10-08-lu-expression-cube-intro.md`。Agent: codex · 2026-10-09。
 - Action: 用用户最终提供的透明底烟晶律核图统一替换旧图标，并将入场后的左上角迷你魔方改为该图标，保留魔方入场与重播。Validation: 图片 Alpha 通道、桌面/手机实景及 390/1440px/减少动效入场回归通过。Report: `Reports/2026-10-08-lu-expression-cube-intro.md`。Agent: codex · 2026-10-09。
 - Action: 用现有圆角 cube 材质和角色表情制作分层魔方入场；双画幅烟晶黑色背景与随魔方运动的 WebGL 暖光、地面反射联动，按参考材质设计魔方格面＋声波律核标记，归位后展开画布并散开小 cube。Validation: 桌面/手机实景、1440/390px 入场回归、既有工作台及双画幅录制通过；实体手机待验。Report: `Reports/2026-10-08-lu-expression-cube-intro.md`。Agent: codex · 2026-10-09。
 - Action: AGY 中断后接手律核单入口，将播放、演出、创作、录制控件集中到四面工作台，修复移动布局、非海报入口、录制状态与键盘焦点。Validation: 1440/390/342px 布局、双画幅真实录制、音乐编排与主画面几何回归通过；实体手机待验。Report: `Reports/2026-10-08-lu-core-handoff-completion.md`。Agent: codex · 2026-10-08。
