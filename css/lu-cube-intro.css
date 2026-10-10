@@ -6,53 +6,33 @@
   display: grid;
   place-items: center;
   overflow: hidden;
-  --lu-light-shift: 0px;
-  --lu-light-scale: 1;
-  --lu-light-opacity: .5;
-  --lu-floor-opacity: .38;
-  --lu-floor-spread: 1;
-  color: #e9dccb;
-  background: #07090b;
+  --intro-backdrop: url('../assets/backgrounds/lu-intro-d-one-piece-wide.png');
+  --lu-theme-edge: #a9c8df;
+  --lu-theme-glow: #d9a676;
+  --lu-intro-ink: #fff2dd;
+  --lu-intro-muted: rgba(255, 241, 220, .82);
+  color: var(--lu-intro-ink);
+  background: #9b3b22;
   perspective: 1400px;
+}
+.lu-intro-overlay[data-theme="dragon-ball"] {
+  --lu-theme-edge: #f0c99c;
+  --lu-theme-glow: #8ac9e9;
+  --lu-intro-ink: #38180b;
+  --lu-intro-muted: rgba(56, 24, 11, .8);
+  --intro-backdrop: url('../assets/backgrounds/lu-intro-d-dragon-ball-wide.png');
+  background: #f8750c;
+}
+.lu-intro-overlay[data-theme="naruto"] {
+  --lu-theme-edge: #b7b9ed;
+  --lu-theme-glow: #87aee4;
+  --lu-intro-ink: #fff0e3;
+  --lu-intro-muted: rgba(255, 240, 227, .86);
+  --intro-backdrop: url('../assets/backgrounds/lu-intro-d-naruto-wide.png');
+  background: #4e4053;
 }
 .lu-intro-overlay[hidden] { display: none !important; }
 .lu-intro-overlay.is-revealing { background: transparent; }
-.lu-intro-overlay::before {
-  content: '';
-  position: absolute;
-  z-index: 1;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(ellipse min(42vw, 350px) min(42vw, 350px) at 50% 51%, rgba(255, 174, 72, .37), rgba(199, 95, 27, .11) 40%, transparent 76%);
-  opacity: var(--lu-light-opacity);
-  transform: translateX(var(--lu-light-shift)) scale(var(--lu-light-scale));
-  mix-blend-mode: screen;
-  will-change: transform, opacity;
-  transition: opacity 650ms ease;
-}
-.lu-intro-overlay::after {
-  content: '';
-  position: absolute;
-  z-index: 1;
-  top: 65%;
-  left: 50%;
-  width: min(62vw, 620px);
-  height: 27vh;
-  pointer-events: none;
-  background: radial-gradient(ellipse at 50% 0%, rgba(255, 181, 78, .58), rgba(184, 88, 31, .19) 34%, transparent 73%),
-    linear-gradient(73deg, transparent 35%, rgba(255, 162, 59, .12) 50%, transparent 62%),
-    linear-gradient(107deg, transparent 35%, rgba(255, 162, 59, .12) 50%, transparent 62%);
-  opacity: var(--lu-floor-opacity);
-  transform: translateX(calc(-50% + var(--lu-light-shift))) scaleX(var(--lu-floor-spread));
-  transform-origin: center top;
-  mix-blend-mode: screen;
-  filter: blur(11px);
-  will-change: transform, opacity;
-  transition: opacity 650ms ease;
-}
-.lu-intro-overlay.is-solved::before { opacity: .94; }
-.lu-intro-overlay.is-revealing::before { opacity: 0; }
-.lu-intro-overlay.is-revealing::after { opacity: 0; }
 .lu-intro-curtain {
   position: absolute;
   z-index: 0;
@@ -66,7 +46,7 @@
   width: 50%;
   height: 100%;
   overflow: hidden;
-  background: #07090b;
+  background: inherit;
   transition: transform 1180ms cubic-bezier(.16, 1, .3, 1);
   will-change: transform;
 }
@@ -76,12 +56,44 @@
   top: 0;
   width: 100vw;
   height: 100%;
-  background: #07090b url('../assets/backgrounds/lu-intro-smoke-desktop.png') center / cover no-repeat;
+  background-color: transparent;
+  background-image: var(--intro-backdrop);
+  background-position: center;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
 }
 .lu-intro-curtain i:first-child::before { left: 0; }
 .lu-intro-curtain i:last-child::before { right: 0; }
 .lu-intro-curtain i:first-child { transform-origin: right center; }
 .lu-intro-curtain i:last-child { transform-origin: left center; }
+.lu-intro-wordmark {
+  position: absolute;
+  z-index: 1;
+  top: 13%;
+  left: 50%;
+  width: 100%;
+  padding: 0 4%;
+  color: rgba(255, 221, 184, .38);
+  font: 900 clamp(72px, 10vw, 180px)/.85 Impact, 'Arial Black', sans-serif;
+  letter-spacing: -.065em;
+  text-align: center;
+  white-space: nowrap;
+  -webkit-text-stroke: 1px rgba(255, 231, 200, .42);
+  text-shadow: 0 2px 0 rgba(91, 28, 11, .4), 0 10px 26px rgba(64, 20, 9, .16);
+  transform: translateX(-50%) scaleX(.84);
+  pointer-events: none;
+  transition: opacity 260ms ease;
+}
+.lu-intro-overlay[data-theme="dragon-ball"] .lu-intro-wordmark {
+  color: rgba(115, 42, 12, .34);
+  -webkit-text-stroke-color: rgba(255, 213, 143, .55);
+  text-shadow: 0 2px 0 rgba(255, 225, 158, .28), 0 10px 30px rgba(109, 30, 6, .16);
+}
+.lu-intro-overlay[data-theme="naruto"] .lu-intro-wordmark {
+  color: rgba(251, 222, 201, .27);
+  -webkit-text-stroke-color: rgba(255, 239, 220, .45);
+  text-shadow: 0 2px 0 rgba(52, 40, 74, .35), 0 10px 26px rgba(23, 18, 39, .18);
+}
 .lu-intro-curtain i:first-child::after,
 .lu-intro-curtain i:last-child::after {
   content: '';
@@ -153,22 +165,6 @@ body.lu-intro-revealing .stageWrap { transform: scale(1); }
   box-sizing: border-box;
   text-align: center;
 }
-.lu-intro-stage::before {
-  content: '';
-  position: absolute;
-  z-index: 0;
-  top: calc(50% + 155px);
-  left: 50%;
-  width: min(44vw, 490px);
-  height: 92px;
-  pointer-events: none;
-  border-radius: 50%;
-  background: radial-gradient(ellipse, rgba(0, 0, 0, .82) 7%, rgba(20, 11, 7, .6) 40%, rgba(222, 116, 31, .18) 64%, transparent 78%);
-  opacity: .72;
-  filter: blur(11px);
-  transform: translateX(calc(-50% + var(--lu-light-shift))) scaleX(var(--lu-floor-spread));
-  will-change: transform;
-}
 .lu-intro-activate {
   position: relative;
   z-index: 1;
@@ -198,11 +194,96 @@ body.lu-intro-revealing .stageWrap { transform: scale(1); }
   position: relative;
   z-index: 1;
   margin: 8px 0 0;
-  color: #c8b6a0;
+  color: var(--lu-intro-ink);
+  text-shadow: 0 1px 8px rgba(30, 17, 13, .32);
   font: 500 12px/1.5 'PingFang SC', 'Noto Sans CJK SC', sans-serif;
   letter-spacing: .2em;
   transition: opacity 200ms ease, transform 200ms ease;
 }
+#avatarGroupTabs .pill-btn { display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
+.lu-theme-cube {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: 0 0 78px;
+  width: 78px;
+  height: 78px;
+  isolation: isolate;
+  filter: drop-shadow(0 6px 6px rgba(31, 16, 13, .37));
+  transform: perspective(260px) rotateX(7deg) rotateY(-8deg);
+  transition: transform 240ms cubic-bezier(.2, .8, .2, 1), filter 240ms ease;
+}
+.lu-theme-cube::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 21%;
+  border-radius: 50%;
+  background: var(--theme-cube-glow, #ffa94d);
+  filter: blur(11px);
+  opacity: .64;
+}
+.lu-theme-cube::after {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: url('../assets/lu-core-emblem.png') center / contain no-repeat;
+  opacity: .72;
+}
+.lu-theme-cube img {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .42));
+  transform: translate(1px, 2px) scale(.96);
+  transition: transform 240ms cubic-bezier(.2, .8, .2, 1);
+}
+.lu-theme-cube--compact { flex-basis: 30px; width: 30px; height: 30px; }
+.lu-theme-cube--compact img { width: 20px; height: 20px; }
+[data-theme="one-piece"], [data-group="one-piece"] { --theme-cube-glow: #fa9244; }
+[data-theme="dragon-ball"], [data-group="dragon-ball"] { --theme-cube-glow: #f9bc36; }
+[data-theme="naruto"], [data-group="naruto"] { --theme-cube-glow: #9381f5; }
+.lu-intro-theme-select {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(20px, 3vw, 38px);
+  margin-top: 20px;
+  transition: opacity 230ms ease, transform 230ms ease;
+}
+.lu-intro-theme {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 88px;
+  min-height: 98px;
+  padding: 0;
+  border: 0;
+  color: var(--lu-intro-muted);
+  background: transparent;
+  cursor: pointer;
+  font: 500 11px/1.2 'PingFang SC', 'Noto Sans CJK SC', sans-serif;
+  transition: transform 200ms ease, color 200ms ease;
+}
+.lu-intro-theme:hover { transform: translateY(-3px); color: var(--lu-intro-ink); }
+.lu-intro-theme:hover .lu-theme-cube { transform: perspective(260px) rotateX(-7deg) rotateY(12deg) translateY(-3px) scale(1.08); }
+.lu-intro-theme:hover .lu-theme-cube img { transform: translate(2px, 1px) scale(1); }
+.lu-intro-theme:active { transform: scale(.96); }
+.lu-intro-theme.active {
+  color: var(--lu-intro-ink);
+}
+.lu-intro-theme.active .lu-theme-cube { filter: drop-shadow(0 7px 8px rgba(25, 13, 9, .43)) drop-shadow(0 0 12px var(--theme-cube-glow)); }
+.lu-intro-theme[data-theme="one-piece"] { --lu-theme-edge: #a9c8df; }
+.lu-intro-theme[data-theme="dragon-ball"] { --lu-theme-edge: #f0c99c; }
+.lu-intro-theme[data-theme="naruto"] { --lu-theme-edge: #b7b9ed; }
 .lu-intro-skip {
   position: absolute;
   z-index: 3;
@@ -212,7 +293,7 @@ body.lu-intro-revealing .stageWrap { transform: scale(1); }
   min-height: 44px;
   padding: 0 4px;
   border: 0;
-  color: #b5a591;
+  color: var(--lu-intro-ink);
   background: transparent;
   font: 500 12px/1 'PingFang SC', 'Noto Sans CJK SC', sans-serif;
   cursor: pointer;
@@ -232,9 +313,10 @@ body.lu-intro-revealing .stageWrap { transform: scale(1); }
 }
 .lu-intro-tools button:focus-visible,
 .lu-intro-skip:focus-visible,
-.lu-intro-activate:focus-visible { outline: 2px solid #f1c297; outline-offset: 4px; }
+.lu-intro-activate:focus-visible,
+.lu-intro-theme:focus-visible { outline: 2px solid var(--lu-theme-edge); outline-offset: 4px; }
 .lu-intro-overlay.is-revealing .lu-intro-activate { transform: scale(1.78); opacity: 0; }
-.lu-intro-overlay.is-revealing :is(.lu-intro-hint, .lu-intro-tools, .lu-intro-skip) {
+.lu-intro-overlay.is-revealing :is(.lu-intro-hint, .lu-intro-tools, .lu-intro-skip, .lu-intro-theme-select, .lu-intro-wordmark) {
   opacity: 0;
   pointer-events: none;
   transition: opacity 180ms ease;
@@ -265,16 +347,22 @@ body.lu-intro-revealing .stageWrap { transform: scale(1); }
 .lue-create-intro-actions { display: flex; gap: 8px; margin-top: 10px; }
 .lue-create-intro-actions .btn { flex: 1 1 50%; min-width: 0; }
 @media (max-width: 760px) {
-  .lu-intro-curtain i::before { background-image: url('../assets/backgrounds/lu-intro-smoke-portrait.png'); }
+  .lu-intro-overlay { --intro-backdrop: url('../assets/backgrounds/lu-intro-d-one-piece-portrait.png'); }
+  .lu-intro-overlay[data-theme="dragon-ball"] { --intro-backdrop: url('../assets/backgrounds/lu-intro-d-dragon-ball-portrait.png'); }
+  .lu-intro-overlay[data-theme="naruto"] { --intro-backdrop: url('../assets/backgrounds/lu-intro-d-naruto-portrait.png'); }
   .lu-intro-stage { padding-top: 76px; }
-  .lu-intro-stage::before { top: calc(50% + 125px); width: min(76vw, 330px); height: 74px; }
+  .lu-intro-wordmark { top: 11%; font-size: clamp(45px, 12vw, 64px); }
   .lu-intro-hint { margin-top: 8px; }
+  .lu-intro-theme-select { gap: 8px; margin-top: 14px; }
+  .lu-intro-theme { width: 82px; min-height: 92px; }
+  .lu-intro-theme .lu-theme-cube { flex-basis: 74px; width: 74px; height: 74px; }
+  .lu-intro-theme .lu-theme-cube img { width: 46px; height: 46px; }
   .performance-capsule .performance-capsule-mark { flex-basis: 38px; width: 38px; height: 38px; }
 }
 @media (prefers-reduced-motion: reduce) {
   html:not(.lu-full-motion) .lu-intro-curtain i,
-  html:not(.lu-full-motion) .lu-intro-overlay::before,
   html:not(.lu-full-motion) .lu-intro-activate,
   html:not(.lu-full-motion) body.lu-intro-active .stageWrap,
-  html:not(.lu-full-motion) .lu-intro-hint { transition: none !important; }
+  html:not(.lu-full-motion) .lu-intro-hint,
+  html:not(.lu-full-motion) .lu-intro-theme-select { transition: none !important; }
 }

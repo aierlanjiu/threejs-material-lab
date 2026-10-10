@@ -1,4 +1,5 @@
 import { renderLiveAvatar } from '../avatar/live.js';
+import { LU_THEME_PALETTES } from './lu-intro-atmosphere.js';
 
 const MOODS = ['calm', 'happy', 'wink', 'curious', 'surprised', 'sleepy'];
 const FACE_COLORS = ['#ce342d', '#dcc4a0', '#b96450', '#aab5ad', '#b88c6d', '#a7a1af'];
@@ -187,7 +188,7 @@ function createSound() {
   };
 }
 
-export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, cubeMaterial, environment, getStageCells, onComplete }) {
+export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, cubeMaterial, environment, getStageCells, onThemeSelect, onComplete }) {
   const overlay = document.querySelector('#luIntroOverlay');
   const app = document.querySelector('.app');
   const activate = document.querySelector('#luIntroActivate');
@@ -197,8 +198,11 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
   const coreReplay = document.querySelector('#luCoreReplay');
   const label = document.querySelector('#luIntroStatus');
   const hint = document.querySelector('.lu-intro-hint');
+  const wordmark = document.querySelector('#luIntroWordmark');
   const mark = document.querySelector('#performanceCapsule .performance-capsule-mark');
+  const themeButtons = [...document.querySelectorAll('#luIntroThemeSelect [data-theme]')];
   const sound = createSound();
+  let selectedTheme = LU_THEME_PALETTES[stageState.theme] ? stageState.theme : 'one-piece';
   const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
     && !document.documentElement.classList.contains('lu-full-motion');
   const scene = new THREE.Scene();
@@ -223,7 +227,11 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
   const pivot = new THREE.Group();
   root.add(pivot);
   const innerGeometry = new THREE.BoxGeometry(.77, .77, .77);
-  const innerMaterial = new THREE.MeshStandardMaterial({ color: '#1b161a', roughness: .44, metalness: .22 });
+  const innerMaterial = new THREE.MeshPhysicalMaterial({ color: '#27252a', roughness: .32,
+    metalness: .14, transparent: true, opacity: .06, depthWrite: false });
+  const edgeMaterial = new THREE.LineBasicMaterial({ color: '#d9e8f2', transparent: true,
+    opacity: .48, depthWrite: false });
+  const edgeGeometry = new THREE.EdgesGeometry(new THREE.BoxGeometry(.73, .73, .73));
   const decalGeometry = new THREE.PlaneGeometry(.70, .70);
   const faceOrientation = [
     { position: [.455, 0, 0], rotation: [0, Math.PI / 2, 0] },
@@ -233,18 +241,25 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
     { position: [0, 0, .455], rotation: [0, 0, 0] },
     { position: [0, 0, -.455], rotation: [0, Math.PI, 0] }
   ];
-  const chosen = [manifest.characters.find(item => item.id === stageState.selectedAvatar) || manifest.characters[0]];
-  chosen.push(...shuffled(manifest.characters.filter(item => item !== chosen[0])).slice(0, 5));
-  const stickers = chosen.map((character, face) => MOODS.map(mood => makeSticker(THREE, character, mood, FACE_COLORS[face])));
+  function makeThemeStickers(theme) {
+    const characters = manifest.characters.filter(item => item.group === theme);
+    const first = characters.find(item => item.id === stageState.selectedAvatar) || characters[0];
+    const chosen = [first, ...shuffled(characters.filter(item => item !== first)).slice(0, 5)];
+    return chosen.map((character, face) => MOODS.map(mood =>
+      makeSticker(THREE, character, mood, FACE_COLORS[face])));
+  }
+  let stickers = makeThemeStickers(selectedTheme);
   const faceMaterials = stickers.map(row => row.map(item => new THREE.MeshPhysicalMaterial({
-    map: item.texture, roughness: .36, metalness: .04, clearcoat: .35, clearcoatRoughness: .2
+    map: item.texture, roughness: .36, metalness: .04, clearcoat: .35, clearcoatRoughness: .2,
+    transparent: true, opacity: .76, depthWrite: false
   })));
   const cubies = [];
   for (let x = -1; x <= 1; x++) for (let y = -1; y <= 1; y++) for (let z = -1; z <= 1; z++) {
     const mesh = new THREE.Group();
     const body = new THREE.Mesh(cubeGeometry, cubeMaterial);
     body.scale.setScalar(.88);
-    mesh.add(new THREE.Mesh(innerGeometry, innerMaterial), body);
+    mesh.add(new THREE.Mesh(innerGeometry, innerMaterial), body,
+      new THREE.LineSegments(edgeGeometry, edgeMaterial));
     const isCenter = x === 0 && y === 0 && z === 0;
     const faces = [x === 1, x === -1, y === 1, y === -1, z === 1 || isCenter, z === -1];
     faces.forEach((visible, face) => {
@@ -281,6 +296,48 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
   let lastLightFrame = 0;
   let lightImpulse = 0;
 
+  function setTheme(id) {
+    const next = LU_THEME_PALETTES[id] ? id : 'one-piece';
+    const changed = next !== selectedTheme;
+    selectedTheme = next;
+    const palette = LU_THEME_PALETTES[next];
+    overlay.dataset.theme = next;
+    wordmark.textContent = { 'one-piece': 'ONE PIECE', 'dragon-ball': 'DRAGON BALL', naruto: 'NARUTO' }[next];
+    light.color.set(palette.edge);
+    rim.color.set(palette.glow);
+    glassBounceLeft.color.set(palette.glow);
+    glassBounceRight.color.set(palette.edge);
+    cubeMaterial.color.set(palette.edge).lerp(new THREE.Color('#ffffff'), .78);
+    cubeMaterial.transmission = 0;
+    cubeMaterial.opacity = .14;
+    cubeMaterial.transparent = true;
+    cubeMaterial.depthWrite = false;
+    cubeMaterial.roughness = .08;
+    cubeMaterial.metalness = .05;
+    cubeMaterial.clearcoat = 1;
+    cubeMaterial.clearcoatRoughness = .04;
+    cubeMaterial.needsUpdate = true;
+    edgeMaterial.color.set(palette.edge);
+    themeButtons.forEach(button => {
+      const active = button.dataset.theme === next;
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+    if (changed) {
+      const previous = stickers;
+      stickers = makeThemeStickers(next);
+      faceMaterials.forEach((row, face) => row.forEach((material, mood) => {
+        material.map = stickers[face][mood].texture;
+        material.needsUpdate = true;
+      }));
+      previous.flat().forEach(item => item.texture.dispose());
+    }
+    lightImpulse = .62;
+    syncLighting(performance.now());
+    draw();
+    return next;
+  }
+
   function setSize(size) {
     if (!renderer) return;
     renderer.setSize(size, size, false);
@@ -296,12 +353,6 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
     const energy = Math.min(1, lightImpulse + turnEnergy * .34);
     const shift = Math.sin(root.rotation.y) * 27
       + Math.sin(pivot.rotation.x + pivot.rotation.y + pivot.rotation.z) * 13;
-    const glow = .38 + energy * .34;
-    overlay.style.setProperty('--lu-light-shift', `${Math.round(shift)}px`);
-    overlay.style.setProperty('--lu-light-scale', (1.02 + energy * .33).toFixed(3));
-    overlay.style.setProperty('--lu-light-opacity', glow.toFixed(3));
-    overlay.style.setProperty('--lu-floor-opacity', (.38 + energy * .27).toFixed(3));
-    overlay.style.setProperty('--lu-floor-spread', (1 + energy * .32).toFixed(3));
     light.position.x = 2 + shift * .035;
     light.intensity = 2.35 + energy * .75;
     rim.intensity = 2.3 + energy * .55;
@@ -513,6 +564,7 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
     hint.textContent = '轻触魔方';
     document.body.classList.add('lu-intro-active');
     app.inert = true;
+    setTheme(stageState.theme);
     if (renderer) {
       activate.prepend(renderer.domElement);
       setSize(Math.min(430, Math.max(260, window.innerWidth * .86)));
@@ -535,6 +587,9 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
     get scrambleMoves() { return scramble.length; },
     get shellVertexCount() { return cubeGeometry.attributes.position.count; },
     get shellMaterialFamily() { return cubeMaterial.userData.family; },
+    get theme() { return selectedTheme; },
+    get backdropMode() { return 'static-image'; },
+    get shellOpacity() { return cubeMaterial.opacity; },
     get solved() { return cubies.every(mesh =>
       Object.keys(mesh.userData.home).every(axis => mesh.userData.coord[axis] === mesh.userData.home[axis])
       && Math.abs(mesh.quaternion.w) > .999); },
@@ -542,9 +597,17 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
     activate: activateIntro,
     skip: complete,
     replay: show,
+    setTheme,
     turnToFacet
   };
   activate.addEventListener('click', activateIntro);
+  themeButtons.forEach(button => button.addEventListener('click', () => {
+    if (phase !== 'waiting') return;
+    const theme = button.dataset.theme;
+    onThemeSelect?.(theme);
+    setTheme(theme);
+    activateIntro();
+  }));
   skipButton.addEventListener('click', complete);
   [introMute, coreMute].forEach(button => button.addEventListener('click', () => {
     sound.enabled = !sound.enabled;
@@ -558,13 +621,16 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
   overlay.addEventListener('keydown', event => {
     if (event.key === 'Escape') { event.stopPropagation(); event.preventDefault(); complete(); }
     else if (event.key === 'Tab') {
-      const focusables = [activate, introMute, skipButton];
+      const focusables = [activate, ...themeButtons, introMute, skipButton];
       const current = focusables.indexOf(document.activeElement);
       const next = current < 0 ? (event.shiftKey ? focusables.length - 1 : 0)
         : (current + (event.shiftKey ? focusables.length - 1 : 1)) % focusables.length;
       event.preventDefault();
       focusables[next].focus();
     }
+  });
+  window.addEventListener('resize', () => {
+    if (phase === 'waiting' && renderer) setSize(Math.min(430, Math.max(260, window.innerWidth * .86)));
   });
   updateSoundButtons();
   if (new URLSearchParams(location.search).get('intro') === 'skip') {

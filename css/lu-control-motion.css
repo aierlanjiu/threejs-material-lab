@@ -259,6 +259,7 @@ body.poster-mode.lue-core-open .lue-core-drawer {
   pointer-events: auto;
   transform: translateY(0) scale(1);
 }
+body.poster-mode.lue-core-open .master-deck-hud { z-index: 60; }
 
 /* 四面分段导航栏 */
 .lue-facet-tabs {

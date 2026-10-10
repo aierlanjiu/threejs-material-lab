@@ -2330,7 +2330,7 @@ body.immersive .stage-hud-right { top: max(12px, env(safe-area-inset-top)); righ
 <link rel="stylesheet" href="./css/lu-control-motion.css">
 <link rel="stylesheet" href="./css/lu-cube-intro.css">
 </head>
-<body>
+<body data-lu-theme="one-piece">
 <div class="app">
 
   <!-- 顶部 Master Deck HUD -->
@@ -2434,6 +2434,21 @@ body.immersive .stage-hud-right { top: max(12px, env(safe-area-inset-top)); righ
               <option value="preset_1">7: CYBER CRYSTAL (合成)</option>
               <option value="preset_2">8: NEO SYNTH 80S (合成)</option>
               <option value="preset_3">9: DEEP SUB BASS (合成)</option>
+              <optgroup data-theme="one-piece" label="海贼王 · 本机歌曲">
+                <option value="anime_op_we_are">We Are! · 导入本机音频</option>
+                <option value="anime_op_over_the_top">OVER THE TOP · 导入本机音频</option>
+                <option value="anime_op_overtaken">Overtaken · 导入本机音频</option>
+              </optgroup>
+              <optgroup data-theme="dragon-ball" label="龙珠 · 本机歌曲">
+                <option value="anime_db_chala">CHA-LA HEAD-CHA-LA · 导入本机音频</option>
+                <option value="anime_db_makafushigi">Makafushigi Adventure! · 导入本机音频</option>
+                <option value="anime_db_dandan">DAN DAN 心魅かれてく · 导入本机音频</option>
+              </optgroup>
+              <optgroup data-theme="naruto" label="火影忍者 · 本机歌曲">
+                <option value="anime_nr_blue_bird">Blue Bird · 导入本机音频</option>
+                <option value="anime_nr_silhouette">Silhouette · 导入本机音频</option>
+                <option value="anime_nr_sign">Sign · 导入本机音频</option>
+              </optgroup>
             </select>
 
             <div class="file-upload-wrap" style="width: auto;">
@@ -2872,12 +2887,26 @@ body.immersive .stage-hud-right { top: max(12px, env(safe-area-inset-top)); righ
             <label><span>项目内置高清背景环境</span></label>
             <select id="presetBgSelect">
               <option value="studio/alpine-light-background-v1.png">山湖晨光 · 风景壁纸</option>
-              <optgroup label="航海王海报壁纸 (9:16 极速匹配)">
+              <optgroup data-theme="one-piece" label="海贼王 · 竖屏与横屏海报">
                 <option value="images/wallpapers/op_luffy_kaido.jpg" selected>路飞 vs 凯多 (Luffy x Kaido)</option>
                 <option value="images/wallpapers/op_zoro_mihawk.jpg">索隆 vs 鹰眼 (Zoro x Mihawk)</option>
                 <option value="images/wallpapers/op_shanks_blackbeard.jpg">红发 vs 黑胡子 (Shanks x Blackbeard)</option>
                 <option value="images/wallpapers/op_law_doflamingo.jpg">罗 vs 明哥 (Law x Doflamingo)</option>
                 <option value="images/wallpapers/op_luffy_crocodile.jpg">路飞 vs 克洛克达尔 (Luffy x Crocodile)</option>
+              </optgroup>
+              <optgroup data-theme="dragon-ball" label="龙珠 · 竖屏与横屏海报">
+                <option value="images/wallpapers/db_goku_vegeta.jpg">悟空 vs 贝吉塔</option>
+                <option value="images/wallpapers/db_goku_frieza.jpg">悟空 vs 弗利萨</option>
+                <option value="images/wallpapers/db_gohan_cell.jpg">悟饭 vs 沙鲁</option>
+                <option value="images/wallpapers/db_beerus_whis.jpg">比鲁斯与维斯</option>
+                <option value="images/wallpapers/db_goku_black_zamasu.jpg">黑悟空与扎马斯</option>
+              </optgroup>
+              <optgroup data-theme="naruto" label="火影忍者 · 竖屏与横屏海报">
+                <option value="images/wallpapers/naruto_naruto_sasuke.jpg">鸣人 vs 佐助</option>
+                <option value="images/wallpapers/naruto_hashirama_madara.jpg">柱间 vs 斑</option>
+                <option value="images/wallpapers/naruto_naruto_pain.jpg">鸣人 vs 佩恩</option>
+                <option value="images/wallpapers/naruto_itachi_sasuke.jpg">鼬 vs 佐助</option>
+                <option value="images/wallpapers/naruto_kakashi_obito.jpg">卡卡西 vs 带土</option>
               </optgroup>
               <option value="">-- 选择项目内置背景图 --</option>
               <option value="images/ocean_waves.jpg">1: 深邃海洋 (Ocean Waves)</option>
@@ -2941,9 +2970,9 @@ body.immersive .stage-hud-right { top: max(12px, env(safe-area-inset-top)); righ
           </div>
           <div class="card-block">
             <div class="pill-group" id="avatarGroupTabs">
-              <button class="pill-btn active" data-group="one-piece">海贼王 10</button>
-              <button class="pill-btn" data-group="dragon-ball">龙珠 10</button>
-              <button class="pill-btn" data-group="naruto">火影忍者 9</button>
+              <button class="pill-btn active" data-group="one-piece"><span class="lu-theme-cube lu-theme-cube--compact"><img src="./assets/icons/themes/one-piece-haki.png" alt=""></span>海贼王 10</button>
+              <button class="pill-btn" data-group="dragon-ball"><span class="lu-theme-cube lu-theme-cube--compact"><img src="./assets/icons/themes/dragon-ball-kamehameha.png" alt=""></span>龙珠 10</button>
+              <button class="pill-btn" data-group="naruto"><span class="lu-theme-cube lu-theme-cube--compact"><img src="./assets/icons/themes/naruto-rasengan.png" alt=""></span>火影忍者 9</button>
             </div>
             <div id="avatarPresetGrid"></div>
 
@@ -3225,6 +3254,7 @@ BEAT</textarea>
 
 <section class="lu-intro-overlay" id="luIntroOverlay" role="dialog" aria-modal="true" aria-labelledby="luIntroHeading">
   <div class="lu-intro-curtain" aria-hidden="true"><i></i><i></i></div>
+  <div class="lu-intro-wordmark" id="luIntroWordmark" aria-hidden="true">ONE PIECE</div>
   <div class="lu-intro-tools">
     <button type="button" id="luIntroMute" aria-pressed="true" aria-label="关闭入场音效" title="关闭入场音效"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path class="lu-sound-on" d="M16 9a4 4 0 0 1 0 6m2-9a8 8 0 0 1 0 12"/><path class="lu-sound-off" d="m16 9 5 6m0-6-5 6"/></svg></button>
   </div>
@@ -3234,6 +3264,17 @@ BEAT</textarea>
       <span class="lu-intro-fallback" aria-hidden="true"><img src="./assets/lu-core-emblem.png" alt=""></span>
     </button>
     <p class="lu-intro-hint" aria-hidden="true">轻触魔方</p>
+    <div class="lu-intro-theme-select" id="luIntroThemeSelect" role="group" aria-label="选择动漫主题并进入律">
+      <button type="button" class="lu-intro-theme active" data-theme="one-piece" aria-pressed="true" aria-label="进入海贼王主题" title="海贼王 · 霸气拳">
+        <span class="lu-theme-cube"><img src="./assets/icons/themes/one-piece-haki.png" alt=""></span><span>海贼王</span>
+      </button>
+      <button type="button" class="lu-intro-theme" data-theme="dragon-ball" aria-pressed="false" aria-label="进入龙珠主题" title="龙珠 · 龟派气功">
+        <span class="lu-theme-cube"><img src="./assets/icons/themes/dragon-ball-kamehameha.png" alt=""></span><span>龙珠</span>
+      </button>
+      <button type="button" class="lu-intro-theme" data-theme="naruto" aria-pressed="false" aria-label="进入火影忍者主题" title="火影忍者 · 螺旋丸">
+        <span class="lu-theme-cube"><img src="./assets/icons/themes/naruto-rasengan.png" alt=""></span><span>火影忍者</span>
+      </button>
+    </div>
     <p class="lu-intro-sr-only" id="luIntroStatus" role="status">点击魔方，唤醒律</p>
   </div>
   <button type="button" class="lu-intro-skip" id="luIntroSkip">跳过</button>
@@ -3278,6 +3319,8 @@ import { VIDEO_PRESETS, drawPerformanceFrame } from './js/ui/recording-composito
 import { lyricCharacters, characterCues, characterCursorAt } from './js/ui/lyric-timing.js';
 import { AVATAR_MANIFEST } from './assets/live-avatars/manifest.js';
 import { createLuCubeIntro } from './js/ui/lu-cube-intro.js';
+import { LU_THEME_PALETTES } from './js/ui/lu-intro-atmosphere.js';
+import { loadLocalThemeAudio, saveLocalThemeAudio } from './js/audio/local-theme-library.js';
 
 function showToast(msg, duration = 3000) {
   motionToast($('#toast'), msg, duration);
@@ -3481,6 +3524,7 @@ const state = {
   tempoSpeed: 'medium', // slow | medium | fast
   speedMultiplier: 1.0,
   textColorMode: 'auto', // auto | dark | white | gold | cyan
+  theme: (() => { try { const saved = localStorage.getItem('luAnimeTheme'); return LU_THEME_PALETTES[saved] ? saved : 'one-piece'; } catch { return 'one-piece'; } })(),
   selectedAvatar: 'one-piece/luffy',
   avatarDist: 'all', // all | mosaic | center | variety
   // 自定义图集盲盒：用户整目录导入照片后，矩阵每格从图集里抽取一张。
@@ -3552,7 +3596,16 @@ const state = {
     { title: '《海鸥》- 逃跑计划', src: 'audio/haiou.mp3', type: 'track_5', isPreset: false },
     { title: 'CYBER CRYSTAL FLOW', isPreset: true, type: 'preset_1' },
     { title: 'NEO SYNTH WAVE 80S', isPreset: true, type: 'preset_2' },
-    { title: 'DEEP SUB BASS 808', isPreset: true, type: 'preset_3' }
+    { title: 'DEEP SUB BASS 808', isPreset: true, type: 'preset_3' },
+    { title: 'We Are! · 海贼王', type: 'anime_op_we_are', theme: 'one-piece', localOnly: true },
+    { title: 'OVER THE TOP · 海贼王', type: 'anime_op_over_the_top', theme: 'one-piece', localOnly: true },
+    { title: 'Overtaken · 海贼王', type: 'anime_op_overtaken', theme: 'one-piece', localOnly: true },
+    { title: 'CHA-LA HEAD-CHA-LA · 龙珠', type: 'anime_db_chala', theme: 'dragon-ball', localOnly: true },
+    { title: 'Makafushigi Adventure! · 龙珠', type: 'anime_db_makafushigi', theme: 'dragon-ball', localOnly: true },
+    { title: 'DAN DAN 心魅かれてく · 龙珠', type: 'anime_db_dandan', theme: 'dragon-ball', localOnly: true },
+    { title: 'Blue Bird · 火影忍者', type: 'anime_nr_blue_bird', theme: 'naruto', localOnly: true },
+    { title: 'Silhouette · 火影忍者', type: 'anime_nr_silhouette', theme: 'naruto', localOnly: true },
+    { title: 'Sign · 火影忍者', type: 'anime_nr_sign', theme: 'naruto', localOnly: true }
   ],
   currentAudioSource: null,
   songTitle: '《游京》- 星火社',
@@ -3604,6 +3657,8 @@ const state = {
   fovPulseAmp: 8.0, // degrees: audible beat hits also register in the lens
   currentFov: 30.0
 };
+state.selectedAvatar = AVATAR_MANIFEST.characters.find(character => character.group === state.theme)?.id || 'one-piece/luffy';
+document.body.dataset.luTheme = state.theme;
 
 const ui = {
   text: $('#text'),
@@ -4155,6 +4210,8 @@ const acidEtchedNormal = createAcidEtchedFrostedNormal();
 // 7. 单层角色的实时眼部与姿态渲染
 // -------------------------------------------------------------
 const AVATAR_KEYS = AVATAR_MANIFEST.characters.map(character => character.id);
+const themeAvatarKeys = theme => AVATAR_MANIFEST.characters
+  .filter(character => character.group === theme).map(character => character.id);
 const liveTextureMap = {};
 const avatarCanvases = {};
 const avatarPending = new Set();
@@ -5059,7 +5116,8 @@ function commitMatrixRebuild() {
               shouldRenderContent = false;
             }
           } else if (state.avatarDist === 'variety') {
-            const avKey = AVATAR_KEYS[slotIdx % AVATAR_KEYS.length];
+            const themeKeys = themeAvatarKeys(state.theme);
+            const avKey = themeKeys[slotIdx % themeKeys.length];
             texture = liveTextureMap[avKey];
           } else {
             texture = liveTextureMap[state.selectedAvatar];
@@ -5522,6 +5580,12 @@ function playTrackAtIndex(idx, resumeFromOffset = false) {
     state.isPlayingMusic = true;
     setPlayPauseButtonState(true);
 
+    if (track.localOnly && !track.buffer && !track.src) {
+      state.isPlayingMusic = false;
+      setPlayPauseButtonState(false);
+      $('#nowPlayingText').textContent = `请先选中《${track.title}》，再点「导入」添加本机音频`;
+      return;
+    }
     if (track.buffer) {
       startBufferPlayback(track, state.playbackOffset);
     } else if (track.src) {
@@ -7628,13 +7692,19 @@ $('#playPauseBtn').addEventListener('click', () => {
   else playTrackAtIndex(state.currentTrackIndex, state.playbackOffset > 0);
 });
 
-$('#prevTrackBtn').addEventListener('click', () => {
-  playTrackAtIndex(state.currentTrackIndex - 1);
-});
-
-$('#nextTrackBtn').addEventListener('click', () => {
-  playTrackAtIndex(state.currentTrackIndex + 1);
-});
+function stepAvailableTrack(direction) {
+  let next = state.currentTrackIndex;
+  for (let attempt = 0; attempt < state.playlist.length; attempt++) {
+    next = (next + direction + state.playlist.length) % state.playlist.length;
+    const track = state.playlist[next];
+    if (track.theme && track.theme !== state.theme) continue;
+    if (track.localOnly && !track.buffer && !track.src) continue;
+    playTrackAtIndex(next);
+    return;
+  }
+}
+$('#prevTrackBtn').addEventListener('click', () => stepAvailableTrack(-1));
+$('#nextTrackBtn').addEventListener('click', () => stepAvailableTrack(1));
 
 $('#stopTrackBtn').addEventListener('click', stopMusic);
 
@@ -7914,12 +7984,27 @@ $('#resetBgBtn').addEventListener('click', () => {
 });
 
 // 对战海报只改变界面外壳；角色、歌词时钟和舞台录制继续共用现有状态。
+const DEFAULT_THEME_WALLPAPERS = Object.freeze({
+  'one-piece': 'images/wallpapers/op_luffy_kaido.jpg',
+  'dragon-ball': 'images/wallpapers/db_goku_vegeta.jpg',
+  naruto: 'images/wallpapers/naruto_naruto_sasuke.jpg'
+});
 const POSTER_WALLPAPERS = Object.freeze({
   'images/wallpapers/op_luffy_kaido.jpg': { left: 'LUFFY', right: 'KAIDO', caption: '路飞 vs 凯多', accent: '#ce342d', secondary: '#5869a8', wide: 'images/wallpapers/op_luffy_kaido_wide.jpg' },
   'images/wallpapers/op_zoro_mihawk.jpg': { left: 'ZORO', right: 'MIHAWK', caption: '索隆 vs 鹰眼', accent: '#275347', secondary: '#b79a63', wide: 'images/wallpapers/op_zoro_mihawk_wide.jpg' },
   'images/wallpapers/op_shanks_blackbeard.jpg': { left: 'SHANKS', right: 'BLACKBEARD', caption: '红发 vs 黑胡子', accent: '#bd342e', secondary: '#e9dfcb', wide: 'images/wallpapers/op_shanks_blackbeard_wide.jpg' },
   'images/wallpapers/op_law_doflamingo.jpg': { left: 'LAW', right: 'DOFLAMINGO', caption: '罗 vs 明哥', accent: '#4477b4', secondary: '#c1406e', wide: 'images/wallpapers/op_law_doflamingo_wide.jpg' },
-  'images/wallpapers/op_luffy_crocodile.jpg': { left: 'LUFFY', right: 'CROCODILE', caption: '路飞 vs 克洛克达尔', accent: '#ad4434', secondary: '#31534b', wide: 'images/wallpapers/op_luffy_crocodile_wide.jpg' }
+  'images/wallpapers/op_luffy_crocodile.jpg': { left: 'LUFFY', right: 'CROCODILE', caption: '路飞 vs 克洛克达尔', accent: '#ad4434', secondary: '#31534b', wide: 'images/wallpapers/op_luffy_crocodile_wide.jpg' },
+  'images/wallpapers/db_goku_vegeta.jpg': { left: 'GOKU', right: 'VEGETA', caption: '悟空 vs 贝吉塔', accent: '#ee5426', secondary: '#174f91', wide: 'images/wallpapers/db_goku_vegeta_wide.jpg' },
+  'images/wallpapers/db_goku_frieza.jpg': { left: 'GOKU', right: 'FRIEZA', caption: '悟空 vs 弗利萨', accent: '#eb5e27', secondary: '#783994', wide: 'images/wallpapers/db_goku_frieza_wide.jpg' },
+  'images/wallpapers/db_gohan_cell.jpg': { left: 'GOHAN', right: 'CELL', caption: '悟饭 vs 沙鲁', accent: '#ba922d', secondary: '#316a46', wide: 'images/wallpapers/db_gohan_cell_wide.jpg' },
+  'images/wallpapers/db_beerus_whis.jpg': { left: 'BEERUS', right: 'WHIS', caption: '比鲁斯与维斯', accent: '#80438f', secondary: '#208fac', wide: 'images/wallpapers/db_beerus_whis_wide.jpg' },
+  'images/wallpapers/db_goku_black_zamasu.jpg': { left: 'BLACK', right: 'ZAMASU', caption: '黑悟空与扎马斯', accent: '#b52f5f', secondary: '#498468', wide: 'images/wallpapers/db_goku_black_zamasu_wide.jpg' },
+  'images/wallpapers/naruto_naruto_sasuke.jpg': { left: 'NARUTO', right: 'SASUKE', caption: '鸣人 vs 佐助', accent: '#e9672d', secondary: '#344a79', wide: 'images/wallpapers/naruto_naruto_sasuke_wide.jpg' },
+  'images/wallpapers/naruto_hashirama_madara.jpg': { left: 'HASHIRAMA', right: 'MADARA', caption: '柱间 vs 斑', accent: '#2f654b', secondary: '#bc342e', wide: 'images/wallpapers/naruto_hashirama_madara_wide.jpg' },
+  'images/wallpapers/naruto_naruto_pain.jpg': { left: 'NARUTO', right: 'PAIN', caption: '鸣人 vs 佩恩', accent: '#d95e28', secondary: '#8b313d', wide: 'images/wallpapers/naruto_naruto_pain_wide.jpg' },
+  'images/wallpapers/naruto_itachi_sasuke.jpg': { left: 'ITACHI', right: 'SASUKE', caption: '鼬 vs 佐助', accent: '#ab2d35', secondary: '#425a8d', wide: 'images/wallpapers/naruto_itachi_sasuke_wide.jpg' },
+  'images/wallpapers/naruto_kakashi_obito.jpg': { left: 'KAKASHI', right: 'OBITO', caption: '卡卡西 vs 带土', accent: '#61788d', secondary: '#b63540', wide: 'images/wallpapers/naruto_kakashi_obito_wide.jpg' }
 });
 function placePosterControls() {
   // All controls live permanently in their respective facets in lueCoreDrawer
@@ -8151,9 +8236,41 @@ $('#autoBlinkToggle').addEventListener('click', e => {
 $('#avatarPanel').addEventListener('pointerenter',()=>renderAvatarRig(state.selectedAvatar,performance.now()/1000),{once:true});
 
 // 批量本地音频与歌词上传管理
+const LOCAL_THEME_AUDIO_ALIASES = [
+  ['anime_op_we_are', /we[\s_-]*are|ウィーアー/i],
+  ['anime_op_over_the_top', /over[\s_-]*the[\s_-]*top/i],
+  ['anime_op_overtaken', /overtaken|追いつめられた/i],
+  ['anime_db_chala', /cha[\s_-]*la|チャラヘッチャラ/i],
+  ['anime_db_makafushigi', /makafushigi|摩訶不思議/i],
+  ['anime_db_dandan', /dan[\s_-]*dan/i],
+  ['anime_nr_blue_bird', /blue[\s_-]*bird|ブルーバード/i],
+  ['anime_nr_silhouette', /silhouette|シルエット/i],
+  ['anime_nr_sign', /(^|[\s_-])sign([\s_.-]|$)/i]
+];
+function updateLocalSongOption(track) {
+  const option = [...$('#playlistSelect').options].find(item => item.value === track.type);
+  if (!option) return;
+  option.textContent = `${track.title.split(' · ')[0]} · ${track.buffer || track.src ? '已导入' : '导入本机音频'}`;
+}
+function localSlotForFile(file, singleFile) {
+  const matchedType = LOCAL_THEME_AUDIO_ALIASES.find(([, pattern]) => pattern.test(file.name))?.[0];
+  if (matchedType) return state.playlist.find(track => track.type === matchedType);
+  const selected = state.playlist[state.currentTrackIndex];
+  return singleFile && selected?.localOnly && selected.theme === state.theme ? selected : null;
+}
+loadLocalThemeAudio().then(records => {
+  records.forEach(record => {
+    const track = state.playlist.find(item => item.type === record.type);
+    if (!track?.localOnly || !record.file || track.src || track.buffer) return;
+    track.src = URL.createObjectURL(record.file);
+    track.localName = record.name;
+    updateLocalSongOption(track);
+  });
+}).catch(error => console.warn('Local anime music library unavailable:', error));
 $('#audioUpload').addEventListener('change', e => {
   const files = Array.from(e.target.files);
   if (!files.length) return;
+  e.target.value = '';
   initAudioEngine();
 
   const audioFiles = files.filter(f => !f.name.endsWith('.lrc') && !f.name.endsWith('.txt'));
@@ -8171,9 +8288,28 @@ $('#audioUpload').addEventListener('change', e => {
 
   audioFiles.forEach((file, fIdx) => {
     const cleanTitle = file.name.replace(/\.[^/.]+$/, '');
+    const localSlot = localSlotForFile(file, audioFiles.length === 1);
     const reader = new FileReader();
     reader.onload = ev => {
-      state.audioCtx.decodeAudioData(ev.target.result, async buffer => {
+      const decoded = state.audioCtx.decodeAudioData(ev.target.result, async buffer => {
+        if (localSlot) {
+          if (localSlot.src?.startsWith('blob:')) URL.revokeObjectURL(localSlot.src);
+          localSlot.src = URL.createObjectURL(file);
+          localSlot.buffer = buffer;
+          localSlot.localName = file.name;
+          localSlot.lyrics = lrcMap[cleanTitle.toLowerCase()] || localSlot.lyrics;
+          try {
+            await saveLocalThemeAudio(localSlot.type, file);
+          } catch (error) {
+            console.warn('Could not retain local anime audio:', error);
+            showToast('这首歌本次可播放，但浏览器未能将它保存在本机');
+          }
+          updateLocalSongOption(localSlot);
+          if (localSlot.theme === state.theme && (audioFiles.length === 1 || fIdx === 0)) {
+            playTrackAtIndex(state.playlist.indexOf(localSlot));
+          }
+          return;
+        }
         const baseName = cleanTitle.toLowerCase();
         let lyrics = lrcMap[baseName] || null;
 
@@ -8199,8 +8335,13 @@ $('#audioUpload').addEventListener('change', e => {
         if (fIdx === 0) {
           playTrackAtIndex(state.playlist.length - 1);
         }
+      }, error => {
+        console.warn('Could not decode local audio:', error);
+        showToast('无法读取该音频文件，请换一份本机文件');
       });
+      decoded?.catch?.(() => {});
     };
+    reader.onerror = () => showToast('无法读取该音频文件，请换一份本机文件');
     reader.readAsArrayBuffer(file);
   });
 });
@@ -8346,7 +8487,7 @@ $('#contentModeGroup').addEventListener('click', e => {
 });
 
 // 角色分组与选择：选中卡片共享舞台实时画布，其余卡片使用静态缩略图。
-let activeAvatarGroup = 'one-piece';
+let activeAvatarGroup = state.theme;
 function renderAvatarCards(){
   const grid=$('#avatarPresetGrid');
   const fragment=document.createDocumentFragment();
@@ -8371,13 +8512,52 @@ function renderAvatarCards(){
     button.setAttribute('aria-pressed',String(active));
   });
 }
-renderAvatarCards();
+function syncThemeWallpaperOptions(theme) {
+  $$('#presetBgSelect optgroup[data-theme]').forEach(group => {
+    const visible = group.dataset.theme === theme;
+    group.hidden = !visible;
+    group.disabled = !visible;
+  });
+}
+function syncThemePlaylistOptions(theme) {
+  $$('#playlistSelect optgroup[data-theme]').forEach(group => {
+    const visible = group.dataset.theme === theme;
+    group.hidden = !visible;
+    group.disabled = !visible;
+  });
+  const current = state.playlist[state.currentTrackIndex];
+  if (current?.theme && current.theme !== theme) {
+    if (state.isPlayingMusic) pauseMusic();
+    state.currentTrackIndex = 0;
+    state.songTitle = state.playlist[0].title;
+    $('#playlistSelect').value = state.playlist[0].type;
+    $('#nowPlayingText').textContent = `已切换到${LU_THEME_PALETTES[theme].label}曲库`;
+  }
+}
+function setLuTheme(theme, { fromIntro = false, force = false } = {}) {
+  if (!LU_THEME_PALETTES[theme] || (!force && theme === activeAvatarGroup)) return;
+  activeAvatarGroup = theme;
+  state.theme = theme;
+  state.selectedAvatar = AVATAR_MANIFEST.characters.find(character => character.group === theme).id;
+  document.body.dataset.luTheme = theme;
+  try { localStorage.setItem('luAnimeTheme', theme); } catch {}
+  syncThemeWallpaperOptions(theme);
+  syncThemePlaylistOptions(theme);
+  renderAvatarCards();
+  renderAvatarRig(state.selectedAvatar, performance.now() / 1000);
+  rebuildMatrix();
+  if (!fromIntro) window.luCubeIntro?.setTheme(theme);
+  const wallpaper = DEFAULT_THEME_WALLPAPERS[theme];
+  if (wallpaper && POSTER_WALLPAPERS[wallpaper]) {
+    $('#presetBgSelect').value = wallpaper;
+    loadLandscapeBackground(wallpaper);
+  }
+}
+setLuTheme(state.theme, { force: true });
 $('#avatarGroupTabs').addEventListener('click',e=>{
   const button=e.target.closest('button[data-group]');
   if(!button||button.dataset.group===activeAvatarGroup)return;
-  activeAvatarGroup=button.dataset.group;
-  state.selectedAvatar=AVATAR_MANIFEST.characters.find(character=>character.group===activeAvatarGroup).id;
-  renderAvatarCards();renderAvatarRig(state.selectedAvatar,performance.now()/1000);rebuildMatrix();
+  setLuTheme(button.dataset.group);
 });
 $('#avatarPresetGrid').addEventListener('click', e => {
   const card = e.target.closest('button.avatar-card');
@@ -8906,8 +9086,9 @@ window.luCubeIntro = createLuCubeIntro({
   manifest: AVATAR_MANIFEST,
   stageState: state,
   cubeGeometry: currentRoundedGeo.clone(),
-  cubeMaterial: createMaterialPreset(ui.material.value, ui.color.value),
+  cubeMaterial: createMaterialPreset('prism', '#d6d7e1'),
   environment: scene.environment,
+  onThemeSelect: theme => setLuTheme(theme, { fromIntro: true }),
   getStageCells: () => matrixGroup.children.map(mesh => ({
     x: mesh.position.x, y: mesh.position.y, z: mesh.position.z
   }))

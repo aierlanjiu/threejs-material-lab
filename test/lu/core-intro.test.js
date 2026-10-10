@@ -35,11 +35,28 @@ try {
     assert.equal(await page.locator('#luIntroOverlay').isVisible(), true);
     assert.equal(await page.locator('.lu-intro-hint').innerText(), '轻触魔方');
     assert.equal(await page.locator('#luIntroSkip').innerText(), '跳过');
-    assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('#luIntroOverlay')).backgroundColor), 'rgb(7, 9, 11)',
-      'the opening scene should hide the stage until the canvas unfolds');
+    assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('#luIntroOverlay')).backgroundColor), 'rgb(155, 59, 34)',
+      'the opening scene should use its own warm art direction before the canvas unfolds');
     const plate = await page.evaluate(() => getComputedStyle(document.querySelector('.lu-intro-curtain i'), '::before').backgroundImage);
-    assert.match(plate, width <= 760 ? /lu-intro-smoke-portrait\.png/ : /lu-intro-smoke-desktop\.png/,
-      'the smoke-glass backdrop should match the viewport');
+    assert.match(plate, width <= 760 ? /lu-intro-d-one-piece-portrait\.png/ : /lu-intro-d-one-piece-wide\.png/,
+      'the static D backdrop should match the viewport');
+    assert.equal(await page.evaluate(() => window.luCubeIntro.backdropMode), 'static-image');
+    assert.equal(await page.locator('#luIntroOverlay canvas').count(), 1,
+      'the static backdrop must not create a second WebGL renderer');
+    assert.deepEqual(await page.locator('#luIntroThemeSelect img').evaluateAll(images =>
+      images.map(image => image.complete && image.naturalWidth > 0)), [true, true, true],
+      'all three theme cubes need their original anime energy assets');
+    assert.match(await page.evaluate(() => getComputedStyle(document.querySelector('#luIntroThemeSelect .lu-theme-cube'), '::after').backgroundImage),
+      /lu-core-emblem\.png/, 'every theme selector should carry its motif inside the prism cube');
+    for (const theme of ['dragon-ball', 'naruto']) {
+      const themePlate = await page.evaluate(theme => {
+        window.luCubeIntro.setTheme(theme);
+        return getComputedStyle(document.querySelector('.lu-intro-curtain i'), '::before').backgroundImage;
+      }, theme);
+      assert.match(themePlate, new RegExp(`lu-intro-d-${theme}-${width <= 760 ? 'portrait' : 'wide'}\\.png`));
+      assert.equal(await page.locator('#luIntroWordmark').innerText(), theme === 'dragon-ball' ? 'DRAGON BALL' : 'NARUTO');
+    }
+    await page.evaluate(() => window.luCubeIntro.setTheme('one-piece'));
     assert.equal(await page.evaluate(() => document.querySelector('.app').inert), true);
     assert.deepEqual(await page.evaluate(() => [window.luCubeIntro.cubieCount, window.luCubeIntro.scrambleMoves]), [27, 8]);
     const shell = await page.evaluate(() => ({
@@ -48,15 +65,13 @@ try {
       stageFamily: document.querySelector('#material').value
     }));
     assert(shell.vertices > 24, 'the entrance should use a subdivided rounded stage cube shell');
-    assert.equal(shell.family, shell.stageFamily, 'the entrance should use the current stage material family');
+    assert.equal(shell.family, 'prism', 'the entrance should retain the translucent prism material');
     assert.equal(await page.evaluate(() => window.luCubeIntro.solved), false);
     assert.equal(await page.locator('#luIntroActivate canvas').count(), 1, 'the opening cube needs a real canvas');
     await page.evaluate(() => { window.introCanvas = document.querySelector('#luIntroActivate canvas'); });
 
-    const idleGlow = await page.evaluate(() => parseFloat(document.querySelector('#luIntroOverlay').style.getPropertyValue('--lu-light-opacity')));
     await page.locator('#luIntroActivate').click();
-    await page.waitForFunction(base => parseFloat(document.querySelector('#luIntroOverlay').style.getPropertyValue('--lu-light-opacity')) > base + .08,
-      idleGlow, { timeout: 12000 });
+    await page.waitForFunction(() => window.luCubeIntro.phase === 'solving', null, { timeout: 12000 });
     await page.waitForFunction(() => window.luCubeIntro.phase === 'complete', null, { timeout: 45000 });
     assert.equal(await page.evaluate(() => window.luCubeIntro.solved), true);
     assert.equal(await page.locator('#luIntroOverlay').isVisible(), false);
