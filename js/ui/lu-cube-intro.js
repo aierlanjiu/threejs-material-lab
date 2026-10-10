@@ -307,7 +307,7 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
     rim.color.set(palette.glow);
     glassBounceLeft.color.set(palette.glow);
     glassBounceRight.color.set(palette.edge);
-    cubeMaterial.color.set(palette.edge).lerp(new THREE.Color('#ffffff'), .78);
+    cubeMaterial.color.set(palette.edge).lerp(new THREE.Color('#ffffff'), .64);
     cubeMaterial.transmission = 0;
     cubeMaterial.opacity = .14;
     cubeMaterial.transparent = true;

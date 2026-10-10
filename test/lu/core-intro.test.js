@@ -35,8 +35,8 @@ try {
     assert.equal(await page.locator('#luIntroOverlay').isVisible(), true);
     assert.equal(await page.locator('.lu-intro-hint').innerText(), '轻触魔方');
     assert.equal(await page.locator('#luIntroSkip').innerText(), '跳过');
-    assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('#luIntroOverlay')).backgroundColor), 'rgb(155, 59, 34)',
-      'the opening scene should use its own warm art direction before the canvas unfolds');
+    assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('#luIntroOverlay')).backgroundColor), 'rgb(8, 40, 56)',
+      'the opening scene should use the ocean palette before the canvas unfolds');
     const plate = await page.evaluate(() => getComputedStyle(document.querySelector('.lu-intro-curtain i'), '::before').backgroundImage);
     assert.match(plate, width <= 760 ? /lu-intro-d-one-piece-portrait\.png/ : /lu-intro-d-one-piece-wide\.png/,
       'the static D backdrop should match the viewport');
@@ -45,9 +45,14 @@ try {
       'the static backdrop must not create a second WebGL renderer');
     assert.deepEqual(await page.locator('#luIntroThemeSelect img').evaluateAll(images =>
       images.map(image => image.complete && image.naturalWidth > 0)), [true, true, true],
-      'all three theme cubes need their original anime energy assets');
+      'all three theme cubes need their theme-specific artwork');
+    assert.match(await page.locator('#luIntroThemeSelect [data-theme="dragon-ball"] img').getAttribute('src'), /dragon-ball-shenron\.png$/,
+      'the Dragon Ball selector should show Shenron');
     assert.match(await page.evaluate(() => getComputedStyle(document.querySelector('#luIntroThemeSelect .lu-theme-cube'), '::after').backgroundImage),
       /lu-core-emblem\.png/, 'every theme selector should carry its motif inside the prism cube');
+    const shellColors = await page.locator('#luIntroThemeSelect .lu-theme-cube').evaluateAll(cubes =>
+      cubes.map(cube => getComputedStyle(cube, '::after').filter));
+    assert.equal(new Set(shellColors).size, 3, 'each theme cube needs a distinct shell color');
     for (const theme of ['dragon-ball', 'naruto']) {
       const themePlate = await page.evaluate(theme => {
         window.luCubeIntro.setTheme(theme);

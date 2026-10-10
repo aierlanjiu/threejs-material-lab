@@ -31,7 +31,7 @@
 
 ## Recent Results
 
-- Action: 参照用户提供的雕塑感视觉图重做海贼王、龙珠、火影双画幅入场背景；将三个主题选择入口改为承载动漫元素的烟晶 cube，并保持实时表情魔方在中央。Validation: 三主题手机与海贼王桌面实景、390/1440px 入场和减少动效回归通过。Report: `Reports/2026-10-10-lu-anime-theme-intro.md`。Agent: codex · 2026-10-10。
+- Action: 仅提取用户参考图的雕塑与反光材质，重做海青航海、翡翠神龙与纸面忍具三套双画幅背景；三个入口 cube 与中央实时魔方分别适配主题色，龙珠入口加入神龙。Validation: 三主题手机与桌面实景、390/1440px 入场和主题曲库回归通过；实体手机待验。Report: `Reports/2026-10-10-lu-anime-theme-intro.md`。Agent: codex · 2026-10-10。
 - Action: 按主题隔离角色、壁纸和曲库；补充龙珠／火影各五组竖横壁纸，增加每主题三首本机歌曲槽位与浏览器内保存；修复手机工作台遮挡。Validation: 主题切换、本机 WAV 导入及刷新恢复通过；原版音频未加入公开仓库。Report: `Reports/2026-10-10-lu-anime-theme-intro.md`。Agent: codex · 2026-10-10。
 - Action: 将律的魔方转层电子短音换为三段 CC0 真实魔方录音，按旋转时长播放齿位与落锁声；保留静音和素材失败降级。Validation: 390/1440px 与减少动效回归通过，三段录音解码及九次物理声音触发得到浏览器验证。Report: `Reports/2026-10-08-lu-expression-cube-intro.md`。Agent: codex · 2026-10-09。
 - Action: 用用户最终提供的透明底烟晶律核图统一替换旧图标，并将入场后的左上角迷你魔方改为该图标，保留魔方入场与重播。Validation: 图片 Alpha 通道、桌面/手机实景及 390/1440px/减少动效入场回归通过。Report: `Reports/2026-10-08-lu-expression-cube-intro.md`。Agent: codex · 2026-10-09。
