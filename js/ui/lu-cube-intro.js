@@ -2,8 +2,7 @@ import { renderLiveAvatar } from '../avatar/live.js';
 import { LU_THEME_PALETTES } from './lu-intro-atmosphere.js';
 
 const MOODS = ['calm', 'happy', 'wink', 'curious', 'surprised', 'sleepy'];
-const FACE_COLORS = ['#ce342d', '#dcc4a0', '#b96450', '#aab5ad', '#b88c6d', '#a7a1af'];
-const PITCH = 0.97;
+const PITCH = 1.05;
 const TURN = Math.PI / 2;
 const TURN_RECORDINGS = [
   { file: '../../assets/sfx/lu-cube-turn-4.mp3', offset: .39, length: .27, gain: 2.0 },
@@ -22,30 +21,18 @@ function shuffled(items) {
   return copy;
 }
 
-function makeSticker(THREE, character, mood, accent) {
+function makeSticker(THREE, character, mood) {
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = 160;
   const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#221e22';
-  ctx.fillRect(0, 0, 160, 160);
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   const ready = renderLiveAvatar(character.id, canvas, 0, mood)
     .then(() => {
-      ctx.globalCompositeOperation = 'destination-over';
-      ctx.fillStyle = '#d7c9b5';
-      ctx.fillRect(0, 0, 160, 160);
-      ctx.globalCompositeOperation = 'source-over';
-      ctx.strokeStyle = '#211b21';
-      ctx.lineWidth = 14;
-      ctx.strokeRect(7, 7, 146, 146);
-      ctx.strokeStyle = accent;
-      ctx.lineWidth = 3;
-      ctx.strokeRect(14, 14, 132, 132);
       texture.needsUpdate = true;
     })
     .catch(() => {
-      ctx.fillStyle = accent;
+      ctx.fillStyle = '#f2f6e8';
       ctx.font = 'bold 72px sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -188,7 +175,7 @@ function createSound() {
   };
 }
 
-export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, cubeMaterial, environment, getStageCells, onThemeSelect, onComplete }) {
+export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, cubeMaterial, applySurfaceContent, environment, getStageCells, onThemeSelect, onComplete }) {
   const overlay = document.querySelector('#luIntroOverlay');
   const app = document.querySelector('.app');
   const activate = document.querySelector('#luIntroActivate');
@@ -208,7 +195,7 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
   const scene = new THREE.Scene();
   scene.environment = environment;
   const camera = new THREE.PerspectiveCamera(40, 1, .1, 40);
-  camera.position.set(0, 0, 6.5);
+  camera.position.set(0, 0, 7.1);
   scene.add(new THREE.AmbientLight(0xffffff, 1.4));
   const light = new THREE.DirectionalLight(0xffffff, 2.35);
   light.position.set(2, 5, 7);
@@ -226,50 +213,34 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
   scene.add(root);
   const pivot = new THREE.Group();
   root.add(pivot);
-  const innerGeometry = new THREE.BoxGeometry(.77, .77, .77);
-  const innerMaterial = new THREE.MeshPhysicalMaterial({ color: '#27252a', roughness: .32,
-    metalness: .14, transparent: true, opacity: .06, depthWrite: false });
-  const edgeMaterial = new THREE.LineBasicMaterial({ color: '#d9e8f2', transparent: true,
-    opacity: .48, depthWrite: false });
-  const edgeGeometry = new THREE.EdgesGeometry(new THREE.BoxGeometry(.73, .73, .73));
-  const decalGeometry = new THREE.PlaneGeometry(.70, .70);
-  const faceOrientation = [
-    { position: [.455, 0, 0], rotation: [0, Math.PI / 2, 0] },
-    { position: [-.455, 0, 0], rotation: [0, -Math.PI / 2, 0] },
-    { position: [0, .455, 0], rotation: [-Math.PI / 2, 0, 0] },
-    { position: [0, -.455, 0], rotation: [Math.PI / 2, 0, 0] },
-    { position: [0, 0, .455], rotation: [0, 0, 0] },
-    { position: [0, 0, -.455], rotation: [0, Math.PI, 0] }
-  ];
+  const emptyCanvas = document.createElement('canvas');
+  emptyCanvas.width = emptyCanvas.height = 1;
+  const emptyTexture = new THREE.CanvasTexture(emptyCanvas);
   function makeThemeStickers(theme) {
     const characters = manifest.characters.filter(item => item.group === theme);
     const first = characters.find(item => item.id === stageState.selectedAvatar) || characters[0];
     const chosen = [first, ...shuffled(characters.filter(item => item !== first)).slice(0, 5)];
-    return chosen.map((character, face) => MOODS.map(mood =>
-      makeSticker(THREE, character, mood, FACE_COLORS[face])));
+    return chosen.map(character => MOODS.map(mood =>
+      makeSticker(THREE, character, mood)));
   }
   let stickers = makeThemeStickers(selectedTheme);
-  const faceMaterials = stickers.map(row => row.map(item => new THREE.MeshPhysicalMaterial({
-    map: item.texture, roughness: .36, metalness: .04, clearcoat: .35, clearcoatRoughness: .2,
-    transparent: true, opacity: .76, depthWrite: false
-  })));
   const cubies = [];
+  const bodies = [];
+  function applyCubieFaces(body) {
+    const textures = body.userData.visibleFaces.map((visible, face) => visible
+      ? stickers[face][body.userData.moods[face]].texture : emptyTexture);
+    applySurfaceContent(body.material, textures, 'conformal', .94, [0, 1, 0, 1]);
+  }
   for (let x = -1; x <= 1; x++) for (let y = -1; y <= 1; y++) for (let z = -1; z <= 1; z++) {
     const mesh = new THREE.Group();
-    const body = new THREE.Mesh(cubeGeometry, cubeMaterial);
-    body.scale.setScalar(.88);
-    mesh.add(new THREE.Mesh(innerGeometry, innerMaterial), body,
-      new THREE.LineSegments(edgeGeometry, edgeMaterial));
+    const body = new THREE.Mesh(cubeGeometry, cubeMaterial.clone());
+    body.renderOrder = 5;
+    mesh.add(body);
     const isCenter = x === 0 && y === 0 && z === 0;
-    const faces = [x === 1, x === -1, y === 1, y === -1, z === 1 || isCenter, z === -1];
-    faces.forEach((visible, face) => {
-      if (!visible) return;
-      const sticker = new THREE.Mesh(decalGeometry, faceMaterials[face][Math.floor(Math.random() * MOODS.length)]);
-      const { position, rotation } = faceOrientation[face];
-      sticker.position.set(...position);
-      sticker.rotation.set(...rotation);
-      mesh.add(sticker);
-    });
+    body.userData.visibleFaces = [x === 1, x === -1, y === 1, y === -1, z === 1 || isCenter, z === -1];
+    body.userData.moods = Array.from({ length: 6 }, () => Math.floor(Math.random() * MOODS.length));
+    applyCubieFaces(body);
+    bodies.push(body);
     mesh.position.set(x * PITCH, y * PITCH, z * PITCH);
     mesh.userData.home = { x, y, z };
     mesh.userData.coord = { x, y, z };
@@ -280,6 +251,8 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
   try {
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power' });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.setClearColor(0x000000, 0);
     renderer.domElement.className = 'lu-cube-canvas';
@@ -307,29 +280,21 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
     rim.color.set(palette.glow);
     glassBounceLeft.color.set(palette.glow);
     glassBounceRight.color.set(palette.edge);
-    cubeMaterial.color.set(palette.edge).lerp(new THREE.Color('#ffffff'), .64);
-    cubeMaterial.transmission = 0;
-    cubeMaterial.opacity = .14;
-    cubeMaterial.transparent = true;
-    cubeMaterial.depthWrite = false;
-    cubeMaterial.roughness = .08;
-    cubeMaterial.metalness = .05;
-    cubeMaterial.clearcoat = 1;
-    cubeMaterial.clearcoatRoughness = .04;
+    cubeMaterial.attenuationColor.set(palette.edge).lerp(new THREE.Color('#ffffff'), .18);
     cubeMaterial.needsUpdate = true;
-    edgeMaterial.color.set(palette.edge);
+    bodies.forEach(body => body.material.attenuationColor.copy(cubeMaterial.attenuationColor));
     themeButtons.forEach(button => {
       const active = button.dataset.theme === next;
       button.classList.toggle('active', active);
       button.setAttribute('aria-pressed', String(active));
     });
+    document.querySelectorAll('#performanceCapsule .lu-core-mark-fallback img, .brand-glyph-box img').forEach(image => {
+      image.src = themeButtons.find(button => button.dataset.theme === next)?.querySelector('img')?.src || image.src;
+    });
     if (changed) {
       const previous = stickers;
       stickers = makeThemeStickers(next);
-      faceMaterials.forEach((row, face) => row.forEach((material, mood) => {
-        material.map = stickers[face][mood].texture;
-        material.needsUpdate = true;
-      }));
+      bodies.forEach(applyCubieFaces);
       previous.flat().forEach(item => item.texture.dispose());
     }
     lightImpulse = .62;
@@ -583,10 +548,12 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
   }
   const controller = {
     get phase() { return phase; },
+    get ready() { return Promise.allSettled(stickers.flat().map(item => item.ready)); },
     get cubieCount() { return cubies.length; },
     get scrambleMoves() { return scramble.length; },
     get shellVertexCount() { return cubeGeometry.attributes.position.count; },
     get shellMaterialFamily() { return cubeMaterial.userData.family; },
+    get shellTransmission() { return cubeMaterial.transmission; },
     get theme() { return selectedTheme; },
     get backdropMode() { return 'static-image'; },
     get shellOpacity() { return cubeMaterial.opacity; },
@@ -608,6 +575,20 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
     setTheme(theme);
     activateIntro();
   }));
+  themeButtons.forEach(button => {
+    button.addEventListener('pointermove', event => {
+      if (reduced() || event.pointerType === 'touch') return;
+      const bounds = button.getBoundingClientRect();
+      const x = (event.clientX - bounds.left) / bounds.width - .5;
+      const y = (event.clientY - bounds.top) / bounds.height - .5;
+      button.style.setProperty('--tilt-x', `${(-y * 9).toFixed(2)}deg`);
+      button.style.setProperty('--tilt-y', `${(x * 9).toFixed(2)}deg`);
+    });
+    button.addEventListener('pointerleave', () => {
+      button.style.removeProperty('--tilt-x');
+      button.style.removeProperty('--tilt-y');
+    });
+  });
   skipButton.addEventListener('click', complete);
   [introMute, coreMute].forEach(button => button.addEventListener('click', () => {
     sound.enabled = !sound.enabled;

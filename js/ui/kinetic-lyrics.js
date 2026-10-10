@@ -187,7 +187,7 @@ export class SlotTextLyricsEngine {
  *    正面平视视图，地面堆叠散落，歌词反重力腾空升入中央正面排列，低音炮震颤起跳。
  * ========================================================================= */
 export class Three3DGravityLyricsEngine {
-  constructor(threeContext) {
+  constructor(threeContext, { activate = true } = {}) {
     this.ctx = threeContext || {};
     this.THREE = threeContext.THREE;
     this.scene = threeContext.scene;
@@ -206,6 +206,7 @@ export class Three3DGravityLyricsEngine {
 
     this.group = new this.THREE.Group();
     this.group.name = 'gravityMaterialSandbox';
+    this.group.visible = false;
     if (this.scene) this.scene.add(this.group);
 
     this.bottomCubes = [];
@@ -216,6 +217,8 @@ export class Three3DGravityLyricsEngine {
     this.activeBankIndex = -1;
     this.cubes = []; // 暴露给外部检测器及统计工具
     this.currentText = '';
+    this.presentationMaterials = new Map();
+    this.physicalMaterials = [];
 
     // 歌词魔方优先采用高纯净通透物理材质（水晶、棱镜、冰晶、毛玻璃、烟晶）
     this.transparentMaterials = ['crystal', 'prism', 'ice', 'frosted', 'smoke'];
@@ -252,18 +255,26 @@ export class Three3DGravityLyricsEngine {
     this.dockY = 0.85; // 歌词区域中心高度基准
 
     this.initCubes();
+    this.setTheme(this.ctx.getTheme?.() || 'one-piece');
     this.lastFramingAspect = this.camera?.aspect || 1.6;
-    this.onEnterMode();
+    if (activate) this.onEnterMode();
   }
 
   onEnterMode() {
+    this.setTheme(this.ctx.getTheme?.() || 'one-piece');
+    this.syncPresentation();
     // 1. 原编排方阵优雅隐退消失
     if (this.matrixGroup) {
       this.matrixGroup.visible = false;
     }
     this.group.visible = true;
 
-    // 2. 摄像机与控制器锁定纯正正面平视机位 (Front View，自适应宽窄视口)
+    // Camera framing is requested once; the camera controller owns FOV and motion.
+    if (this.ctx.onGravityEnter) {
+      this.ctx.onGravityEnter();
+      this.onAspectChange();
+      return;
+    }
     const aspect = this.camera ? (this.camera.aspect || 1.6) : 1.6;
     const tanHalfFov = 0.26794919243;
     const targetHalfWidth = aspect < 1.42 ? 5.6 : 4.35;
@@ -274,8 +285,6 @@ export class Three3DGravityLyricsEngine {
 
     if (this.camera) {
       this.camera.position.set(0, targetY, targetZ);
-      this.camera.fov = 30;
-      this.camera.updateProjectionMatrix();
     }
     if (this.controls) {
       this.controls.target.set(0, targetY, 0);
@@ -287,6 +296,207 @@ export class Three3DGravityLyricsEngine {
       this.transitionCameraTo(new this.THREE.Vector3(0, targetY, targetZ), 300);
     }
     this.onAspectChange();
+  }
+
+  setTheme(theme) {
+    if (this.theme === theme) return;
+    const characters = AVATAR_MANIFEST.characters.filter(character => character.group === theme);
+    if (!characters.length) return;
+    this.theme = theme;
+    this.avatarCharacters = characters;
+    this.avatarTextures ||= new Map();
+    this.avatarTextureLoader ||= new this.THREE.TextureLoader();
+    for (const character of characters) {
+      if (this.avatarTextures.has(character.id)) continue;
+      const texture = this.liveTextureMap?.[character.id]
+        || this.avatarTextureLoader.load(`assets/live-avatars/${character.id}/still.png`);
+      texture.colorSpace = this.THREE.SRGBColorSpace;
+      texture.userData = { ...texture.userData, isAvatarFace: true, avatarId: character.id, characterName: character.name, group: theme };
+      this.avatarTextures.set(character.id, texture);
+    }
+    this.bottomCubes.forEach((cube, index) => {
+      const character = characters[index % characters.length];
+      const texture = this.avatarTextures.get(character.id);
+      Object.assign(cube.userData, {
+        avatarId: character.id, avatarName: character.name, avatarGroup: theme, faceTexture: texture
+      });
+      cube.userData.decalMat.map = texture;
+    });
+    this.lyricCubes.forEach((cube, index) => {
+      const u = cube.userData;
+      const texture = this.avatarTextures.get(characters[index % characters.length].id);
+      if (u.decalMat.map === u.faceTex) u.decalMat.map = texture;
+      u.faceTex = texture;
+    });
+    this.presentationKey = null;
+    this.syncPresentation();
+  }
+
+  getConfiguration() {
+    return this.ctx.getGravityConfiguration?.() || {
+      contentMode: 'avatar', avatarDist: 'variety', selectedAvatar: this.avatarCharacters[0]?.id,
+      layerMode: 'surface', adhesionCraft: 'conformal', wavePattern: 'ripple', waveMotion: true,
+      waveAmpMultiplier: 1, intensityTier: 2, morphIntervalBeats: 16, beatCount: 0, beatPhase: 0,
+      speedMultiplier: 1, showLyrics: true, materialKey: '', lockMaterial: false
+    };
+  }
+
+  presentationMaterial(type, tone, texture, bounds, config) {
+    const layer = config.layerMode || 'surface';
+    const craft = config.adhesionCraft || 'conformal';
+    const key = JSON.stringify([type, tone, texture?.uuid, bounds, layer, craft]);
+    if (this.presentationMaterials.has(key)) return this.presentationMaterials.get(key);
+    const material = this.createMaterialPreset(type, tone);
+    if (texture && layer === 'surface' && this.ctx.applySurfaceContent) {
+      this.ctx.applySurfaceContent(material, texture, craft, 0.94, bounds);
+    } else if (texture && layer !== 'surface' && material.transmission > 0) {
+      material.depthWrite = false;
+      material.opacity = 1;
+    }
+    this.presentationMaterials.set(key, material);
+    this.physicalMaterials.push(material);
+    return material;
+  }
+
+  presentUnit(unit, index, config, lyric = false) {
+    const u = unit.userData;
+    let texture = null;
+    let bounds = [0, 1, 0, 1];
+    if (config.contentMode !== 'material') {
+      if (lyric) {
+        texture = u.isMagneticLifting && u.magneticProgress < 0.45 ? u.faceTex : u.charTex;
+      } else if (config.contentMode === 'avatar') {
+        const characters = this.avatarCharacters;
+        const selected = characters.find(c => c.id === config.selectedAvatar) || characters[0];
+        const character = config.avatarDist === 'variety' ? characters[index % characters.length] : selected;
+        texture = character ? this.avatarTextures.get(character.id) : null;
+        Object.assign(u, { avatarId: character?.id, avatarName: character?.name, avatarGroup: character?.group });
+        if (config.avatarDist === 'center' && index !== this.centerContentIndex) texture = null;
+        u.faceTexture = texture;
+      } else if (config.contentMode === 'image') {
+        texture = this.ctx.getGravityImage?.(index, config.imageDist) || null;
+      } else if (config.contentMode === 'text') {
+        const chars = splitIntoGraphemes(this.currentText || config.text || '').filter(c => c.trim());
+        const char = chars[index % Math.max(1, chars.length)];
+        if (char) {
+          const textKey = `${char}:${u.matType}:${u.tone}`;
+          this.bottomTextTextures ||= new Map();
+          if (!this.bottomTextTextures.has(textKey)) this.bottomTextTextures.set(textKey, this.createDecalTexture(char, u.matType, u.tone));
+          texture = this.bottomTextTextures.get(textKey);
+        }
+      }
+      if (!lyric && this.isMosaic) {
+        if (index >= 16) texture = null;
+        else {
+          const row = Math.floor(index / 4), col = index % 4;
+          bounds = [col / 4, (col + 1) / 4, 1 - (row + 1) / 4, 1 - row / 4];
+        }
+      }
+    }
+    const type = config.lockMaterial ? config.material : u.matType;
+    const tone = config.lockMaterial ? config.color : u.tone;
+    const block = unit.children[0];
+    const initialMaterial = block.material;
+    block.geometry = this.ctx.getRoundedGeometry?.() || block.geometry;
+    block.material = this.presentationMaterial(type, tone, texture, bounds, config);
+    if (!u.presentationInitialized) { initialMaterial.dispose(); u.presentationInitialized = true; }
+    block.castShadow = block.material.transmission < 0.6;
+    u.contentTexture = texture;
+    u.contentCount = texture ? 1 : 0;
+    u.displayMatType = type;
+    u.decalMesh.visible = !!texture && (config.layerMode !== 'surface' || !this.ctx.applySurfaceContent);
+    if (u.decalMesh.visible && this.ctx.createDimensionalDecalMaterial) {
+      u.decalMat.dispose();
+      u.decalMat = this.ctx.createDimensionalDecalMaterial(texture, config.adhesionCraft, config.layerMode);
+      u.decalMesh.material = u.decalMat;
+      // The same UV bounds are used for all three layers.
+      const old = u.decalMesh.geometry;
+      if (u.ownsDecalGeometry) old.dispose();
+      const geometry = new this.THREE.PlaneGeometry(0.94, 0.94);
+      const uv = geometry.attributes.uv;
+      for (let i = 0; i < uv.count; i++) uv.setXY(i,
+        bounds[0] + uv.getX(i) * (bounds[1] - bounds[0]),
+        bounds[2] + uv.getY(i) * (bounds[3] - bounds[2]));
+      u.decalMesh.geometry = geometry;
+      u.ownsDecalGeometry = true;
+      u.decalMesh.position.z = config.layerMode === 'inside' ? 0 : -0.508;
+      u.decalMesh.renderOrder = 1;
+    } else {
+      // Keep the legacy diagnostic map synchronized even when ink is on the shell.
+      u.decalMat.map = texture;
+    }
+  }
+
+  syncPresentation() {
+    const config = this.getConfiguration();
+    const key = JSON.stringify([config.contentMode, config.avatarDist, config.selectedAvatar,
+      config.imageDist, config.imageKey, config.layerMode, config.adhesionCraft,
+      config.lockMaterial, config.materialKey, this.theme,
+      config.contentMode === 'text' ? (this.currentText || config.text) : '']);
+    if (key === this.presentationKey) return;
+    this.presentationKey = key;
+    const previousMaterials = this.presentationMaterials;
+    this.presentationMaterials = new Map();
+    this.physicalMaterials = [];
+    this.bottomTextTextures?.forEach(texture => texture.dispose());
+    this.bottomTextTextures = new Map();
+    this.isMosaic = (config.contentMode === 'avatar' && config.avatarDist === 'mosaic')
+      || (config.contentMode === 'image' && config.imageDist === 'mosaic');
+    this.centerContentIndex = this.bottomCubes.reduce((best, cube, index, cubes) => {
+      const score = c => c.userData.baseColX ** 2 + (c.userData.restZ - 1.2) ** 2
+        - c.userData.layerIdx * 0.12;
+      return score(cube) < score(cubes[best]) ? index : best;
+    }, 0);
+    const mosaicY = Math.max(...this.bottomCubes.map(cube => {
+      const u = cube.userData;
+      return u.floorY + u.layerIdx / Math.max(1, this.bottomLayersCount - 1)
+        * (this.getMoundProfile(u.baseColX, u.homePose?.z ?? u.restZ, this.peakCenterX) * this.getMoundHeightScale() - 0.275);
+    })) - 0.825;
+    this.bottomCubes.forEach((cube, index) => {
+      const u = cube.userData;
+      u.homePose ||= { x: u.restX, z: u.restZ, rx: u.restRx, ry: u.restRy, rz: u.restRz };
+      u.isMosaicCube = this.isMosaic && index < 16;
+      if (u.isMosaicCube) {
+        u.restX = (index % 4 - 1.5) * 0.55;
+        u.restY = mosaicY + (1.5 - Math.floor(index / 4)) * 0.55;
+        u.restZ = 2.35;
+        u.restRx = u.restRy = u.restRz = 0;
+      } else {
+        Object.assign(u, { restX: u.homePose.x, restZ: u.homePose.z,
+          restRx: u.homePose.rx, restRy: u.homePose.ry, restRz: u.homePose.rz });
+        u.restY = u.floorY + u.layerIdx / Math.max(1, this.bottomLayersCount - 1)
+          * (this.getMoundProfile(u.baseColX, u.restZ, this.peakCenterX) * this.getMoundHeightScale() - 0.275);
+      }
+      this.presentUnit(cube, index, config);
+    });
+    this.lyricCubes.forEach((slot, index) => this.presentUnit(slot, index, config, true));
+    // Retain resources only for the current presentation; borrowed avatar/image textures stay alive.
+    previousMaterials.forEach(material => material.dispose());
+    this.ctx.onGravityPresentation?.({
+      count: this.bottomCubes.reduce((n, cube) => n + cube.userData.contentCount, 0),
+      units: this.bottomCubes.length, config
+    });
+  }
+
+  updateMoundCadence(config) {
+    const interval = Math.max(4, config.morphIntervalBeats || 16);
+    const chapter = Math.floor((config.beatCount || 0) / interval);
+    const key = `${interval}:${chapter}`;
+    if (key === this.moundCadenceKey) return;
+    this.moundCadenceKey = key;
+    if (!config.waveMotion || isReducedMotion()) return;
+    this.peakCenterX = Math.sin(chapter * 0.65) * 0.32;
+    const gain = [0, 0.4, 0.75, 1.2][config.intensityTier || 2] * (config.waveAmpMultiplier ?? 1);
+    this.bottomCubes.forEach(cube => {
+      const u = cube.userData;
+      if (u.isMosaicCube) return;
+      u.restY = u.floorY + u.layerIdx / Math.max(1, this.bottomLayersCount - 1)
+        * (this.getMoundProfile(u.baseColX, u.restZ, this.peakCenterX) * this.getMoundHeightScale() - 0.275);
+      u.vy = Math.max(0, 0.45 - Math.abs(u.baseColX - this.peakCenterX) * 0.12) * gain;
+      u.wx = Math.sin(u.cubeIdx * 1.7) * 0.25 * gain;
+    });
+    this.isRecontouring = true;
+    this.recontourTimer = 0;
   }
 
   onLeaveMode() {
@@ -345,12 +555,14 @@ export class Three3DGravityLyricsEngine {
     const dockDelta = this.dockY - oldDockY;
     this.lyricCubes.forEach(slot => {
       const u = slot.userData;
-      if (u.targetScale > 0.5) {
+      if (u.targetScale > 0.001) {
         u.targetY += dockDelta;
         if (!u.isMagneticLifting && !u.isDropping) slot.position.y = u.targetY;
       }
     });
     this.lastFramingAspect = aspect;
+    this.presentationKey = null;
+    this.syncPresentation();
   }
 
   getMoundProfile(x, z, peakCenterX = 0) {
@@ -660,11 +872,13 @@ export class Three3DGravityLyricsEngine {
         this.lyricCubes.forEach(slot => {
           const u = slot.userData;
           if (u && u.char && u.char.trim().length > 0) {
+            u.charTex?.dispose();
             u.charTex = this.createDecalTexture(u.char, u.matType, u.tone);
             if (!u.isMagneticLifting || u.magneticProgress >= 0.45) {
               u.decalMat.map = u.charTex;
               u.decalMat.needsUpdate = true;
             }
+            this.presentUnit(slot, u.slotIdx, this.getConfiguration(), true);
           }
         });
       }
@@ -672,7 +886,7 @@ export class Three3DGravityLyricsEngine {
 
     // 加载海贼王 (One Piece)、龙珠 (Dragon Ball)、火影忍者 (Naruto) 官方 29 款动漫角色表情资产
     const officialChars = (typeof AVATAR_MANIFEST !== 'undefined' && AVATAR_MANIFEST.characters)
-      ? AVATAR_MANIFEST.characters
+      ? AVATAR_MANIFEST.characters.filter(character => character.group === (this.ctx.getTheme?.() || 'one-piece'))
       : [];
     this.avatarCharacters = officialChars;
 
@@ -858,6 +1072,10 @@ export class Three3DGravityLyricsEngine {
     // 歌词魔方优先采用高纯净通透物理材质（水晶、棱镜、冰晶、毛玻璃、烟晶）
     // =========================================================================
     const maxLyricSlotsPerBank = 40;
+    const blankCanvas = document.createElement('canvas');
+    blankCanvas.width = blankCanvas.height = 1;
+    const blankTexture = new this.THREE.CanvasTexture(blankCanvas);
+    blankTexture.colorSpace = this.THREE.SRGBColorSpace;
     this.lyricBankA = [];
     this.lyricBankB = [];
     this.lyricCubes = [];
@@ -874,7 +1092,7 @@ export class Three3DGravityLyricsEngine {
       cubeMesh.receiveShadow = true;
       cubeMesh.renderOrder = 8;
 
-      const texture = this.createDecalTexture(' ', matType, tone);
+      const texture = blankTexture;
       const decalMat = new this.THREE.MeshBasicMaterial({
         map: texture,
         transparent: true,
@@ -952,6 +1170,8 @@ export class Three3DGravityLyricsEngine {
   update(activeText, prevText, nextText, beatPeriod = 0.5, progressInLine = 0, bassEnergy = 0, isKick = false, dt = 0.016, lineKey = activeText, characterCursor = null) {
     this.lastBassEnergy = bassEnergy;
     this.lastIsKick = isKick;
+    const config = this.getConfiguration();
+    if (config.showLyrics === false) { activeText = ''; lineKey = 'lyrics-hidden'; }
 
     if (lineKey === activeText && activeText === this.currentText && this.currentLineKey) lineKey = this.currentLineKey;
     if (lineKey !== this.currentLineKey) {
@@ -959,6 +1179,9 @@ export class Three3DGravityLyricsEngine {
       this.currentText = activeText || '';
       this.handlePhraseTransition(this.currentText, beatPeriod);
     }
+
+    this.syncPresentation();
+    this.updateMoundCadence(config);
 
     this.updateProgress(progressInLine, characterCursor);
 
@@ -986,7 +1209,7 @@ export class Three3DGravityLyricsEngine {
       const oldBank = this.banks[this.activeBankIndex];
       oldBank.forEach(slot => {
         const u = slot.userData;
-        if (u.targetScale > 0.5 || u.currentScale > 0.5) {
+        if (!isReducedMotion() && (u.targetScale > 0.001 || u.currentScale > 0.001)) {
           u.meltY = this.getMoundSurfaceY(slot.position.x, slot.position.z);
           u.dropScale = Math.max(0.55, u.currentScale);
           u.isDropping = true;
@@ -1018,21 +1241,7 @@ export class Three3DGravityLyricsEngine {
     this.isMobileStack = isMobileNow;
     this.dockY = isMobileNow ? 1.75 : 0.85;
 
-    // 山脊只做小幅平滑偏移，避免换句时突然变成另一座不规则山峰。
-    this.peakCenterX = Math.sin((this.phraseCount || 0) * 0.65) * 0.32;
-    this.bottomCubes.forEach(cube => {
-      const u = cube.userData;
-      const moundThick = this.getMoundProfile(u.baseColX, u.restZ, this.peakCenterX) * this.getMoundHeightScale();
-      const totalLayers = Math.max(1, (this.bottomLayersCount || 6) - 1);
-      const yRest = u.floorY + (u.layerIdx / totalLayers) * (moundThick - 0.55 * 0.5);
-      u.restY = yRest;
-      const distFromPeak = Math.abs(u.baseColX - this.peakCenterX);
-      const wave = Math.max(0, 0.45 - distFromPeak * 0.12);
-      u.vy = wave * (0.6 + Math.random() * 0.4);
-      u.wx = (Math.random() - 0.5) * 0.5;
-    });
-    this.isRecontouring = true;
-    this.recontourTimer = 0.0;
+    // Mound reshaping follows the selected beat cadence independently of lyric changes.
 
     if (N === 0) {
       this.activeBankIndex = -1;
@@ -1072,10 +1281,10 @@ export class Three3DGravityLyricsEngine {
         // 同一句歌词严格统一单一通透透明材质与统一色调
         u.matType = phraseMat;
         u.tone = phraseTone;
-        slot.children[0].material = this.createMaterialPreset(u.matType, u.tone);
 
         // 正面贴图初始继承母体方块的“日漫头像”！
         u.faceTex = seedCube.userData.faceTexture;
+        u.charTex?.dispose();
         u.charTex = this.createDecalTexture(char, u.matType, u.tone);
         u.decalMat.map = u.faceTex;
         u.decalMat.needsUpdate = true;
@@ -1109,6 +1318,15 @@ export class Three3DGravityLyricsEngine {
         u.ascendProgress = 0.0;
         u.isDropping = false;
         u.sung = false;
+        this.presentUnit(slot, idx, this.getConfiguration(), true);
+        if (isReducedMotion()) {
+          u.isMagneticLifting = u.isAscending = false;
+          u.currentScale = u.targetScale;
+          slot.position.set(u.targetX, u.targetY, 0);
+          slot.rotation.set(0, 0, 0);
+          slot.scale.setScalar(u.targetScale);
+          this.presentUnit(slot, idx, this.getConfiguration(), true);
+        }
       } else {
         u.targetScale = 0.0;
         u.currentScale = 0.0;
@@ -1119,11 +1337,20 @@ export class Three3DGravityLyricsEngine {
         slot.position.set(0, -10, 0);
       }
     });
+    this.prunePresentationMaterials();
+  }
+
+  prunePresentationMaterials() {
+    const used = new Set(this.cubes.map(unit => unit.children[0].material));
+    for (const [key, material] of this.presentationMaterials) {
+      if (!used.has(material)) { material.dispose(); this.presentationMaterials.delete(key); }
+    }
+    this.physicalMaterials = [...this.presentationMaterials.values()];
   }
 
   updateProgress(progressInLine, characterCursor = null) {
     if (this.activeBankIndex < 0) return;
-    const activeSlots = this.banks[this.activeBankIndex].filter(s => s.userData.targetScale > 0.5);
+    const activeSlots = this.banks[this.activeBankIndex].filter(s => s.userData.targetScale > 0.001);
     const N = activeSlots.length;
     if (N === 0) return;
     const sungCount = characterCursor === null
@@ -1141,16 +1368,18 @@ export class Three3DGravityLyricsEngine {
   }
 
   triggerBassShockwave(energy = 0.5) {
-    // 反重力模式稳态严格静止：只在歌词切换瞬间动作，彻底消除日常演奏中的低音冲击与方块随机跳跃
+    // stepPhysics reads the current bass energy and selected waveform together.
   }
 
   stepPhysics(dt) {
     if (!this.group.visible) return;
     const safeDt = Math.max(0.001, Math.min(0.035, isNaN(dt) ? 0.016 : dt));
-    this.stackTime = (this.stackTime || 0) + safeDt;
+    const config = this.getConfiguration();
+    const motionEnabled = config.waveMotion !== false && !isReducedMotion();
+    this.stackTime = (this.stackTime || 0) + safeDt * (config.speedMultiplier || 1);
 
     // 1. 底部方块稳态与换句重塑动力学
-    if (this.isRecontouring) {
+    if (this.isRecontouring && motionEnabled) {
       this.recontourTimer += safeDt;
       if (this.recontourTimer >= 0.60) {
         // 约 0.6 秒落稳，恢复绝对静止
@@ -1166,6 +1395,11 @@ export class Three3DGravityLyricsEngine {
         // 换句瞬态微幅物理波纹
         this.bottomCubes.forEach(cube => {
           const u = cube.userData;
+          if (u.isMosaicCube) {
+            cube.position.set(u.restX, u.restY, u.restZ);
+            cube.rotation.set(0, 0, 0);
+            return;
+          }
           cube.position.x += u.vx * safeDt;
           cube.position.y += u.vy * safeDt;
           cube.position.z += u.vz * safeDt;
@@ -1199,40 +1433,40 @@ export class Three3DGravityLyricsEngine {
         });
       }
     } else {
-      // 稳态下：富有节奏与层次的“层叠起伏波”（Cascading Layered Swell）
-      // 底层稳固扎根微动，中高层沿 X/Z 与层级相位阶梯错开（-layerIdx * 0.65），呈现连绵起伏、有机呼吸的波浪层叠感
-      const reduced = isReducedMotion();
-      const rhythmDrive = (this.lastBassEnergy || 0) * 1.8 + (this.lastIsKick ? 0.85 : 0);
-      const totalLayers = Math.max(1, (this.bottomLayersCount || 6) - 1);
-      const motionScale = reduced ? 0 : (this.isMobileStack ? 0.8 : 0.18);
-
-      // 时钟累加器随节拍动态推进
-      this.stackTime += safeDt * (1.15 + rhythmDrive * 0.75);
-
+      const gain = motionEnabled ? [0, 0.4, 0.75, 1.2][config.intensityTier || 2]
+        * Math.max(0.2, Math.min(1, config.waveAmpMultiplier ?? 1)) : 0;
+      const drive = 0.25 + Math.min(1, (this.lastBassEnergy || 0) * 1.3 + (this.lastIsKick ? 0.35 : 0));
+      const phase = this.stackTime * (1.4 + drive);
+      const blend = 1 - Math.exp(-12 * safeDt);
       this.bottomCubes.forEach(cube => {
         const u = cube.userData;
-        const layerIdx = u.layerIdx || 0;
-        const layerRatio = layerIdx / totalLayers;
-
-        // 方块独立节奏体质：约 18% 为高弹活跃魔方，随低音爆发更大跳跃
-        const isSpike = !!u.isSpikeUnit;
-        const sens = u.rhythmSens || 1.0;
-        const phase = this.stackTime * 1.35 - layerIdx * 0.65 + u.restX * 0.35 + u.restZ * 0.25 + (u.phaseOffset || 0);
-
-        // 基础波幅 + 音乐重音动态注入
-        const dynamicBoost = 1.0 + rhythmDrive * (isSpike ? 1.6 : 0.65);
-        const layerAmp = (0.010 + layerRatio * 0.022) * sens * motionScale * dynamicBoost;
-
-        const lift = Math.sin(phase) * layerAmp;
-        const swayX = Math.cos(phase * 0.85) * layerAmp * 0.22;
-        const swayZ = Math.sin(phase * 0.85 + 0.4) * layerAmp * 0.18;
-
-        // 伴随微幅倾角起伏（Pitch & Roll），活跃方块伴随更剧烈翻滚
-        const tiltX = Math.cos(phase) * (0.035 + 0.075 * layerRatio) * (isSpike ? 1.8 : 1.0);
-        const tiltZ = Math.sin(phase) * (0.025 + 0.065 * layerRatio) * (isSpike ? 1.8 : 1.0);
-
-        cube.position.set(u.restX + swayX, u.restY + lift, u.restZ + swayZ);
-        cube.rotation.set(u.restRx + tiltX, u.restRy, u.restRz + tiltZ);
+        const coherent = u.isMosaicCube && config.mosaicLock !== false;
+        const x = coherent ? 0 : u.restX, z = coherent ? 0 : u.restZ;
+        const radius = Math.hypot(x, z);
+        let signal;
+        switch (config.wavePattern) {
+          case 'diagonal': signal = Math.sin(x * 0.95 + z * 0.6 - phase); break;
+          case 'equalizer': signal = Math.sin((coherent ? 3 : u.cubeIdx % 7) * 0.9 + phase * 1.5); break;
+          case 'spiral': signal = Math.sin(Math.atan2(z, x) * 2 + radius * 0.9 - phase); break;
+          case 'heartbeat': {
+            const p = config.beatPhase || 0;
+            signal = Math.exp(-Math.pow((p - 0.12) / 0.07, 2))
+              + 0.6 * Math.exp(-Math.pow((p - 0.36) / 0.09, 2)) - 0.25;
+            break;
+          }
+          case 'glitch': signal = Math.sin((coherent ? 3 : u.cubeIdx) * 2.7 + Math.floor(phase * 3) * 1.9) > 0.55 ? 1 : -0.3; break;
+          default: signal = Math.sin(radius * 1.9 - phase);
+        }
+        const layer = coherent ? 0.65 : u.layerIdx / Math.max(1, this.bottomLayersCount - 1);
+        const amplitude = (0.025 + layer * 0.06) * gain * drive;
+        const lift = signal * amplitude;
+        const tilt = coherent ? 0 : signal * (0.03 + layer * 0.07) * gain * drive;
+        cube.position.x += (u.restX + (coherent ? 0 : Math.cos(phase + x) * amplitude * 0.18) - cube.position.x) * blend;
+        cube.position.y += (u.restY + lift - cube.position.y) * blend;
+        cube.position.z += (u.restZ - cube.position.z) * blend;
+        cube.rotation.x += (u.restRx + tilt - cube.rotation.x) * blend;
+        cube.rotation.y += (u.restRy - cube.rotation.y) * blend;
+        cube.rotation.z += (u.restRz - tilt * 0.6 - cube.rotation.z) * blend;
       });
     }
 
@@ -1291,10 +1525,7 @@ export class Three3DGravityLyricsEngine {
             slot.scale.setScalar(u.targetScale);
             slot.position.set(u.targetX, u.targetY, 0);
             slot.rotation.set(0, 0, 0);
-            if (u.charTex) {
-              u.decalMat.map = u.charTex;
-              u.decalMat.needsUpdate = true;
-            }
+            if (u.charTex) this.presentUnit(slot, u.slotIdx, config, true);
             haptic.click('mechanical');
           } else {
             const p = Math.min(1.0, u.magneticProgress);
@@ -1317,13 +1548,13 @@ export class Three3DGravityLyricsEngine {
             slot.scale.setScalar(u.currentScale);
 
             // 正面贴图变形：飞行中段 (p >= 0.45) 翻转为歌词汉字！
-            if (p >= 0.45 && u.charTex && u.decalMat.map !== u.charTex) {
-              u.decalMat.map = u.charTex;
-              u.decalMat.needsUpdate = true;
+            if (p >= 0.45 && u.charTex && u.contentTexture !== u.charTex) {
+              this.presentUnit(slot, u.slotIdx, config, true);
+              this.prunePresentationMaterials();
             }
           }
         }
-      } else if (u.targetScale > 0.5) {
+      } else if (u.targetScale > 0.001) {
         // 已归位稳态：磁吸卡扣完成后严格保持视觉静止，不随低音冲击或唱响进度改变 y
         slot.position.set(u.targetX, u.targetY, 0);
         slot.rotation.set(0, 0, 0);
@@ -1335,6 +1566,8 @@ export class Three3DGravityLyricsEngine {
 
   destroy() {
     this.onLeaveMode();
+    this.bottomTextTextures?.forEach(texture => texture.dispose());
+    this.lyricCubes.forEach(slot => slot.userData.charTex?.dispose());
     if (this.group && this.scene) {
       this.scene.remove(this.group);
       this.cubes.forEach(c => {
@@ -1410,8 +1643,88 @@ export class KineticLyricsManager {
     }
   }
 
+  setTheme(theme) { this.gravityEngine?.setTheme(theme); }
+
+  prepareGravity() {
+    if (this.gravityPreparation) return this.gravityPreparation;
+    if (!this.threeCtx?.scene) return Promise.resolve();
+    this.gravityPreparation = (async () => {
+      this.gravityEngine ||= new Three3DGravityLyricsEngine(this.threeCtx, { activate: false });
+      const { THREE, renderer, scene, camera } = this.threeCtx;
+      if (renderer?.compileAsync) {
+        const warmScene = new THREE.Scene();
+        warmScene.environment = scene.environment;
+        warmScene.fog = scene.fog;
+        warmScene.background = scene.background;
+        scene.traverseVisible(object => {
+          if (object.isLight) warmScene.add(object.clone());
+        });
+        const materials = new Set();
+        const textures = new Set();
+        this.warmMaterials = [];
+        this.gravityEngine.group.traverse(mesh => {
+          if (!mesh.isMesh) return;
+          for (const key of ['map', 'normalMap', 'roughnessMap']) {
+            const texture = mesh.material[key];
+            if (texture && !textures.has(texture)) {
+              textures.add(texture);
+              renderer.initTexture(texture);
+            }
+          }
+          const key = `${mesh.material.userData.family || mesh.material.type}:${mesh.material.side}:${!!mesh.material.map}:${mesh.material.customProgramCacheKey()}`;
+          if (materials.has(key)) return;
+          materials.add(key);
+          const sides = mesh.material.side === THREE.DoubleSide
+            ? [THREE.FrontSide, THREE.BackSide, THREE.DoubleSide] : [mesh.material.side];
+          for (const side of sides) {
+            const material = mesh.material.clone();
+            material.side = side;
+            material.onBeforeCompile = mesh.material.onBeforeCompile;
+            material.customProgramCacheKey = mesh.material.customProgramCacheKey;
+            this.warmMaterials.push(material);
+            const sample = new THREE.Mesh(mesh.geometry, material);
+            sample.castShadow = mesh.castShadow;
+            sample.receiveShadow = mesh.receiveShadow;
+            sample.frustumCulled = false;
+            warmScene.add(sample);
+          }
+        });
+        // Match the composer's linear render target, shadows and transmission passes.
+        const warmTarget = new THREE.WebGLRenderTarget(32, 32, { type: THREE.HalfFloatType });
+        const previousTarget = renderer.getRenderTarget();
+        let compilation;
+        try {
+          renderer.setRenderTarget(warmTarget);
+          compilation = renderer.compileAsync(warmScene, camera);
+        } finally { renderer.setRenderTarget(previousTarget); }
+        await compilation;
+        try {
+          renderer.setRenderTarget(warmTarget);
+          renderer.render(warmScene, camera);
+        } finally {
+          renderer.setRenderTarget(previousTarget);
+          warmTarget.dispose();
+          warmScene.traverse(object => object.shadow?.map?.dispose());
+        }
+      }
+      this.gravityPrepared = true;
+    })().catch(error => {
+      this.gravityPrepared = true;
+      console.warn('Gravity material preparation unavailable:', error);
+    });
+    return this.gravityPreparation;
+  }
+
   setMode(mode, silent = false) {
     if (!['slot', 'gravity', 'off'].includes(mode)) return;
+    if (mode === 'gravity' && this.gravityPreparation && !this.gravityPrepared) {
+      this.pendingMode = mode;
+      this.gravityPreparation.then(() => {
+        if (this.pendingMode === mode) this.setMode(mode, silent);
+      });
+      return this.gravityPreparation;
+    }
+    this.pendingMode = null;
     this.mode = mode;
     try {
       localStorage.setItem('lu_kinetic_lyrics_mode', mode);
@@ -1473,6 +1786,7 @@ export class KineticLyricsManager {
       btn.setAttribute('role', 'radio');
       btn.setAttribute('aria-checked', String(selected));
     });
+    this.threeCtx.onModeChange?.(mode);
 
     if (!silent) {
       haptic.click('mechanical');

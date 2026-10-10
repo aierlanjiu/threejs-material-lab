@@ -9,6 +9,9 @@ try {
     const page = await browser.newPage({ viewport: { width, height: 900 } });
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
+    page.on('console', message => {
+      if (message.type() === 'error' && message.text().includes('Shader Error')) errors.push(message.text());
+    });
     await page.addInitScript(() => {
       const NativeAudioContext = window.AudioContext;
       window.introOscillatorCount = 0;
@@ -45,14 +48,23 @@ try {
       'the static backdrop must not create a second WebGL renderer');
     assert.deepEqual(await page.locator('#luIntroThemeSelect img').evaluateAll(images =>
       images.map(image => image.complete && image.naturalWidth > 0)), [true, true, true],
-      'all three theme cubes need their theme-specific artwork');
-    assert.match(await page.locator('#luIntroThemeSelect [data-theme="dragon-ball"] img').getAttribute('src'), /dragon-ball-shenron\.png$/,
+      'all three theme buttons need their theme-specific artwork');
+    assert.deepEqual(await page.locator('#luIntroThemeSelect img').evaluateAll(images =>
+      images.map(image => new URL(image.src).pathname.split('/').pop())),
+      ['one-piece-straw-compass.png', 'dragon-ball-shenron-cutout.png', 'naruto-leaf-chakra.png']);
+    assert.match(await page.locator('#luIntroThemeSelect [data-theme="dragon-ball"] img').getAttribute('src'), /dragon-ball-shenron-cutout\.png$/,
       'the Dragon Ball selector should show Shenron');
-    assert.match(await page.evaluate(() => getComputedStyle(document.querySelector('#luIntroThemeSelect .lu-theme-cube'), '::after').backgroundImage),
-      /lu-core-emblem\.png/, 'every theme selector should carry its motif inside the prism cube');
-    const shellColors = await page.locator('#luIntroThemeSelect .lu-theme-cube').evaluateAll(cubes =>
-      cubes.map(cube => getComputedStyle(cube, '::after').filter));
-    assert.equal(new Set(shellColors).size, 3, 'each theme cube needs a distinct shell color');
+    assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('#luIntroThemeSelect .lu-theme-art'), '::after').backgroundImage),
+      'none', 'theme artwork should not be framed by the generic cube shell');
+    if (width === 1440) {
+      const button = page.locator('#luIntroThemeSelect [data-theme="one-piece"]');
+      const box = await button.boundingBox();
+      await page.mouse.move(box.x + box.width * .8, box.y + box.height * .3);
+      assert.notEqual(await button.evaluate(element => element.style.getPropertyValue('--tilt-y')), '',
+        'pointer movement should add slight button parallax');
+      await page.mouse.move(0, 0);
+      assert.equal(await button.evaluate(element => element.style.getPropertyValue('--tilt-y')), '');
+    }
     for (const theme of ['dragon-ball', 'naruto']) {
       const themePlate = await page.evaluate(theme => {
         window.luCubeIntro.setTheme(theme);
@@ -67,10 +79,12 @@ try {
     const shell = await page.evaluate(() => ({
       vertices: window.luCubeIntro.shellVertexCount,
       family: window.luCubeIntro.shellMaterialFamily,
+      transmission: window.luCubeIntro.shellTransmission,
       stageFamily: document.querySelector('#material').value
     }));
     assert(shell.vertices > 24, 'the entrance should use a subdivided rounded stage cube shell');
-    assert.equal(shell.family, 'prism', 'the entrance should retain the translucent prism material');
+    assert.equal(shell.family, shell.stageFamily, 'the entrance should use the stage crystal material family');
+    assert(shell.transmission > .8, 'the entrance should retain crystal transmission');
     assert.equal(await page.evaluate(() => window.luCubeIntro.solved), false);
     assert.equal(await page.locator('#luIntroActivate canvas').count(), 1, 'the opening cube needs a real canvas');
     await page.evaluate(() => { window.introCanvas = document.querySelector('#luIntroActivate canvas'); });
@@ -82,10 +96,15 @@ try {
     assert.equal(await page.locator('#luIntroOverlay').isVisible(), false);
     assert.equal(await page.evaluate(() => document.querySelector('.app').inert), false);
     const coreIcon = page.locator('#performanceCapsule .lu-core-mark-fallback img');
-    assert.equal(await coreIcon.isVisible(), true, 'the supplied logo should replace the top-left mini cube');
-    assert.match(await coreIcon.getAttribute('src'), /lu-core-emblem\.png$/);
+    assert.equal(await coreIcon.isVisible(), true, 'the current theme artwork should appear in the top-left control');
+    assert.match(await coreIcon.getAttribute('src'), /one-piece-straw-compass\.png$/);
     assert.equal(await coreIcon.evaluate(image => image.complete && image.naturalWidth > 0), true);
     assert.equal(await page.locator('#performanceCapsule .lu-cube-canvas').count(), 0);
+    assert.equal(await page.locator('.poster-side').count(), 0, 'the poster side labels should be removed');
+    await page.locator('#avatarGroupTabs [data-group="dragon-ball"]').evaluate(button => button.click());
+    assert.match(await coreIcon.getAttribute('src'), /dragon-ball-shenron-cutout\.png$/,
+      'the top-left artwork should follow theme changes');
+    await page.locator('#avatarGroupTabs [data-group="one-piece"]').evaluate(button => button.click());
     assert.equal(await page.evaluate(() => document.activeElement?.id), 'performanceCapsule',
       'keyboard focus should land on the persistent core control');
     assert.equal(await page.evaluate(() => window.introCanvas === document.querySelector('#luIntroActivate canvas')), true,

@@ -53,20 +53,66 @@ try {
   assert.match(dragonBall.introBackground, /lu-intro-d-dragon-ball-portrait\.png/);
 
   await page.locator('#performanceCapsule').click();
+  // 1. 本机环境：已取得的动漫曲目无需手动导入，直接就绪并可播放
   await page.locator('#playlistSelect').selectOption('anime_db_chala');
-  assert.match(await page.locator('#nowPlayingText').innerText(), /导入/,
-    'an empty local song slot should ask for a real file');
-  await page.locator('#audioUpload').setInputFiles({
-    name: 'CHA-LA HEAD-CHA-LA.wav', mimeType: 'audio/wav', buffer: makeToneWav()
+  assert.match(await page.locator('#nowPlayingText').innerText(), /CHA-LA HEAD-CHA-LA/,
+    'local connected track should be ready and playable without manual import');
+
+  // 2. 模拟公开页面/空槽环境（?localAudio=0）：保持公开页面的提示导入行为
+  const publicPage = await context.newPage();
+  await publicPage.goto('http://localhost:8000/index.html?localAudio=0', { waitUntil: 'domcontentloaded' });
+  await publicPage.waitForFunction(() => window.luCubeIntro?.phase === 'waiting');
+  await publicPage.locator('#luIntroThemeSelect [data-theme="dragon-ball"]').click();
+  await publicPage.waitForFunction(() => window.luCubeIntro?.phase === 'complete');
+  await publicPage.locator('#performanceCapsule').click();
+  await publicPage.locator('#playlistSelect').selectOption('anime_db_chala');
+  assert.match(await publicPage.locator('#nowPlayingText').innerText(), /导入/,
+    'an empty local song slot on public page should prompt to import');
+  await publicPage.close();
+
+  // 3. 本机导入与覆盖测试（支持音频与歌词并发上传，不发生竞态，且持久化至 IndexedDB）
+  const lrcBuffer = Buffer.from('[00:00.00]前奏\n[00:04.38]CHA-LA HEAD-CHA-LA 自定义歌词\n', 'utf-8');
+  await page.locator('#audioUpload').setInputFiles([
+    { name: 'CHA-LA HEAD-CHA-LA.wav', mimeType: 'audio/wav', buffer: makeToneWav() },
+    { name: 'CHA-LA HEAD-CHA-LA.lrc', mimeType: 'text/plain', buffer: lrcBuffer }
+  ]);
+  await page.waitForFunction(async () => {
+    const { loadLocalThemeAudio } = await import('./js/audio/local-theme-library.js');
+    const record = (await loadLocalThemeAudio()).find(item => item.type === 'anime_db_chala');
+    return record?.file?.size > 1000 && record?.lyrics?.[1]?.text?.includes('自定义歌词');
   });
-  await page.waitForFunction(() => document.querySelector('#playlistSelect [value="anime_db_chala"]').textContent.includes('已导入'));
   assert.match(await page.locator('#nowPlayingText').innerText(), /CHA-LA HEAD-CHA-LA/);
+  assert.equal(await page.evaluate(() => state.playlist.find(t => t.type === 'anime_db_chala').translatedLyrics), null,
+    'importing a different LRC must clear the previous Chinese translation');
+
+  // 4. 刷新页面验证 IndexedDB 恢复（包括音频与歌词）
   await page.reload({ waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.luCubeIntro?.phase === 'waiting');
-  await page.waitForFunction(() => document.querySelector('#playlistSelect [value="anime_db_chala"]').textContent.includes('已导入'));
+  await page.waitForFunction(() => state.playlist.find(t => t.type === 'anime_db_chala')?.lyrics?.[1]?.text === 'CHA-LA HEAD-CHA-LA 自定义歌词');
+  const restoredLyrics = await page.evaluate(() => state.playlist.find(t => t.type === 'anime_db_chala')?.lyrics);
+  assert.equal(restoredLyrics?.[1]?.text, 'CHA-LA HEAD-CHA-LA 自定义歌词',
+    'user imported custom lyrics should restore across page reload');
   assert.equal(await page.evaluate(() => document.body.dataset.luTheme), 'dragon-ball',
     'the selected theme should persist locally');
 
+  await page.locator('#luIntroSkip').click();
+  await page.locator('#performanceCapsule').click();
+  await page.locator('#playlistSelect').selectOption('anime_db_chala');
+  await page.locator('#lueTabCreate').click();
+  await page.locator('#lrcUpload').setInputFiles({
+    name: 'revised-lyrics.lrc', mimeType: 'text/plain',
+    buffer: Buffer.from('[00:00.00]前奏\n[00:04.38]仅替换歌词\n', 'utf-8')
+  });
+  await page.waitForFunction(() => document.querySelector('#lyricsStatusBadge').textContent.includes('已加载本地 LRC'));
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => window.luCubeIntro?.phase === 'waiting');
+  const preservedAudio = await page.evaluate(async () => {
+    const { loadLocalThemeAudio } = await import('./js/audio/local-theme-library.js');
+    const record = (await loadLocalThemeAudio()).find(item => item.type === 'anime_db_chala');
+    return { bytes: record?.file?.size || 0, lyric: record?.lyrics?.[1]?.text || '' };
+  });
+  assert(preservedAudio.bytes > 1000, 'replacing only LRC must preserve the stored audio file');
+  assert.equal(preservedAudio.lyric, '仅替换歌词');
   await page.locator('#luIntroSkip').click();
   await page.locator('#performanceCapsule').click();
   await page.locator('#lueTabCreate').click();

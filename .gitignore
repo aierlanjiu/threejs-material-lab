@@ -9,6 +9,7 @@ node_modules/
 *.zip
 *.tar
 output/
+test/lu/anime-lyrics-verification.test.js
 .playwright-cli/
 *.before.js
 mouth_crop.png

@@ -208,7 +208,11 @@ body.poster-mode .bottom-dynamic-dock #beatDialIndicator { background: var(--pos
 body.poster-mode .bottom-dynamic-dock output { color: var(--poster-paper); font-variant-numeric: tabular-nums; }
 
 /* Inspector remains a secondary tool, but follows the same local surface language. */
-body.poster-mode .modular-inspector { color: var(--poster-paper); background: #19191f; border-radius: 4px; }
+body.poster-mode .modular-inspector { color: var(--poster-paper); background: #19191f; border-radius: 4px; --muted: #c7bbaa; --text: #ede2cf; --text-graphite: #ede2cf; }
+body.poster-mode .modular-inspector :is(label, .range > span, output) { color: var(--poster-paper); }
+.lu-auto-selection { width: 100%; margin: 4px 0 8px; font-size: 11px; }
+.lu-control-hint { font-size: 12px; line-height: 1.5; color: var(--muted); margin: 8px 0 0; }
+.modular-inspector .pill-btn:disabled { opacity: 0.45; cursor: default; }
 body.poster-mode .inspector-heading,
 body.poster-mode .inspector-tabs { color: var(--poster-paper); background: #222127; border-color: #575157; }
 body.poster-mode .inspector-tab-btn,

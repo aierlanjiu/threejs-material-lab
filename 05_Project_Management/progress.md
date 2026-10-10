@@ -3,12 +3,19 @@
 ## Current State
 
 - 『律』主入口为 `index.html`：3D 物理材质与声波工作台、歌词同步、29 位角色实时表情；页面继续提供桌面与移动端操作。
+- 本地主入口已采用三套透明主题图按钮与同步律核图标；27 块入场魔方复用主场景圆角水晶及贴面，主视图取消两侧文字栏。入场标题与按钮已按主题增强对比度，本机十首主题曲已接入（含 One day），新增歌曲实际播放通过；验证与图片提示词见主题统一报告。
+- 本机机械魔方控件与运镜已修复：手动波形／排布保持，三档、拍数、振幅、内容层级与工艺及光学参数实际生效；滚轮与基础 FOV 平滑同步。真实歌曲、有声录制与桌面／窄屏回归通过；本次尚未发布，实体手机待验。
+- 本机反重力控件已修复并通过播放／录制、主题表情、图片图集、层级工艺与窄屏取景验证；已有八首外文歌词提供中文／原文切换（301 句）。One day 音频已就绪，完整译词待原文／LRC；本次未发布。
 - 『荔』主入口为 `mascot_studio.html`，快捷入口为 `li.html`；『弈律』主入口为 `xiangqi.html`，三者共用当前仓库。
 - 角色来源为用户提供的透明头像。运行资产在 `assets/live-avatars/`，实时渲染模块在 `js/avatar/live.js`，29 张独立 GIF 在本地 `output/live-avatar-gifs/`。
 - 律核单入口四面工作台和此前主视窗、录制修复已同步至 `master` 与 `gh-pages`，Pages 线上入口已更新。
 
 ## Active Assets
 
+- [律的反重力修复与全部要求检查表](Reports/2026-10-10-lu-gravity-controls-full-requirements.md)
+- [律的机械魔方控件、运镜与功能检查表](Reports/2026-10-10-lu-mechanical-controls-camera-fix.md)
+- [律的主题图按钮与入场水晶统一报告](Reports/2026-10-10-lu-theme-art-crystal-unification.md)
+- [律的动漫主题九首歌曲接入、逐行LRC与竞态修复报告](Reports/2026-10-10-lu-anime-theme-music-integration.md)
 - [律的表情魔方入场与律核接续报告](Reports/2026-10-08-lu-expression-cube-intro.md)
 - [律的动漫主题入场与主题素材库报告](Reports/2026-10-10-lu-anime-theme-intro.md)
 - [律核单入口四面工作台接手交付报告](Reports/2026-10-08-lu-core-handoff-completion.md)
@@ -31,6 +38,13 @@
 
 ## Recent Results
 
+- Action: 完成反重力控件、主题过滤、切换预热及窄屏取景，接入 One day 与八首中文译词。Validation: 控件／运镜／歌词与实际 GPU 桌面窄屏、有声 MP4 通过；One day 译词待原文／LRC，实体手机待验。Report: `Reports/2026-10-10-lu-gravity-controls-full-requirements.md`。Agent: codex · 2026-10-10。
+
+- Action: 按「先只修机械魔方」修复控件与自动编排争用、波形／档位／拍数／振幅、空图片与三层三工艺、光学参数及按钮同步；此前已修复运镜／FOV 与反重力主题、录制切换预热。Validation: 机械功能、真实歌曲与九种工艺实际绘制、1440／390／342px 布局、有声 1080×1920 录制、图集及几何回归通过；换阵瞬时轻微穿插与实体手机缺口见报告。Report: `Reports/2026-10-10-lu-mechanical-controls-camera-fix.md`。Agent: codex · 2026-10-10。
+- Action: 调整三主题入场标题、图形周围局部明暗与按钮文字衬底，桌面标题上移；逐首复核本机九首歌曲实际播放。Validation: 六张桌面/手机实景无横向溢出，名称文字最不利衬底对比度为 8.17:1 以上；九首解码、时钟推进、输出波形及歌词加载通过。Report: `Reports/2026-10-10-lu-theme-art-crystal-unification.md`、`Reports/2026-10-10-lu-anime-theme-music-integration.md`。Agent: codex · 2026-10-10。
+- Action: 神龙直接作为入口主体，重做草帽航海与护额查克拉主题图并加入轻微视差；27 块入场复用主场景圆角水晶、六面表面着色，修正切主题旧纹理；移除左右文字栏并同步左上主题图。Validation: 三主题桌面/手机实景、390/1440px 入场与音效、减少动效及 1440/390/342px 工作台布局通过；实体手机待验，本次尚未发布。Report: `Reports/2026-10-10-lu-theme-art-crystal-unification.md`。Agent: codex · 2026-10-10。
+- Action: 独立复核 AGY 九首本机歌曲接入，修复单独上传 LRC 会以空文件覆盖已保存音频的缺陷，并让测试等待音频与歌词真正写入。Validation: 九首文件与歌词时钟、主题库导入和刷新恢复回归通过；全曲逐字听辨仍待人工抽检。Report: `Reports/2026-10-10-lu-anime-theme-music-integration.md`。Agent: codex · 2026-10-10。
+- Action: 本机取得海贼王/龙珠/火影九首动漫完整曲目并配齐逐行匹配LRC；纯器乐曲目规范标注器乐段落；修正音频与LRC并发上传竞态并支持IndexedDB歌词持久化；曲目存放于Git忽略的output/audio/，保留公开页面手动导入与降级。Validation: 9/9 物理文件与浏览器端到端时点验证（前奏/主歌/副歌）、主题库回归、WAV+LRC竞态测试及刷新恢复全部通过；纯器乐无编造歌词。Report: `Reports/2026-10-10-lu-anime-theme-music-integration.md`。Agent: AGY · 2026-10-10。
 - Action: 仅提取用户参考图的雕塑与反光材质，重做海青航海、翡翠神龙与纸面忍具三套双画幅背景；三个入口 cube 与中央实时魔方分别适配主题色，龙珠入口加入神龙。Validation: 三主题手机与桌面实景、390/1440px 入场和主题曲库回归通过；实体手机待验。Report: `Reports/2026-10-10-lu-anime-theme-intro.md`。Agent: codex · 2026-10-10。
 - Action: 按主题隔离角色、壁纸和曲库；补充龙珠／火影各五组竖横壁纸，增加每主题三首本机歌曲槽位与浏览器内保存；修复手机工作台遮挡。Validation: 主题切换、本机 WAV 导入及刷新恢复通过；原版音频未加入公开仓库。Report: `Reports/2026-10-10-lu-anime-theme-intro.md`。Agent: codex · 2026-10-10。
 - Action: 将律的魔方转层电子短音换为三段 CC0 真实魔方录音，按旋转时长播放齿位与落锁声；保留静音和素材失败降级。Validation: 390/1440px 与减少动效回归通过，三段录音解码及九次物理声音触发得到浏览器验证。Report: `Reports/2026-10-08-lu-expression-cube-intro.md`。Agent: codex · 2026-10-09。

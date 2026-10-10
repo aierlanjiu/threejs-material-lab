@@ -23,6 +23,7 @@ try {
     window.luDiagnostics.composer.render = () => {};
     const enhanced = window.parseLrcString('[00:01.00]<00:01.00>你<00:01.30>好');
     state.lyricOffsetMs = 0;
+    state.lyricLanguage = 'original';
     const tracks = window.luDiagnostics.lyricTracks;
     let inspected = 0;
     const failures = [];
@@ -35,7 +36,7 @@ try {
         const next = lines[lineIndex + 1];
         const at = line.time + Math.min(0.05, next ? (next.time - line.time) / 2 : 0.05);
         const context = window.getSynchronizedLyricContext(at);
-        if (context.activeText !== line.text || context.lineKey !== `${title}:${lineIndex}`) {
+        if (context.activeText !== line.text || context.lineKey !== `${title}:${state.lyricLanguage}:${lineIndex}`) {
           failures.push(`${title} @${at}: ${context.activeText}`);
         }
         if (context.characterCursor < 0 || context.characterCursor > [...line.text].filter(char => char.trim()).length) {
@@ -72,7 +73,10 @@ try {
     const seekBackSung = document.querySelectorAll('.cube-slot.char-sung').length;
     state.currentTrackIndex = synthetic;
     state.songTitle = state.playlist[synthetic].title;
+    state.camMotionMode = 'off'; state.enableDynamicFov = false;
     manager.setMode('gravity');
+    let frameTime = performance.now();
+    for (let i = 0; i < 60; i++) window.__luFrame(frameTime += 50);
     manager.update({ ...context, beatPeriod: 0.5, bassEnergy: 0, isKick: false, dt: 0.016 });
     const gravityCount = manager.gravityEngine.lyricCubes.filter(cube => cube.userData.targetScale > 0.5).length;
     const sungCount = () => manager.gravityEngine.lyricCubes.filter(cube => cube.userData.targetScale > 0.5 && cube.userData.sung).length;
@@ -85,12 +89,12 @@ try {
     const camera = window.luDiagnostics.camera;
     const before = { fov: camera.fov, x: camera.position.x, y: camera.position.y, z: camera.position.z };
     state.gridCols = 6; state.gridRows = 6; window.rebuildMatrix();
-    window.__luFrame(performance.now() + 16);
+    window.__luFrame(frameTime += 16);
     const after = { fov: camera.fov, x: camera.position.x, y: camera.position.y, z: camera.position.z };
     const nextContext = window.getSynchronizedLyricContext(12.1);
     manager.update({ ...nextContext, beatPeriod: 0.5, bassEnergy: 0, isKick: false, dt: 0.016 });
     window.rebuildMatrix();
-    window.__luFrame(performance.now() + 32);
+    window.__luFrame(frameTime += 16);
     const afterLine = { fov: camera.fov, x: camera.position.x, y: camera.position.y, z: camera.position.z };
     return { enhanced, inspected, failures, slotCount, gravityCount, expectedCount: [...context.activeText].filter(char => char.trim()).length,
       earlySung, lateSung, seekBackSung, earlyCursor: early.characterCursor, lateCursor: late.characterCursor,
