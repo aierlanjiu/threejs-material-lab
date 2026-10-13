@@ -18,6 +18,7 @@ export async function createBandController({stage,state,getTime,getLyric=()=>'',
  const clock=()=>demo?(demoPlaying?Math.min(32,demoOffset+(performance.now()-demoOrigin)/1000):demoOffset):getTime();
  const controls=createBandControls($('bandArrangementControls'),{settings,getTheme:()=>state.theme,getScore:currentScore,
   onChange:(_,options)=>{if(options.rebuildParts)rebuildParts();frame();},onFocus:id=>{focus=id;frame();}});
+ scene.canvas.addEventListener('band-member-select',event=>controls.setFocus(event.detail));
  function rebuildParts(){parts=compileBandParts(currentScore(),state.theme,settings.overrides);partScore=bandPartScore(currentScore(),parts);controls.setParts(parts);}
  async function syncTrack(){
   const track=state.playlist[state.currentTrackIndex],key=`${track?.type}|${track?.src||''}`;if(key===sourceKey)return;

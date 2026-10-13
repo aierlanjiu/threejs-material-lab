@@ -9438,6 +9438,7 @@ function createBandCube(texture) {
 }
 const bandCubeDesign = {
   createCube:createBandCube, environmentScene:neutralEnvScene,
+  createStageMaterial:()=>createMaterialPreset('prism','#dae3ed'),
   getKey:()=>JSON.stringify([ui.material.value,ui.color.value,ui.bevelRadius.value,ui.roughness.value,
     ui.ior.value,ui.thickness.value,ui.transmission.value,ui.dispersion.value,ui.envIntensity.value,
     state.layerMode,state.adhesionCraft,[...state.manualOptics]])

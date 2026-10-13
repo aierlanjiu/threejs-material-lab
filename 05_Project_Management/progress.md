@@ -2,6 +2,7 @@
 
 ## Current State
 
+- 本地 `feat/band-prism-pet-stage` 已接入 29 个完整演奏 pet、半圆／直角棱镜舞台和高潮点缀；浏览器及有声双画幅通过，未发布，实体手机待验。
 - 乐队 V2 视觉升级与全量音乐已同步部署至 Pages：背景柔焦与对比度调谐、休止成员可见度提升（0.90/0.84）、演奏与主奏聚光灯与脚下光环增强、五官不过曝；全量 10 首主题音乐及 LRC 歌词、分谱 JSON/MIDI/MusicXML 接入并部署；全站加入双语版权与非商业免责声明（DISCLAIMER.md）。
 - 『律』主入口为 `index.html`：3D 物理材质与声波工作台、歌词同步、29 位角色实时表情；页面继续提供桌面与移动端操作。
 - 本地主入口已采用三套透明主题图按钮与同步律核图标；27 块入场魔方复用主场景圆角水晶及贴面，主视图取消两侧文字栏。入场标题与按钮已按主题增强对比度，本机十首主题曲已接入（含 One day），新增歌曲实际播放通过；验证与图片提示词见主题统一报告。
@@ -13,6 +14,7 @@
 
 ## Active Assets
 
+- [律的演奏 pet 与棱镜舞台实现](Reports/2026-10-13-lu-pet-stage-implementation.md)；预览 `http://127.0.0.1:8000/band-study.html`，有声样片在 `output/lu-band/pet-stage-validation/`。
 - [律的乐队 V2、全量音乐与免责声明 Pages 发布报告](Reports/2026-10-13-lu-band-v2-pages-release.md)
 - [律的乐队 V2：全员、独立动作、自由编排与双画幅验收](Reports/2026-10-13-lu-band-v2.md)；入口「演出 → 乐队」，本机最终样片为 `output/lu-band/v2-landscape-final.mp4` 与 `v2-portrait-final.mp4`。
 - [律的乐队演出、桌面立方体修订与真实歌曲验证](Reports/2026-10-13-lu-band-performance.md)；预览 `http://localhost:8000/band-study.html`；音轨／谱面及视频在本机 `output/lu-band/`。
@@ -44,6 +46,7 @@
 
 ## Recent Results
 
+- Action: 按已批准图片稿接入 29 个 pet／116 帧、双画幅棱镜舞台与三主题布景、高潮气泡／烟花。Validation: 三主题实景、播放／暂停／跳转、主入口与有声横竖录制通过（48.52／49.25 fps）；未发布，实体手机待验。Report: `Reports/2026-10-13-lu-pet-stage-implementation.md`。Agent: codex · 2026-10-13。
 - Action: 完成乐队 V2 视觉升级（背景柔焦、休止成员透光保真、主奏聚光灯/边光与舞台光环增强）、全量 10 首主题歌曲与声部谱面加入版本库、双语免责声明与弹窗交付，并部署至 GitHub Pages。Validation: 单元/时间轴测试、Playwright 控件回归、静态语法检查全数通过。Report: `Reports/2026-10-13-lu-band-v2-pages-release.md`。Agent: Antigravity (Gemini 3.8 Flash High) · 2026-10-13。
 - Action: 按已确认 V2 方案完成同级模式、29 人全员、材质状态、五队形、独立动作与全队／成员参数；修复窄窗口横屏录制谱窗和成片取景。Validation: 实际模式切换、1280／390px 五队形、九人阵列、跳转一致性、十曲时间轴、有声 1920×1080／1080×1920 MP4 通过；Astra 实景复核无交付阻碍，实体手机／人工校谱待验。Report: `Reports/2026-10-13-lu-band-v2.md`。Agent: codex · 2026-10-13。
 - Action: 完成五人乐队、三种追光、十曲音轨／谱面与正式播放组装；按用户反馈收紧桌面镜头并复用主舞台立方体工厂，修复本地声部试听跳转。Validation: 十曲源哈希、40 类音轨时长、MIDI／XML 与时间轴测试、桌面／390px 实景和有声横竖屏 MP4 通过；自动谱面／实体手机待人工验。Report: `Reports/2026-10-13-lu-band-performance.md`。Agent: codex · 2026-10-13。

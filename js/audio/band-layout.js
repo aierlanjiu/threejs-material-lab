@@ -1,5 +1,5 @@
 export const BAND_FORMATIONS=Object.freeze([
- ['arc','弧形合奏'],['terrace','错层阶梯'],['ring','声部环阵'],['wings','双翼对答'],['solo','独奏前台']
+ ['arc','弧形合奏'],['terrace','错层阶梯'],['ring','声部弧阵'],['wings','双翼对答'],['solo','独奏前台']
 ].map(([id,label])=>Object.freeze({id,label})));
 const clamp=(x,min=0,max=1)=>Math.max(min,Math.min(max,x));
 export const bandEase=x=>{x=clamp(x);return x*x*(3-2*x);};

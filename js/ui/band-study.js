@@ -62,6 +62,7 @@ try{
  scene=await createBandScene($('bandStudyScene'),{safeTop:130,safeBottom:48});scene.setActive(true);await scene.configure(theme);
  controls=createBandControls($('bandStudyControls'),{settings,getTheme:()=>theme,getScore:()=>score,storageKey:'lu_band_study_v2',
   onChange:(_,options)=>{if(options.rebuildParts)rebuildParts();draw();},onFocus:id=>{focus=id;draw();}});
+ scene.canvas.addEventListener('band-member-select',event=>controls.setFocus(event.detail));
  rebuildParts();await loadTracks();$('bandListen').disabled=true;draw();requestAnimationFrame(tick);
  window.luBandStudy={get diagnostics(){return {...scene.diagnostics,time:clock(),playing,focus,source:score.source,trackId:score.trackId,audioSourceUrl,settings,parts:parts.map(p=>({id:p.id,stem:p.stemId,events:p.events.length,shared:p.shared}))};}};
  window.addEventListener('pagehide',()=>{scene.dispose();if(audioObjectUrl)URL.revokeObjectURL(audioObjectUrl);},{once:true});

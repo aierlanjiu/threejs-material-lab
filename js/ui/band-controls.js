@@ -7,13 +7,14 @@ export function createBandControls(host,{settings,getTheme,getScore,onChange,onF
  host.innerHTML=`<div class="lu-band-controls band-quick-controls">
   <label>队形<select data-control="formation" aria-label="乐队队形"><option value="auto">自动编排</option></select></label>
   <label>灯光<select data-control="lightMode" aria-label="乐队聚光调度"><option value="follow">单灯主奏</option><option value="move">人入光 · 追光</option><option value="multi">多灯合奏</option></select></label>
+  <label>高潮点缀<select data-control="effects" aria-label="高潮点缀"><option value="auto">随音乐</option><option value="off">关闭</option><option value="preview">预览气泡与烟花</option></select></label>
   <a href="./band-study.html">独立预览 ↗</a></div>
  <div class="lu-band-members" data-members aria-label="乐队成员视觉聚焦"></div>
  <p class="lu-band-detail" data-part-detail></p>
- <details class="band-adjustments"><summary>组合与动作 <span data-adjustment-summary>舞台合奏</span></summary>
+ <details class="band-adjustments"><summary>角色与动作 <span data-adjustment-summary>舞台合奏</span></summary>
   <div class="lu-band-controls"><label>调整对象<select data-control="target" aria-label="乐队调整对象"><option value="">全队</option></select></label>
    <label>组合预设<select data-control="preset" aria-label="乐队组合预设"></select></label>
-   <label><input type="checkbox" data-control="contrast">演奏与休止材质对比</label></div>
+   <label><input type="checkbox" data-control="contrast">突出正在演奏</label></div>
   <div class="band-parameter-grid" data-fields></div>
   <div class="lu-band-controls" data-source-controls><label>音轨来源<select data-control="stem" aria-label="成员音轨来源"></select></label>
    <label>奏法<select data-control="technique" aria-label="成员奏法"><option value="">按乐器</option></select></label></div>
@@ -36,7 +37,7 @@ export function createBandControls(host,{settings,getTheme,getScore,onChange,onF
   const values=target?settingsForMember(settings,target):settings;
   for(const f of BAND_FIELDS){const input=host.querySelector(`[data-field="${f.id}"]`);input.value=values[f.id];
    input.nextElementSibling.textContent=f.id.includes('Rotation')?`${values[f.id]}°`:f.id==='gap'?`${values[f.id].toFixed(2)}D`:`${values[f.id].toFixed(2)}×`;}
-  for(const key of ['formation','lightMode','preset'])find(key).value=settings[key];find('contrast').checked=settings.contrast;find('target').value=target;
+  for(const key of ['formation','lightMode','effects','preset'])find(key).value=settings[key];find('contrast').checked=settings.contrast;find('target').value=target;
   const custom=settings.overrides[target]||{};find('stem').value=custom.stem||'';find('technique').value=custom.technique||'';
   host.querySelector('[data-source-controls]').hidden=!target;
   host.querySelector('[data-action="reset"]').textContent=target?'还原此成员':'还原全队预设';
@@ -70,7 +71,7 @@ export function createBandControls(host,{settings,getTheme,getScore,onChange,onF
  }
  membersHost.addEventListener('click',event=>{const button=event.target.closest('button[data-member]');if(button&&!disabled)setFocus(button.dataset.member);});
  find('target').addEventListener('change',()=>setFocus(find('target').value));
- for(const key of ['formation','lightMode','contrast'])find(key).addEventListener('change',()=>{settings[key]=key==='contrast'?find(key).checked:find(key).value;changed();});
+ for(const key of ['formation','lightMode','effects','contrast'])find(key).addEventListener('change',()=>{settings[key]=key==='contrast'?find(key).checked:find(key).value;changed();});
  find('preset').addEventListener('change',()=>{settings.preset=find('preset').value;Object.assign(settings,BAND_PRESETS[settings.preset]);changed();});
  for(const key of ['stem','technique'])find(key).addEventListener('change',()=>{if(!target)return;settings.overrides[target]||={};const value=find(key).value;if(value)settings.overrides[target][key]=value;else delete settings.overrides[target][key];changed(true);});
  host.querySelector('[data-fields]').addEventListener('input',event=>{const id=event.target.dataset.field;if(!id)return;
