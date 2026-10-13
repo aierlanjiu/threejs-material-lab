@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>律 · 乐器设计预览</title>
+  <link rel="stylesheet" href="./css/lu-instrument-study.css">
+</head>
+<body>
+  <main class="study">
+    <header class="study-heading"><div><a href="./index.html?intro=skip">← 返回律</a><h1>角色专属乐器</h1><p id="studyScaleCaption">乐器设计预览 · 主晶体与 40% 伴生晶体</p></div><span class="study-phase">视觉设计 / 01</span></header>
+    <div class="study-toolbar">
+    <nav class="study-themes" aria-label="动漫主题">
+      <button type="button" data-theme="one-piece" aria-pressed="true">海贼王</button>
+      <button type="button" data-theme="dragon-ball" aria-pressed="false">龙珠</button>
+      <button type="button" data-theme="naruto" aria-pressed="false">火影忍者</button>
+    </nav>
+    <nav class="study-layouts" aria-label="晶体构图">
+      <button type="button" data-mode="mechanical" aria-pressed="true">机械 · 伴生</button>
+      <button type="button" data-mode="gravity" aria-pressed="false">反重力 · 等大</button>
+    </nav>
+    </div>
+    <section class="study-stage" aria-label="角色与乐器水晶配对预览">
+      <div id="studyScene"></div><p id="studyFallback" hidden>水晶预览暂不可用，仍可在下方查看角色与乐器素材。</p>
+      <div id="studyPairLabels" class="study-pair-labels"></div>
+    </section>
+    <section class="study-score" aria-label="乐谱排版示例"><div><strong id="studyScoreTitle">乐谱排版</strong><span>演示谱 · 非当前歌曲</span></div><canvas id="studyScoreCanvas" role="img" aria-label="乐谱排版示例"></canvas></section>
+    <section class="study-assets" aria-labelledby="studyAssetsHeading"><div class="study-assets-heading"><h2 id="studyAssetsHeading">专属乐器素材</h2><span id="studyCount"></span></div><p>选择角色查看配对与谱面造型。真实声部和乐谱将在音频分析后接入。</p><div id="studyAssetGrid" class="study-asset-grid"></div></section>
+  </main>
+  <script type="module" src="./js/ui/instrument-study.js"></script>
+</body></html>

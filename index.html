@@ -2341,6 +2341,7 @@ body.immersive .stage-hud-right { top: max(12px, env(safe-area-inset-top)); righ
         <div class="brand-title">
           <span>『 律 』LÜ</span>
           <span class="brand-tag">3D RESONANCE</span>
+          <button type="button" class="btn btn-sm lu-disclaimer-btn" id="openDisclaimerBtn" title="查看项目非商业研究及版权免责声明" style="font-size:10px; padding:1px 6px; opacity:0.8; border-radius:10px; margin-left:6px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:inherit; cursor:pointer;">免责声明</button>
         </div>
         <div class="brand-sub">物理材质 / 声波矩阵 / 动效母带工作台</div>
       </div>
@@ -2355,6 +2356,8 @@ body.immersive .stage-hud-right { top: max(12px, env(safe-area-inset-top)); righ
       <span class="performance-capsule-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
       <span class="performance-capsule-cue" aria-hidden="true">▾</span>
     </button>
+
+    <button type="button" class="btn btn-sm lu-disclaimer-pill" id="topDisclaimerBtn" title="查看项目非商业研究及版权免责声明" style="font-size:11px; padding:4px 9px; opacity:0.8; border-radius:14px; background:rgba(255,255,255,0.06); border:1px solid var(--poster-rule,#6a625e); color:var(--poster-paper,#ede2cf); cursor:pointer; flex:0 0 auto;">免责声明</button>
 
     <!-- 律核四面展开工作台 (LÜ Core Expanded Workbench) -->
     <div class="lue-core-drawer" id="lueCoreDrawer" role="region" aria-label="律核工作台" hidden>
@@ -2459,6 +2462,7 @@ body.immersive .stage-hud-right { top: max(12px, env(safe-area-inset-top)); righ
               </button>
               <input type="file" id="audioUpload" accept="audio/*" multiple>
             </div>
+            <button type="button" class="btn btn-sm" id="hudDisclaimerBtn" title="版权与非商业免责声明" style="font-size:11px;opacity:0.8;padding:4px 8px;">声明</button>
           </div>
         </div>
 
@@ -2466,7 +2470,7 @@ body.immersive .stage-hud-right { top: max(12px, env(safe-area-inset-top)); righ
         <div class="lue-facet-panel" id="lueFacetChoreo" role="tabpanel" aria-labelledby="lueTabChoreo" hidden>
           <div class="lue-choreo-container">
             <div class="lue-choreo-header">
-              <div class="kinetic-mode-switcher" id="kineticModeSwitcher" role="radiogroup" aria-label="灵动歌词模式">
+              <div class="kinetic-mode-switcher" id="kineticModeSwitcher" role="radiogroup" aria-label="演出模式">
                 <button type="button" class="kinetic-mode-btn active" data-mode="slot" title="Daniel White 机械魔方 3D 轴心翻转模式">
                   <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                   机械魔方
@@ -2474,6 +2478,9 @@ body.immersive .stage-hud-right { top: max(12px, env(safe-area-inset-top)); righ
                 <button type="button" class="kinetic-mode-btn" data-mode="gravity" title="aaayandev 物理重力沙盒与反重力升空模式">
                   <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v6l4 2"></path></svg>
                   物理反重力
+                </button>
+                <button type="button" class="kinetic-mode-btn" data-mode="band" title="角色与专属乐器共同演奏">
+                  <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13M9 8l12-2"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>乐队
                 </button>
                 <button type="button" class="kinetic-mode-btn" data-mode="off" title="隐藏灵动歌词">
                   关闭
@@ -2493,6 +2500,17 @@ body.immersive .stage-hud-right { top: max(12px, env(safe-area-inset-top)); righ
               </div>
             </div>
 
+            <select id="bandStageSelect" aria-label="演出舞台" hidden><option value="matrix">阵列</option><option value="band">乐队</option></select>
+            <div id="bandControlsExtra" class="lu-band-control-extra" hidden>
+              <div id="bandArrangementControls"></div>
+              <div class="lu-band-controls"><button type="button" id="bandDemoStart">开始编排演示</button><button type="button" id="bandDemoExit">回到当前歌曲</button></div>
+            </div>
+            <div class="lu-score-controls">
+              <label><input type="checkbox" id="scoreVisibleToggle" checked>显示乐谱</label>
+              <label for="scoreRoleSelect">角色<select id="scoreRoleSelect" aria-label="乐谱角色"></select></label>
+              <label><input type="checkbox" id="scoreDemoToggle">演示谱 · 非当前歌曲</label>
+              <a id="instrumentStudyLink" href="./instrument-study.html">乐器设计预览 ↗</a>
+            </div>
             <!-- 底部 Dynamic Flow Dock (六个波形样本板、三张运动样本卡、节拍旋钮视觉、振幅精度轨) -->
             <nav class="bottom-dynamic-dock" id="workbenchDock" aria-label="调律工作台">
               <!-- 六个波形样本板 -->
@@ -3081,6 +3099,7 @@ BEAT</textarea>
               <div class="pill-group" id="kineticEngineModeGroup">
                 <button class="pill-btn active" data-kmode="slot">3D机械魔方</button>
                 <button class="pill-btn" data-kmode="gravity">物理反重力</button>
+                <button class="pill-btn" data-kmode="band">乐队</button>
                 <button class="pill-btn" data-kmode="off">隐藏关闭</button>
               </div>
             </div>
@@ -3307,6 +3326,28 @@ BEAT</textarea>
     </div>
   </div>
 </div>
+
+<!-- 免责声明模态弹窗 -->
+<div class="modal-backdrop" id="disclaimerModal" style="display:none; z-index:9999;">
+  <div class="modal-card" style="max-width:540px; max-height:85vh; overflow-y:auto; line-height:1.6; font-size:13px; color:var(--text,#ede2cf);">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px; margin-bottom:12px;">
+      <h3 style="font-size:15px; font-weight:700; margin:0; display:flex; align-items:center; gap:8px;">
+        <svg class="svg-icon" viewBox="0 0 24 24" style="width:18px;height:18px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        免责声明 · 版权与非商业研究说明
+      </h3>
+      <button id="disclaimerClose" style="background:transparent; border:none; color:var(--muted,#9aa0aa); cursor:pointer; font-size:20px; padding:0 4px;">✕</button>
+    </div>
+    <div class="disclaimer-content" style="color:#dcd6cb;">
+      <p style="margin-top:0;"><strong>1. 项目性质</strong><br>本项目（『 律 』LÜ / Three.js Material Lab）为个人非商业性质的 WebGL 3D 物理材质、音频流实时分析与动效呈现技术探索项目，旨在展示前端图形学与音频驱动视觉的交互实验。</p>
+      <p><strong>2. 知识产权与版权归属</strong><br>站内所包含的所有动漫主题歌曲、原声音频片段、歌词原文与翻译、以及角色艺术设计等视听素材，其著作权与全部知识产权均归属于原作者、词曲创作者、唱片公司、出品委员会及动画制作方（包括但不限于东映动画、集英社、Pierrot、avex、Aniplex、Sony Music 等权利人）所有。</p>
+      <p><strong>3. 严格禁止商业用途</strong><br>本项目代码与页面严禁用于任何形式的商业盈利、广告宣传或收费分发活动。所有音频及视觉资源仅供技术学习、代码交流与学术研究目的合理使用。</p>
+      <p style="margin-bottom:0;"><strong>4. 权利人联络与即刻下架</strong><br>如权利方或版权持有机构认为本项目内容存在侵权，请联系维护者（通过 GitHub Issue 或代码仓库），我们将在第一时间核实并进行下架、删除或替换处理。</p>
+    </div>
+    <div style="display:flex; justify-content:flex-end; margin-top:16px; border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;">
+      <button class="btn active" id="disclaimerConfirm" style="padding:6px 18px;">我知道了</button>
+    </div>
+  </div>
+</div>
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.166.1/+esm';
 import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/controls/OrbitControls.js/+esm';
@@ -3319,6 +3360,9 @@ import { OutputPass } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examples/
 import { motionRise, motionLeave, motionTabSwitch, motionToast, motionTextMorph, haptic } from './js/ui/motion-adapter.js';
 import { KineticLyricsManager } from './js/ui/kinetic-lyrics.js?v=20261006-motion';
 import { VIDEO_PRESETS, drawPerformanceFrame } from './js/ui/recording-compositor.js';
+import { createBandController } from './js/ui/band-controller.js';
+import { applySurfaceContent } from './js/ui/cube-surface.js';
+let bandController = null;
 import { lyricCharacters, characterCues, characterCursorAt } from './js/ui/lyric-timing.js';
 import { AVATAR_MANIFEST } from './assets/live-avatars/manifest.js';
 import { createLuCubeIntro } from './js/ui/lu-cube-intro.js';
@@ -4882,79 +4926,6 @@ function createConformalDecalGeometry(w, h, cornerRadius, isMosaic, u0, u1, v0, 
 }
 
 // 3D 晶体多维融合材质 (具备物理光照响应、清漆微高光、沉金微浮雕与全息激光体核视差)
-function applySurfaceContent(material, texture, craft, scale, bounds) {
-  // Content is shaded on the actual cube: shared silhouette, normals, lighting and depth.
-  const faces = Array.isArray(texture);
-  const inkFragment = faces ? `
-      vec2 inkUV; vec4 ink; float faceNormal;
-      if(abs(vLuNormal.x)>abs(vLuNormal.y)&&abs(vLuNormal.x)>abs(vLuNormal.z)) {
-        inkUV=vec2(vLuNormal.x>0.0?-vLuPosition.z:vLuPosition.z,vLuPosition.y)/luInkScale+0.5;
-        ink=vLuNormal.x>0.0?texture2D(luInkPX,inkUV):texture2D(luInkNX,inkUV);
-        faceNormal=abs(vLuNormal.x);
-      } else if(abs(vLuNormal.y)>abs(vLuNormal.z)) {
-        inkUV=vec2(vLuPosition.x,vLuNormal.y>0.0?-vLuPosition.z:vLuPosition.z)/luInkScale+0.5;
-        ink=vLuNormal.y>0.0?texture2D(luInkPY,inkUV):texture2D(luInkNY,inkUV);
-        faceNormal=abs(vLuNormal.y);
-      } else {
-        inkUV=vec2(vLuNormal.z>0.0?vLuPosition.x:-vLuPosition.x,vLuPosition.y)/luInkScale+0.5;
-        ink=vLuNormal.z>0.0?texture2D(luInkPZ,inkUV):texture2D(luInkNZ,inkUV);
-        faceNormal=abs(vLuNormal.z);
-      }
-      float inkMask=step(0.0,inkUV.x)*step(inkUV.x,1.0)*step(0.0,inkUV.y)*step(inkUV.y,1.0);
-      float inkCoverage=ink.a*inkMask*smoothstep(0.75,0.98,faceNormal);` : `
-      vec2 inkUV=vLuPosition.xy/luInkScale+0.5;
-      if(vLuNormal.z<0.0) inkUV.x=1.0-inkUV.x;
-      float inkMask=step(0.0,inkUV.x)*step(inkUV.x,1.0)*step(0.0,inkUV.y)*step(inkUV.y,1.0);
-      inkUV=mix(luInkBounds.xz,luInkBounds.yw,inkUV);
-      vec4 ink=texture2D(luInkMap,inkUV);
-      float inkCoverage=ink.a*inkMask*smoothstep(0.75,0.98,vLuNormal.z);`;
-  material.userData.surfaceTexture=texture;
-  const bindInkUniforms = uniforms => {
-    if(faces) ['PX','NX','PY','NY','PZ','NZ'].forEach((face,index)=>{
-      const name=`luInk${face}`;
-      if(uniforms[name]) uniforms[name].value=texture[index];
-      else uniforms[name]={value:texture[index]};
-    });
-    else if(uniforms.luInkMap) uniforms.luInkMap.value=texture;
-    else uniforms.luInkMap={value:texture};
-  };
-  if(material.userData.surfaceUniforms) bindInkUniforms(material.userData.surfaceUniforms);
-  material.customProgramCacheKey=()=>`lu-surface-v2-${craft}-${faces?'six':'front'}`;
-  material.onBeforeCompile=shader=>{
-    bindInkUniforms(shader.uniforms);
-    material.userData.surfaceUniforms=Object.fromEntries(
-      Object.entries(shader.uniforms).filter(([name])=>name.startsWith('luInk')));
-    shader.uniforms.luInkScale={value:scale};
-    shader.uniforms.luInkBounds={value:new THREE.Vector4(...bounds)};
-    shader.vertexShader=shader.vertexShader.replace('#include <common>',`#include <common>
-      varying vec3 vLuPosition; varying vec3 vLuNormal;`)
-      .replace('#include <begin_vertex>',`#include <begin_vertex>
-      vLuPosition=position; vLuNormal=normal;`);
-    shader.fragmentShader=shader.fragmentShader.replace('#include <common>',`#include <common>
-      ${faces?'uniform sampler2D luInkPX,luInkNX,luInkPY,luInkNY,luInkPZ,luInkNZ;':'uniform sampler2D luInkMap;'}
-      uniform float luInkScale; uniform vec4 luInkBounds;
-      varying vec3 vLuPosition; varying vec3 vLuNormal;`)
-      .replace('#include <map_fragment>',`#include <map_fragment>
-      ${inkFragment}
-      ${craft==='hologram'?`vec3 holoView=normalize(vViewPosition);
-      float holoPhase=(vLuPosition.x+vLuPosition.y)*32.0+holoView.x*8.0+holoView.y*5.0;
-      ink.rgb=mix(ink.rgb,0.5+0.5*cos(vec3(0.0,2.1,4.2)+holoPhase),0.55);`:''}
-      diffuseColor.rgb=mix(diffuseColor.rgb,ink.rgb,inkCoverage);
-      diffuseColor.a=mix(diffuseColor.a,1.0,inkCoverage);`)
-      .replace('#include <emissivemap_fragment>',`#include <emissivemap_fragment>
-      totalEmissiveRadiance+=ink.rgb*inkCoverage*${craft==='hologram'?'0.48':'0.12'};`)
-      .replace('#include <roughnessmap_fragment>',`#include <roughnessmap_fragment>
-      roughnessFactor=mix(roughnessFactor,${craft==='emboss'?'0.48':'0.24'},inkCoverage);`)
-      .replace('#include <metalnessmap_fragment>',`#include <metalnessmap_fragment>
-      metalnessFactor*=1.0-inkCoverage*0.92;`)
-      .replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
-      ${craft==='emboss'?'normal=normalize(normal-vec3(dFdx(inkCoverage),dFdy(inkCoverage),0.0)*0.12);':''}`)
-      .replace('#include <transmission_fragment>',THREE.ShaderChunk.transmission_fragment.replace(
-        'material.transmission = transmission;',
-        'material.transmission = transmission * (1.0 - inkCoverage * 0.96);'));
-  };
-  material.needsUpdate=true;
-}
 
 function finishDecalCraft(material, craft) {
   material.customProgramCacheKey = () => `lu-decal-${craft}`;
@@ -5409,7 +5380,7 @@ function commitMatrixRebuild() {
     ? `${compactPhase} · ${specText} · ${placedCount}项`
     : fullStatus;
   statusText.title = fullStatus;
-  $('#movementBadge').textContent = kineticLyricsManager.mode === 'gravity'
+  $('#movementBadge').textContent = kineticLyricsManager.mode === 'band' ? '乐队 · 自动编配' : kineticLyricsManager.mode === 'gravity'
     ? `山体共振 · ${state.beatCount % 4 + 1}/4`
     : `${FORMATION_LABELS[state.activeFormation]} · ${state.beatCount % 4 + 1}/4`;
   syncContentPresentationControls();
@@ -5893,7 +5864,7 @@ async function toggleScreenRecording() {
     recordingPreparation = true;
     try { await kineticLyricsManager.prepareGravity(); }
     finally { recordingPreparation = false; }
-    const sceneCanvas = stage.querySelector('canvas');
+    const sceneCanvas = bandController?.enabled ? bandController.canvas : stage.querySelector('canvas');
     const outputCanvas = $('#recordingPreviewCanvas');
     const outputContext = outputCanvas?.getContext('2d', { alpha: false });
     if (!sceneCanvas || !outputContext || typeof MediaRecorder === 'undefined') {
@@ -5904,7 +5875,8 @@ async function toggleScreenRecording() {
     const preset = VIDEO_PRESETS[state.videoAspect] || VIDEO_PRESETS.landscape;
     outputCanvas.width = preset.width;
     outputCanvas.height = preset.height;
-    drawPerformanceFrame(outputContext, sceneCanvas, stageWrapEl, kineticLyricsManager.mode);
+    if (bandController?.enabled) bandController.drawRecording(outputContext);
+    else drawPerformanceFrame(outputContext, sceneCanvas, stageWrapEl, kineticLyricsManager.mode);
     let stream;
     try { stream = outputCanvas.captureStream(60); }
     catch (error) { console.error('Video capture unavailable:', error); showToast('视频画布无法录制'); setRecordUiState('error'); return; }
@@ -5943,7 +5915,8 @@ async function toggleScreenRecording() {
     activeRecording = session;
     const drawNextFrame = () => {
       if (activeRecording !== session) return;
-      drawPerformanceFrame(outputContext, sceneCanvas, stageWrapEl, kineticLyricsManager.mode);
+      if (bandController?.enabled) bandController.drawRecording(outputContext);
+      else drawPerformanceFrame(outputContext, renderer.domElement, stageWrapEl, kineticLyricsManager.mode);
       session.frameId = requestAnimationFrame(drawNextFrame);
     };
     session.frameId = requestAnimationFrame(drawNextFrame);
@@ -6107,6 +6080,16 @@ $('#cropZoom').addEventListener('input', e => {
 
 $('#cropCancel').addEventListener('click', () => { $('#cropperModal').style.display = 'none'; });
 $('#cropperClose').addEventListener('click', () => { $('#cropperModal').style.display = 'none'; });
+
+const disclaimerModal = $('#disclaimerModal');
+const showDisclaimer = () => { if (disclaimerModal) disclaimerModal.style.display = 'flex'; };
+const hideDisclaimer = () => { if (disclaimerModal) disclaimerModal.style.display = 'none'; };
+$('#openDisclaimerBtn')?.addEventListener('click', showDisclaimer);
+$('#topDisclaimerBtn')?.addEventListener('click', showDisclaimer);
+$('#hudDisclaimerBtn')?.addEventListener('click', showDisclaimer);
+$('#disclaimerClose')?.addEventListener('click', hideDisclaimer);
+$('#disclaimerConfirm')?.addEventListener('click', hideDisclaimer);
+disclaimerModal?.addEventListener('click', e => { if (e.target === disclaimerModal) hideDisclaimer(); });
 
 $('#cropConfirm').addEventListener('click', () => {
   const finalCanvas = document.createElement('canvas');
@@ -6991,7 +6974,7 @@ function updateMasterChoreography(dt = 0.016) {
   const tierCfg = TIER_CONFIGS[state.intensityTier] || TIER_CONFIGS[2];
   const interval = Math.max(2, state.morphIntervalBeats || 16);
   const moveIdx = Math.floor(state.beatCount / interval) % CHOREOGRAPHY_MOVEMENTS.length;
-  $('#movementBadge').textContent = kineticLyricsManager.mode === 'gravity'
+  $('#movementBadge').textContent = kineticLyricsManager.mode === 'band' ? '乐队 · 自动编配' : kineticLyricsManager.mode === 'gravity'
     ? `山体共振 · ${state.beatCount % 4 + 1}/4`
     : `${FORMATION_LABELS[state.activeFormation]} · ${state.beatCount % 4 + 1}/4`;
   $('#movementBadge').title = `音频起音估计：${Math.round(60/state.beatPeriod)} BPM；不代表人工标定拍点`;
@@ -7762,7 +7745,7 @@ function animate(nowTimestamp) {
   }
 
   updateContactShadows();
-  composer.render();
+  if (!bandController?.enabled) composer.render();
   requestAnimationFrame(animate);
 }
 
@@ -8723,12 +8706,12 @@ $('#videoFormatSelect').addEventListener('change', e => {
 
 // 模式切换
 function syncModeControlAvailability() {
-  const gravity = kineticLyricsManager.mode === 'gravity';
+  const gravity = kineticLyricsManager.mode === 'gravity', band = kineticLyricsManager.mode === 'band';
   const matrixControls = [ui.gridCols, ui.gridRows, ui.gridLayers,
     $('#matrixSequenceSelect'), $('#formationSelect'), ...$$('#gridPresetGroup button')];
   matrixControls.forEach(control => {
-    control.disabled = gravity;
-    control.title = gravity ? '反重力使用固定山体；切回机械魔方后可调整方阵尺寸与阵型。' : '';
+    control.disabled = gravity || band;
+    control.title = band ? '乐队队形与成员参数在演出面调整。' : gravity ? '反重力使用固定山体；切回机械魔方后可调整方阵尺寸与阵型。' : '';
   });
 }
 function syncContentPresentationControls() {
@@ -9217,6 +9200,7 @@ $('#materialSamples').addEventListener('click', event => {
   rebuildMatrix();
 });
 $('#formationSelect').addEventListener('change', event => {
+  if (kineticLyricsManager.mode === 'band') kineticLyricsManager.setMode('slot');
   state.formationMode = event.target.value;
   state.activeFormation = state.formationMode === 'auto' ? FORMATION_SEQUENCE[Math.max(0,lastMovementIdx)] : state.formationMode;
   rebuildMatrix();
@@ -9341,6 +9325,7 @@ window.getPlaybackTime = getPlaybackTime;
 window.parseLrcString = parseLrcString;
 // 只读诊断入口：供几何/后处理回归测试读取实际间距、采样数与避让统计，不参与渲染
 window.luDiagnostics = {
+  get performanceMode(){ return kineticLyricsManager.mode; },
   get renderer(){ return renderer; },
   get composer(){ return composer; },
   get camera(){ return camera; },
@@ -9402,7 +9387,9 @@ if (typeof kineticLyricsManager !== 'undefined' && kineticLyricsManager) {
       statusText.textContent = `反重力山体 · ${units} 块 · ${count} 项呈现`;
       syncContentPresentationControls();
     },
-    onModeChange: () => {
+    canChangeMode: () => !state.isRecording,
+    onModeChange: mode => {
+      bandController?.setEnabled(mode === 'band');
       syncModeControlAvailability();
       syncContentPresentationControls();
       rebuildMatrix();
@@ -9426,6 +9413,36 @@ updateProgressUI(true);
 syncInspectorAccessibility();
 motionTabSwitch($('#tab-optics'));
 requestAnimationFrame(animate);
+function createBandCube(texture) {
+  const group = new THREE.Group();
+  const material = createMaterialPreset(ui.material.value, ui.color.value);
+  if (state.layerMode !== 'surface' && material.transmission > 0) {
+    material.depthWrite = false; material.opacity = 1;
+  }
+  const block = new THREE.Mesh(currentRoundedGeo.clone(), material);
+  block.renderOrder = 5; group.add(block);
+  if (ui.material.value === 'wool') [1.016,1.032].forEach((scale,index) => {
+    const shell = new THREE.Mesh(currentRoundedGeo.clone(), new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color(ui.color.value).lerp(new THREE.Color(0xffffff), .35+index*.35),
+      roughness:.96, metalness:0, alphaMap:woolFiberFuzzTexture, transparent:true,
+      alphaTest:.28+index*.12, sheen:1, sheenColor:new THREE.Color(0xffffff), sheenRoughness:.5
+    })); shell.scale.setScalar(scale); shell.renderOrder=6+index; group.add(shell);
+  });
+  if (state.layerMode === 'surface') applySurfaceContent(material,texture,state.adhesionCraft,.94,[0,1,0,1]);
+  else {
+    const content = new THREE.Mesh(createConformalDecalGeometry(.88,.88,Math.min(.20,+ui.bevelRadius.value)),
+      createDimensionalDecalMaterial(texture,state.adhesionCraft,state.layerMode));
+    content.position.z=state.layerMode==='inside'?0:-.508;content.renderOrder=1;group.add(content);
+  }
+  return group;
+}
+const bandCubeDesign = {
+  createCube:createBandCube, environmentScene:neutralEnvScene,
+  getKey:()=>JSON.stringify([ui.material.value,ui.color.value,ui.bevelRadius.value,ui.roughness.value,
+    ui.ior.value,ui.thickness.value,ui.transmission.value,ui.dispersion.value,ui.envIntensity.value,
+    state.layerMode,state.adhesionCraft,[...state.manualOptics]])
+};
+createBandController({stage:stageWrapEl,state,getTime:getPlaybackTime,getLyric:()=>getSynchronizedLyricPhrase()||'',pauseMusic,cubeDesign:bandCubeDesign,requestMode:mode=>kineticLyricsManager.setMode(mode)}).then(controller=>{bandController=controller;window.luBand=controller;controller.setEnabled(kineticLyricsManager.mode==='band');}).catch(error=>{console.error('Band mode unavailable:',error);$('#bandStageSelect').disabled=true;});
 window.luCubeIntro = createLuCubeIntro({
   THREE,
   manifest: AVATAR_MANIFEST,
@@ -9442,6 +9459,9 @@ window.luCubeIntro = createLuCubeIntro({
 // Prepare the alternate scene before playback/recording needs its first frame.
 setTimeout(() => kineticLyricsManager.prepareGravity(), 300);
 </script>
+<link rel="stylesheet" href="./css/lu-score-panel.css">
+<link rel="stylesheet" href="./css/lu-band.css">
+<script type="module" src="./js/ui/score-panel.js"></script>
 <div id="toast" class="toast" role="status"></div>
 </body>
 </html>

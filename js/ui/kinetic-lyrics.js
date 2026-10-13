@@ -1603,7 +1603,7 @@ export class KineticLyricsManager {
 
     try {
       const savedMode = localStorage.getItem('lu_kinetic_lyrics_mode');
-      if (savedMode && ['slot', 'gravity', 'off'].includes(savedMode)) {
+      if (savedMode && ['slot', 'gravity', 'band', 'off'].includes(savedMode)) {
         this.mode = savedMode;
       }
     } catch (_) {}
@@ -1716,7 +1716,8 @@ export class KineticLyricsManager {
   }
 
   setMode(mode, silent = false) {
-    if (!['slot', 'gravity', 'off'].includes(mode)) return;
+    if (!['slot', 'gravity', 'band', 'off'].includes(mode)) return;
+    if (mode !== this.mode && this.threeCtx.canChangeMode?.() === false) return;
     if (mode === 'gravity' && this.gravityPreparation && !this.gravityPrepared) {
       this.pendingMode = mode;
       this.gravityPreparation.then(() => {
@@ -1761,7 +1762,7 @@ export class KineticLyricsManager {
             this.slotEngine = new SlotTextLyricsEngine(this.mountEl);
           }
         }
-      } else if (mode === 'off') {
+      } else if (mode === 'off' || mode === 'band') {
         if (this.mountEl) this.mountEl.style.display = 'none';
         if (this.slotEngine) {
           this.slotEngine.destroy();

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" fill="none">
+  <path d="M 80 50 C 74 50, 70 56, 76 62 L 96 76" stroke="#1f1816" stroke-width="8" stroke-linecap="round" />
+  <path d="M 94 74 L 118 90" stroke="#1f1816" stroke-width="12" stroke-linecap="round" />
+  <path d="M 94 74 L 118 90" stroke="#f59e24" stroke-width="6" stroke-linecap="round" />
+  <circle cx="100" cy="80" r="5" fill="#d83624" stroke="#1f1816" stroke-width="3" />
+  <circle cx="108" cy="86" r="5" fill="#d83624" stroke="#1f1816" stroke-width="3" />
+  <circle cx="116" cy="92" r="5" fill="#d83624" stroke="#1f1816" stroke-width="3" />
+  <path d="M 116 92 L 102 184 C 100 196, 108 214, 130 216 C 152 218, 166 200, 170 186 L 180 148" fill="none" stroke="#1f1816" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 116 92 L 102 184 C 100 196, 108 214, 130 216 C 152 218, 166 200, 170 186 L 180 148" fill="none" stroke="#d63422" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 116 92 L 102 184 C 100 196, 108 214, 130 216" fill="none" stroke="#8d1a10" stroke-width="8" stroke-linecap="round" />
+  <circle cx="102" cy="116" r="6" fill="#f59e24" stroke="#1f1816" stroke-width="4" />
+  <circle cx="100" cy="134" r="6" fill="#f59e24" stroke="#1f1816" stroke-width="4" />
+  <circle cx="98" cy="152" r="6" fill="#f59e24" stroke="#1f1816" stroke-width="4" />
+  <circle cx="98" cy="170" r="6" fill="#f59e24" stroke="#1f1816" stroke-width="4" />
+  <line x1="94" y1="110" x2="94" y2="176" stroke="#1f1816" stroke-width="4" stroke-linecap="round" />
+  <path d="M 166 174 L 182 128 C 172 120, 168 104, 184 102 C 182 86, 198 84, 206 98 C 214 90, 222 96, 218 114 C 228 126, 214 140, 204 146 L 182 186 Z" fill="#f59e24" stroke="#1f1816" stroke-width="6" stroke-linejoin="round" />
+  <path d="M 174 158 L 186 124 C 180 118, 178 108, 188 106 C 188 96, 198 94, 202 104 C 208 98, 214 102, 212 114 C 218 122, 208 132, 202 136 Z" fill="#fed053" />
+  <ellipse cx="196" cy="120" rx="14" ry="18" fill="#8d1a10" stroke="#1f1816" stroke-width="4" transform="rotate(24 196 120)" />
+</svg>

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" fill="none">
+  <polygon points="42,106 182,78 214,152 74,180" fill="#182329" stroke="#12181d" stroke-width="6" stroke-linejoin="round" />
+  <polygon points="48,104 182,78 196,128 62,154" fill="#243740" stroke="#12181d" stroke-width="6" stroke-linejoin="round" />
+  <polygon points="42,106 62,154 74,180 54,132" fill="#faf6ee" stroke="#12181d" stroke-width="6" stroke-linejoin="round" />
+  <ellipse cx="52" cy="122" rx="4" ry="7" fill="#182329" transform="rotate(-15 52 122)" />
+  <ellipse cx="64" cy="156" rx="5" ry="4" fill="#182329" />
+  <polygon points="182,78 196,128 214,152 200,102" fill="#faf6ee" stroke="#12181d" stroke-width="6" stroke-linejoin="round" />
+  <ellipse cx="192" cy="102" rx="4" ry="6" fill="#182329" transform="rotate(20 192 102)" />
+  <ellipse cx="206" cy="136" rx="4" ry="5" fill="#182329" />
+  <polygon points="68,110 114,102 110,126 64,134" fill="#0c161a" stroke="#12181d" stroke-width="4" />
+  <path d="M 68 122 L 80 120 L 86 112 L 92 126 L 98 118 L 108 116" fill="none" stroke="#00e5ff" stroke-width="3" stroke-linecap="round" />
+  <ellipse cx="148" cy="106" rx="18" ry="12" fill="#e8b938" stroke="#12181d" stroke-width="5" />
+  <ellipse cx="148" cy="106" rx="10" ry="6" fill="#182329" />
+  <line x1="148" y1="98" x2="148" y2="114" stroke="#ffffff" stroke-width="3" />
+  <line x1="140" y1="106" x2="156" y2="106" stroke="#ffffff" stroke-width="3" />
+  <line x1="174" y1="94" x2="170" y2="114" stroke="#12181d" stroke-width="4" stroke-linecap="round" />
+  <circle cx="172" cy="104" r="3" fill="#ffffff" />
+  <polygon points="62,154 196,128 206,160 72,186" fill="#fdfbf7" stroke="#12181d" stroke-width="6" stroke-linejoin="round" />
+  <polygon points="80,150 90,148 94,166 84,168" fill="#12181d" />
+  <polygon points="102,146 112,144 116,162 106,164" fill="#12181d" />
+  <polygon points="132,140 142,138 146,156 136,158" fill="#12181d" />
+  <polygon points="154,136 164,134 168,152 158,154" fill="#12181d" />
+  <polygon points="174,132 184,130 188,148 178,150" fill="#12181d" />
+</svg>
