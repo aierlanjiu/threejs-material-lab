@@ -53,5 +53,10 @@
 .lu-band-score canvas{pointer-events:none}
 .band-v2-controls [data-listen-controls][hidden]{display:none}
 .lu-band-status{background:#101a27a6;border:1px solid #b7d6e321;color:#d6e5ed;border-radius:3px;font-size:10px}
-.lu-band-lyric{background:linear-gradient(90deg,transparent,#0d18296e,transparent);text-shadow:0 2px 8px #081222}
+.lu-band-lyric{display:flex;flex-direction:column;align-items:center;gap:3px;bottom:42px;padding:6px 14px;background:linear-gradient(90deg,transparent,#0b152499 18%,#0b152499 82%,transparent);text-shadow:0 2px 8px #081222;--lyric-progress:0%}
+.lu-band-lyric[hidden]{display:none}
+.lu-band-lyric-orig{display:inline-block;font-size:19px;font-weight:600;line-height:1.32;letter-spacing:.02em;color:#fff6e5;background:linear-gradient(90deg,#ffd98a 0%,#ffd98a var(--lyric-progress,0%),#f4ebd9 var(--lyric-progress,0%),#f4ebd9 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 2px 6px #060d18)}
+.lu-band-lyric-zh{display:inline-block;font-size:14.5px;font-weight:500;line-height:1.3;letter-spacing:.04em;color:#d2e7f6;text-shadow:0 1px 6px #060d18}
+.lu-band-lyric-zh[hidden]{display:none}
+@media(max-width:600px){.lu-band-lyric{bottom:36px;padding:4px 8px}.lu-band-lyric-orig{font-size:15px}.lu-band-lyric-zh{font-size:12.5px}}
 @media(prefers-reduced-motion:reduce){.band-score-arrow{transition:none}}

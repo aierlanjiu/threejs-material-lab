@@ -59,6 +59,7 @@ export class SlotTextLyricsEngine {
     this.deckEl = null;
     this.pastLineEl = null;
     this.activeLineEl = null;
+    this.subLineEl = null;
     this.nextLineEl = null;
     this.currentText = '';
     this.slots = [];
@@ -72,21 +73,29 @@ export class SlotTextLyricsEngine {
         <div class="cube-line cube-line-active" id="cubeLineActive">
           <div class="cube-slots-track" id="cubeSlotsTrack"></div>
         </div>
+        <div class="cube-line cube-line-sub" id="cubeLineSub" hidden></div>
         <div class="cube-line cube-line-next" id="cubeLineNext"></div>
       </div>
     `;
     this.deckEl = this.container.querySelector('#cubeLyricsDeck');
     this.pastLineEl = this.container.querySelector('#cubeLinePast');
     this.activeLineEl = this.container.querySelector('#cubeSlotsTrack');
+    this.subLineEl = this.container.querySelector('#cubeLineSub');
     this.nextLineEl = this.container.querySelector('#cubeLineNext');
   }
 
-  update(activeText, prevText, nextText, beatPeriod = 0.5, progressInLine = 0, lineKey = activeText, characterCursor = null) {
+  update(activeText, prevText, nextText, beatPeriod = 0.5, progressInLine = 0, lineKey = activeText, characterCursor = null, secondaryText = '') {
     if (!this.deckEl) return;
     if (lineKey === activeText && activeText === this.currentText && this.currentLineKey) lineKey = this.currentLineKey;
 
     if (this.pastLineEl && this.pastLineEl.textContent !== (prevText || '')) {
       this.pastLineEl.textContent = prevText || '';
+    }
+    if (this.subLineEl) {
+      const sub = (secondaryText && secondaryText !== activeText) ? secondaryText : '';
+      if (this.subLineEl.textContent !== sub) this.subLineEl.textContent = sub;
+      this.subLineEl.hidden = !sub;
+      this.subLineEl.style.setProperty('--lyric-progress', `${(Math.max(0, Math.min(1, Number(progressInLine) || 0)) * 100).toFixed(1)}%`);
     }
     if (this.nextLineEl && this.nextLineEl.textContent !== (nextText || '')) {
       this.nextLineEl.textContent = nextText || '';
@@ -1622,6 +1631,14 @@ export class KineticLyricsManager {
       this.stage.appendChild(mount);
     }
     this.mountEl = mount;
+    let gravityOverlay = this.stage?.querySelector('.kinetic-gravity-overlay');
+    if (!gravityOverlay && this.stage) {
+      gravityOverlay = document.createElement('div');
+      gravityOverlay.className = 'kinetic-gravity-overlay';
+      gravityOverlay.hidden = true;
+      this.stage.appendChild(gravityOverlay);
+    }
+    this.gravityOverlayEl = gravityOverlay;
   }
 
   initUIButtons() {
@@ -1754,6 +1771,9 @@ export class KineticLyricsManager {
       if (this.gravityEngine) {
         this.gravityEngine.onLeaveMode();
       }
+      if (this.gravityOverlayEl) {
+        this.gravityOverlayEl.hidden = true;
+      }
 
       if (mode === 'slot') {
         if (this.mountEl) {
@@ -1794,12 +1814,22 @@ export class KineticLyricsManager {
     }
   }
 
-  update({ activeText, prevText, nextText, beatPeriod, progressInLine, lineKey, characterCursor, bassEnergy, isKick, dt = 0.016 }) {
-    if (this.mode === 'off') return;
+  update({ activeText, secondaryText = '', prevText, nextText, beatPeriod, progressInLine, lineKey, characterCursor, bassEnergy, isKick, dt = 0.016 }) {
+    if (this.mode === 'off') {
+      if (this.gravityOverlayEl) this.gravityOverlayEl.hidden = true;
+      return;
+    }
     if (this.mode === 'slot' && this.slotEngine) {
-      this.slotEngine.update(activeText, prevText, nextText, beatPeriod, progressInLine, lineKey, characterCursor);
+      if (this.gravityOverlayEl) this.gravityOverlayEl.hidden = true;
+      this.slotEngine.update(activeText, prevText, nextText, beatPeriod, progressInLine, lineKey, characterCursor, secondaryText);
     } else if (this.mode === 'gravity' && this.gravityEngine) {
       this.gravityEngine.update(activeText, prevText, nextText, beatPeriod, progressInLine, bassEnergy, isKick, dt, lineKey, characterCursor);
+      if (this.gravityOverlayEl) {
+        const showLyrics = this.gravityEngine.getConfiguration()?.showLyrics !== false;
+        const companion = (showLyrics && secondaryText && secondaryText !== activeText) ? secondaryText : '';
+        if (this.gravityOverlayEl.textContent !== companion) this.gravityOverlayEl.textContent = companion;
+        this.gravityOverlayEl.hidden = !companion;
+      }
     }
   }
 }

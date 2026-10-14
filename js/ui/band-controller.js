@@ -1,19 +1,23 @@
 import {createBandScene} from './band-scene.js';
 import {createBandDemoScore} from '../audio/band-timeline.js';
 import {compileBandParts,sampleBandEnsemble,bandPartScore,bandRoster} from '../audio/band-parts.js';
-import {loadBandAnalysis,verifyBandSource} from '../audio/band-library.js';
+import {loadBandAnalysis,verifyBandSource,synthesizeBandScoreForTrack} from '../audio/band-library.js';
+import {sampleBandLyric} from '../audio/band-cues.js';
 import {loadBandSettings} from './band-settings.js';
 import {createBandControls} from './band-controls.js';
 import {drawBandScore,drawBandPulse} from './band-score.js';
 import {bandRecordingLayout} from './band-recording-layout.js';
 import {setupBandScoreDisclosure} from './band-score-disclosure.js';
 
-export async function createBandController({stage,state,getTime,getLyric=()=>'',pauseMusic=()=>{},monitorStem=null,cubeDesign=null,requestMode=null}){
+export async function createBandController({stage,state,getTime,getLyric=()=>'',getTrackLyrics=null,pauseMusic=()=>{},monitorStem=null,cubeDesign=null,requestMode=null}){
  const $=id=>document.getElementById(id),host=document.createElement('div');host.className='lu-band-scene';host.hidden=true;stage.append(host);
  const panel=document.createElement('section');panel.className='lu-band-score';panel.hidden=true;panel.setAttribute('aria-label','乐队分谱');panel.innerHTML='<div class="lu-band-score-heading"><strong>主旋律</strong><small>待接入</small></div><canvas role="img" aria-label="乐队成员分谱"></canvas>';stage.append(panel);
  const scoreDisclosure=setupBandScoreDisclosure(panel);
  const status=document.createElement('div');status.className='lu-band-status';status.hidden=true;stage.append(status);
- const lyric=document.createElement('p');lyric.className='lu-band-lyric';lyric.hidden=true;stage.append(lyric);
+ const lyric=document.createElement('p');lyric.className='lu-band-lyric';lyric.hidden=true;
+ lyric.innerHTML='<span class="lu-band-lyric-orig"></span><span class="lu-band-lyric-zh" hidden></span>';
+ stage.append(lyric);
+ const lyricOrigEl=lyric.querySelector('.lu-band-lyric-orig'),lyricZhEl=lyric.querySelector('.lu-band-lyric-zh');
  const scene=await createBandScene(host,{safeTop:130,safeBottom:85,cubeDesign}),reduced=matchMedia('(prefers-reduced-motion:reduce)'),settings=loadBandSettings();
  let enabled=false,score=null,sourceKey='',controller=null,theme='',focus=null,demo=false,demoPlaying=false,demoOffset=0,demoOrigin=0,frameId,lastDraw=0,loadError='',disposed=false,parts=[],partScore=null,lastSnapshot=null,lastRecording=null;
  const demoScore=createBandDemoScore(),currentScore=()=>demo?demoScore:score;
@@ -25,11 +29,25 @@ export async function createBandController({stage,state,getTime,getLyric=()=>'',
  scene.canvas.addEventListener('band-member-select',event=>controls.setFocus(event.detail));
  function rebuildParts(){parts=compileBandParts(currentScore(),state.theme,settings.overrides);partScore=bandPartScore(currentScore(),parts);controls.setParts(parts);if(demo){monitorStem?.({id:'mix'}).catch(console.warn);controls.setListening('mix');}}
  async function syncTrack(){
-  const track=state.playlist[state.currentTrackIndex],key=`${track?.type}|${track?.src||''}`;if(key===sourceKey)return;
+  const track=state.playlist[state.currentTrackIndex],key=`${track?.type}|${track?.title||''}|${track?.src||''}|${Boolean(track?.buffer)}`;if(key===sourceKey)return;
   sourceKey=key;controller?.abort();controller=new AbortController();const signal=controller.signal;score=null;loadError='本曲音轨与分谱尚未接入';rebuildParts();
-  try{const loaded=await loadBandAnalysis(track?.type,{signal});if(signal.aborted)return;
-   if(loaded&&await verifyBandSource(loaded,track.src,signal)){score=loaded;loadError='';}else if(loaded)loadError='音频与谱面源文件不匹配，请重新分析';
-  }catch(error){if(!signal.aborted){console.warn('Band analysis:',error);loadError='本曲分谱无法读取';}}
+  try{
+   const loaded=await loadBandAnalysis(track?.type,{signal});if(signal.aborted)return;
+   if(loaded&&await verifyBandSource(loaded,track.src,signal)){score=loaded;loadError='';}
+   else{
+    const fallbackLyrics=getTrackLyrics?getTrackLyrics(track):(track?.lyrics||[]);
+    const synthesized=synthesizeBandScoreForTrack(track,{lyrics:fallbackLyrics,translatedLyrics:track?.translatedLyrics||[],theme:state.theme});
+    if(synthesized){score=synthesized;loadError='';}
+    else if(loaded)loadError='音频与谱面源文件不匹配，请重新分析';
+   }
+  }catch(error){
+   if(!signal.aborted){
+    const fallbackLyrics=getTrackLyrics?getTrackLyrics(track):(track?.lyrics||[]);
+    const synthesized=synthesizeBandScoreForTrack(track,{lyrics:fallbackLyrics,translatedLyrics:track?.translatedLyrics||[],theme:state.theme});
+    if(synthesized){score=synthesized;loadError='';}
+    else{console.warn('Band analysis:',error);loadError='本曲分谱无法读取';}
+   }
+  }
   if(!signal.aborted){rebuildParts();if(enabled)frame();}
  }
  async function syncScene(){if(theme===state.theme)return;theme=state.theme;focus=null;await scene.configure(theme);rebuildParts();controls.setFocus(null,false);}
@@ -43,8 +61,27 @@ export async function createBandController({stage,state,getTime,getLyric=()=>'',
   status.textContent=demo?`编排演示 · 未绑定当前歌曲 · ${playing}/${parts.length} 演奏`:
    data?`${data.title} · ${parts.length} 成员 · ${playing} 演奏 · 自动编配`:
    loadError||'正在读取本曲分谱';
-  lyric.textContent=demo?'':getLyric();lyric.hidden=!enabled||demo||!lyric.textContent;
-  lastSnapshot={time:sampled.time,trackId:data?.trackId||null,source:demo?'demo':data?'analysis':'pending',partId:part.id,formation:scene.formation,playing,lyric:lyric.textContent};
+  const rawLyric=demo?null:getLyric();
+  const scoreLyric=!demo&&data?.lyrics?.length?sampleBandLyric(data,sampled.time):null;
+  const lctx=typeof rawLyric==='object'&&rawLyric!==null?rawLyric:{
+   activeText:typeof rawLyric==='string'&&rawLyric?rawLyric:(scoreLyric?.activeText||''),
+   originalText:scoreLyric?.originalText||(typeof rawLyric==='string'?rawLyric:''),
+   translatedText:scoreLyric?.translatedText||'',
+   bilingual:Boolean(scoreLyric?.bilingual),
+   progressInLine:scoreLyric?.progressInLine??0
+  };
+  const origText=lctx.originalText||lctx.activeText||'';
+  const zhText=lctx.bilingual?(lctx.translatedText||lctx.secondaryText||''):(scoreLyric?.bilingual?scoreLyric.translatedText:'');
+  const isBilingual=Boolean(origText&&zhText&&origText!==zhText);
+  const prog=Math.max(0,Math.min(1,Number.isFinite(lctx.progressInLine)?lctx.progressInLine:(scoreLyric?.progressInLine??0)));
+  lyric.style.setProperty('--lyric-progress',`${(prog*100).toFixed(1)}%`);
+  lyric.dataset.bilingual=isBilingual?'true':'false';
+  if(lyricOrigEl.textContent!==origText)lyricOrigEl.textContent=origText;
+  if(lyricZhEl.textContent!==(isBilingual?zhText:''))lyricZhEl.textContent=isBilingual?zhText:'';
+  lyricZhEl.hidden=!isBilingual;
+  lyric.hidden=!enabled||demo||!origText;
+  const combinedLyric=isBilingual?`${origText} · ${zhText}`:origText;
+  lastSnapshot={time:sampled.time,trackId:data?.trackId||null,source:demo?'demo':data?'analysis':'pending',partId:part.id,formation:scene.formation,playing,lyric:combinedLyric,lyricOriginal:origText,lyricTranslated:isBilingual?zhText:'',bilingual:isBilingual,lyricProgress:prog};
  }
  function tick(now){if(disposed)return;frameId=requestAnimationFrame(tick);if(!enabled||document.hidden||now-lastDraw<33)return;lastDraw=now;
   if(!state.isRecording&&scene.captureActive)scene.endCapture();
@@ -74,7 +111,18 @@ export async function createBandController({stage,state,getTime,getLyric=()=>'',
   else{ctx.fillStyle='#cbbb9e';ctx.font=`${9*sx}px sans-serif`;ctx.fillText('演奏声部',px+12*sx,py+34*sy,80*sx);
    drawBandPulse(ctx,partScore,lastSnapshot?.time||0,lastSnapshot?.partId,{x:px+100*sx,y:py+25*sy,width:pw-112*sx,height:13*sy,scale:sx});}
   ctx.fillStyle='#111116cc';ctx.fillRect(0,height-48*sy,width,48*sy);ctx.fillStyle='#ede2cf';ctx.font=`${11*Math.min(sx,sy)}px sans-serif`;ctx.fillText(status.textContent,12*sx,height-14*sy,width-24*sx);
-  if(lastSnapshot?.lyric){ctx.textAlign='center';ctx.font=`${20*Math.min(sx,sy)}px sans-serif`;ctx.fillText(lastSnapshot.lyric,width/2,height-62*sy,width-24*sx);}ctx.restore();
+  if(lastSnapshot?.lyricOriginal){
+   ctx.textAlign='center';
+   if(lastSnapshot.bilingual&&lastSnapshot.lyricTranslated){
+    ctx.fillStyle='#fff4dc';ctx.font=`600 ${18*Math.min(sx,sy)}px sans-serif`;
+    ctx.fillText(lastSnapshot.lyricOriginal,width/2,height-80*sy,width-24*sx);
+    ctx.fillStyle='#d6e8f5';ctx.font=`500 ${14*Math.min(sx,sy)}px sans-serif`;
+    ctx.fillText(lastSnapshot.lyricTranslated,width/2,height-56*sy,width-24*sx);
+   }else{
+    ctx.fillStyle='#ede2cf';ctx.font=`${20*Math.min(sx,sy)}px sans-serif`;
+    ctx.fillText(lastSnapshot.lyricOriginal,width/2,height-62*sy,width-24*sx);
+   }
+  }ctx.restore();
  }
  requestAnimationFrame(tick);
  return {setEnabled,drawRecording,get enabled(){return enabled;},get canvas(){return scene.canvas;},get diagnostics(){return {...scene.diagnostics,enabled,source:demo?'demo':score?'analysis':'pending',trackId:score?.trackId,time:clock(),focus,settings,parts:parts.map(p=>({id:p.id,stem:p.stemId,events:p.events.length,shared:p.shared,technique:p.technique})),snapshot:lastSnapshot,loadError};},

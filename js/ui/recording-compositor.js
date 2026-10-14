@@ -65,9 +65,9 @@ export function drawPerformanceFrame(ctx, sceneCanvas, stageElement, lyricMode) 
     ctx.stroke();
   }
 
-  for (const [selector, color] of [['.cube-line-past', '#505e72'], ['.cube-line-next', '#505e72']]) {
+  for (const [selector, color] of [['.cube-line-past', '#505e72'], ['.cube-line-sub', '#3158a6'], ['.cube-line-next', '#505e72']]) {
     const line = deck.querySelector(selector);
-    if (!line?.textContent?.trim() || getComputedStyle(line).display === 'none') continue;
+    if (!line || line.hidden || !line.textContent?.trim() || getComputedStyle(line).display === 'none') continue;
     const lineBox = box(line);
     ctx.fillStyle = posterMode ? '#ede2cf' : color;
     ctx.font = `600 ${Math.max(12, lineBox.height * 0.72)}px sans-serif`;

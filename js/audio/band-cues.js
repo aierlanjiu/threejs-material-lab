@@ -48,3 +48,40 @@ export function buildBandCues(score,lyrics=[]){
  }
  return {source:choruses.length?'lrc-repetition-and-drum-onsets':'energy-fallback',choruses,segments,bursts,lyricLines:usable.length,repeatedLines:repeats.length};
 }
+export function computeVocalLineSpans(score,lyrics=[]){
+ const vocals=score?.stems?.find(s=>s.id==='vocals'),env=vocals?.envelope||[],duration=Number(score?.duration)||240;
+ return lyrics.map((line,index)=>{
+  const start=Math.max(0,Number(line?.time)||0),nextTime=Math.max(start+.3,Number(lyrics[index+1]?.time??duration));
+  if(/前奏|间奏|尾奏|器乐|无人声|intro|instrumental|outro/i.test(line?.text||''))return {vocalStart:start,end:nextTime};
+  const windowEnv=env.filter(p=>p.time>=start-.08&&p.time<=nextTime-.04);
+  const active=windowEnv.filter(p=>p.value>=.068);
+  if(active.length<2)return {vocalStart:start,end:Math.min(nextTime-.04,start+Math.max(1.2,(nextTime-start)*.82))};
+  const first=active[0].time,vocalStart=first>start&&first-start<=.42?Number(first.toFixed(3)):start;
+  let end=Math.min(nextTime-.04,active.at(-1).time+.16);
+  if(nextTime-vocalStart>2.4){
+   let sung=false,silentSince=null;
+   for(const p of windowEnv){
+    if(p.time<vocalStart+.6)continue;
+    if(p.value>=.075){sung=true;silentSince=null;}
+    else if(sung&&p.value<.052){
+     if(silentSince===null)silentSince=p.time;
+     else if(p.time-silentSince>=.58){
+      const resumes=windowEnv.some(q=>q.time>p.time&&q.time<nextTime-.3&&q.value>=.13);
+      if(!resumes){end=Math.min(end,silentSince+.1);break;}
+     }
+    }
+   }
+  }
+  return {vocalStart,end:Number(Math.max(Math.min(nextTime-.04,vocalStart+.75),end).toFixed(3))};
+ });
+}
+export function sampleBandLyric(score,time=0){
+ const lyrics=score?.lyrics||[];if(!lyrics.length)return {activeText:'',originalText:'',translatedText:'',secondaryText:'',bilingual:false,progressInLine:0,matchIdx:-1};
+ let matchIdx=0;
+ for(let i=0;i<lyrics.length;i++){if(time>=lyrics[i].time)matchIdx=i;else break;}
+ const cur=lyrics[matchIdx],zh=score?.translatedLyrics?.[matchIdx],span=score?.vocalLineSpans?.[matchIdx];
+ const start=span?.vocalStart??cur.time,stop=span?.end??(lyrics[matchIdx+1]?.time??score.duration??start+4);
+ const progressInLine=clamp((time-start)/Math.max(.25,stop-start),0,1);
+ const originalText=cur?.text||'',translatedText=zh?.text||'',bilingual=Boolean(originalText&&translatedText&&originalText!==translatedText);
+ return {activeText:translatedText||originalText,originalText,translatedText:bilingual?translatedText:'',secondaryText:bilingual?originalText:'',bilingual,progressInLine,matchIdx};
+}
