@@ -5,25 +5,27 @@ import {createBandControls} from './band-controls.js';
 import {createBandDemoScore} from '../audio/band-timeline.js';
 import {BAND_TRACKS,loadBandAnalysis} from '../audio/band-library.js';
 import {drawBandScore} from './band-score.js';
+import {setupBandScoreDisclosure} from './band-score-disclosure.js';
+import {createBandAudioSources} from '../audio/band-audio-source.js';
 const $=id=>document.getElementById(id),audio=$('bandAudio'),reduced=matchMedia('(prefers-reduced-motion:reduce)');
 const settings=loadBandSettings('lu_band_study_v2');
-let controls,parts=[],partScore=null,scene,score=createBandDemoScore(),theme='one-piece',focus=null,playing=false,offset=0,origin=0,lastDraw=0,loadRevision=0,pendingAudioTime=null,audioObjectUrl=null,audioSourceUrl='';
+const audioSources=createBandAudioSources();
+const scoreDisclosure=setupBandScoreDisclosure($('bandScoreCanvas').closest('.lu-band-score'));
+let controls,parts=[],partScore=null,scene,score=createBandDemoScore(),theme='one-piece',focus=null,playing=false,offset=0,origin=0,lastDraw=0,loadRevision=0,pendingAudioTime=null,audioSourceUrl='';
 const clock=()=>score.source==='analysis'?(pendingAudioTime??audio.currentTime):(playing?Math.min(score.duration,offset+(performance.now()-origin)/1000):offset);
 function loading(value){for(const id of ['bandPlay','bandSeek','bandTrack','bandTheme'])$(id).disabled=value;$('bandListen').disabled=value||score.source==='demo';}
 async function replaceAudio(src,time=0){
  pendingAudioTime=time;audio.pause();
- const previous=audioObjectUrl;
  try{
-  // The local static server has no byte ranges. A fully fetched Blob supports seeking.
-  const response=await fetch(src);if(!response.ok)throw new Error('声部音频无法读取');
-  audioObjectUrl=URL.createObjectURL(await response.blob());audioSourceUrl=src;
+  // Native media streaming is preferred; the development server needs a Blob fallback.
+  const resolved=await audioSources.resolve(src);audioSourceUrl=src;
   await new Promise((resolve,reject)=>{
    const cleanup=()=>{clearTimeout(timer);audio.removeEventListener('loadedmetadata',ready);audio.removeEventListener('error',failed);};
    const ready=()=>{cleanup();resolve();},failed=()=>{cleanup();reject(new Error('声部音频无法读取'));};
-   const timer=setTimeout(failed,15000);audio.addEventListener('loadedmetadata',ready,{once:true});audio.addEventListener('error',failed,{once:true});audio.src=audioObjectUrl;audio.load();
+   const timer=setTimeout(failed,15000);audio.addEventListener('loadedmetadata',ready,{once:true});audio.addEventListener('error',failed,{once:true});audio.src=resolved;audio.load();
   });
   audio.currentTime=Math.min(time,Number.isFinite(audio.duration)?audio.duration:time);
- }finally{pendingAudioTime=null;if(previous)URL.revokeObjectURL(previous);}
+ }finally{pendingAudioTime=null;}
 }
 const format=t=>`${Math.floor(t/60).toString().padStart(2,'0')}:${Math.floor(t%60).toString().padStart(2,'0')}`;
 function rebuildParts(){parts=compileBandParts(score,theme,settings.overrides);partScore=bandPartScore(score,parts);controls?.setParts(parts);}
@@ -64,7 +66,7 @@ try{
   onChange:(_,options)=>{if(options.rebuildParts)rebuildParts();draw();},onFocus:id=>{focus=id;draw();}});
  scene.canvas.addEventListener('band-member-select',event=>controls.setFocus(event.detail));
  rebuildParts();await loadTracks();$('bandListen').disabled=true;draw();requestAnimationFrame(tick);
- window.luBandStudy={get diagnostics(){return {...scene.diagnostics,time:clock(),playing,focus,source:score.source,trackId:score.trackId,audioSourceUrl,settings,parts:parts.map(p=>({id:p.id,stem:p.stemId,events:p.events.length,shared:p.shared}))};}};
- window.addEventListener('pagehide',()=>{scene.dispose();if(audioObjectUrl)URL.revokeObjectURL(audioObjectUrl);},{once:true});
+ window.luBandStudy={get diagnostics(){return {...scene.diagnostics,time:clock(),playing,focus,source:score.source,trackId:score.trackId,audioSourceUrl,audioMode:audioSources.mode,settings,parts:parts.map(p=>({id:p.id,stem:p.stemId,events:p.events.length,shared:p.shared}))};}};
+ window.addEventListener('pagehide',()=>{scoreDisclosure.dispose();scene.dispose();audioSources.dispose();},{once:true});
 }
 catch(error){console.error('Band study:',error);$('bandStatus').textContent='乐队预览无法加载，请检查浏览器图形支持与网络';}

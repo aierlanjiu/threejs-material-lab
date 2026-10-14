@@ -34,8 +34,24 @@
  .band-quick-controls label{display:grid;gap:5px}
  .band-quick-controls select{width:100%;min-width:0}
  .band-quick-controls a{grid-column:1/-1;margin-left:0}
- .band-study-stage{height:730px}
+ .band-study-stage{height:620px}
  .kinetic-mode-switcher{flex-wrap:wrap}
  .kinetic-mode-btn[data-mode=band]{min-width:58px}
  .band-adjustments select{max-width:175px}
 }
+/* Concert stage: a compact, expandable score leaves the mobile proscenium visible. */
+.lu-band-score{padding:7px 12px;background:#111b27df;border-color:#b8d6e344;box-shadow:0 6px 22px #050e1a26;pointer-events:auto}
+.lu-band-score-toggle{display:flex;align-items:center;gap:8px;width:100%;min-height:28px;margin:0;padding:0;border:0!important;background:none!important;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.lu-band-score-toggle:focus-visible{outline:2px solid #b7e3ee;outline-offset:4px}
+.lu-band-score-heading{flex:1;min-width:0;align-items:center}
+.lu-band-score-heading strong{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-weight:500}
+.lu-band-score-heading small{white-space:nowrap}
+.band-score-arrow{font-size:14px;color:#cbbb9e;transition:transform .18s}
+.lu-band-score-toggle[aria-expanded=true] .band-score-arrow{transform:rotate(180deg)}
+.lu-band-score[data-compact=true]{height:44px}
+.lu-band-score canvas[hidden]{display:none}
+.lu-band-score canvas{pointer-events:none}
+.band-v2-controls [data-listen-controls][hidden]{display:none}
+.lu-band-status{background:#101a27a6;border:1px solid #b7d6e321;color:#d6e5ed;border-radius:3px;font-size:10px}
+.lu-band-lyric{background:linear-gradient(90deg,transparent,#0d18296e,transparent);text-shadow:0 2px 8px #081222}
+@media(prefers-reduced-motion:reduce){.band-score-arrow{transition:none}}

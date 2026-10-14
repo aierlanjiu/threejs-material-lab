@@ -5573,19 +5573,38 @@ function initAudioEngine() {
   state.audioDataArray = new Uint8Array(state.analyser.frequencyBinCount);
 }
 
+let bandMonitorBuffer=null,bandMonitorType='',bandMonitorId='mix',bandMonitorRevision=0,bandMonitorAbort=null;
+const bandMonitorCache=new Map();
+async function listenBandStem(stem){
+  const revision=++bandMonitorRevision;bandMonitorAbort?.abort();bandMonitorAbort=new AbortController();
+  const track=state.playlist[state.currentTrackIndex],type=track?.type;
+  if(stem.id==='mix'){
+    bandMonitorBuffer=null;bandMonitorType='';bandMonitorId='mix';
+  }else{
+    initAudioEngine();const key=`${type}|${stem.audio}`;
+    let buffer=bandMonitorCache.get(key);
+    if(!buffer){try{const response=await fetch(stem.audio,{signal:bandMonitorAbort.signal});if(!response.ok)throw new Error('声部音频无法读取');buffer=await state.audioCtx.decodeAudioData(await response.arrayBuffer());}catch(error){if(revision!==bandMonitorRevision||error.name==='AbortError')return;throw error;}
+      if(revision!==bandMonitorRevision||state.playlist[state.currentTrackIndex]?.type!==type)return;
+      bandMonitorCache.set(key,buffer);if(bandMonitorCache.size>5)bandMonitorCache.delete(bandMonitorCache.keys().next().value);}
+    if(revision!==bandMonitorRevision)return;
+    bandMonitorBuffer=buffer;bandMonitorType=type;bandMonitorId=stem.id;
+  }
+  if(state.isPlayingMusic&&track?.buffer)startBufferPlayback(track,getPlaybackTime());
+}
 function startBufferPlayback(track, startPos = 0) {
   if (state.currentAudioSource) {
     try { state.currentAudioSource.stop(); } catch(e){}
     state.currentAudioSource = null;
   }
   const source = state.audioCtx.createBufferSource();
-  source.buffer = track.buffer;
+  source.buffer = bandMonitorType===track.type&&bandMonitorBuffer?bandMonitorBuffer:track.buffer;
   source.loop = true;
+  source.loopEnd = Math.min(track.buffer.duration,source.buffer.duration);
   source.connect(state.analyser);
 
   const dur = track.buffer.duration || 180;
   const offset = startPos % dur;
-  source.start(0, offset);
+  source.start(0, Math.min(offset,Math.max(0,source.buffer.duration-.01)));
   state.currentAudioSource = source;
   state.playbackStartTime = state.audioCtx.currentTime;
   state.playbackOffset = offset;
@@ -5614,6 +5633,7 @@ function playTrackAtIndex(idx, resumeFromOffset = false) {
 
     state.currentTrackIndex = normalizedIndex;
     const track = state.playlist[state.currentTrackIndex];
+    if(bandMonitorType&&bandMonitorType!==track.type){++bandMonitorRevision;bandMonitorAbort?.abort();bandMonitorBuffer=null;bandMonitorType='';bandMonitorId='mix';}
 
     state.songTitle = track.title;
     $('#nowPlayingText').textContent = `当前：${track.title}`;
@@ -9443,7 +9463,7 @@ const bandCubeDesign = {
     ui.ior.value,ui.thickness.value,ui.transmission.value,ui.dispersion.value,ui.envIntensity.value,
     state.layerMode,state.adhesionCraft,[...state.manualOptics]])
 };
-createBandController({stage:stageWrapEl,state,getTime:getPlaybackTime,getLyric:()=>getSynchronizedLyricPhrase()||'',pauseMusic,cubeDesign:bandCubeDesign,requestMode:mode=>kineticLyricsManager.setMode(mode)}).then(controller=>{bandController=controller;window.luBand=controller;controller.setEnabled(kineticLyricsManager.mode==='band');}).catch(error=>{console.error('Band mode unavailable:',error);$('#bandStageSelect').disabled=true;});
+createBandController({stage:stageWrapEl,state,getTime:getPlaybackTime,getLyric:()=>getSynchronizedLyricPhrase()||'',pauseMusic,monitorStem:listenBandStem,cubeDesign:bandCubeDesign,requestMode:mode=>kineticLyricsManager.setMode(mode)}).then(controller=>{bandController=controller;window.luBand=controller;controller.setEnabled(kineticLyricsManager.mode==='band');}).catch(error=>{console.error('Band mode unavailable:',error);$('#bandStageSelect').disabled=true;});
 window.luCubeIntro = createLuCubeIntro({
   THREE,
   manifest: AVATAR_MANIFEST,

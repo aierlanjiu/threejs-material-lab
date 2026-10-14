@@ -1,4 +1,12 @@
 const names=['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'];
+export function drawBandPulse(ctx,score,time,partId,{x,y,width,height,scale=1}){
+ const events=score?.stems.find(s=>s.id===partId)?.events||[],start=time-2,span=2.25;
+ ctx.save();ctx.strokeStyle='#b8d6e344';ctx.lineWidth=scale;ctx.beginPath();ctx.moveTo(x,y+height/2);ctx.lineTo(x+width,y+height/2);ctx.stroke();
+ for(const event of events){if(event.end<start||event.start>time+.25)continue;const px=x+Math.max(0,(event.start-start)/span)*width,active=event.start<=time&&event.end>time;
+  const h=Math.max(2*scale,event.velocity*height*.88),w=Math.max(2*scale,Math.min(width-(px-x),(event.end-event.start)/span*width));
+  ctx.fillStyle=active?'#ffe0a5':'#91c5df';ctx.globalAlpha=active?1:.35;ctx.fillRect(px,y+(height-h)/2,w,h);
+ }ctx.globalAlpha=1;ctx.strokeStyle='#fff0c9';ctx.beginPath();ctx.moveTo(x+width*2/span,y);ctx.lineTo(x+width*2/span,y+height);ctx.stroke();ctx.restore();
+}
 export function drawBandScore(canvas,score,time,stemId='vocals',fallbackSize=null){
  let rect=canvas.getBoundingClientRect();if((!rect.width||!rect.height)&&fallbackSize)rect=fallbackSize;if(!rect.width||!rect.height)return;
  const ratio=Math.min(devicePixelRatio,2);canvas.width=Math.round(rect.width*ratio);canvas.height=Math.round(rect.height*ratio);

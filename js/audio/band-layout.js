@@ -5,6 +5,9 @@ const clamp=(x,min=0,max=1)=>Math.max(min,Math.min(max,x));
 export const bandEase=x=>{x=clamp(x);return x*x*(3-2*x);};
 export function formationAt(time,score,requested='auto'){
  const fixed=BAND_FORMATIONS.find(f=>f.id===requested);if(fixed)return {id:fixed.id,previousId:fixed.id,nextId:fixed.id,mix:1,phase:0,auto:false};
+ const segments=score?.stageCues?.segments;
+ if(segments?.length){const found=segments.findIndex(s=>time>=s.start&&time<s.end),index=found>=0?found:time>=segments.at(-1).end?segments.length-1:0,segment=segments[index],phase=Math.max(0,time-segment.start);
+  return {id:segment.formation,previousId:segments[Math.max(0,index-1)].formation,nextId:segments[Math.min(segments.length-1,index+1)].formation,mix:index?bandEase(phase/1.6):1,phase,auto:true,cue:segment.kind};}
  const t=Math.max(0,Number.isFinite(time)?time:0),period=16,index=Math.floor(t/period),phase=t-index*period;
  const id=BAND_FORMATIONS[index%5].id,previousId=index?BAND_FORMATIONS[(index+4)%5].id:id,nextId=BAND_FORMATIONS[(index+1)%5].id;
  return {id,previousId,nextId,mix:index?bandEase(phase/1.6):1,phase,auto:true};

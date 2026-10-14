@@ -1,4 +1,5 @@
 import { validateBandScore } from './band-timeline.js';
+import {parseBandLrc,buildBandCues} from './band-cues.js';
 export const BAND_TRACKS=Object.freeze([
  ['anime_op_we_are','We Are!','one-piece'],['anime_op_over_the_top','OVER THE TOP','one-piece'],['anime_op_overtaken','Overtaken','one-piece'],['anime_op_one_day','One day','one-piece'],
  ['anime_db_chala','CHA-LA HEAD-CHA-LA','dragon-ball'],['anime_db_makafushigi','Makafushigi Adventure!','dragon-ball'],['anime_db_dandan','DAN DAN 心魅かれてく','dragon-ball'],
@@ -9,6 +10,8 @@ export async function loadBandAnalysis(id,{signal}={}){
  const response=await fetch(`./output/lu-band/${id}/score.json`,{signal});if(!response.ok)return null;
  const score=await response.json(),checked=validateBandScore(score);
  if(!checked.ok||score.trackId!==id||score.source!=='analysis'||!/^[a-f0-9]{64}$/.test(score.sourceSha256))throw new Error('声部谱面数据未通过校验');
+ let lyrics=[];try{const lrc=await fetch(`./output/audio/${id}.lrc`,{signal});if(lrc.ok)lyrics=parseBandLrc(await lrc.text());}catch(error){if(error.name==='AbortError')throw error;}
+ score.stageCues=buildBandCues(score,lyrics);
  return score;
 }
 export async function verifyBandSource(score,src,signal){

@@ -1,0 +1,14 @@
+[
+  {
+    "theme": "one-piece",
+    "prompt": "Use case: stylized-concept. Production asset: a seamless-looking wide LED backdrop image for a realistic miniature pirate adventure music theatre, 16:9 landscape, full bleed, no border. Photographic cinematic ocean at blue hour, deep teal and sapphire water, fine rolling silver wave reflections, distant hazy islands toward left and right, a warm small sun low on horizon slightly left of centre, high soft clouds illuminated peach and gold, subtle nautical wonder. Rich depth, large calm central negative space, lower quarter dark teal, brightest glow in upper middle third. Designed to sit behind real 3D sails and a transparent prism concert stage. No stage, no steps, no performers, no ships in foreground, no curtains, no rigging, no text, no logos, no frame, no UI. Refined cinematic art and realistic atmospheric perspective, restrained highlights rather than visual clutter."
+  },
+  {
+    "theme": "dragon-ball",
+    "prompt": "Use case: stylized-concept. Production asset: wide LED backdrop image for a realistic miniature Dragon Ball themed concert theatre, 16:9 landscape, full bleed, no border. A magnificent emerald celestial sky above distant terraced Asian limestone mountains, luminous cloud wisps, delicate star dust, an elegant very distant serpentine Eastern dragon silhouette winding through the upper sky, partly concealed in clouds. Deep turquoise and emerald, pale jade moonlight, a little warm gold. Large calm middle and lower central space, darker lower quarter for miniature performers, soft cinematic atmospheric depth. Designed to sit behind a real 3D gold arch and seven amber spheres on a transparent prism concert stage. No stage, no stairs, no people, no characters, no sphere props, no curtains, no lighting fixtures, no text, no logos, no UI. Expensive theatrical background art, natural cloud volumes and intricate distant landscape, restrained brightness."
+  },
+  {
+    "theme": "naruto",
+    "prompt": "Use case: stylized-concept. Production asset: wide LED backdrop image for a realistic miniature Naruto themed concert theatre, 16:9 landscape, full bleed, no border. A cinematic Japanese night landscape, distant misty wooded mountains and softly glowing village roofs, enormous pale peach moon behind thin cloud in upper middle, delicate cherry blossom branches at outermost left and right, indigo and desaturated lavender sky with muted crimson and warm amber accents. High atmospheric depth with spacious calm centre, lower quarter dark indigo. Designed to sit behind an actual 3D torii gate and lanterns on a translucent prism concert stage. No stage, no steps, no gate in foreground, no performers, no people, no recognizable anime characters, no curtains, no lighting fixtures, no text, no logos, no UI. Photographic depth and fine blossom detail with luxurious restrained theatrical mood."
+  }
+]
