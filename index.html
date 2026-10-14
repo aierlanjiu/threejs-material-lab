@@ -2290,38 +2290,33 @@ body.poster-mode #workbenchHandle, body.poster-mode #inspectorDockButton { backg
 body.poster-mode .bottom-dynamic-dock, body.poster-mode .modular-inspector { backdrop-filter: none; -webkit-backdrop-filter: none; border-color: var(--poster-rule); box-shadow: none; }
 
 @media (min-width: 761px) and (max-width: 1439px) {
-  body.poster-mode .app { grid-template-rows: 124px minmax(0, 1fr); }
+  body.poster-mode .app { grid-template-rows: minmax(0, 1fr); }
   body.poster-mode .master-deck-hud {
-    display: grid;
-    grid-template-columns: 206px minmax(0, 1fr) auto;
-    grid-template-rows: 48px 52px;
-    grid-template-areas: "capsule modes actions" "player player player";
-    align-content: center;
-    height: auto;
-    padding: 6px 10px;
-    gap: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: 48px;
+    padding: 0;
+    gap: 8px;
   }
-  body.poster-mode .performance-capsule { grid-area: capsule; }
-  body.poster-mode .poster-mode-host { grid-area: modes; justify-content: center; }
-  body.poster-mode .top-actions { grid-area: actions; }
-  body.poster-mode .deck-player { grid-area: player; width: 100%; }
-  body.poster-mode .deck-info { flex: 0 0 190px; max-width: 190px; }
-  body.poster-mode .time-rail-wrap { flex: 1 1 auto; min-width: 120px; }
+  body.poster-mode .performance-capsule { position: relative; }
+  body.poster-mode .poster-mode-host { display: none; }
+  body.poster-mode .top-actions { display: none; }
+  body.poster-mode .deck-player { display: none; }
 }
 
 @media (max-width: 760px) {
   body.poster-mode .app { grid-template-rows: auto minmax(0, 1fr); padding: 6px; gap: 6px; }
   body.poster-mode .master-deck-hud {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-rows: 46px auto 48px;
-    grid-template-areas: "capsule actions" "player player" "modes modes";
-    height: auto;
-    min-height: 0;
-    padding: 5px;
-    gap: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: 48px;
+    min-height: 48px;
+    padding: 0;
+    gap: 6px;
   }
-  body.poster-mode .performance-capsule { grid-area: capsule; width: min(206px, 100%); min-width: 0; height: 44px; }
+  body.poster-mode .performance-capsule { width: min(206px, 100%); min-width: 0; height: 44px; }
   body.poster-mode .performance-capsule[data-state="beat"], body.poster-mode .performance-capsule[data-state="lyric"] { width: min(248px, 100%); }
   body.poster-mode .top-actions { grid-area: actions; }
   body.poster-mode .deck-player { grid-area: player; grid-column: 1 / -1; grid-row: auto; min-height: 114px; border-radius: 3px; }
@@ -2518,19 +2513,19 @@ body.immersive .stage-hud-right { top: max(12px, env(safe-area-inset-top)); righ
           <div class="lue-choreo-container">
             <div class="lue-choreo-header">
               <div class="kinetic-mode-switcher" id="kineticModeSwitcher" role="radiogroup" aria-label="演出模式">
-                <button type="button" class="kinetic-mode-btn active" data-mode="slot" title="Daniel White 机械魔方 3D 轴心翻转模式">
+                <button type="button" class="kinetic-mode-btn active" data-mode="band" title="角色与专属乐器共同演奏">
+                  <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13M9 8l12-2"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>乐队
+                </button>
+                <button type="button" class="kinetic-mode-btn" data-mode="off" title="纯享模式，隐藏灵动歌词">
+                  <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M12 2c0 5-4 9-9 9 5 0 9 4 9 9 0-5 4-9 9-9-5 0-9-4-9-9z"/><circle cx="12" cy="11" r="1.5"/></svg>纯享
+                </button>
+                <button type="button" class="kinetic-mode-btn" data-mode="slot" title="Daniel White 机械魔方 3D 轴心翻转模式">
                   <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                   机械魔方
                 </button>
                 <button type="button" class="kinetic-mode-btn" data-mode="gravity" title="aaayandev 物理重力沙盒与反重力升空模式">
                   <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v6l4 2"></path></svg>
                   物理反重力
-                </button>
-                <button type="button" class="kinetic-mode-btn" data-mode="band" title="角色与专属乐器共同演奏">
-                  <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13M9 8l12-2"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>乐队
-                </button>
-                <button type="button" class="kinetic-mode-btn" data-mode="off" title="隐藏灵动歌词">
-                  关闭
                 </button>
               </div>
 
@@ -3376,6 +3371,33 @@ BEAT</textarea>
             <line x1="4" y1="4" x2="9" y2="9"></line>
           </svg>
           <span class="lu-apple-mode-badge" id="appleOrderOneBadge" hidden>1</span>
+        </button>
+
+        <!-- 舞台模式切换轮换按钮 (纯享 / 机械魔方 / 反重力 / 乐队) 默认乐队 -->
+        <button type="button" class="lu-apple-icon-btn" id="appleModeBtn" data-mode="band" title="模式：乐队（点击切换纯享/魔方/反重力/乐队）" aria-label="切换舞台模式，当前：乐队">
+          <!-- 乐队 SVG (默认) -->
+          <svg class="lu-apple-mode-icon" data-icon-mode="band" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M9 18V5l12-2v13M9 9l12-2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="6" cy="18" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/>
+            <circle cx="18" cy="16" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/>
+          </svg>
+          <!-- 纯享 SVG -->
+          <svg class="lu-apple-mode-icon" data-icon-mode="off" viewBox="0 0 24 24" aria-hidden="true" style="display:none;">
+            <path d="M12 2c0 5-4 9-9 9 5 0 9 4 9 9 0-5 4-9 9-9-5 0-9-4-9-9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            <circle cx="12" cy="11" r="1.5" fill="currentColor"/>
+          </svg>
+          <!-- 机械魔方 SVG -->
+          <svg class="lu-apple-mode-icon" data-icon-mode="slot" viewBox="0 0 24 24" aria-hidden="true" style="display:none;">
+            <path d="M12 2.5L20 7v10l-8 4.5L4 17V7l8-4.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M12 11.5L4 7M12 11.5l8-4.5M12 11.5v10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <!-- 反重力 SVG -->
+          <svg class="lu-apple-mode-icon" data-icon-mode="gravity" viewBox="0 0 24 24" aria-hidden="true" style="display:none;">
+            <path d="M12 15V3M8 7l4-4 4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="12" cy="10" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/>
+            <ellipse cx="12" cy="19.5" rx="8" ry="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
+          </svg>
+          <span class="lu-apple-mode-label" id="appleModeLabel">乐队</span>
         </button>
 
         <button type="button" class="lu-apple-icon-btn" id="applePlaylistBtn" aria-expanded="false" aria-controls="applePlaylistPopover" title="歌单与曲目切换" aria-label="歌单" hidden>
@@ -5747,7 +5769,7 @@ function updatePerformanceCapsule(now, track) {
   const quickMode = $('#quickModeCycleBtn');
   if (quickMode) {
     const modeNames = { slot: '魔方', gravity: '反重力', band: '乐队', off: '纯享' };
-    const mLabel = `模式：${modeNames[kineticLyricsManager?.mode || 'slot'] || '魔方'} ↻`;
+    const mLabel = `模式：${modeNames[kineticLyricsManager?.mode || 'band'] || '乐队'} ↻`;
     if (quickMode.textContent !== mLabel) quickMode.textContent = mLabel;
   }
   const quickWave = $('#quickWaveCycleBtn');
@@ -9314,6 +9336,7 @@ const lueCore = {
     const capsule = $('#performanceCapsule');
     if (capsule) {
       capsule.setAttribute('aria-expanded', 'true');
+      capsule.setAttribute('aria-label', '收起律核工作台');
     }
     const appleSettingsBtn = $('#appleSettingsBtn');
     if (appleSettingsBtn) {
@@ -9342,6 +9365,7 @@ const lueCore = {
     const capsule = $('#performanceCapsule');
     if (capsule) {
       capsule.setAttribute('aria-expanded', 'false');
+      capsule.setAttribute('aria-label', '打开律核工作台');
       capsule.focus();
     }
     const appleSettingsBtn = $('#appleSettingsBtn');
@@ -9398,17 +9422,22 @@ const lueCore = {
 };
 window.lueCore = lueCore;
 
-// 绑定律核入口与四面交互
+// 绑定律核入口与四面交互（左上角状态胶囊及品牌徽标均可一键展开/收起）
+const handleOpenWorkbench = (e) => {
+  e?.stopPropagation?.();
+  if (document.body.classList.contains('immersive')) {
+    setImmersive(false);
+  } else {
+    lueCore.toggle();
+  }
+};
 const perfCapsuleEl = $('#performanceCapsule');
 if (perfCapsuleEl) {
-  perfCapsuleEl.addEventListener('click', () => {
-    if (document.body.classList.contains('immersive')) {
-      setImmersive(false);
-    } else {
-      lueCore.toggle();
-    }
-  });
+  perfCapsuleEl.addEventListener('click', handleOpenWorkbench);
 }
+$('.brand-section')?.addEventListener('click', handleOpenWorkbench);
+$('.brand-glyph-box')?.addEventListener('click', handleOpenWorkbench);
+$('#appleSettingsBtn')?.addEventListener('click', handleOpenWorkbench);
 
 $$('.lue-facet-tab').forEach(tab => {
   tab.addEventListener('click', () => {
@@ -9541,6 +9570,30 @@ function setupLuSelection(group, underline = false) {
   update();
 }
 
+// 舞台演出模式定义 (乐队 / 纯享 / 机械魔方 / 物理反重力)
+const STAGE_MODE_METAS = {
+  band: { label: '乐队', desc: '乐队模式（角色与乐器共同演奏）', next: 'off' },
+  off: { label: '纯享', desc: '纯享模式（纯净音乐与光影）', next: 'slot' },
+  slot: { label: '机械魔方', desc: '机械魔方（3D翻转魔方歌词）', next: 'gravity' },
+  gravity: { label: '反重力', desc: '反重力（3D物理沙盒与浮空歌词）', next: 'band' }
+};
+
+function updateAppleModeUI(mode) {
+  const meta = STAGE_MODE_METAS[mode] || STAGE_MODE_METAS.band;
+  const btn = $('#appleModeBtn');
+  if (btn) {
+    btn.dataset.mode = mode;
+    btn.title = `模式：${meta.label}（点击切换）`;
+    btn.setAttribute('aria-label', `切换舞台模式，当前：${meta.label}`);
+    const labelEl = $('#appleModeLabel');
+    if (labelEl) labelEl.textContent = meta.label;
+    btn.querySelectorAll('.lu-apple-mode-icon').forEach(icon => {
+      icon.style.display = icon.dataset.iconMode === mode ? '' : 'none';
+    });
+  }
+}
+window.updateAppleModeUI = updateAppleModeUI;
+
 // 绑定顶部单行快捷直达胶囊（播放/模式循环/波形强度循环）与胶囊底部手势光轨
 $('#quickPlayToggle')?.addEventListener('click', e => {
   e.stopPropagation();
@@ -9549,12 +9602,13 @@ $('#quickPlayToggle')?.addEventListener('click', e => {
 });
 $('#quickModeCycleBtn')?.addEventListener('click', e => {
   e.stopPropagation();
-  const order = ['slot', 'gravity', 'band', 'off'];
-  const cur = kineticLyricsManager?.mode || 'slot';
+  const order = ['band', 'off', 'slot', 'gravity'];
+  const cur = kineticLyricsManager?.mode || 'band';
   const next = order[(order.indexOf(cur) + 1) % order.length];
   const btn = $(`#kineticModeSwitcher [data-mode="${next}"]`);
   if (btn) btn.click();
   else kineticLyricsManager?.setMode(next);
+  updateAppleModeUI(next);
   updateProgressUI(true);
 });
 $('#quickWaveCycleBtn')?.addEventListener('click', e => {
@@ -9575,6 +9629,7 @@ $('#quickWaveCycleBtn')?.addEventListener('click', e => {
   const hud = $('.master-deck-hud');
   if (!rail || !slider) return;
   let scrubbing = false;
+  let didScrub = false;
   const updateFromClientX = (clientX, commit = false) => {
     const rect = rail.getBoundingClientRect();
     if (!rect.width) return;
@@ -9584,23 +9639,27 @@ $('#quickWaveCycleBtn')?.addEventListener('click', e => {
     if (hud) hud.style.setProperty('--capsule-progress', `${pct}%`);
     slider.dispatchEvent(new Event(commit ? 'change' : 'input', { bubbles: true }));
   };
-  rail.addEventListener('click', e => e.stopPropagation());
+  rail.addEventListener('click', e => {
+    if (didScrub) {
+      e.stopPropagation();
+      didScrub = false;
+    }
+  });
   rail.addEventListener('pointerdown', e => {
-    e.stopPropagation();
-    e.preventDefault();
     scrubbing = true;
+    didScrub = false;
     rail.classList.add('is-scrubbing');
     rail.setPointerCapture?.(e.pointerId);
     updateFromClientX(e.clientX, false);
   });
   rail.addEventListener('pointermove', e => {
     if (!scrubbing) return;
+    didScrub = true;
     e.stopPropagation();
     updateFromClientX(e.clientX, false);
   });
   const finishScrub = e => {
     if (!scrubbing) return;
-    e.stopPropagation();
     scrubbing = false;
     rail.classList.remove('is-scrubbing');
     updateFromClientX(e.clientX, true);
@@ -9725,6 +9784,22 @@ $('#quickWaveCycleBtn')?.addEventListener('click', e => {
   });
   syncShuffle();
 
+  const modeBtn = $('#appleModeBtn');
+  modeBtn?.addEventListener('click', () => {
+    const cur = kineticLyricsManager?.mode || 'band';
+    const next = STAGE_MODE_METAS[cur]?.next || 'off';
+    const targetBtn = $(`#kineticModeSwitcher [data-mode="${next}"]`);
+    if (targetBtn) {
+      targetBtn.click();
+    } else {
+      kineticLyricsManager?.setMode(next);
+    }
+    updateAppleModeUI(next);
+    updateProgressUI(true);
+    wake();
+  });
+  updateAppleModeUI(kineticLyricsManager?.mode || 'band');
+
   scrub.addEventListener('pointerdown', () => { dragging = true; clearTimeout(hideTimer); reveal(); });
   const finishDrag = () => { dragging = false; scheduleHide(); };
   document.addEventListener('pointerup', finishDrag);
@@ -9817,6 +9892,11 @@ $('#quickWaveCycleBtn')?.addEventListener('click', e => {
     keyboardFocus = false;
     if (!playlist.hidden && !playlist.contains(event.target) && !picker.contains(event.target)) closePlaylist();
     if (!recordMenu.hidden && !recordMenu.contains(event.target) && !record.contains(event.target)) closeRecord();
+    const lueDrawer = $('#lueCoreDrawer');
+    const perfCapsule = $('#performanceCapsule');
+    if (lueCore.isOpen && lueDrawer && !lueDrawer.contains(event.target) && !perfCapsule?.contains(event.target) && !event.target.closest('.brand-section, .brand-glyph-box, #appleSettingsBtn')) {
+      lueCore.close();
+    }
     wake();
   }, { capture: true, passive: true });
   document.addEventListener('keydown', event => {
@@ -10089,6 +10169,7 @@ if (typeof kineticLyricsManager !== 'undefined' && kineticLyricsManager) {
       syncModeControlAvailability();
       syncContentPresentationControls();
       rebuildMatrix();
+      updateAppleModeUI(mode);
     },
     onGravityEnter: () => {
       pendingFrameDistance = null;

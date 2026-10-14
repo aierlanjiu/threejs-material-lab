@@ -1603,9 +1603,8 @@ export class KineticLyricsManager {
     this.stage = stageContainerEl;
     this.threeCtx = threeContext;
 
-    // A fresh visitor sees the slot button selected in the markup. Keep the
-    // engine in that same state; an explicit saved "off" still wins below.
-    this.mode = 'slot';
+    // Default to band mode as requested; a saved valid mode still restores below.
+    this.mode = 'band';
     this.slotEngine = null;
     this.gravityEngine = null;
     this.mountEl = null;
@@ -1614,8 +1613,12 @@ export class KineticLyricsManager {
       const savedMode = localStorage.getItem('lu_kinetic_lyrics_mode');
       if (savedMode && ['slot', 'gravity', 'band', 'off'].includes(savedMode)) {
         this.mode = savedMode;
+      } else {
+        this.mode = 'band';
       }
-    } catch (_) {}
+    } catch (_) {
+      this.mode = 'band';
+    }
 
     this.initMount();
     this.initUIButtons();

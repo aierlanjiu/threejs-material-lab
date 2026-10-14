@@ -24,6 +24,13 @@ body.poster-mode #topDisclaimerBtn {
   display: none !important;
 }
 body.poster-mode .master-deck-hud {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  grid-template-columns: none !important;
+  grid-template-rows: none !important;
+  grid-template-areas: none !important;
+  align-content: normal !important;
   background: transparent !important;
   border-color: transparent !important;
   box-shadow: none !important;
@@ -835,21 +842,27 @@ body.poster-mode .modular-inspector input[type="range"] { accent-color: var(--po
     transform 240ms cubic-bezier(.32, .72, 0, 1);
 }
 
-body.poster-mode:not(.lue-core-open) .lue-core-drawer {
+body.poster-mode:not(.lue-core-open) .lue-core-drawer,
+body:not(.lue-core-open) .lue-core-drawer {
   display: none !important;
   opacity: 0;
   pointer-events: none;
   transform: translateY(-8px) scale(0.95);
 }
 
-body.poster-mode.lue-core-open .lue-core-drawer {
+body.poster-mode.lue-core-open .lue-core-drawer,
+body.lue-core-open .lue-core-drawer {
   display: flex !important;
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0) scale(1);
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: translateY(0) scale(1) !important;
+  z-index: 125 !important;
   animation: lu-capsule-morph-open 240ms cubic-bezier(.32, .72, 0, 1);
 }
-body.poster-mode.lue-core-open .master-deck-hud { z-index: 60; }
+body.poster-mode.lue-core-open .master-deck-hud,
+body.lue-core-open .master-deck-hud {
+  z-index: 120 !important;
+}
 
 /* 顶部四面分段导航栏 */
 .lue-facet-tabs {
@@ -1436,7 +1449,26 @@ button.lu-apple-track-zone {
 }
 @media (min-width: 761px) {
   body.poster-mode .app { grid-template-rows: minmax(0, 1fr); padding: 0; gap: 0; height: 100dvh; }
-  body.poster-mode .master-deck-hud { position: absolute; top: 20px; left: 24px; right: 24px; height: 48px; min-height: 48px; max-height: 48px; padding: 0; z-index: 60; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+  body.poster-mode .master-deck-hud {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    grid-template-columns: none !important;
+    grid-template-rows: none !important;
+    grid-template-areas: none !important;
+    align-content: normal !important;
+    position: absolute;
+    top: 20px;
+    left: 24px;
+    right: 24px;
+    height: 48px;
+    min-height: 48px;
+    max-height: 48px;
+    padding: 0;
+    z-index: 60;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
   body.poster-mode .stage-cell { grid-row: 1; width: 100%; height: 100%; }
   body.poster-mode .stageWrap { border: 0; border-radius: 0; }
   body.poster-mode .lu-band-lyric { bottom: 162px; }
@@ -1496,3 +1528,75 @@ button.lu-apple-track-zone {
   .lu-apple-play-btn, .lu-apple-icon-btn { transition: none; }
   #cubeLyricsDeck, .stageWrap:has(.mode-slot) #stage, .lu-band-lyric { transition: none; }
 }
+
+/* ========================================================================= */
+/* 底部 Apple Dock 舞台模式切换按钮 (#appleModeBtn)                            */
+/* ========================================================================= */
+#appleModeBtn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 10px;
+  width: auto !important;
+  min-width: 44px !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  border-radius: 999px;
+  color: rgba(245, 245, 247, 0.88);
+  transition: background 180ms ease, color 180ms ease, transform 180ms cubic-bezier(.34, 1.56, .64, 1);
+}
+#appleModeBtn:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #fff;
+}
+#appleModeBtn:active {
+  transform: scale(0.92);
+}
+#appleModeBtn .lu-apple-mode-icon {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  flex-shrink: 0;
+  transition: transform 260ms cubic-bezier(.34, 1.56, .64, 1), opacity 180ms ease;
+}
+#appleModeBtn:active .lu-apple-mode-icon {
+  transform: scale(0.82) rotate(18deg);
+}
+.lu-apple-mode-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  user-select: none;
+}
+@media (max-width: 760px) {
+  .lu-apple-mode-label {
+    display: none;
+  }
+  #appleModeBtn {
+    width: 38px !important;
+    min-width: 38px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 0 !important;
+  }
+  #appleModeBtn .lu-apple-mode-icon {
+    width: 19px;
+    height: 19px;
+  }
+}
+@media (max-width: 370px) {
+  #appleModeBtn {
+    width: 34px !important;
+    min-width: 34px !important;
+    height: 34px !important;
+    min-height: 34px !important;
+  }
+  #appleModeBtn .lu-apple-mode-icon {
+    width: 17px;
+    height: 17px;
+  }
+}
+
