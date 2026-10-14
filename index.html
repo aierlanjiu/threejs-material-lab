@@ -2396,6 +2396,7 @@ body.immersive .stage-hud-right { top: max(12px, env(safe-area-inset-top)); righ
       </span>
       <span class="performance-capsule-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
       <span class="performance-capsule-cue" aria-hidden="true">▾</span>
+      <span class="capsule-scrub-rail" id="capsuleScrubRail" aria-hidden="true" title="左右拖拽底部光轨可直接快进"><i></i></span>
     </button>
 
     <button type="button" class="btn btn-sm lu-disclaimer-pill" id="topDisclaimerBtn" title="查看项目非商业研究及版权免责声明" style="font-size:11px; padding:4px 9px; opacity:0.8; border-radius:14px; background:rgba(255,255,255,0.06); border:1px solid var(--poster-rule,#6a625e); color:var(--poster-paper,#ede2cf); cursor:pointer; flex:0 0 auto;">免责声明</button>
@@ -2419,6 +2420,11 @@ body.immersive .stage-hud-right { top: max(12px, env(safe-area-inset-top)); righ
           <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4" fill="currentColor"></circle></svg>
           <span>录制</span>
         </button>
+        <div class="lue-inline-quickbar" aria-label="快捷直达操作">
+          <button type="button" class="lue-quick-pill" id="quickPlayToggle" title="一键播放/暂停">▶ 播放</button>
+          <button type="button" class="lue-quick-pill" id="quickModeCycleBtn" title="一键循环切换舞台模式（魔方/反重力/乐队/纯享）">模式：魔方 ↻</button>
+          <button type="button" class="lue-quick-pill" id="quickWaveCycleBtn" title="单击切换声波形态，按住 Shift 单击切换律动强度档位">水波·2档 ↻</button>
+        </div>
         <button type="button" class="lue-facet-close" id="lueDrawerCloseBtn" aria-label="关闭律核工作台">收起 ✕</button>
       </div>
 
@@ -3313,6 +3319,126 @@ BEAT</textarea>
     </div>
   </aside>
 
+  <!-- Apple 系统风格底部圆钮与展开式播放控制胶囊 -->
+  <div class="lu-apple-dock" id="luAppleDock" data-dock-state="expanded" data-visibility="visible" role="region" aria-label="音乐播放器">
+    <button type="button" class="lu-apple-orb-btn" id="luAppleOrbBtn" aria-label="播放并展开底部控制胶囊" title="点击开始播放并展开播放控件">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7.5 5.25c0-1.02 1.12-1.64 1.99-1.1l10.22 6.35c.82.51.82 1.69 0 2.2L9.49 19.05c-.87.54-1.99-.08-1.99-1.1V5.25Z"/>
+      </svg>
+    </button>
+
+    <div class="lu-apple-capsule-body" id="luAppleCapsuleBody">
+      <div class="lu-apple-transport-cluster" role="group" aria-label="播放控制">
+        <button type="button" class="lu-apple-icon-btn" id="applePrevBtn" title="上一首" aria-label="上一首">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 6a1 1 0 0 1 1 1v10a1 1 0 1 1-2 0V7a1 1 0 0 1 1-1Zm11.45.66a1.2 1.2 0 0 1 1.8.99v8.7a1.2 1.2 0 0 1-1.8.99l-7.1-4.35a1.2 1.2 0 0 1 0-1.98l7.1-4.35Z"/>
+          </svg>
+        </button>
+        <button type="button" class="lu-apple-play-btn" id="applePlayPauseBtn" title="播放 / 暂停" aria-label="播放">
+          <svg id="applePlayIcon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7.5 5.25c0-1.02 1.12-1.64 1.99-1.1l10.22 6.35c.82.51.82 1.69 0 2.2L9.49 19.05c-.87.54-1.99-.08-1.99-1.1V5.25Z"/>
+          </svg>
+          <svg id="applePauseIcon" viewBox="0 0 24 24" aria-hidden="true" hidden>
+            <rect x="6.5" y="5" width="4" height="14" rx="1.4"></rect>
+            <rect x="13.5" y="5" width="4" height="14" rx="1.4"></rect>
+          </svg>
+        </button>
+        <button type="button" class="lu-apple-icon-btn" id="appleNextBtn" title="下一首" aria-label="下一首">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M18 6a1 1 0 0 1 1 1v10a1 1 0 1 1-2 0V7a1 1 0 0 1 1-1ZM6.55 6.66l7.1 4.35a1.2 1.2 0 0 1 0 1.98l-7.1 4.35a1.2 1.2 0 0 1-1.8-.99v-8.7a1.2 1.2 0 0 1 1.8-.99Z"/>
+          </svg>
+        </button>
+      </div>
+
+      <button type="button" class="lu-apple-track-zone" id="appleTrackPicker" aria-expanded="false" aria-controls="applePlaylistPopover" aria-label="选择歌曲">
+        <img class="lu-apple-artwork" id="appleArtwork" src="./assets/icons/themes/one-piece-straw-compass.png" alt="">
+        <span class="lu-apple-track-copy"><span class="lu-apple-track-title" id="appleTrackTitle">《游京》</span><small id="appleTrackArtist">星火社 · 选择歌曲</small></span>
+      </button>
+
+      <div class="lu-apple-actions-cluster" role="group" aria-label="播放模式、歌单与设置">
+        <button type="button" class="lu-apple-icon-btn" id="appleOrderModeBtn" data-order-mode="loop" aria-pressed="false" title="顺序播放，点击开启随机播放" aria-label="随机播放">
+          <svg id="appleIconRepeat" class="stroke-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <polyline points="17 1 21 5 17 9"></polyline>
+            <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+            <polyline points="7 23 3 19 7 15"></polyline>
+            <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+          </svg>
+          <svg id="appleIconShuffle" class="stroke-icon" viewBox="0 0 24 24" aria-hidden="true" hidden>
+            <polyline points="16 3 21 3 21 8"></polyline>
+            <line x1="4" y1="20" x2="21" y2="3"></line>
+            <polyline points="21 16 21 21 16 21"></polyline>
+            <line x1="15" y1="15" x2="21" y2="21"></line>
+            <line x1="4" y1="4" x2="9" y2="9"></line>
+          </svg>
+          <span class="lu-apple-mode-badge" id="appleOrderOneBadge" hidden>1</span>
+        </button>
+
+        <button type="button" class="lu-apple-icon-btn" id="applePlaylistBtn" aria-expanded="false" aria-controls="applePlaylistPopover" title="歌单与曲目切换" aria-label="歌单" hidden>
+          <svg class="stroke-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <line x1="8" y1="6" x2="21" y2="6"></line>
+            <line x1="8" y1="12" x2="21" y2="12"></line>
+            <line x1="8" y1="18" x2="21" y2="18"></line>
+            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+          </svg>
+        </button>
+
+        <button type="button" class="lu-apple-icon-btn" id="appleSettingsBtn" aria-expanded="false" aria-controls="lueCoreDrawer" title="设置与舞台工作台" aria-label="设置" hidden>
+          <svg class="stroke-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <line x1="4" y1="21" x2="4" y2="14"></line>
+            <line x1="4" y1="10" x2="4" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12" y2="3"></line>
+            <line x1="20" y1="21" x2="20" y2="16"></line>
+            <line x1="20" y1="12" x2="20" y2="3"></line>
+            <line x1="1" y1="14" x2="7" y2="14"></line>
+            <line x1="9" y1="8" x2="15" y2="8"></line>
+            <line x1="17" y1="16" x2="23" y2="16"></line>
+          </svg>
+        </button>
+
+        <button type="button" class="lu-apple-icon-btn" id="appleRecordMenuBtn" aria-expanded="false" aria-controls="appleRecordPopover" aria-label="录制" title="录制视频">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.7"></circle><circle cx="12" cy="12" r="4"></circle></svg>
+          <span>录制</span>
+        </button>
+        <button type="button" class="lu-apple-icon-btn" id="appleCollapseOrbBtn" title="收起为底部圆钮" aria-label="收起控件胶囊" hidden>
+          <svg class="stroke-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+      </div>
+      <div class="lu-apple-timeline">
+        <div class="lu-apple-scrub-wrap"><input type="range" class="lu-apple-scrub-input" id="appleScrubInput" min="0" max="100" value="0" step="0.1" aria-label="播放进度"></div>
+        <span class="lu-apple-track-time" id="appleTimeText">00:00 / 00:00</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Apple 系统风格歌单浮层 -->
+  <div class="lu-apple-playlist-popover" id="applePlaylistPopover" role="dialog" aria-label="播放歌单" hidden>
+    <div class="lu-apple-popover-header">
+      <strong>播放歌单</strong>
+      <button type="button" class="lu-apple-import-trigger" id="appleImportAudioBtn" title="导入本机音频文件">＋ 导入音频</button>
+    </div>
+    <div class="lu-apple-playlist-list" id="applePlaylistList" role="listbox" aria-label="可选曲目"></div>
+  </div>
+
+  <div class="lu-apple-playlist-popover lu-apple-record-popover" id="appleRecordPopover" role="dialog" aria-label="录制视频" hidden>
+    <div class="lu-apple-popover-header"><strong>录制视频</strong><button type="button" class="lu-apple-icon-btn" id="appleRecordCloseBtn" aria-label="关闭录制菜单">×</button></div>
+    <div class="lu-apple-record-options">
+      <span>画幅</span>
+      <div role="group" aria-label="录制画幅" class="lu-apple-aspect-group">
+        <button type="button" data-apple-aspect="landscape" aria-pressed="true">16:9</button>
+        <button type="button" data-apple-aspect="portrait" aria-pressed="false">9:16</button>
+        <button type="button" data-apple-aspect="ultrawide" aria-pressed="false">21:9</button>
+      </div>
+      <button type="button" id="appleRecordStartBtn" class="lu-apple-record-start">开始录制</button>
+      <span class="lu-sr-only" id="appleRecordAnnouncement" role="status" aria-live="polite"></span>
+    </div>
+  </div>
+  <button type="button" id="appleRecordingIndicator" class="lu-apple-recording-indicator" aria-label="停止录制并保存" hidden><span class="rec-dot-pill" aria-hidden="true"></span><span id="appleRecordingTime">00:00</span><span>停止</span></button>
+
 </div>
 
 <section class="lu-intro-overlay" id="luIntroOverlay" role="dialog" aria-modal="true" aria-labelledby="luIntroHeading">
@@ -3465,11 +3591,21 @@ function showControlFace(button, faceName) {
 
 function setPlayPauseButtonState(isPlaying) {
   const btn = $('#playPauseBtn');
-  if (!btn) return;
-  btn.classList.toggle('choreography-active', isPlaying);
-  btn.dataset.playState = isPlaying ? 'playing' : 'paused';
-  btn.setAttribute('aria-label', isPlaying ? '暂停' : '播放');
-  showControlFace(btn, isPlaying ? 'face-pause' : 'face-play');
+  if (btn) {
+    btn.classList.toggle('choreography-active', isPlaying);
+    btn.dataset.playState = isPlaying ? 'playing' : 'paused';
+    btn.setAttribute('aria-label', isPlaying ? '暂停' : '播放');
+    showControlFace(btn, isPlaying ? 'face-pause' : 'face-play');
+  }
+  const appleBtn = $('#applePlayPauseBtn');
+  if (appleBtn) {
+    appleBtn.dataset.playState = isPlaying ? 'playing' : 'paused';
+    appleBtn.setAttribute('aria-label', isPlaying ? '暂停' : '播放');
+    const playIcon = $('#applePlayIcon');
+    const pauseIcon = $('#applePauseIcon');
+    if (playIcon) playIcon.toggleAttribute('hidden', isPlaying);
+    if (pauseIcon) pauseIcon.toggleAttribute('hidden', !isPlaying);
+  }
 }
 
 
@@ -3678,6 +3814,8 @@ const state = {
   playbackStartTime: 0.0,
   lyricOffsetMs: 0,
   lyricLanguage: 'zh',
+  playbackOrderMode: 'loop', // 'loop' | 'one' | 'shuffle'
+  appleDockExpanded: true,
   trackCustomLyricsMap: {},
   currentTrackIndex: 0,
   playlist: [
@@ -5586,6 +5724,30 @@ function updatePerformanceCapsule(now, track) {
     const amplitude = playing && !prefersReducedMotion ? values[index] : 0;
     bar.style.transform = `scaleY(${(0.22 + Math.min(1, amplitude) * 0.78).toFixed(2)})`;
   });
+  const hud = $('.master-deck-hud');
+  if (hud) {
+    const pulse = playing && !prefersReducedMotion ? Math.min(1, state.beatPulse || 0) : 0;
+    const bass = playing && !prefersReducedMotion ? Math.min(1, state.bassEnergy || 0) : 0;
+    hud.style.setProperty('--beat-pulse', pulse.toFixed(3));
+    hud.style.setProperty('--bass-energy', bass.toFixed(3));
+  }
+  const quickPlay = $('#quickPlayToggle');
+  if (quickPlay) {
+    const playLabel = state.isPlayingMusic ? '⏸ 暂停' : '▶ 播放';
+    if (quickPlay.textContent !== playLabel) quickPlay.textContent = playLabel;
+  }
+  const quickMode = $('#quickModeCycleBtn');
+  if (quickMode) {
+    const modeNames = { slot: '魔方', gravity: '反重力', band: '乐队', off: '纯享' };
+    const mLabel = `模式：${modeNames[kineticLyricsManager?.mode || 'slot'] || '魔方'} ↻`;
+    if (quickMode.textContent !== mLabel) quickMode.textContent = mLabel;
+  }
+  const quickWave = $('#quickWaveCycleBtn');
+  if (quickWave) {
+    const waveNames = { ripple: '水波', diagonal: '巨浪', equalizer: '针雕', spiral: '涡流', heartbeat: '心跳', glitch: '脉冲' };
+    const wLabel = `${waveNames[state.wavePattern] || '水波'}·${state.intensityTier || 2}档 ↻`;
+    if (quickWave.textContent !== wLabel) quickWave.textContent = wLabel;
+  }
 }
 function updateProgressUI(force = false) {
   const now = performance.now();
@@ -5594,14 +5756,39 @@ function updateProgressUI(force = false) {
   const curTrack = state.playlist[state.currentTrackIndex];
   const dur = getTrackDuration(curTrack);
   const curTime = getPlaybackTime();
+  const pct = dur > 0 ? Math.max(0, Math.min(100, (curTime / dur) * 100)) : 0;
+  const formattedTime = `${formatTime(curTime)} / ${formatTime(dur)}`;
   if ($('#timeDisplay')) {
-    $('#timeDisplay').textContent = `${formatTime(curTime)} / ${formatTime(dur)}`;
+    $('#timeDisplay').textContent = formattedTime;
+  }
+  if ($('#appleTimeText')) {
+    $('#appleTimeText').textContent = formattedTime;
+  }
+  if ($('#appleTrackTitle') && curTrack?.title) {
+    const cleanTitle = curTrack.title.replace(/^\d+:\s*/, '');
+    const parts = cleanTitle.match(/^(《[^》]+》)\s*[-—]\s*(.+)$/) || cleanTitle.match(/^(.+)\s+[-—]\s+(.+)$/);
+    const name = parts?.[1] || cleanTitle, artist = parts?.[2] || '选择歌曲';
+    if ($('#appleTrackTitle').textContent !== name) $('#appleTrackTitle').textContent = name;
+    if ($('#appleTrackArtist')) $('#appleTrackArtist').textContent = artist;
+    const artwork = $('.performance-capsule-mark img')?.getAttribute('src');
+    if (artwork && $('#appleArtwork')?.getAttribute('src') !== artwork) $('#appleArtwork').src = artwork;
   }
   if ($('#timeProgressSlider') && !isDraggingProgressSlider) {
-    const pct = dur > 0 ? (curTime / dur) * 100 : 0;
     $('#timeProgressSlider').value = pct.toFixed(1);
   }
+  if ($('#appleScrubInput') && !isDraggingProgressSlider) {
+    $('#appleScrubInput').value = pct.toFixed(1);
+  }
+  const hud = $('.master-deck-hud');
+  if (hud && !isDraggingProgressSlider) {
+    hud.style.setProperty('--capsule-progress', `${pct.toFixed(1)}%`);
+  }
+  const appleDock = $('#luAppleDock');
+  if (appleDock && !isDraggingProgressSlider) {
+    appleDock.style.setProperty('--capsule-progress', `${pct.toFixed(1)}%`);
+  }
   updatePerformanceCapsule(now, curTrack);
+  window.luApplePlayer?.sync();
 }
 
 function initAudioEngine() {
@@ -5635,17 +5822,22 @@ async function listenBandStem(stem){
 }
 function startBufferPlayback(track, startPos = 0) {
   if (state.currentAudioSource) {
-    try { state.currentAudioSource.stop(); } catch(e){}
+    try { state.currentAudioSource.onended = null; state.currentAudioSource.stop(); } catch(e){}
     state.currentAudioSource = null;
   }
   const source = state.audioCtx.createBufferSource();
   source.buffer = bandMonitorType===track.type&&bandMonitorBuffer?bandMonitorBuffer:track.buffer;
-  source.loop = true;
+  source.loop = (state.playbackOrderMode === 'one');
   source.loopEnd = Math.min(track.buffer.duration,source.buffer.duration);
   source.connect(state.analyser);
 
   const dur = track.buffer.duration || 180;
   const offset = startPos % dur;
+  source.onended = () => {
+    if (state.isPlayingMusic && state.currentAudioSource === source && state.playbackOrderMode !== 'one' && !isDraggingProgressSlider) {
+      stepAvailableTrack(1, { autoEnded: true });
+    }
+  };
   source.start(0, Math.min(offset,Math.max(0,source.buffer.duration-.01)));
   state.currentAudioSource = source;
   state.playbackStartTime = state.audioCtx.currentTime;
@@ -5653,6 +5845,9 @@ function startBufferPlayback(track, startPos = 0) {
   state.audioReady = true;
   resetBeatClock();
   $('#nowPlayingText').textContent = `当前：${track.title}`;
+  if ($('#appleTrackTitle')) {
+    $('#appleTrackTitle').textContent = track.title.replace(/^\d+:\s*/, '');
+  }
 }
 
 function playTrackAtIndex(idx, resumeFromOffset = false) {
@@ -6185,7 +6380,10 @@ $('#cropConfirm').addEventListener('click', () => {
 function fitStagePreview() {
   const preset = VIDEO_PRESETS[state.videoAspect] || VIDEO_PRESETS.landscape;
   stageWrapEl.dataset.aspect = state.videoAspect;
-  if (document.body.classList.contains('immersive')) {
+  const recordFraming = state.isRecording || document.body.classList.contains('lu-record-menu-open')
+    || (document.body.classList.contains('lue-core-open') && $('#lueTabRecord')?.getAttribute('aria-selected') === 'true');
+  const desktopPerformance = innerWidth > 760 && document.body.classList.contains('poster-mode') && !recordFraming;
+  if (document.body.classList.contains('immersive') || desktopPerformance) {
     stageWrapEl.style.width = '100%';
     stageWrapEl.style.height = '100%';
     return;
@@ -7903,7 +8101,26 @@ $('#playPauseBtn').addEventListener('click', () => {
   else playTrackAtIndex(state.currentTrackIndex, state.playbackOffset > 0);
 });
 
-function stepAvailableTrack(direction) {
+function stepAvailableTrack(direction, { autoEnded = false } = {}) {
+  if (autoEnded && state.playbackOrderMode === 'one') {
+    playTrackAtIndex(state.currentTrackIndex, false);
+    return;
+  }
+  const playableIndices = [];
+  for (let i = 0; i < state.playlist.length; i++) {
+    const t = state.playlist[i];
+    if (t.theme && t.theme !== state.theme) continue;
+    if (t.localOnly && !t.buffer && !t.src) continue;
+    playableIndices.push(i);
+  }
+  if (state.playbackOrderMode === 'shuffle' && playableIndices.length > 0) {
+    const pool = playableIndices.length > 1
+      ? playableIndices.filter(i => i !== state.currentTrackIndex)
+      : playableIndices;
+    const randomIdx = pool[Math.floor(Math.random() * pool.length)];
+    playTrackAtIndex(randomIdx);
+    return;
+  }
   let next = state.currentTrackIndex;
   for (let attempt = 0; attempt < state.playlist.length; attempt++) {
     next = (next + direction + state.playlist.length) % state.playlist.length;
@@ -9090,6 +9307,17 @@ const lueCore = {
     if (capsule) {
       capsule.setAttribute('aria-expanded', 'true');
     }
+    const appleSettingsBtn = $('#appleSettingsBtn');
+    if (appleSettingsBtn) {
+      appleSettingsBtn.setAttribute('aria-expanded', 'true');
+      appleSettingsBtn.dataset.active = 'true';
+    }
+    const playlistPopover = $('#applePlaylistPopover');
+    if (playlistPopover && !playlistPopover.hidden) {
+      playlistPopover.hidden = true;
+      $('#applePlaylistBtn')?.setAttribute('aria-expanded', 'false');
+      if ($('#applePlaylistBtn')) $('#applePlaylistBtn').dataset.active = 'false';
+    }
     const facetName = this.activeFacet.charAt(0).toUpperCase() + this.activeFacet.slice(1);
     const tab = $(`#lueTab${facetName}`);
     if (tab) tab.focus();
@@ -9107,6 +9335,11 @@ const lueCore = {
     if (capsule) {
       capsule.setAttribute('aria-expanded', 'false');
       capsule.focus();
+    }
+    const appleSettingsBtn = $('#appleSettingsBtn');
+    if (appleSettingsBtn) {
+      appleSettingsBtn.setAttribute('aria-expanded', 'false');
+      appleSettingsBtn.dataset.active = 'false';
     }
     if ($('#workbenchDock')) {
       $('#workbenchDock').inert = true;
@@ -9249,6 +9482,9 @@ function setupLuSelection(group, underline = false) {
   surface.style.transition = 'none';
   group.prepend(surface);
   let frame = 0;
+  let prevX = null;
+  let prevY = null;
+  let stretchTimer = 0;
   const update = () => {
     cancelAnimationFrame(frame);
     frame = requestAnimationFrame(() => {
@@ -9256,8 +9492,27 @@ function setupLuSelection(group, underline = false) {
       if (!selected) return;
       const groupRect = group.getBoundingClientRect();
       const rect = selected.getBoundingClientRect();
-      group.style.setProperty('--lu-selection-x', `${(rect.left - groupRect.left).toFixed(2)}px`);
-      group.style.setProperty('--lu-selection-y', `${(rect.top - groupRect.top + (underline ? rect.height - 2 : 0)).toFixed(2)}px`);
+      const nextX = rect.left - groupRect.left;
+      const nextY = rect.top - groupRect.top + (underline ? rect.height - 2 : 0);
+      if (prevX !== null && !prefersReducedMotion && group.dataset.luKeyboard !== 'true') {
+        const dx = Math.abs(nextX - prevX);
+        const dy = Math.abs(nextY - prevY);
+        if (dx > 2 || dy > 2) {
+          const sx = dx >= dy ? Math.min(1.24, 1 + dx / 190) : Math.max(0.9, 1 - dy / 360);
+          const sy = dy > dx ? Math.min(1.2, 1 + dy / 160) : Math.max(0.88, 1 - dx / 420);
+          group.style.setProperty('--lu-selection-scale-x', sx.toFixed(3));
+          group.style.setProperty('--lu-selection-scale-y', sy.toFixed(3));
+          clearTimeout(stretchTimer);
+          stretchTimer = setTimeout(() => {
+            group.style.setProperty('--lu-selection-scale-x', '1');
+            group.style.setProperty('--lu-selection-scale-y', '1');
+          }, 135);
+        }
+      }
+      prevX = nextX;
+      prevY = nextY;
+      group.style.setProperty('--lu-selection-x', `${nextX.toFixed(2)}px`);
+      group.style.setProperty('--lu-selection-y', `${nextY.toFixed(2)}px`);
       group.style.setProperty('--lu-selection-width', `${rect.width.toFixed(2)}px`);
       group.style.setProperty('--lu-selection-height', `${underline ? 2 : rect.height.toFixed(2)}px`);
       if (!group.dataset.luSelectionReady) {
@@ -9277,12 +9532,329 @@ function setupLuSelection(group, underline = false) {
   window.addEventListener('resize', update);
   update();
 }
+
+// 绑定顶部单行快捷直达胶囊（播放/模式循环/波形强度循环）与胶囊底部手势光轨
+$('#quickPlayToggle')?.addEventListener('click', e => {
+  e.stopPropagation();
+  $('#playPauseBtn')?.click();
+  updateProgressUI(true);
+});
+$('#quickModeCycleBtn')?.addEventListener('click', e => {
+  e.stopPropagation();
+  const order = ['slot', 'gravity', 'band', 'off'];
+  const cur = kineticLyricsManager?.mode || 'slot';
+  const next = order[(order.indexOf(cur) + 1) % order.length];
+  const btn = $(`#kineticModeSwitcher [data-mode="${next}"]`);
+  if (btn) btn.click();
+  else kineticLyricsManager?.setMode(next);
+  updateProgressUI(true);
+});
+$('#quickWaveCycleBtn')?.addEventListener('click', e => {
+  e.stopPropagation();
+  if (e.shiftKey) {
+    const nextTier = (state.intensityTier % 3) + 1;
+    $(`#intensityTierGroup [data-tier="${nextTier}"]`)?.click();
+  } else {
+    const patterns = ['ripple', 'diagonal', 'equalizer', 'spiral', 'heartbeat', 'glitch'];
+    const nextPattern = patterns[(patterns.indexOf(state.wavePattern) + 1) % patterns.length];
+    $(`#wavePatternGroup [data-pattern="${nextPattern}"]`)?.click();
+  }
+  updateProgressUI(true);
+});
+(() => {
+  const rail = $('#capsuleScrubRail');
+  const slider = $('#timeProgressSlider');
+  const hud = $('.master-deck-hud');
+  if (!rail || !slider) return;
+  let scrubbing = false;
+  const updateFromClientX = (clientX, commit = false) => {
+    const rect = rail.getBoundingClientRect();
+    if (!rect.width) return;
+    const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    const pct = (ratio * 100).toFixed(1);
+    slider.value = pct;
+    if (hud) hud.style.setProperty('--capsule-progress', `${pct}%`);
+    slider.dispatchEvent(new Event(commit ? 'change' : 'input', { bubbles: true }));
+  };
+  rail.addEventListener('click', e => e.stopPropagation());
+  rail.addEventListener('pointerdown', e => {
+    e.stopPropagation();
+    e.preventDefault();
+    scrubbing = true;
+    rail.classList.add('is-scrubbing');
+    rail.setPointerCapture?.(e.pointerId);
+    updateFromClientX(e.clientX, false);
+  });
+  rail.addEventListener('pointermove', e => {
+    if (!scrubbing) return;
+    e.stopPropagation();
+    updateFromClientX(e.clientX, false);
+  });
+  const finishScrub = e => {
+    if (!scrubbing) return;
+    e.stopPropagation();
+    scrubbing = false;
+    rail.classList.remove('is-scrubbing');
+    updateFromClientX(e.clientX, true);
+  };
+  rail.addEventListener('pointerup', finishScrub);
+  rail.addEventListener('pointercancel', finishScrub);
+})();
+
+// Compact player: playback state comes from the existing audio and recording engines.
+(() => {
+  const dock = $('#luAppleDock'), play = $('#applePlayPauseBtn');
+  const picker = $('#appleTrackPicker'), playlist = $('#applePlaylistPopover');
+  const record = $('#appleRecordMenuBtn'), recordMenu = $('#appleRecordPopover');
+  const start = $('#appleRecordStartBtn'), indicator = $('#appleRecordingIndicator');
+  const scrub = $('#appleScrubInput'), mainSlider = $('#timeProgressSlider');
+  if (!dock || !play) return;
+  let hideTimer = 0, lastWake = 0, pointerInside = false, dragging = false;
+  let keyboardFocus = false, previousPlaying = false, previousRecord = '', previousAspect = '';
+  let preparing = false;
+
+  const isPlaying = () => state.isPlayingMusic && state.audioReady;
+  const locked = () => pointerInside || dragging || !playlist.hidden || !recordMenu.hidden || lueCore.isOpen
+    || (keyboardFocus && dock.contains(document.activeElement));
+  function reveal() {
+    dock.dataset.visibility = 'visible';
+    dock.inert = false;
+    dock.removeAttribute('aria-hidden');
+  }
+  function scheduleHide() {
+    clearTimeout(hideTimer);
+    if (!isPlaying() || locked()) return;
+    hideTimer = setTimeout(() => {
+      if (!isPlaying() || locked() || document.hidden) return;
+      dock.dataset.visibility = 'hidden';
+      dock.inert = true;
+      dock.setAttribute('aria-hidden', 'true');
+    }, 3000);
+  }
+  function wake() {
+    reveal();
+    scheduleHide();
+  }
+  function closePlaylist(restoreFocus = false) {
+    playlist.hidden = true;
+    picker.setAttribute('aria-expanded', 'false');
+    if (restoreFocus) picker.focus({ preventScroll: true });
+  }
+  function closeRecord(restoreFocus = false) {
+    recordMenu.hidden = true;
+    record.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('lu-record-menu-open');
+    fitStagePreview();
+    if (restoreFocus) record.focus({ preventScroll: true });
+  }
+  function renderPlaylist() {
+    const list = $('#applePlaylistList');
+    list.replaceChildren();
+    state.playlist.forEach((track, index) => {
+      if (track.theme && track.theme !== state.theme) return;
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'lu-apple-song-item' + (index === state.currentTrackIndex ? ' active' : '');
+      button.setAttribute('role', 'option');
+      button.setAttribute('aria-selected', String(index === state.currentTrackIndex));
+      const title = document.createElement('span'), tag = document.createElement('span');
+      title.textContent = (track.title || '').replace(/^\d+:\s*/, '');
+      tag.className = 'lu-apple-song-tag';
+      const needsImport = track.localOnly && !track.buffer && !track.src;
+      tag.textContent = index === state.currentTrackIndex ? '当前歌曲' : needsImport ? '导入音频' : '';
+      button.append(title, tag);
+      button.addEventListener('click', () => {
+        closePlaylist();
+        playTrackAtIndex(index);
+        if (needsImport) $('#audioUpload')?.click();
+        wake();
+      });
+      list.appendChild(button);
+    });
+  }
+  picker.addEventListener('click', () => {
+    if (!playlist.hidden) { closePlaylist(); wake(); return; }
+    closeRecord();
+    lueCore.close();
+    renderPlaylist();
+    playlist.hidden = false;
+    picker.setAttribute('aria-expanded', 'true');
+    reveal();
+    clearTimeout(hideTimer);
+    if (keyboardFocus) playlist.querySelector('.active, button')?.focus({ preventScroll: true });
+  });
+  $('#appleImportAudioBtn').addEventListener('click', () => {
+    closePlaylist();
+    $('#audioUpload')?.click();
+    wake();
+  });
+  play.addEventListener('click', () => { $('#playPauseBtn').click(); wake(); });
+  $('#luAppleOrbBtn').addEventListener('click', () => { dock.dataset.dockState = 'expanded'; play.click(); });
+  $('#applePrevBtn').addEventListener('click', () => { stepAvailableTrack(-1); wake(); });
+  $('#appleNextBtn').addEventListener('click', () => { stepAvailableTrack(1); wake(); });
+
+  const shuffle = $('#appleOrderModeBtn');
+  function syncShuffle() {
+    const enabled = state.playbackOrderMode === 'shuffle';
+    shuffle.dataset.orderMode = enabled ? 'shuffle' : 'loop';
+    shuffle.dataset.active = String(enabled);
+    shuffle.setAttribute('aria-pressed', String(enabled));
+    shuffle.title = enabled ? '随机播放，点击恢复顺序播放' : '顺序播放，点击开启随机播放';
+    $('#appleIconRepeat').setAttribute('hidden', '');
+    $('#appleIconShuffle').removeAttribute('hidden');
+    $('#appleOrderOneBadge').hidden = true;
+  }
+  shuffle.addEventListener('click', () => {
+    state.playbackOrderMode = state.playbackOrderMode === 'shuffle' ? 'loop' : 'shuffle';
+    if (state.currentAudioSource) state.currentAudioSource.loop = false;
+    syncShuffle();
+    wake();
+  });
+  syncShuffle();
+
+  scrub.addEventListener('pointerdown', () => { dragging = true; clearTimeout(hideTimer); reveal(); });
+  const finishDrag = () => { dragging = false; scheduleHide(); };
+  document.addEventListener('pointerup', finishDrag);
+  document.addEventListener('pointercancel', finishDrag);
+  for (const type of ['input', 'change']) scrub.addEventListener(type, () => {
+    mainSlider.value = scrub.value;
+    dock.style.setProperty('--capsule-progress', `${scrub.value}%`);
+    mainSlider.dispatchEvent(new Event(type, { bubbles: true }));
+    wake();
+  });
+
+  record.addEventListener('click', () => {
+    if (!recordMenu.hidden) { closeRecord(); wake(); return; }
+    closePlaylist();
+    lueCore.close();
+    recordMenu.hidden = false;
+    record.setAttribute('aria-expanded', 'true');
+    const trigger = record.getBoundingClientRect(), halfWidth = recordMenu.offsetWidth / 2;
+    recordMenu.style.left = `${Math.max(halfWidth + 12, Math.min(innerWidth - halfWidth - 12, trigger.right - halfWidth))}px`;
+    document.body.classList.add('lu-record-menu-open');
+    fitStagePreview();
+    reveal();
+    clearTimeout(hideTimer);
+    sync();
+    if (keyboardFocus) recordMenu.querySelector('[aria-pressed="true"]')?.focus({ preventScroll: true });
+  });
+  $('#appleRecordCloseBtn').addEventListener('click', () => { closeRecord(keyboardFocus); wake(); });
+  $$('[data-apple-aspect]').forEach(button => button.addEventListener('click', () => {
+    if (state.isRecording || preparing || recordUiState === 'exporting') return;
+    const select = $('#videoAspectSelect');
+    select.value = button.dataset.appleAspect;
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+    sync();
+  }));
+  async function runRecording() {
+    if (preparing || recordUiState === 'exporting') return;
+    preparing = true;
+    sync();
+    try {
+      await toggleScreenRecording();
+      closeRecord();
+    } catch (error) {
+      console.error('Recording could not start:', error);
+      setRecordUiState('error');
+      showToast('录制未能开始，请重试');
+    } finally {
+      preparing = false;
+      sync();
+      wake();
+    }
+  }
+  start.addEventListener('click', runRecording);
+  indicator.addEventListener('click', runRecording);
+
+  function sync() {
+    const playing = isPlaying();
+    if (playing !== previousPlaying) {
+      previousPlaying = playing;
+      reveal();
+      scheduleHide();
+    }
+    const status = recordUiState || 'idle', recording = state.isRecording;
+    record.dataset.recordState = status;
+    start.disabled = preparing || status === 'exporting';
+    start.textContent = preparing ? '正在准备…' : recording ? '停止并保存' : status === 'exporting' ? '正在保存…' : '开始录制';
+    indicator.hidden = !recording;
+    if (recording) $('#appleRecordingTime').textContent = formatTime((Date.now() - state.recordStartTime) / 1000);
+    $$('[data-apple-aspect]').forEach(button => {
+      button.setAttribute('aria-pressed', String(button.dataset.appleAspect === state.videoAspect));
+      button.disabled = preparing || recording || status === 'exporting';
+    });
+    if (status !== previousRecord || state.videoAspect !== previousAspect) {
+      previousRecord = status;
+      previousAspect = state.videoAspect;
+      $('#appleRecordAnnouncement').textContent = status === 'success' ? '视频已保存' : status === 'error' ? '录制失败，可重试' : '';
+      fitStagePreview();
+    }
+  }
+  dock.addEventListener('pointerenter', () => { pointerInside = true; reveal(); clearTimeout(hideTimer); });
+  dock.addEventListener('pointerleave', () => { pointerInside = false; scheduleHide(); });
+  dock.addEventListener('focusin', () => { reveal(); if (keyboardFocus) clearTimeout(hideTimer); });
+  dock.addEventListener('focusout', () => { setTimeout(scheduleHide, 0); });
+  document.addEventListener('pointermove', event => {
+    if (event.pointerType !== 'mouse' || performance.now() - lastWake < 80) return;
+    lastWake = performance.now();
+    keyboardFocus = false;
+    wake();
+  }, { passive: true });
+  document.addEventListener('pointerdown', event => {
+    keyboardFocus = false;
+    if (!playlist.hidden && !playlist.contains(event.target) && !picker.contains(event.target)) closePlaylist();
+    if (!recordMenu.hidden && !recordMenu.contains(event.target) && !record.contains(event.target)) closeRecord();
+    wake();
+  }, { capture: true, passive: true });
+  document.addEventListener('keydown', event => {
+    keyboardFocus = true;
+    reveal();
+    clearTimeout(hideTimer);
+    if (event.key === 'Escape') {
+      if (!recordMenu.hidden) closeRecord(true);
+      else if (!playlist.hidden) closePlaylist(true);
+    }
+    const editable = event.target.closest('input, textarea, select, button, [contenteditable="true"]');
+    if (event.code === 'Space' && !editable && !document.body.classList.contains('immersive')) {
+      event.preventDefault();
+      play.click();
+    }
+  }, { capture: true });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) clearTimeout(hideTimer);
+    else wake();
+  });
+  new MutationObserver(() => {
+    if (lueCore.isOpen) { reveal(); clearTimeout(hideTimer); }
+    else scheduleHide();
+    fitStagePreview();
+  }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  new MutationObserver(sync).observe($('#recordToggle'), { attributes: true, attributeFilter: ['data-record-state'] });
+  window.luApplePlayer = { sync, reveal: wake };
+  dock.dataset.dockState = 'expanded';
+  state.appleDockExpanded = true;
+  sync();
+})();
+
+// 舞台双击手势快速循环切换预设机位（正面 -> 等轴 -> 俯视）
+(() => {
+  const camCycle = ['front', 'iso', 'top'];
+  let camIdx = 0;
+  $('#stage')?.addEventListener('dblclick', e => {
+    if (e.target.closest('.kinetic-lyrics-stage, .lu-band-scene, .lu-band-score')) return;
+    if (kineticLyricsManager?.mode === 'gravity' || kineticLyricsManager?.mode === 'band') return;
+    camIdx = (camIdx + 1) % camCycle.length;
+    const nextCam = camCycle[camIdx];
+    $(`.preset-cam-btn[data-cam="${nextCam}"]`)?.click();
+  });
+})();
 [
   '#kineticModeSwitcher', '#wavePatternGroup', '#intensityTierGroup',
   '#morphFreqGroup', '.inspector-tabs', '.lue-facet-tabs'
 ].forEach(selector => setupLuSelection($(selector), selector === '.inspector-tabs' || selector === '.lue-facet-tabs'));
 
-for (const slider of [$('#timeProgressSlider'), $('#waveAmpSlider')]) {
+for (const slider of [$('#timeProgressSlider'), $('#waveAmpSlider'), $('#appleScrubInput')]) {
+  if (!slider) continue;
   slider.addEventListener('pointerdown', () => slider.classList.add('is-scrubbing'));
   for (const name of ['pointerup', 'pointercancel', 'blur', 'change']) {
     slider.addEventListener(name, () => slider.classList.remove('is-scrubbing'));

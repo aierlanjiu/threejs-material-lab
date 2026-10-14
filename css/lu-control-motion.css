@@ -1,4 +1,6 @@
-/* Poster-control motion. The stage and its recording canvas use their existing layout. */
+/* Poster-control motion & Apple-Style Bottom Morphing Orb / Player Capsule.
+   Preserves all existing DOM test contracts while moving primary daily interaction
+   to a clean Apple-style bottom circular orb -> morphing player capsule. */
 .lu-sr-only {
   position: absolute;
   width: 1px;
@@ -11,11 +13,32 @@
   border: 0;
 }
 
-/* 律核唯一视觉入口：演出状态胶囊 */
+.master-deck-hud {
+  --beat-pulse: 0;
+  --bass-energy: 0;
+  --capsule-progress: 0%;
+}
+
+/* 顶部辅助胶囊保持轻量透明玻璃态，收起多余声明横条，让舞台成为绝对主角 */
+body.poster-mode #topDisclaimerBtn {
+  display: none !important;
+}
+body.poster-mode .master-deck-hud {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  pointer-events: none;
+}
+body.poster-mode .master-deck-hud > * {
+  pointer-events: auto;
+}
+
+/* 律核顶部状态胶囊（兼容自动化测试尺寸契约，采用 Apple 暗色毛玻璃质感） */
 body.poster-mode .performance-capsule,
 body.poster-mode .performance-capsule[data-state="beat"],
 body.poster-mode .performance-capsule[data-state="lyric"],
 body.poster-mode .performance-capsule[data-state="record"] {
+  position: relative;
   width: 206px;
   min-width: 206px;
   max-width: 206px;
@@ -28,19 +51,72 @@ body.poster-mode .performance-capsule[data-state="record"] {
   text-align: left;
   cursor: pointer;
   user-select: none;
-  background: #181820;
-  border: 1px solid var(--poster-paper, #ede2cf);
-  border-radius: 4px;
-  transition: opacity 180ms ease-out, transform 180ms ease-out;
+  overflow: hidden;
+  background: rgba(24, 24, 30, 0.72);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  box-shadow:
+    inset 0 1px 0.5px rgba(255, 255, 255, 0.25),
+    0 8px 24px rgba(0, 0, 0, 0.38);
+  transition:
+    opacity 180ms ease-out,
+    transform 240ms cubic-bezier(.32, .72, 0, 1),
+    border-color 180ms ease-out,
+    box-shadow 180ms ease-out;
+}
+body.poster-mode .performance-capsule:hover {
+  border-color: rgba(255, 255, 255, 0.34);
+}
+body.poster-mode .performance-capsule:active {
+  transform: scale(0.97);
 }
 body.poster-mode .performance-capsule[data-state="record"],
 body.poster-mode .performance-capsule[data-state="exporting"] { border-color: var(--poster-accent); }
 body.poster-mode .performance-capsule[data-state="error"] { border-color: #f07870; }
 body.poster-mode .performance-capsule[data-state="success"] { border-color: var(--poster-paper); }
-body.poster-mode .performance-capsule-copy { transition: opacity 100ms ease-out, transform 160ms cubic-bezier(.2,.8,.2,1); }
-body.poster-mode .performance-capsule-copy.is-changing { transform: translateY(3px); }
 
-/* 展开指示箭头 */
+.performance-capsule-mark {
+  border-radius: 50%;
+  transform: scale(calc(1 + var(--beat-pulse, 0) * 0.06));
+  transition: transform 95ms cubic-bezier(.22, 1.3, .36, 1);
+}
+body.poster-mode .performance-capsule-copy {
+  transition: opacity 110ms ease-out, transform 180ms cubic-bezier(.32, .72, 0, 1);
+}
+body.poster-mode .performance-capsule-copy.is-changing {
+  opacity: 0;
+  transform: translateY(4px) scale(0.98);
+}
+
+/* 胶囊底部 3px 连续手势进度光轨 */
+.capsule-scrub-rail {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  pointer-events: auto;
+  cursor: ew-resize;
+  transition: height 150ms cubic-bezier(.32, .72, 0, 1), background-color 150ms ease;
+}
+.performance-capsule:hover .capsule-scrub-rail,
+.capsule-scrub-rail.is-scrubbing {
+  height: 5px;
+  background: rgba(255, 255, 255, 0.24);
+}
+.capsule-scrub-rail > i {
+  display: block;
+  height: 100%;
+  width: var(--capsule-progress, 0%);
+  background: linear-gradient(90deg, var(--poster-accent, #ce342d), #f5b971);
+  border-radius: 999px;
+  transition: width 90ms linear;
+}
+
 .performance-capsule-cue {
   display: inline-flex;
   align-items: center;
@@ -50,7 +126,7 @@ body.poster-mode .performance-capsule-copy.is-changing { transform: translateY(3
   height: 14px;
   color: var(--poster-paper, #ede2cf);
   opacity: 0.65;
-  transition: transform 180ms cubic-bezier(.2,.8,.2,1);
+  transition: transform 220ms cubic-bezier(.32, .72, 0, 1);
 }
 .performance-capsule-cue svg {
   width: 12px;
@@ -61,6 +137,425 @@ body.poster-mode .performance-capsule-copy.is-changing { transform: translateY(3
 }
 body.poster-mode.lue-core-open .performance-capsule-cue {
   transform: rotate(180deg);
+  color: #fff;
+  opacity: 1;
+}
+
+/* ========================================================================= */
+/* Apple 系统风格底部圆钮 -> 展开播放胶囊 (#luAppleDock)                      */
+/* ========================================================================= */
+@keyframes lu-orb-pulse-ring {
+  0%, 100% { transform: scale(1); opacity: 0.42; }
+  50% { transform: scale(1.09); opacity: 0.78; }
+}
+
+.lu-apple-dock {
+  --apple-glass-bg: rgba(24, 24, 30, 0.78);
+  --apple-glass-border: rgba(255, 255, 255, 0.22);
+  --apple-glass-highlight: rgba(255, 255, 255, 0.34);
+  --apple-pill-text: #f5f5f7;
+  --apple-pill-sub: rgba(235, 235, 245, 0.62);
+  position: fixed;
+  left: 50%;
+  bottom: max(16px, env(safe-area-inset-bottom, 14px));
+  transform: translateX(-50%);
+  z-index: 110;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+  width: 56px;
+  border-radius: 999px;
+  background: var(--apple-glass-bg);
+  backdrop-filter: blur(34px) saturate(195%);
+  -webkit-backdrop-filter: blur(34px) saturate(195%);
+  border: 1px solid var(--apple-glass-border);
+  box-shadow:
+    inset 0 1px 0.5px var(--apple-glass-highlight),
+    0 14px 36px rgba(0, 0, 0, 0.52),
+    0 2px 8px rgba(0, 0, 0, 0.28);
+  color: var(--apple-pill-text);
+  user-select: none;
+  overflow: hidden;
+  transition:
+    width 420ms cubic-bezier(0.32, 0.72, 0, 1),
+    height 420ms cubic-bezier(0.32, 0.72, 0, 1),
+    border-radius 420ms cubic-bezier(0.32, 0.72, 0, 1),
+    background-color 240ms ease,
+    box-shadow 240ms ease,
+    transform 240ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.lu-apple-dock[data-dock-state="expanded"] {
+  width: min(calc(100vw - 20px), 620px);
+  height: 58px;
+  padding: 0 10px;
+  justify-content: space-between;
+}
+
+body.immersive .lu-apple-dock,
+body.recording-preview .lu-apple-dock,
+body.lu-intro-active .lu-apple-dock {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(20px) scale(0.92);
+}
+
+/* 态 1：初始底部中心单颗圆形播放按钮 (#luAppleOrbBtn) */
+.lu-apple-orb-btn {
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  min-height: 56px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: radial-gradient(120% 120% at 30% 22%, rgba(255, 255, 255, 0.20) 0%, rgba(30, 30, 38, 0.45) 58%, rgba(14, 14, 18, 0.75) 100%);
+  color: #f5f5f7;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  transition: transform 200ms cubic-bezier(0.32, 0.72, 0, 1), opacity 180ms ease;
+}
+.lu-apple-orb-btn::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  animation: lu-orb-pulse-ring 2.8s ease-in-out infinite;
+  pointer-events: none;
+}
+.lu-apple-orb-btn:hover {
+  transform: scale(1.05);
+}
+.lu-apple-orb-btn:active {
+  transform: scale(0.93);
+}
+.lu-apple-orb-btn svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+  transform: translateX(1.5px);
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
+}
+.lu-apple-dock[data-dock-state="expanded"] .lu-apple-orb-btn {
+  display: none !important;
+}
+
+/* 态 2：展开后的 Apple 风格播放控制胶囊 (.lu-apple-capsule-body) */
+.lu-apple-capsule-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 220ms ease 60ms, transform 320ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.lu-apple-dock[data-dock-state="orb"] .lu-apple-capsule-body {
+  display: none !important;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.86);
+}
+
+.lu-apple-transport-cluster,
+.lu-apple-actions-cluster {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.lu-apple-icon-btn {
+  width: 36px !important;
+  min-width: 36px !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  color: var(--apple-pill-text) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer;
+  position: relative;
+  transition: background-color 150ms ease, transform 160ms cubic-bezier(0.32, 0.72, 0, 1), color 150ms ease;
+}
+.lu-apple-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+.lu-apple-icon-btn:active {
+  transform: scale(0.90);
+}
+.lu-apple-icon-btn[aria-pressed="true"],
+.lu-apple-icon-btn[data-active="true"] {
+  background: rgba(255, 255, 255, 0.18) !important;
+  color: #ffffff !important;
+}
+.lu-apple-icon-btn svg {
+  width: 17px;
+  height: 17px;
+  fill: currentColor;
+  stroke: none;
+}
+.lu-apple-icon-btn svg.stroke-icon {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* 中央主播放/暂停圆钮 (Apple 经典高亮象牙白圆钮) */
+.lu-apple-play-btn {
+  width: 40px !important;
+  min-width: 40px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: #f5f5f7 !important;
+  color: #121217 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.28);
+  transition: transform 180ms cubic-bezier(0.32, 0.72, 0, 1), background-color 150ms ease;
+}
+.lu-apple-play-btn:hover {
+  background: #ffffff !important;
+  transform: scale(1.04);
+}
+.lu-apple-play-btn:active {
+  transform: scale(0.91);
+}
+.lu-apple-play-btn svg {
+  width: 17px;
+  height: 17px;
+  fill: currentColor;
+}
+
+/* 中央曲目名称 + 进度滑轨区 */
+.lu-apple-track-zone {
+  flex: 1 1 auto;
+  min-width: 96px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 8px;
+}
+.lu-apple-track-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+.lu-apple-track-title {
+  font-size: 12.5px !important;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--apple-pill-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  letter-spacing: -0.01em;
+}
+.lu-apple-track-title:hover {
+  color: #ffffff;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.lu-apple-track-time {
+  font-size: 10.5px !important;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--apple-pill-sub);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.lu-apple-scrub-wrap {
+  position: relative;
+  width: 100%;
+  height: 12px;
+  display: flex;
+  align-items: center;
+}
+.lu-apple-scrub-input {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px !important;
+  min-height: 4px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.92) 0%,
+    rgba(255, 255, 255, 0.92) var(--capsule-progress, 0%),
+    rgba(255, 255, 255, 0.22) var(--capsule-progress, 0%),
+    rgba(255, 255, 255, 0.22) 100%
+  );
+  outline: none;
+  cursor: pointer;
+  transition: height 140ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.lu-apple-scrub-wrap:hover .lu-apple-scrub-input {
+  height: 6px !important;
+}
+.lu-apple-scrub-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  transition: opacity 140ms ease, transform 140ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.lu-apple-scrub-wrap:hover .lu-apple-scrub-input::-webkit-slider-thumb,
+.lu-apple-scrub-input:focus-visible::-webkit-slider-thumb {
+  opacity: 1;
+}
+
+/* 单曲循环角标 1 */
+.lu-apple-mode-badge {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  font-size: 8.5px !important;
+  font-weight: 800;
+  line-height: 1;
+  padding: 1px 2.5px;
+  border-radius: 999px;
+  background: #f5f5f7;
+  color: #121217;
+  pointer-events: none;
+}
+.lu-apple-mode-badge[hidden] { display: none !important; }
+
+/* Apple 风格歌单浮层 (#applePlaylistPopover) */
+.lu-apple-playlist-popover {
+  position: fixed;
+  left: 50%;
+  bottom: calc(max(16px, env(safe-area-inset-bottom, 14px)) + 68px);
+  transform: translateX(-50%);
+  z-index: 115;
+  width: min(calc(100vw - 24px), 420px);
+  max-height: min(56dvh, 420px);
+  background: rgba(24, 24, 30, 0.86);
+  backdrop-filter: blur(36px) saturate(195%);
+  -webkit-backdrop-filter: blur(36px) saturate(195%);
+  border: 1px solid rgba(255, 255, 255, 0.20);
+  border-radius: 20px;
+  box-shadow:
+    inset 0 1px 0.5px rgba(255, 255, 255, 0.28),
+    0 20px 48px rgba(0, 0, 0, 0.62);
+  color: #f5f5f7;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform-origin: 50% 100%;
+  animation: lu-apple-popover-in 240ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.lu-apple-playlist-popover[hidden] {
+  display: none !important;
+}
+@keyframes lu-apple-popover-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+.lu-apple-popover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+.lu-apple-popover-header strong {
+  font-size: 13px !important;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.lu-apple-import-trigger {
+  min-height: 28px !important;
+  height: 28px;
+  padding: 0 10px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  background: rgba(255, 255, 255, 0.10) !important;
+  color: #f5f5f7 !important;
+  font-size: 11px !important;
+  font-weight: 600;
+  cursor: pointer;
+}
+.lu-apple-import-trigger:hover {
+  background: rgba(255, 255, 255, 0.18) !important;
+}
+.lu-apple-playlist-list {
+  overflow-y: auto;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  scrollbar-width: thin;
+}
+.lu-apple-song-item {
+  width: 100%;
+  min-height: 38px !important;
+  padding: 6px 10px !important;
+  border: 0 !important;
+  border-radius: 10px !important;
+  background: transparent !important;
+  color: #f5f5f7 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 140ms ease;
+}
+.lu-apple-song-item:hover {
+  background: rgba(255, 255, 255, 0.10) !important;
+}
+.lu-apple-song-item.active {
+  background: rgba(255, 255, 255, 0.16) !important;
+  font-weight: 600;
+}
+.lu-apple-song-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.lu-apple-song-tag {
+  font-size: 10px !important;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(235, 235, 245, 0.78);
 }
 
 /* 录制中红点 */
@@ -80,7 +575,7 @@ body.poster-mode.lue-core-open .performance-capsule-cue {
   to { opacity: 1; transform: scale(1.15); }
 }
 
-/* A face changes inside its original button; the transport does not reflow. */
+/* 原位双面变形按钮 (Play/Pause, Record) */
 body.poster-mode .deck-controls .morph-btn { position: relative; overflow: hidden; }
 body.poster-mode .deck-controls .morph-btn > .face,
 body.poster-mode .deck-controls .morph-btn > .face[aria-hidden="true"],
@@ -94,8 +589,8 @@ body.poster-mode .lue-facet-panel .morph-btn > .face[aria-hidden="true"] {
   justify-content: center;
   gap: 5px;
   opacity: 0 !important;
-  transform: translate(-50%, -42%) scale(.97) !important;
-  transition: opacity 95ms ease-out, transform 180ms cubic-bezier(.2,.8,.2,1);
+  transform: translate(-50%, -38%) scale(.92) !important;
+  transition: opacity 110ms ease-out, transform 210ms cubic-bezier(.32, .72, 0, 1);
   pointer-events: none !important;
 }
 body.poster-mode .deck-controls .morph-btn > .face:not([aria-hidden="true"]),
@@ -126,11 +621,11 @@ body.poster-mode #recordToggle .rec-dot { box-shadow: none !important; }
 body.poster-mode #timeProgressSlider,
 body.poster-mode #waveAmpSlider { cursor: pointer; touch-action: none; }
 body.poster-mode #timeProgressSlider::-webkit-slider-thumb,
-body.poster-mode #waveAmpSlider::-webkit-slider-thumb { transition: transform 120ms cubic-bezier(.2,.8,.2,1); }
+body.poster-mode #waveAmpSlider::-webkit-slider-thumb { transition: transform 140ms cubic-bezier(.32, .72, 0, 1); }
 body.poster-mode #timeProgressSlider.is-scrubbing::-webkit-slider-thumb,
-body.poster-mode #waveAmpSlider.is-scrubbing::-webkit-slider-thumb { transform: scale(1.16); }
+body.poster-mode #waveAmpSlider.is-scrubbing::-webkit-slider-thumb { transform: scale(1.22); }
 
-/* One moving selection surface per real control group. */
+/* 非对称弹性拉伸滑块指示器 */
 body.poster-mode :is(#kineticModeSwitcher, #wavePatternGroup, #intensityTierGroup, #morphFreqGroup, .inspector-tabs, .lue-facet-tabs) {
   position: relative;
   isolation: isolate;
@@ -144,12 +639,21 @@ body.poster-mode .lu-selection-surface {
   display: block;
   width: var(--lu-selection-width, 0px);
   height: var(--lu-selection-height, 0px);
-  border-radius: 2px;
+  border-radius: 6px;
   background: var(--poster-accent);
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--poster-accent, #ce342d) 45%, transparent);
   opacity: 0;
   pointer-events: none;
-  transform: translate3d(var(--lu-selection-x, 0px), var(--lu-selection-y, 0px), 0);
-  transition: transform 220ms cubic-bezier(.2,1.06,.32,1), opacity 100ms ease-out;
+  transform-origin: center center;
+  transform:
+    translate3d(var(--lu-selection-x, 0px), var(--lu-selection-y, 0px), 0)
+    scaleX(var(--lu-selection-scale-x, 1))
+    scaleY(var(--lu-selection-scale-y, 1));
+  transition:
+    transform 220ms cubic-bezier(.32, .72, 0, 1),
+    width 200ms cubic-bezier(.32, .72, 0, 1),
+    height 200ms cubic-bezier(.32, .72, 0, 1),
+    opacity 100ms ease-out;
 }
 body.poster-mode [data-lu-selection-ready="true"] > .lu-selection-surface { opacity: 1; }
 body.poster-mode [data-lu-keyboard="true"] > .lu-selection-surface { transition-duration: 1ms; }
@@ -172,45 +676,109 @@ body.poster-mode #morphFreqGroup .pill-btn.active {
 body.poster-mode :is(#kineticModeSwitcher .active, #wavePatternGroup .active, #intensityTierGroup .active, #morphFreqGroup .active) { color: #fff !important; }
 body.poster-mode #wavePatternGroup .active .svg-icon { color: #fff !important; }
 
-/* The existing poster palette reaches the real workbench controls. */
+/* 紧凑化调律工作台 */
 body.poster-mode .bottom-dynamic-dock {
   color: var(--poster-paper);
   background: rgba(24, 24, 30, .96);
   border: 1px solid var(--poster-rule);
-  border-radius: 4px;
+  border-radius: 12px;
   box-shadow: none;
-  padding: 8px;
+  padding: 6px;
 }
 body.poster-mode .bottom-dynamic-dock .dock-section {
   color: var(--poster-paper);
-  background: #222127;
-  border: 1px solid #575157;
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
   box-shadow: none;
 }
-body.poster-mode .bottom-dynamic-dock .dock-label { color: #c7bbaa; }
+body.poster-mode .bottom-dynamic-dock .dock-label {
+  display: none !important;
+}
 body.poster-mode .bottom-dynamic-dock :is(.waveform-board, .motion-card, .pill-btn, #waveMotionToggle) {
   color: var(--poster-paper);
-  background: #302e34;
-  border: 1px solid #575157;
-  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
   box-shadow: none;
 }
-body.poster-mode .bottom-dynamic-dock .waveform-board .svg-icon { color: var(--poster-paper); }
-body.poster-mode .bottom-dynamic-dock .motion-card-desc { color: #c7bbaa; }
-body.poster-mode .bottom-dynamic-dock .motion-card.active .motion-card-desc { color: #fff; }
-body.poster-mode .bottom-dynamic-dock .motion-cards { background: #302e34; border-radius: 2px; }
+body.poster-mode .bottom-dynamic-dock .waveform-boards {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(44px, 1fr));
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.28);
+  padding: 3px;
+  border-radius: 10px;
+}
+body.poster-mode .bottom-dynamic-dock .waveform-board {
+  min-height: 36px !important;
+  height: 36px;
+  padding: 4px 6px !important;
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+body.poster-mode .bottom-dynamic-dock .waveform-board .svg-icon {
+  width: 15px;
+  height: 15px;
+  color: var(--poster-paper);
+}
+body.poster-mode .bottom-dynamic-dock .motion-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(72px, 1fr));
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.28);
+  padding: 3px;
+  border-radius: 10px;
+}
+body.poster-mode .bottom-dynamic-dock .motion-card {
+  min-height: 36px !important;
+  height: 36px;
+  padding: 4px 8px !important;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+body.poster-mode .bottom-dynamic-dock .motion-card-desc {
+  display: none !important;
+}
+body.poster-mode .bottom-dynamic-dock .beat-dial-graphic {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+}
+body.poster-mode .bottom-dynamic-dock .beat-dial-indicator {
+  left: 17.5px;
+  top: 4px;
+  height: 9px;
+  transform-origin: 1.5px 15px;
+}
+body.poster-mode .bottom-dynamic-dock .beat-knob-wrap .pill-group {
+  display: flex;
+  width: auto;
+  flex: 1;
+  gap: 3px;
+  background: rgba(0, 0, 0, 0.28);
+  padding: 3px;
+  border-radius: 10px;
+}
+body.poster-mode .bottom-dynamic-dock .beat-knob-wrap .pill-btn {
+  min-height: 32px;
+  padding: 2px 8px;
+}
 body.poster-mode .bottom-dynamic-dock #waveAmpSlider { accent-color: var(--poster-accent); }
-body.poster-mode .bottom-dynamic-dock #waveMotionToggle.active { background: #302e34 !important; color: var(--poster-paper) !important; border-color: var(--poster-accent) !important; }
-body.poster-mode .bottom-dynamic-dock #beatDialGraphic { color: var(--poster-paper); background: #302e34; border-color: #575157; }
-body.poster-mode .bottom-dynamic-dock #beatDialGraphic::after { color: var(--poster-paper); }
+body.poster-mode .bottom-dynamic-dock #waveMotionToggle.active { background: rgba(255, 255, 255, 0.14) !important; color: #fff !important; border-color: var(--poster-accent) !important; }
+body.poster-mode .bottom-dynamic-dock #beatDialGraphic { color: var(--poster-paper); background: rgba(0, 0, 0, 0.32); border-color: rgba(255, 255, 255, 0.16); }
+body.poster-mode .bottom-dynamic-dock #beatDialGraphic::after { color: var(--poster-paper); font-size: 10px !important; }
 body.poster-mode .bottom-dynamic-dock #beatDialIndicator { background: var(--poster-accent); }
 body.poster-mode .bottom-dynamic-dock output { color: var(--poster-paper); font-variant-numeric: tabular-nums; }
 
-/* Inspector remains a secondary tool, but follows the same local surface language. */
-body.poster-mode .modular-inspector { color: var(--poster-paper); background: #19191f; border-radius: 4px; --muted: #c7bbaa; --text: #ede2cf; --text-graphite: #ede2cf; }
+/* Inspector 保持二级深度调参抽屉定位 */
+body.poster-mode .modular-inspector { color: var(--poster-paper); background: rgba(22, 22, 28, 0.92); backdrop-filter: blur(28px); border-radius: 16px; --muted: #c7bbaa; --text: #ede2cf; --text-graphite: #ede2cf; }
 body.poster-mode .modular-inspector :is(label, .range > span, output) { color: var(--poster-paper); }
-.lu-auto-selection { width: 100%; margin: 4px 0 8px; font-size: 11px; }
+.lu-auto-selection { width: auto; min-height: 28px !important; padding: 2px 8px !important; margin: 0 0 4px; font-size: 11px; }
 .lu-control-hint { font-size: 12px; line-height: 1.5; color: var(--muted); margin: 8px 0 0; }
 .modular-inspector .pill-btn:disabled { opacity: 0.45; cursor: default; }
 body.poster-mode .inspector-heading,
@@ -222,39 +790,56 @@ body.poster-mode .inspector-tabs > .lu-selection-surface { border-radius: 0; }
 body.poster-mode #inspectorCloseBtn { color: var(--poster-paper); }
 body.poster-mode #inspectorCloseBtn:hover { background: #3b383f; }
 body.poster-mode .modular-inspector :is(.section-title, .material-heading, .tone-heading, .material-lock, .studio-lighting, .custom-tone, .material-details summary, #materialName, .official-avatar-tools, #officialAvatarStatus) { color: var(--poster-paper); }
-body.poster-mode .modular-inspector :is(.material-families button, .studio-lighting button) { color: #c7bbaa; border-radius: 2px; }
+body.poster-mode .modular-inspector :is(.material-families button, .studio-lighting button) { color: #c7bbaa; border-radius: 6px; }
 body.poster-mode .modular-inspector :is(.material-families button, .studio-lighting button)[aria-pressed="true"] { color: #fff; background: var(--poster-accent); }
-body.poster-mode #tab-optics .material-samples button { color: var(--poster-paper); border-radius: 2px; }
+body.poster-mode #tab-optics .material-samples button { color: var(--poster-paper); border-radius: 6px; }
 body.poster-mode #tab-optics .material-samples button[aria-pressed="true"] { background: #302e34; border-color: var(--poster-accent); }
 body.poster-mode .modular-inspector :is(.pill-btn, .mini-grid-btn, select, input:not([type="color"]), textarea) { color: var(--poster-paper); background-color: #302e34; border-color: #575157; }
 body.poster-mode .modular-inspector :is(.pill-btn, .mini-grid-btn).active { color: #fff; background-color: var(--poster-accent); border-color: var(--poster-accent); }
 body.poster-mode .modular-inspector input[type="range"] { accent-color: var(--poster-accent); }
 
-/* ======================================================== */
-/* 律核展开工作台与四面布局 (LÜ Core Expanded Workbench)     */
-/* ======================================================== */
+/* ========================================================================= */
+/* Apple 风格设置与工作台浮层 (#lueCoreDrawer)                               */
+/* ========================================================================= */
+@keyframes lu-capsule-morph-open {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .lue-core-drawer {
   position: absolute;
-  top: 56px;
-  left: 10px;
+  top: 54px;
+  left: 12px;
   z-index: 95;
-  width: calc(100vw - 20px);
-  max-width: 880px;
-  background: rgba(22, 22, 28, 0.98);
-  border: 1px solid var(--poster-rule, #575157);
-  border-radius: 4px;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.85);
+  width: min(calc(100vw - 24px), 700px);
+  max-width: 700px;
+  background: rgba(24, 24, 30, 0.86);
+  backdrop-filter: blur(36px) saturate(195%);
+  -webkit-backdrop-filter: blur(36px) saturate(195%);
+  border: 1px solid rgba(255, 255, 255, 0.20);
+  border-radius: 20px;
+  box-shadow:
+    inset 0 1px 0.5px rgba(255, 255, 255, 0.28),
+    0 20px 48px rgba(0, 0, 0, 0.65);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: opacity 160ms cubic-bezier(.2,.8,.2,1), transform 160ms cubic-bezier(.2,.8,.2,1);
+  transition:
+    opacity 200ms cubic-bezier(.32, .72, 0, 1),
+    transform 240ms cubic-bezier(.32, .72, 0, 1);
 }
 
 body.poster-mode:not(.lue-core-open) .lue-core-drawer {
   display: none !important;
   opacity: 0;
   pointer-events: none;
-  transform: translateY(-6px) scale(0.99);
+  transform: translateY(-8px) scale(0.95);
 }
 
 body.poster-mode.lue-core-open .lue-core-drawer {
@@ -262,64 +847,77 @@ body.poster-mode.lue-core-open .lue-core-drawer {
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0) scale(1);
+  animation: lu-capsule-morph-open 240ms cubic-bezier(.32, .72, 0, 1);
 }
 body.poster-mode.lue-core-open .master-deck-hud { z-index: 60; }
 
-/* 四面分段导航栏 */
+/* 顶部四面分段导航栏 */
 .lue-facet-tabs {
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 6px 8px;
-  background: #111116;
-  border-bottom: 1px solid var(--poster-rule, #575157);
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
   flex-shrink: 0;
 }
 .lue-facet-tab {
-  min-height: 38px;
-  min-width: 60px;
-  padding: 4px 10px;
+  min-height: 32px;
+  min-width: 54px;
+  padding: 4px 12px;
   font-size: 12px;
-  font-weight: 700;
-  color: var(--poster-paper, #ede2cf);
-  background: #26252c;
-  border: 1px solid var(--poster-rule, #575157);
-  border-radius: 2px;
+  font-weight: 600;
+  color: rgba(235, 235, 245, 0.76);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 999px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 5px;
   cursor: pointer;
   user-select: none;
-  transition: opacity 140ms ease, transform 140ms ease;
+  transition: color 140ms ease, transform 140ms cubic-bezier(.32, .72, 0, 1);
 }
+.lue-facet-tab:active { transform: scale(0.95); }
 .lue-facet-tab.active {
   color: #fff !important;
-  background: var(--poster-accent, #ce342d) !important;
-  border-color: var(--poster-accent, #ce342d) !important;
+  background: rgba(255, 255, 255, 0.18) !important;
 }
+
+.lue-inline-quickbar {
+  display: none !important;
+}
+
 .lue-facet-close {
   margin-left: auto;
-  min-height: 34px;
-  padding: 4px 10px;
+  min-height: 28px;
+  padding: 3px 10px;
   font-size: 11px;
-  color: var(--poster-paper, #ede2cf);
-  background: transparent;
-  border: 1px solid var(--poster-rule, #575157);
-  border-radius: 2px;
+  color: rgba(235, 235, 245, 0.82);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
   cursor: pointer;
-  transition: opacity 140ms ease;
+  transition: background-color 140ms ease;
 }
-.lue-facet-close:hover { background: #302e34; }
+.lue-facet-close:hover { background: rgba(255, 255, 255, 0.16); }
 
 /* 四面内容容器 */
 .lue-facet-panels {
-  padding: 10px;
-  color: var(--poster-paper, #ede2cf);
-  background: #181820;
+  padding: 10px 12px;
+  color: #f5f5f7;
+  background: transparent;
   overflow-y: auto;
 }
-.lue-facet-panel { display: block; }
+.lue-facet-panel {
+  display: block;
+  animation: lu-facet-fade-slide 190ms cubic-bezier(.32, .72, 0, 1);
+}
+@keyframes lu-facet-fade-slide {
+  from { opacity: 0; transform: translateY(4px) scale(0.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
 .lue-facet-panel[hidden] { display: none !important; }
 
 /* 播放面排版 */
@@ -331,23 +929,23 @@ body.poster-mode.lue-core-open .master-deck-hud { z-index: 60; }
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
-  padding: 4px 0 !important;
+  padding: 2px 0 !important;
   width: 100% !important;
   grid-template-columns: none !important;
   grid-template-rows: none !important;
 }
 .lue-facet-panel .deck-player .deck-info {
-  flex: 0 1 180px !important;
-  min-width: 140px !important;
+  flex: 0 1 170px !important;
+  min-width: 130px !important;
 }
 .lue-facet-panel .deck-player .deck-controls {
   display: flex !important;
   align-items: center !important;
-  gap: 6px !important;
+  gap: 5px !important;
 }
 .lue-facet-panel .deck-player .time-rail-wrap {
-  flex: 1 1 160px !important;
-  min-width: 140px !important;
+  flex: 1 1 150px !important;
+  min-width: 130px !important;
   display: flex !important;
   align-items: center !important;
   gap: 6px !important;
@@ -356,19 +954,19 @@ body.poster-mode.lue-core-open .master-deck-hud { z-index: 60; }
   flex: 1 !important;
 }
 .lue-facet-panel .deck-player #playlistSelect {
-  flex: 0 1 160px !important;
-  min-width: 120px !important;
+  flex: 0 1 155px !important;
+  min-width: 115px !important;
 }
 .lue-facet-panel .deck-player .file-upload-wrap {
   flex: 0 0 auto !important;
 }
 
-/* 演出面排版与调律工作台内嵌适配 */
-.lue-choreo-container { display: flex; flex-direction: column; gap: 8px; }
-.lue-choreo-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
-.lue-choreo-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 6px; border-top: 1px solid var(--poster-rule); }
-.lue-cam-group { display: flex; align-items: center; gap: 6px; }
-.lue-sublabel { font-size: 11px; color: #c7bbaa; font-weight: 600; white-space: nowrap; }
+/* 演出面排版 */
+.lue-choreo-container { display: flex; flex-direction: column; gap: 6px; }
+.lue-choreo-header { display: flex; align-items: center; justify-content: space-between; gap: 6px; flex-wrap: wrap; }
+.lue-choreo-footer { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding-top: 4px; border-top: 1px solid rgba(255, 255, 255, 0.10); }
+.lue-cam-group { display: flex; align-items: center; gap: 4px; }
+.lue-sublabel { font-size: 11px; color: rgba(235, 235, 245, 0.65); font-weight: 600; white-space: nowrap; }
 
 .lue-facet-panel .bottom-dynamic-dock {
   position: static !important;
@@ -380,27 +978,42 @@ body.poster-mode.lue-core-open .master-deck-hud { z-index: 60; }
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
-  padding: 4px 0 !important;
-  display: flex !important;
-  flex-wrap: wrap !important;
-  gap: 8px !important;
+  padding: 2px 0 !important;
+  display: grid !important;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 6px !important;
   overflow: visible !important;
 }
 .lue-facet-panel .bottom-dynamic-dock .dock-section {
-  flex: 1 1 180px !important;
-  min-width: 160px !important;
+  min-width: 0 !important;
   height: auto !important;
-  background: #222127;
-  border: 1px solid var(--poster-rule, #575157);
-  border-radius: 3px;
-  padding: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 5px 7px;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
 }
 
 /* 创作面排版 */
-.lue-create-container { display: flex; flex-direction: column; gap: 8px; }
-.lue-create-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; }
-.lue-create-card { background: #222127; border: 1px solid #575157; border-radius: 3px; padding: 8px; }
+.lue-create-container { display: flex; flex-direction: column; gap: 6px; }
+.lue-create-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.lue-create-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.lue-create-card > div:nth-child(2) {
+  display: none !important;
+}
 .lue-create-inspector-cta #inspectorToggleBtn,
 .lue-create-inspector-cta .btn {
   display: inline-flex !important;
@@ -408,34 +1021,35 @@ body.poster-mode.lue-core-open .master-deck-hud { z-index: 60; }
   justify-content: center;
   gap: 6px;
   width: 100%;
-  min-height: 40px;
-  font-weight: 700;
-  color: var(--poster-paper);
-  background: #2b2a32;
-  border: 1px solid var(--poster-accent);
+  min-height: 36px;
+  font-weight: 600;
+  color: #f5f5f7;
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 10px;
 }
 .lue-related-link {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   align-self: flex-start;
-  padding: 7px 10px;
-  color: var(--poster-paper);
+  padding: 5px 10px;
+  color: #f5f5f7;
   text-decoration: none;
-  background: #2b2a32;
-  border: 1px solid var(--poster-rule);
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
 }
 
 /* 录制面排版 */
-.lue-record-container { display: flex; flex-direction: column; gap: 10px; padding: 4px; }
-.lue-record-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; align-items: flex-end; }
-.lue-record-field label { display: block; font-size: 11px; color: #c7bbaa; margin-bottom: 4px; font-weight: 600; }
-.lue-record-field select { width: 100%; min-height: 40px; }
+.lue-record-container { display: flex; flex-direction: column; gap: 8px; padding: 2px; }
+.lue-record-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; align-items: flex-end; }
+.lue-record-field label { display: block; font-size: 11px; color: rgba(235, 235, 245, 0.68); margin-bottom: 3px; font-weight: 600; }
+.lue-record-field select { width: 100%; min-height: 38px; border-radius: 10px; }
 .lue-record-action { display: flex; align-items: center; gap: 8px; }
-.lue-record-notes { font-size: 11px; color: #c7bbaa; line-height: 1.5; padding: 6px 8px; background: #222127; border: 1px solid #575157; border-radius: 3px; }
+.lue-record-notes { font-size: 11px; color: rgba(235, 235, 245, 0.68); line-height: 1.45; padding: 6px 10px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.10); border-radius: 10px; }
 
-/* 海报模式只有律核作为操作入口，旧的浮动入口保留给非海报模式。 */
+/* 海报模式隐藏冗余浮动入口 */
 body.poster-mode .brand-section,
 body.poster-mode .top-actions,
 body.poster-mode #posterModeHost,
@@ -445,7 +1059,7 @@ body.poster-mode #inspectorDockButton {
 }
 .lue-core-drawer[hidden] { display: none !important; }
 
-/* 切换非海报背景后，四面入口仍管理同一组真实控件。 */
+/* 切换非海报背景后，保持一致尺寸契约 */
 body:not(.poster-mode) .master-deck-hud {
   position: relative;
   display: flex;
@@ -453,11 +1067,11 @@ body:not(.poster-mode) .master-deck-hud {
   height: 64px;
   min-height: 64px;
   padding: 6px 10px;
-  background: #111116;
-  border: 1px solid #6a625e;
-  border-radius: 4px;
+  background: transparent;
+  border: 0;
 }
 body:not(.poster-mode) .performance-capsule {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -473,9 +1087,10 @@ body:not(.poster-mode) .performance-capsule {
   text-align: left;
   white-space: nowrap;
   color: #ede2cf;
-  background: #181820;
-  border: 1px solid #ede2cf;
-  border-radius: 4px;
+  background: rgba(24, 24, 30, 0.78);
+  backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
   cursor: pointer;
 }
 body:not(.poster-mode) .performance-capsule[data-state="record"] { border-color: #ce342d; }
@@ -523,16 +1138,37 @@ body:not(.poster-mode) #inspectorDockButton { display: none !important; }
     grid-template-rows: none !important;
     grid-template-areas: none !important;
   }
+  .lu-apple-dock[data-dock-state="expanded"] {
+    width: calc(100vw - 16px);
+    height: 54px;
+    padding: 0 6px;
+  }
+  .lu-apple-icon-btn {
+    width: 32px !important;
+    min-width: 32px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+  }
+  .lu-apple-play-btn {
+    width: 36px !important;
+    min-width: 36px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+  }
+  .lu-apple-track-time {
+    display: none;
+  }
   .lue-core-drawer {
-    top: 54px;
+    top: 52px;
     left: 4px;
     right: 4px;
     width: auto;
     max-width: none;
     max-height: 35dvh !important;
+    border-radius: 16px;
   }
   .lue-facet-panels {
-    max-height: calc(35dvh - 46px);
+    max-height: calc(35dvh - 44px);
     overflow-y: auto;
     padding: 6px;
     overscroll-behavior: contain;
@@ -555,7 +1191,7 @@ body:not(.poster-mode) #inspectorDockButton { display: none !important; }
     flex-direction: column !important;
     align-items: stretch !important;
     justify-content: flex-start !important;
-    gap: 8px !important;
+    gap: 6px !important;
   }
   .lue-facet-panel .deck-player > :is(.deck-info, .audio-visualizer, .deck-controls, .time-rail-wrap, #playlistSelect, .file-upload-wrap) {
     flex: 0 0 auto !important;
@@ -579,6 +1215,7 @@ body:not(.poster-mode) #inspectorDockButton { display: none !important; }
     justify-content: center !important;
   }
   .lue-facet-panel .bottom-dynamic-dock {
+    display: flex !important;
     flex-direction: column !important;
   }
   .lue-facet-panel .bottom-dynamic-dock .dock-section {
@@ -586,11 +1223,14 @@ body:not(.poster-mode) #inspectorDockButton { display: none !important; }
     width: 100% !important;
     min-width: 0 !important;
   }
+  .lue-create-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (min-width: 761px) {
-  .lue-core-drawer { max-height: 450px; }
-  .lue-facet-panels { max-height: 400px; overflow-y: auto; }
+  .lue-core-drawer { max-height: 380px; }
+  .lue-facet-panels { max-height: 330px; overflow-y: auto; }
 }
 
 /* ======================================================== */
@@ -642,10 +1282,178 @@ body.immersive .lue-core-drawer { display: none !important; }
   body.poster-mode .deck-controls .morph-btn > .face,
   body.poster-mode .lu-selection-surface,
   body.poster-mode .bottom-dynamic-dock,
+  .lu-apple-dock,
+  .lu-apple-orb-btn,
+  .lu-apple-capsule-body,
+  .lu-apple-playlist-popover,
   .lue-core-drawer,
   .lue-facet-tab,
+  .lue-facet-panel,
   body.poster-mode #timeProgressSlider::-webkit-slider-thumb,
-  body.poster-mode #waveAmpSlider::-webkit-slider-thumb { transition-duration: 1ms !important; }
+  body.poster-mode #waveAmpSlider::-webkit-slider-thumb {
+    transition-duration: 1ms !important;
+    animation: none !important;
+  }
   body.poster-mode .export-spinner { animation: none; border-right-color: currentColor; }
   .rec-dot-pill { animation: none; }
+}
+
+/* Daily player: one transport row, one timeline, and two secondary actions. */
+.lu-apple-dock {
+  width: min(760px, calc(100vw - 32px));
+  height: 128px;
+  padding: 10px 20px;
+  bottom: max(20px, env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  border-radius: 26px;
+  background: linear-gradient(155deg, rgba(48, 48, 54, .85), rgba(23, 23, 28, .88));
+  border-color: rgba(255, 255, 255, .16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18), 0 16px 48px rgba(0, 0, 0, .36);
+  overflow: visible;
+  transition: opacity 180ms ease-out, transform 220ms cubic-bezier(.2, .8, .2, 1);
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", sans-serif;
+  backdrop-filter: blur(18px) saturate(120%);
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
+}
+.lu-apple-dock[data-dock-state="expanded"] {
+  width: min(760px, calc(100vw - 32px));
+  height: 128px;
+  padding: 10px 20px;
+}
+.lu-apple-dock[data-visibility="hidden"] {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(8px);
+}
+.lu-apple-dock [hidden], .lu-apple-recording-indicator[hidden] { display: none !important; }
+body.poster-mode:not(.lue-core-open) :is(.lu-band-score, .lu-band-status, #luScorePanel) { visibility: hidden; pointer-events: none; }
+body.poster-mode:not(.recording-preview):not(.lu-record-menu-open) .stageWrap:has(.mode-slot) #stage { height: calc(100% - 158px); }
+body.poster-mode:not(.recording-preview):not(.lu-record-menu-open) #cubeLyricsDeck { margin-bottom: 158px; }
+.lu-apple-dock .lu-apple-capsule-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-rows: 72px 24px;
+  grid-template-areas: "track transport actions" "timeline timeline timeline";
+  gap: 4px 14px;
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+.lu-apple-transport-cluster { grid-area: transport; gap: 10px; }
+.lu-apple-actions-cluster { grid-area: actions; justify-self: end; gap: 6px; }
+.lu-apple-icon-btn {
+  width: 44px !important; min-width: 44px !important;
+  height: 44px !important; min-height: 44px !important;
+  color: rgba(245, 245, 247, .78) !important;
+  transform: none;
+}
+.lu-apple-icon-btn svg { width: 21px; height: 21px; }
+.lu-apple-play-btn {
+  width: 64px !important; min-width: 64px !important;
+  height: 64px !important; min-height: 64px !important;
+  background: linear-gradient(#fff, #ececef) !important;
+  color: #17171c !important;
+  box-shadow: inset 0 1px 0 #fff, 0 5px 16px rgba(0, 0, 0, .28), 0 0 28px rgba(255, 255, 255, .10);
+}
+.lu-apple-play-btn svg { width: 27px; height: 27px; }
+#applePlayIcon { transform: translateX(2px); }
+.lu-apple-play-btn:active, .lu-apple-icon-btn:active { transform: scale(.97); }
+.lu-apple-dock :is(button, input):focus-visible,
+.lu-apple-record-popover button:focus-visible,
+.lu-apple-recording-indicator:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+button.lu-apple-track-zone {
+  grid-area: track;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: 48px;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  color: #f5f5f7;
+  font-family: inherit;
+}
+.lu-apple-artwork { width: 40px; height: 40px; flex: 0 0 40px; object-fit: contain; border-radius: 9px; background: #ffffff0a; }
+.lu-apple-track-copy { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.lu-apple-track-title { font-family: inherit; font-size: 14px !important; font-weight: 600; }
+.lu-apple-track-copy small { font-size: 11px; color: #bebec6; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.lu-apple-timeline { grid-area: timeline; display: flex; align-items: center; gap: 14px; }
+.lu-apple-scrub-wrap { height: 24px; flex: 1; min-width: 0; }
+.lu-apple-dock .lu-apple-track-time { display: block; font-size: 11px !important; color: #c6c6ce; }
+.lu-apple-dock .lu-apple-scrub-input,
+.lu-apple-dock .lu-apple-scrub-wrap:hover .lu-apple-scrub-input {
+  height: 24px !important; min-height: 24px !important; background: transparent; border: 0; box-shadow: none;
+}
+.lu-apple-scrub-input::-webkit-slider-runnable-track {
+  height: 3px;
+  border-radius: 9px;
+  background: linear-gradient(90deg, #e8e8ed var(--capsule-progress), #ffffff30 var(--capsule-progress));
+}
+.lu-apple-scrub-input::-webkit-slider-thumb { width: 11px; height: 11px; margin-top: -4px; opacity: 1; box-shadow: 0 1px 4px #0005; }
+.lu-apple-scrub-input::-moz-range-track { height: 3px; background: #ffffff30; }
+.lu-apple-scrub-input::-moz-range-progress { height: 3px; background: #e8e8ed; }
+#appleOrderModeBtn[aria-pressed="true"] { background: #f5f5f7 !important; color: #17171c !important; }
+#appleRecordMenuBtn { width: 88px !important; min-width: 88px !important; gap: 6px; font-size: 12px; font-family: inherit; border-radius: 16px !important; }
+#appleRecordMenuBtn svg { color: #d0d0d8; }
+#appleRecordMenuBtn[data-record-state="recording"] svg { color: #ff5f68; }
+.lu-apple-playlist-popover { bottom: max(164px, calc(env(safe-area-inset-bottom) + 144px)); font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif; background: linear-gradient(155deg, #303036, #222228); backdrop-filter: none; -webkit-backdrop-filter: none; animation: none; }
+.lu-apple-record-popover { width: min(296px, calc(100vw - 32px)); }
+.lu-apple-record-popover .lu-apple-popover-header { padding: 5px 10px 5px 16px; }
+.lu-apple-record-options { display: flex; flex-direction: column; gap: 12px; padding: 14px 16px 16px; }
+.lu-apple-record-options > span:not(.lu-sr-only) { color: #c5c5cd; font-size: 12px; }
+.lu-apple-aspect-group { display: flex; gap: 4px; border-radius: 12px; padding: 3px; background: #0003; }
+.lu-apple-aspect-group button { flex: 1; min-height: 44px; border: 0; border-radius: 9px; background: transparent; color: #d5d5dc; font: inherit; font-size: 13px; cursor: pointer; }
+.lu-apple-aspect-group button[aria-pressed="true"] { background: #ffffff20; color: #fff; box-shadow: 0 1px 3px #0003; }
+.lu-apple-record-start { min-height: 44px; border: 0; border-radius: 12px; background: #f5f5f7; color: #17171c; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.lu-apple-record-options button:disabled { opacity: .45; cursor: default; }
+.lu-apple-recording-indicator {
+  position: fixed; right: max(20px, env(safe-area-inset-right)); top: max(20px, env(safe-area-inset-top)); z-index: 120;
+  display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 6px 14px;
+  border: 1px solid #ffffff24; border-radius: 24px; background: #24242be8; color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif; font-size: 12px; font-variant-numeric: tabular-nums; cursor: pointer;
+}
+@media (min-width: 761px) {
+  body.poster-mode .app { grid-template-rows: minmax(0, 1fr); padding: 0; gap: 0; height: 100dvh; }
+  body.poster-mode .master-deck-hud { position: absolute; top: 20px; left: 24px; right: 24px; height: 48px; min-height: 48px; max-height: 48px; padding: 0; z-index: 60; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+  body.poster-mode .stage-cell { grid-row: 1; width: 100%; height: 100%; }
+  body.poster-mode .stageWrap { border: 0; border-radius: 0; }
+  body.poster-mode .lu-band-lyric { bottom: 162px; }
+}
+@media (max-width: 760px) {
+  .lu-apple-dock, .lu-apple-dock[data-dock-state="expanded"] { width: calc(100vw - 24px); height: 84px; padding: 8px 12px; border-radius: 21px; bottom: max(12px, env(safe-area-inset-bottom)); }
+  .lu-apple-dock .lu-apple-capsule-body { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); grid-template-rows: 48px 16px; grid-template-areas: "track transport actions" "timeline timeline timeline"; gap: 4px; }
+  .lu-apple-transport-cluster { justify-self: center; gap: 0; }
+  .lu-apple-play-btn { width: 48px !important; min-width: 48px !important; height: 48px !important; min-height: 48px !important; }
+  .lu-apple-play-btn svg { width: 23px; height: 23px; }
+  .lu-apple-artwork { width: 24px; height: 24px; flex-basis: 24px; border-radius: 6px; }
+  button.lu-apple-track-zone { min-height: 44px; gap: 6px; }
+  .lu-apple-track-title { font-size: 13px !important; }
+  .lu-apple-track-copy small { font-size: 10px; }
+  .lu-apple-actions-cluster { gap: 0; }
+  #appleRecordMenuBtn { width: 44px !important; min-width: 44px !important; }
+  #appleRecordMenuBtn > span { display: none; }
+  #appleRecordMenuBtn svg { width: 19px; height: 19px; }
+  .lu-apple-timeline { gap: 10px; }
+  .lu-apple-scrub-wrap { display: flex; align-items: center; height: 16px; }
+  .lu-apple-dock .lu-apple-track-time { font-size: 10px !important; }
+  .lu-apple-playlist-popover { bottom: max(108px, calc(env(safe-area-inset-bottom) + 100px)); max-height: min(50dvh, 420px); }
+  body.poster-mode .lu-band-lyric { bottom: 102px; }
+  body.poster-mode:not(.recording-preview):not(.lu-record-menu-open) .stageWrap:has(.mode-slot) #stage { height: calc(100% - 102px); }
+  body.poster-mode:not(.recording-preview):not(.lu-record-menu-open) #cubeLyricsDeck { margin-bottom: 102px; }
+}
+@media (max-width: 370px) {
+  .lu-apple-dock .lu-apple-capsule-body { grid-template-columns: minmax(0, 1fr) auto 88px; }
+  .lu-apple-artwork { display: none; }
+}
+@media (hover: hover) and (pointer: fine) {
+  .lu-apple-play-btn:hover { transform: scale(1.025); }
+  .lu-apple-icon-btn:hover { background: #ffffff12 !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lu-apple-dock[data-visibility="hidden"] { transform: translateX(-50%); }
+  .lu-apple-play-btn, .lu-apple-icon-btn { transition: none; }
 }
