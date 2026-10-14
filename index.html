@@ -3348,6 +3348,11 @@ BEAT</textarea>
             <path d="M18 6a1 1 0 0 1 1 1v10a1 1 0 1 1-2 0V7a1 1 0 0 1 1-1ZM6.55 6.66l7.1 4.35a1.2 1.2 0 0 1 0 1.98l-7.1 4.35a1.2 1.2 0 0 1-1.8-.99v-8.7a1.2 1.2 0 0 1 1.8-.99Z"/>
           </svg>
         </button>
+        <button type="button" class="lu-apple-icon-btn" id="appleStopBtn" title="停止播放" aria-label="停止">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="6.5" y="6.5" width="11" height="11" rx="2" fill="currentColor"></rect>
+          </svg>
+        </button>
       </div>
 
       <button type="button" class="lu-apple-track-zone" id="appleTrackPicker" aria-expanded="false" aria-controls="applePlaylistPopover" aria-label="选择歌曲">
@@ -3419,7 +3424,10 @@ BEAT</textarea>
   <div class="lu-apple-playlist-popover" id="applePlaylistPopover" role="dialog" aria-label="播放歌单" hidden>
     <div class="lu-apple-popover-header">
       <strong>播放歌单</strong>
-      <button type="button" class="lu-apple-import-trigger" id="appleImportAudioBtn" title="导入本机音频文件">＋ 导入音频</button>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button type="button" class="lu-apple-import-trigger" id="applePlaylistStopBtn" title="停止播放">停止播放</button>
+        <button type="button" class="lu-apple-import-trigger" id="appleImportAudioBtn" title="导入本机音频文件">＋ 导入音频</button>
+      </div>
     </div>
     <div class="lu-apple-playlist-list" id="applePlaylistList" role="listbox" aria-label="可选曲目"></div>
   </div>
@@ -9620,6 +9628,7 @@ $('#quickWaveCycleBtn')?.addEventListener('click', e => {
     dock.dataset.visibility = 'visible';
     dock.inert = false;
     dock.removeAttribute('aria-hidden');
+    document.body.classList.remove('apple-dock-hidden');
   }
   function scheduleHide() {
     clearTimeout(hideTimer);
@@ -9629,6 +9638,7 @@ $('#quickWaveCycleBtn')?.addEventListener('click', e => {
       dock.dataset.visibility = 'hidden';
       dock.inert = true;
       dock.setAttribute('aria-hidden', 'true');
+      document.body.classList.add('apple-dock-hidden');
     }, 3000);
   }
   function wake() {
@@ -9692,6 +9702,9 @@ $('#quickWaveCycleBtn')?.addEventListener('click', e => {
   $('#luAppleOrbBtn').addEventListener('click', () => { dock.dataset.dockState = 'expanded'; play.click(); });
   $('#applePrevBtn').addEventListener('click', () => { stepAvailableTrack(-1); wake(); });
   $('#appleNextBtn').addEventListener('click', () => { stepAvailableTrack(1); wake(); });
+  const handleStop = () => { stopMusic(); closePlaylist(); wake(); };
+  $('#appleStopBtn')?.addEventListener('click', handleStop);
+  $('#applePlaylistStopBtn')?.addEventListener('click', handleStop);
 
   const shuffle = $('#appleOrderModeBtn');
   function syncShuffle() {

@@ -238,7 +238,7 @@ body.lu-intro-active .lu-apple-dock {
   width: 22px;
   height: 22px;
   fill: currentColor;
-  transform: translateX(1.5px);
+  transform: translateX(0.6px);
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
 }
 .lu-apple-dock[data-dock-state="expanded"] .lu-apple-orb-btn {
@@ -1310,7 +1310,7 @@ body.immersive .lue-core-drawer { display: none !important; }
   border-color: rgba(255, 255, 255, .16);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18), 0 16px 48px rgba(0, 0, 0, .36);
   overflow: visible;
-  transition: opacity 180ms ease-out, transform 220ms cubic-bezier(.2, .8, .2, 1);
+  transition: opacity 220ms ease-out, visibility 220ms ease-out, transform 240ms cubic-bezier(.2, .8, .2, 1);
   font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", sans-serif;
   backdrop-filter: blur(18px) saturate(120%);
   -webkit-backdrop-filter: blur(18px) saturate(120%);
@@ -1322,13 +1322,31 @@ body.immersive .lue-core-drawer { display: none !important; }
 }
 .lu-apple-dock[data-visibility="hidden"] {
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
   transform: translateX(-50%) translateY(8px);
 }
 .lu-apple-dock [hidden], .lu-apple-recording-indicator[hidden] { display: none !important; }
 body.poster-mode:not(.lue-core-open) :is(.lu-band-score, .lu-band-status, #luScorePanel) { visibility: hidden; pointer-events: none; }
-body.poster-mode:not(.recording-preview):not(.lu-record-menu-open) .stageWrap:has(.mode-slot) #stage { height: calc(100% - 158px); }
-body.poster-mode:not(.recording-preview):not(.lu-record-menu-open) #cubeLyricsDeck { margin-bottom: 158px; }
+
+#cubeLyricsDeck {
+  transition: margin-bottom 260ms cubic-bezier(.2, .8, .2, 1);
+}
+.stageWrap:has(.mode-slot) #stage {
+  transition: height 260ms cubic-bezier(.2, .8, .2, 1);
+}
+.lu-band-lyric {
+  transition: bottom 260ms cubic-bezier(.2, .8, .2, 1);
+}
+
+body.poster-mode:not(.recording-preview):not(.lu-record-menu-open):not(.apple-dock-hidden):not(:has(#luAppleDock[data-visibility="hidden"])) .stageWrap:has(.mode-slot) #stage { height: calc(100% - 158px); }
+body.poster-mode:not(.recording-preview):not(.lu-record-menu-open):not(.apple-dock-hidden):not(:has(#luAppleDock[data-visibility="hidden"])) #cubeLyricsDeck { margin-bottom: 158px; }
+body.poster-mode:is(.apple-dock-hidden, :has(#luAppleDock[data-visibility="hidden"])) .stageWrap:has(.mode-slot) #stage { height: 100% !important; }
+body.poster-mode:is(.apple-dock-hidden, :has(#luAppleDock[data-visibility="hidden"])) #cubeLyricsDeck { margin-bottom: 24px !important; }
+body.poster-mode:is(.apple-dock-hidden, :has(#luAppleDock[data-visibility="hidden"])) .lu-band-lyric { bottom: 42px !important; }
 .lu-apple-dock .lu-apple-capsule-body {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
@@ -1356,7 +1374,7 @@ body.poster-mode:not(.recording-preview):not(.lu-record-menu-open) #cubeLyricsDe
   box-shadow: inset 0 1px 0 #fff, 0 5px 16px rgba(0, 0, 0, .28), 0 0 28px rgba(255, 255, 255, .10);
 }
 .lu-apple-play-btn svg { width: 27px; height: 27px; }
-#applePlayIcon { transform: translateX(2px); }
+#applePlayIcon { transform: translateX(0.6px); }
 .lu-apple-play-btn:active, .lu-apple-icon-btn:active { transform: scale(.97); }
 .lu-apple-dock :is(button, input):focus-visible,
 .lu-apple-record-popover button:focus-visible,
@@ -1440,14 +1458,34 @@ button.lu-apple-track-zone {
   .lu-apple-timeline { gap: 10px; }
   .lu-apple-scrub-wrap { display: flex; align-items: center; height: 16px; }
   .lu-apple-dock .lu-apple-track-time { font-size: 10px !important; }
+  .lu-apple-dock[data-visibility="hidden"] {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+    transform: translateX(-50%) translateY(8px);
+  }
+  .lu-apple-transport-cluster .lu-apple-icon-btn {
+    width: 38px !important;
+    min-width: 38px !important;
+  }
   .lu-apple-playlist-popover { bottom: max(108px, calc(env(safe-area-inset-bottom) + 100px)); max-height: min(50dvh, 420px); }
-  body.poster-mode .lu-band-lyric { bottom: 102px; }
-  body.poster-mode:not(.recording-preview):not(.lu-record-menu-open) .stageWrap:has(.mode-slot) #stage { height: calc(100% - 102px); }
-  body.poster-mode:not(.recording-preview):not(.lu-record-menu-open) #cubeLyricsDeck { margin-bottom: 102px; }
+  body.poster-mode:not(.apple-dock-hidden):not(:has(#luAppleDock[data-visibility="hidden"])) .lu-band-lyric { bottom: 102px; }
+  body.poster-mode:not(.recording-preview):not(.lu-record-menu-open):not(.apple-dock-hidden):not(:has(#luAppleDock[data-visibility="hidden"])) .stageWrap:has(.mode-slot) #stage { height: calc(100% - 102px); }
+  body.poster-mode:not(.recording-preview):not(.lu-record-menu-open):not(.apple-dock-hidden):not(:has(#luAppleDock[data-visibility="hidden"])) #cubeLyricsDeck { margin-bottom: 102px; }
+  body.poster-mode:is(.apple-dock-hidden, :has(#luAppleDock[data-visibility="hidden"])) .stageWrap:has(.mode-slot) #stage { height: 100% !important; }
+  body.poster-mode:is(.apple-dock-hidden, :has(#luAppleDock[data-visibility="hidden"])) #cubeLyricsDeck { margin-bottom: 24px !important; }
+  body.poster-mode:is(.apple-dock-hidden, :has(#luAppleDock[data-visibility="hidden"])) .lu-band-lyric { bottom: 28px !important; }
 }
 @media (max-width: 370px) {
   .lu-apple-dock .lu-apple-capsule-body { grid-template-columns: minmax(0, 1fr) auto 88px; }
   .lu-apple-artwork { display: none; }
+  .lu-apple-transport-cluster .lu-apple-icon-btn {
+    width: 34px !important;
+    min-width: 34px !important;
+  }
 }
 @media (hover: hover) and (pointer: fine) {
   .lu-apple-play-btn:hover { transform: scale(1.025); }
@@ -1456,4 +1494,5 @@ button.lu-apple-track-zone {
 @media (prefers-reduced-motion: reduce) {
   .lu-apple-dock[data-visibility="hidden"] { transform: translateX(-50%); }
   .lu-apple-play-btn, .lu-apple-icon-btn { transition: none; }
+  #cubeLyricsDeck, .stageWrap:has(.mode-slot) #stage, .lu-band-lyric { transition: none; }
 }
