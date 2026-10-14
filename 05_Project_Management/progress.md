@@ -2,7 +2,7 @@
 
 ## Current State
 
-- 本地 `feat/band-prism-pet-stage` 已接入 29 个演奏 pet、桌面四层半圆／手机三层棱镜舞台、六组 GPU 冷焰火及副歌候选联动；双画幅有声导出通过，未发布，实体手机待验。
+- 本地 `feat/band-prism-pet-stage` 已接入 29 个 pet、桌面四层／手机三层棱镜舞台、8／6 组台口齐射、二段礼花、光谱波纹与机位联动；双画幅有声导出通过，未发布，实体手机待验。
 - 乐队 V2 视觉升级与全量音乐已同步部署至 Pages：背景柔焦与对比度调谐、休止成员可见度提升（0.90/0.84）、演奏与主奏聚光灯与脚下光环增强、五官不过曝；全量 10 首主题音乐及 LRC 歌词、分谱 JSON/MIDI/MusicXML 接入并部署；全站加入双语版权与非商业免责声明（DISCLAIMER.md）。
 - 『律』主入口为 `index.html`：3D 物理材质与声波工作台、歌词同步、29 位角色实时表情；页面继续提供桌面与移动端操作。
 - 本地主入口已采用三套透明主题图按钮与同步律核图标；27 块入场魔方复用主场景圆角水晶及贴面，主视图取消两侧文字栏。入场标题与按钮已按主题增强对比度，本机十首主题曲已接入（含 One day），新增歌曲实际播放通过；验证与图片提示词见主题统一报告。
@@ -14,7 +14,7 @@
 
 ## Active Assets
 
-- [舞台精修与六项优化](Reports/2026-10-14-lu-stage-refinement.md)；最终截图／有声样片：`output/lu-band/stage-refinement/*-final.*`。Agent: codex · 2026-10-14。
+- [舞台机位与三层焰火升级](Reports/2026-10-14-lu-concert-upgrade.md)；最终截图／有声预览：`output/lu-band/concert-upgrade/`。Validation: 三主题、20 种队形画幅及双画幅导出通过。Agent: codex · 2026-10-14。
 - [律的演奏 pet 与棱镜舞台实现](Reports/2026-10-13-lu-pet-stage-implementation.md)；预览 `http://127.0.0.1:8000/band-study.html`，有声样片在 `output/lu-band/pet-stage-validation/`。
 - [律的乐队 V2、全量音乐与免责声明 Pages 发布报告](Reports/2026-10-13-lu-band-v2-pages-release.md)
 - [律的乐队 V2：全员、独立动作、自由编排与双画幅验收](Reports/2026-10-13-lu-band-v2.md)；入口「演出 → 乐队」，本机最终样片为 `output/lu-band/v2-landscape-final.mp4` 与 `v2-portrait-final.mp4`。

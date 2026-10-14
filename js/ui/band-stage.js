@@ -9,7 +9,7 @@ const palettes={
 };
 export function createConcertStage(scene,{createMaterial,textureFor,onChange=()=>{}}={}){
  const root=new THREE.Group(),effects=new THREE.Group();scene.add(root,effects);
- let narrow=null,theme='one-piece',screen=null,glass=[],lamps=[],bubbles=[],beams=[],glows=[],emissives=[],disposed=false,themeRevision=0,lastLighting=null;
+ let narrow=null,theme='one-piece',screen=null,glass=[],lamps=[],bubbles=[],beams=[],glows=[],emissives=[],spectrum=[],floorFlash=null,disposed=false,themeRevision=0,lastLighting=null;
  const steel=()=>new THREE.MeshStandardMaterial({color:'#333d49',metalness:.8,roughness:.32});
  const metal=()=>new THREE.MeshStandardMaterial({color:'#c1b69f',metalness:.82,roughness:.23});
  const add=(geometry,material,x=0,y=0,z=0,parent=root)=>{const mesh=new THREE.Mesh(geometry,material);mesh.position.set(x,y,z);mesh.receiveShadow=true;parent.add(mesh);return mesh;};
@@ -30,14 +30,23 @@ export function createConcertStage(scene,{createMaterial,textureFor,onChange=()=
  }
  function slab(spec,level,height,bevel=true){const g=new THREE.ExtrudeGeometry(platformShape(spec,level),{depth:height,bevelEnabled:bevel,bevelThickness:.045,bevelSize:.065,bevelSegments:2,curveSegments:64});g.rotateX(-Math.PI/2);return g;}
  function prismMaterial(){const m=createMaterial();m.color.set('#ffffff');m.roughness=.035;m.transmission=.96;m.thickness=.86;m.ior=1.5;m.opacity=1;m.transparent=false;m.side=THREE.DoubleSide;m.attenuationColor.set(palettes[theme].glass);m.attenuationDistance=5.8;m.envMapIntensity=1.3;m.iridescence=.36;m.dispersion=.18;return m;}
- function edge(spec,level,top){const count=narrow?48:96,positions=[],colors=[],indices=[],width=spec.widths?.[level]||0;
+ function edge(spec,level,top){const count=narrow?48:96,positions=[],uvs=[],indices=[],width=spec.widths?.[level]||0;
   for(let i=0;i<=count;i++){const t=i/count,a=t*Math.PI,r=(spec.radii?.[level]||0)+.07,x=narrow?(t-.5)*width:Math.cos(a)*r,z=narrow?spec.fronts[level]+.07:spec.back+Math.sin(a)*r;
-   const c=new THREE.Color().setHSL(.52+t*.32+level*.05,.48,.53);for(const y of [top-.52,top-.17]){positions.push(x,y,z);colors.push(c.r,c.g,c.b);}if(i<count){const k=i*2;indices.push(k,k+1,k+2,k+1,k+3,k+2);}}
-  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));g.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));g.setIndex(indices);
-  const m=new THREE.MeshBasicMaterial({vertexColors:true,side:THREE.DoubleSide,transparent:true,opacity:.36,depthWrite:false,blending:THREE.AdditiveBlending});const mesh=add(g,m);mesh.receiveShadow=false;emissives.push(m);
+   for(const [v,y] of [[0,top-spec.step+.12],[1,top-.14]]){positions.push(x,y,z);uvs.push(t,v);}if(i<count){const k=i*2;indices.push(k,k+1,k+2,k+1,k+3,k+2);}}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));g.setIndex(indices);
+  const m=new THREE.ShaderMaterial({uniforms:{uTime:{value:0},uBass:{value:0},uDrums:{value:0},uRow:{value:0},uFlash:{value:0},uReduced:{value:0},uLevel:{value:level},uCool:{value:new THREE.Color(palettes[theme].cool)},uWarm:{value:new THREE.Color(palettes[theme].warm)}},
+   vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+   fragmentShader:`varying vec2 vUv;uniform float uTime,uBass,uDrums,uRow,uFlash,uReduced,uLevel;uniform vec3 uCool,uWarm;
+    void main(){float r=abs(vUv.x-.5)*2.,clock=uTime*(1.-uReduced),flow=.5+.5*cos(r*15.-clock*3.2-uLevel*.65);
+    float pulse=pow(max(0.,cos(r*9.-clock*8.)),8.)*uDrums;
+    vec3 rainbow=.55+.45*cos(vec3(0.,2.1,4.2)+r*4.3-clock*.8-uLevel*.4);
+    vec3 color=mix(uCool,uWarm,flow*.42)*.70+rainbow*.42+uWarm*uFlash*.75;
+    float edge=pow(sin(vUv.y*3.14159265),.7),power=.16+uRow*.32+uBass*.19+flow*uBass*.17+pulse*.52+uFlash*.25;
+    gl_FragColor=vec4(color,edge*power);}`,side:THREE.DoubleSide,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});const mesh=add(g,m);mesh.receiveShadow=false;spectrum.push(m);
   const path=narrow?[new THREE.Vector3(-width/2,top,spec.back),new THREE.Vector3(-width/2,top,spec.fronts[level]),new THREE.Vector3(width/2,top,spec.fronts[level]),new THREE.Vector3(width/2,top,spec.back)]:Array.from({length:97},(_,i)=>new THREE.Vector3(Math.cos(i/96*Math.PI)*spec.radii[level],top,spec.back+Math.sin(i/96*Math.PI)*spec.radii[level]));
   const edgeGeometry=new THREE.BufferGeometry().setFromPoints(path),edgeColors=[];path.forEach((p,i)=>{const c=new THREE.Color().setHSL(.52+i/path.length*.32+level*.05,.45,.80);edgeColors.push(c.r,c.g,c.b);});edgeGeometry.setAttribute('color',new THREE.Float32BufferAttribute(edgeColors,3));
   const line=new THREE.Line(edgeGeometry,new THREE.LineBasicMaterial({vertexColors:true,transparent:true,opacity:.72,depthTest:false}));root.add(line);
+  const lower=new THREE.Line(edgeGeometry.clone(),new THREE.LineBasicMaterial({color:palettes[theme].warm,transparent:true,opacity:.55}));lower.position.y=-spec.step+.10;root.add(lower);
  }
  function curtain(x,width,height,z,color,parent=root){const g=new THREE.PlaneGeometry(width,height,36,16),p=g.attributes.position;
   for(let i=0;i<p.count;i++){const u=p.getX(i)/width,v=p.getY(i)/height;p.setZ(i,Math.sin(u*Math.PI*14)*.22+Math.sin(v*3+u*7)*.07);}g.computeVertexNormals();
@@ -101,8 +110,9 @@ export function createConcertStage(scene,{createMaterial,textureFor,onChange=()=
    if(sourceAspect>targetAspect){map.repeat.x=targetAspect/sourceAspect;map.offset.x=(1-map.repeat.x)/2;}else{map.repeat.y=sourceAspect/targetAspect;map.offset.y=(1-map.repeat.y)/2;}map.userData.stageBackdrop=true;map.needsUpdate=true;screen.material.map=map;screen.material.needsUpdate=true;}
   const old=root.getObjectByName('theme-decor');if(old){disposeTree(old);root.remove(old);}decorations();onChange();
  }
- function setLayout(value,force=false){if(narrow===value&&!force)return;narrow=value;disposeTree(root);glass=[];lamps=[];beams=[];glows=[];emissives=[];const s=stageSpec(narrow),p=palettes[theme],m=prismMaterial();fountains.setLayout(narrow);
+ function setLayout(value,force=false){if(narrow===value&&!force)return;narrow=value;disposeTree(root);glass=[];lamps=[];beams=[];glows=[];emissives=[];spectrum=[];const s=stageSpec(narrow),p=palettes[theme],m=prismMaterial();fountains.setLayout(narrow);
   const floor=add(new THREE.PlaneGeometry(160,160),new THREE.MeshStandardMaterial({color:'#111b28',metalness:.36,roughness:.40,envMapIntensity:.8}),0,-.5,4);floor.rotation.x=-Math.PI/2;
+  floorFlash=add(new THREE.PlaneGeometry(narrow?22:40,25),new THREE.ShaderMaterial({uniforms:{uFlash:{value:0},uTime:{value:0}},vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'varying vec2 vUv;uniform float uFlash,uTime;void main(){vec2 p=(vUv-.5)*vec2(1.,.7);float light=exp(-dot(p,p)*12.);float ripple=.8+.2*cos(length(p)*40.-uTime*15.);gl_FragColor=vec4(1.,.68,.28,light*ripple*uFlash*.38);}',transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}),0,-.485,5);floorFlash.rotation.x=-Math.PI/2;
   for(let level=0;level<s.levels;level++){const top=.35+level*s.step,base=top-s.step;glass.push(add(slab(s,level,s.step),m,0,base,s.back));
    const under=new THREE.MeshStandardMaterial({color:new THREE.Color(p.glass).multiplyScalar(.27),metalness:.42,roughness:.24,emissive:new THREE.Color(p.cool).multiplyScalar(.055),emissiveIntensity:1.0,envMapIntensity:.85});
    add(slab(s,level,.045,false),under,0,base+.10,s.back);emissives.push(under);edge(s,level,top);
@@ -121,7 +131,9 @@ export function createConcertStage(scene,{createMaterial,textureFor,onChange=()=
   }
   box(width+.5,.16,.22,brass,0,s.rigHeight+.55,back+1);truss(width,s.rigHeight,back+.5);batchRods(root);setTheme(theme).catch(console.warn);
  }
- function update(time,fx,reduced=false,lighting={lift:.55,climax:0},viewportHeight=650){const s=stageSpec(narrow),amount=reduced?0:fx.intensity,lastLift=lighting.lift;lastLighting={lift:lastLift,climax:lighting.climax};
+ function update(time,fx,reduced=false,lighting={lift:.55,climax:0},viewportHeight=650,rows=[]){const s=stageSpec(narrow),amount=reduced?0:fx.intensity,lastLift=lighting.lift;lastLighting={lift:lastLift,climax:lighting.climax,flash:lighting.flash||0,section:lighting.section,drums:lighting.drums||0,bass:lighting.bass||0,rows};
+  spectrum.forEach((m,i)=>{const u=m.uniforms;u.uTime.value=time;u.uBass.value=lighting.bass||0;u.uDrums.value=lighting.drums||0;u.uRow.value=rows[i]||0;u.uFlash.value=lighting.flash||0;u.uReduced.value=reduced?1:0;});
+  if(floorFlash){floorFlash.material.uniforms.uFlash.value=lighting.flash||0;floorFlash.material.uniforms.uTime.value=time;}
   emissives.forEach((m,i)=>{if(m.isMeshBasicMaterial)m.opacity=.16+lastLift*.20+(lighting.climax||0)*.08;else m.emissiveIntensity=.65+lastLift*.85;});
   if(screen)screen.material.color.setScalar(.68+lastLift*.20);
   lamps.forEach((lamp,i)=>{lamp.intensity=65+lastLift*42+(lighting.impact||0)*35;lamp.target.position.x=(i?1:-1)*(narrow?2.5:5)+(reduced?0:Math.sin(time*.23+i)*1.2*lastLift);});
@@ -130,5 +142,5 @@ export function createConcertStage(scene,{createMaterial,textureFor,onChange=()=
   bubbles.forEach((b,i)=>{b.visible=amount>.02;if(!b.visible)return;const age=(time*.34+i*.57)%4.3,side=i%2?1:-1;b.position.set(side*(s.width*.40+Math.sin(i+time*.27)*.35),3+age*1.05,narrow?-2.6-i%3*.65:1+i%3);b.scale.setScalar((.19+i%4*.08)*(.75+amount*.25));});
   fountains.update(time,fx,reduced,viewportHeight);
  }
- makeEffects();return {setLayout,setTheme,update,refreshMaterial(){const m=prismMaterial(),old=new Set(glass.map(o=>o.material));glass.forEach(o=>o.material=m);old.forEach(o=>o.dispose());},get diagnostics(){return {shape:stageSpec(narrow).shape,levels:stageSpec(narrow).levels,material:glass[0]?.material.userData.family||'prism',decorations:root.getObjectByName('theme-decor')?.children.length||0,bubbles:bubbles.filter(o=>o.visible).length,fireworks:fountains.diagnostics.visible,pyro:'fountains',fountains:fountains.diagnostics,bubbleTransmission:0,lighting:lastLighting,shafts:beams.length};},dispose(){disposed=true;disposeTree(root);disposeTree(effects);lightTexture.dispose();scene.remove(root,effects);}};
+ makeEffects();return {setLayout,setTheme,update,refreshMaterial(){const m=prismMaterial(),old=new Set(glass.map(o=>o.material));glass.forEach(o=>o.material=m);old.forEach(o=>o.dispose());},get diagnostics(){return {shape:stageSpec(narrow).shape,levels:stageSpec(narrow).levels,material:glass[0]?.material.userData.family||'prism',decorations:root.getObjectByName('theme-decor')?.children.length||0,bubbles:bubbles.filter(o=>o.visible).length,fireworks:fountains.diagnostics.visible,pyro:'layered-concert',fountains:fountains.diagnostics,spectrum:spectrum.length,bubbleTransmission:0,lighting:lastLighting,shafts:beams.length};},dispose(){disposed=true;disposeTree(root);disposeTree(effects);lightTexture.dispose();scene.remove(root,effects);}};
 }

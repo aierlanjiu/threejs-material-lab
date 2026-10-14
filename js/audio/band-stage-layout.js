@@ -49,12 +49,41 @@ export function petFrameAt(time,bpm,activity,{reduced=false,speed=1,index=0,atta
  return [1,2][phase%2];
 }
 const cues=new WeakMap();
+export function stageFountainSlots(narrow=false){
+ const s=stageSpec(narrow),xs=narrow?[-6,-4.15,-2.25,2.25,4.15,6]:[-12,-8.8,-5.8,-2.7,2.7,5.8,8.8,12];
+ return xs.map(x=>{const z=narrow?s.front-.08:s.back+Math.sqrt(s.radii[0]**2-x*x)-.12;return [x,stageHeightAt(x,z,narrow)+.09,z];});
+}
+const pulse=(age,start,hold,fade)=>age<start?0:age<start+.09?clamp((age-start)/.09):age<start+hold?1:clamp(1-(age-start-hold)/fade);
+export function stagePyroAt(time,fx,narrow=false,reduced=false){
+ const count=narrow?6:8,start=fx.bursts.length?Math.max(...fx.bursts):-100,age=time-start,enabled=!reduced&&start>=0;
+ const salvo=enabled?pulse(age,.48,.85,.7):0;
+ const powers=Array.from({length:count},(_,i)=>{const rank=Math.floor(Math.abs(i-(count-1)/2));return enabled?Math.max(pulse(age,rank*.11,.33,.45)*.85,salvo):0;});
+ const flash=enabled&&age>=.48&&age<.73?Math.sin((age-.48)/.25*Math.PI):0;
+ return {start,age,powers,flash,salvo,mode:salvo>.05?'salvo':powers.some(p=>p>.05)?'wave':'rest',airStarts:[start+.72,start+1.18],airPowers:[.72,1.18].map(delay=>enabled&&age>=delay&&age<delay+3.4?1:0)};
+}
+function stemLevelAt(stem,time){
+ const points=stem?.envelope||[];let lo=0,hi=points.length;
+ while(lo<hi){const mid=(lo+hi)>>1;if(points[mid].time<=time)lo=mid+1;else hi=mid;}
+ const a=points[Math.max(0,lo-1)],b=points[Math.min(points.length-1,lo)];
+ return a?a.value+(b.value-a.value)*clamp((time-a.time)/Math.max(.001,b.time-a.time)):0;
+}
+function stemAttackAt(stem,time){
+ const points=stem?.onsets||[];let lo=0,hi=points.length;
+ while(lo<hi){const mid=(lo+hi)>>1;if(points[mid].time<=time)lo=mid+1;else hi=mid;}
+ const point=points[lo-1];return point?point.strength*clamp(1-(time-point.time)/.32):0;
+}
 export function stageLightingAt(score,time,fx,reduced=false){
  const opening=clamp(time/3),ending=score?.duration?clamp((score.duration-time)/5):1;
  const climax=reduced?0:fx.intensity;
- const start=fx.bursts.at(-1),impact=reduced||start===undefined?0:clamp(1-(time-start)/.42);
+ const start=fx.bursts.length?Math.max(...fx.bursts):undefined,impact=reduced||start===undefined?0:clamp(1-(time-start)/.42);
+ const chorus=score?.stageCues?.choruses.find(c=>time>=c.start&&time<c.end),chorusView=reduced?0:chorus?Math.min(clamp((time-chorus.start)/2),clamp((chorus.end-time)/2)):climax;
+ const section=time<6?'intro':chorusView>.1?'chorus':'verse',verse=reduced?0:clamp((time-6)/4)*(1-chorusView);
+ const drums=score?.stems?.find(s=>s.id==='drums'),bass=score?.stems?.find(s=>s.id==='bass');
  return {lift:reduced?.55:(.42+fx.energy*.34+climax*.24)*(.70+.30*opening)*(.55+.45*ending),climax,
-  impact,cameraShift:reduced?0:Math.sin(time*.14)*.11,cameraLift:reduced?0:Math.sin(time*.11)*.065};
+  impact,flash:stagePyroAt(time,fx,false,reduced).flash,section,chorusView,verse,
+  drums:reduced?0:stemAttackAt(drums,time),bass:reduced?0:Math.max(stemLevelAt(bass,time)*.65,stemAttackAt(bass,time)),
+  cameraScale:reduced?1:1.012-verse*.018+chorusView*.04+Math.sin(time*.27)*.014,
+  cameraShift:reduced?0:Math.sin(time*.14)*.38*(1-chorusView*.65),cameraLift:reduced?0:Math.sin(time*.11)*.13};
 }
 function energyAt(score,time){
  if(!score?.stems?.length||time<0||time>=score.duration)return 0;
@@ -78,5 +107,5 @@ export function stageClimaxAt(score,time,mode='auto'){
  const chorusPower=chorus?Math.min(clamp((time-chorus.start)/.35),clamp((chorus.end-time)/2))*.9:0;
  const intensity=mode==='preview'?1:score.stageCues?.choruses.length?chorusPower:clamp((energy-cue.threshold)/.18);
  const starts=mode==='preview'?Array.from({length:3},(_,i)=>Math.floor(time/cue.period)*cue.period-i*cue.period):cue.bursts;
- return {energy,intensity,bursts:starts.filter(t=>t>=0&&time>=t&&time-t<2.6).slice(-3)};
+ return {energy,intensity,bursts:starts.filter(t=>t>=0&&time>=t&&time-t<5.5).sort((a,b)=>a-b).slice(-3)};
 }
