@@ -2,69 +2,139 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.166.1/+esm';
 import {stageSpec,stageFountainSlots,stagePyroAt} from '../audio/band-stage-layout.js';
 
 const random=n=>{const x=Math.sin(n*127.1+311.7)*43758.5453;return x-Math.floor(x);};
-const trajectory=`
- uniform float uTime,uPower,uSide,uViewportHeight;
- attribute vec4 dynamics,accents;
- varying float vFade,vWhite;
- vec3 spark(float tail){
-  float head=mod(uTime+dynamics.x,dynamics.y),age=max(0.,head-tail);
-  vFade=pow(max(0.,1.-head/dynamics.y),.6)*(.83+.17*sin(accents.z+uTime*37.));vWhite=accents.w;
-  return vec3(uSide*dynamics.w*age+sin(accents.z)*age*.10,
-   max(.10,dynamics.z*age-6.2*age*age),(.85+accents.y)*age);
+// Pure GLSL helpers are also exercised by the numerical regression test.
+const physicsShader=`
+ float dragDistance(float age){return 1.-exp(-max(0.,age)*2.8);}
+ vec3 fountainAt(float age,float speed,float spread,float theta){
+  float a=max(0.,age),drag=dragDistance(a),terminal=12.4/2.8;
+  float y=(speed+terminal)/2.8*drag-terminal*a;
+  float crown=smoothstep(.40,.95,a)*(1.-exp(-max(0.,a-.40)*1.5));
+  float radius=.025+spread*(.24*drag+1.35*crown);
+  return vec3(cos(theta)*radius,y,sin(theta)*radius);
  }
+ float particleAlive(float age,float life,float height){return step(0.,age)*step(.015,height)*(1.-step(life,age));}
+ vec3 sphereAt(vec3 direction,float age,float willow){
+  float a=max(0.,age),spread=1.-exp(-a*9.);
+  return vec3(direction.x*spread,direction.y*spread-willow*a*a,direction.z*spread);
+ }
+ vec3 coolingColor(float life){
+  vec3 hot=vec3(.94,.98,1.),gold=vec3(1.,.8235,.4784),copper=vec3(.8784,.3255,.1098),ember=vec3(.16,.022,.006);
+  if(life<.18)return hot;
+  if(life<.60)return mix(hot,gold,(life-.18)/.42);
+  if(life<.85)return mix(gold,copper,(life-.60)/.25);
+  return mix(copper,ember,clamp((life-.85)/.15,0.,1.));
+ }
+ float emissionPulse(float age,float start,float hold,float fade){
+  if(age<start)return 0.;
+  if(age<start+.09)return clamp((age-start)/.09,0.,1.);
+  if(age<start+hold)return 1.;
+  return clamp(1.-(age-start-hold)/fade,0.,1.);
+ }
+ float emissionAt(float age,float rank){return max(emissionPulse(age,rank*.11,.33,.45)*.85,emissionPulse(age,.48,.85,.7));}
 `;
-const sparkFragment=`uniform float uPower;varying float vFade,vWhite;
- void main(){vec2 p=gl_PointCoord-.5;float core=exp(-length(p)*15.);
- float cross=exp(-abs(p.x)*34.-abs(p.y)*8.)+exp(-abs(p.y)*34.-abs(p.x)*8.);
- vec3 color=mix(vec3(1.,.62,.20),vec3(1.,.98,.88),max(vWhite,core));
- gl_FragColor=vec4(color,(core+cross*.3)*vFade*uPower*1.65);}`;
-const trailFragment=`uniform float uPower;varying float vFade,vWhite,vTail;
- void main(){gl_FragColor=vec4(mix(vec3(1.,.64,.23),vec3(.92,.97,1.),vWhite),vFade*uPower*(1.-vTail*.8));}`;
-function particles(count,dynamics,accents,uniforms,vertex,fragment,lines=false){
- const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.Float32BufferAttribute(new Float32Array(count*3),3));
- geometry.setAttribute('dynamics',new THREE.Float32BufferAttribute(dynamics,4));geometry.setAttribute('accents',new THREE.Float32BufferAttribute(accents,4));
- if(lines)geometry.setAttribute('tail',new THREE.Float32BufferAttribute(Array.from({length:count},(_,i)=>i%2),1));
- const material=new THREE.ShaderMaterial({uniforms,vertexShader:vertex,fragmentShader:fragment,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});
- const mesh=lines?new THREE.LineSegments(geometry,material):new THREE.Points(geometry,material);mesh.frustumCulled=false;return mesh;
-}
-export function createStageFountains(parent,{lightTexture}){
- const jets=[],airbursts=[],capacity=320,airCapacity=640;let narrow=false,lastTime=0,lastPyro=null;
- for(let i=0;i<8;i++){
-  const group=new THREE.Group(),dynamics=[],accents=[],lineDynamics=[],lineAccents=[];
-  for(let k=0;k<capacity;k++){
-   const seed=k+i*capacity,white=k%5<3,life=1.55+random(seed+8)*.55;
-   const d=[random(seed+1)*life,life,12.7+random(seed+3)*1.8,.45+random(seed+5)*.50];
-   const a=[k%13===0?.38:.19+random(seed+2)*.13,(random(seed+7)-.5)*.3,seed*3.2,white?1:0];
-   dynamics.push(...d);accents.push(...a);for(let j=0;j<2;j++){lineDynamics.push(...d);lineAccents.push(...a);}
-  }
-  const uniforms={uTime:{value:0},uPower:{value:0},uSide:{value:1},uViewportHeight:{value:650}};
-  const points=particles(capacity,dynamics,accents,uniforms,trajectory+`void main(){vec4 mv=modelViewMatrix*vec4(spark(0.),1.);gl_Position=projectionMatrix*mv;gl_PointSize=clamp(accents.x*uViewportHeight/max(1.,-mv.z),1.,18.);}`,sparkFragment);
-  const trails=particles(capacity*2,lineDynamics,lineAccents,uniforms,trajectory+`attribute float tail;varying float vTail;void main(){vTail=tail;gl_Position=projectionMatrix*modelViewMatrix*vec4(spark(tail*.075),1.);}`,trailFragment,true);group.add(points,trails);
-  const glow=new THREE.Sprite(new THREE.SpriteMaterial({map:lightTexture,color:'#ffdaa0',transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending,toneMapped:false}));glow.position.y=.18;glow.scale.set(1.4,1.4,1);group.add(glow);
-  const nozzle=new THREE.Mesh(new THREE.CylinderGeometry(.10,.14,.19,10),new THREE.MeshStandardMaterial({color:'#303743',metalness:.8,roughness:.3}));nozzle.position.y=.1;group.add(nozzle);parent.add(group);
-  jets.push({group,points,trails,glow,uniforms});group.visible=false;
+const vertexShader=physicsShader+`
+ uniform float uTime,uAge,uPreviousAge,uRank,uPower,uViewportHeight,uKind,uRise,uHeight;
+ attribute vec4 dynamics,accents;attribute vec2 extras;
+ varying vec2 vUv;varying float vFade,vLife,vSeed,vKind,vHot,vGrain;
+ vec3 positionAt(float a){
+  if(uKind<.5)return fountainAt(a-dynamics.x,dynamics.z,accents.y,accents.x);
+  if(uKind<1.5)return sphereAt(dynamics.xyz,a-dynamics.w,accents.w>.5?.48:.78);
+  if(uKind<2.5){float rise=clamp((a-dynamics.x+.35)/.35,0.,1.);return vec3(0.,-uRise*(1.-pow(rise,1.45)),0.);}
+  if(uKind<3.5)return vec3(0.);
+  if(uKind<4.5)return vec3(0.,.20,0.);
+  float t=max(0.,a-dynamics.x);return vec3(cos(accents.x)*t*.10,2.2+t*.60,sin(accents.x)*t*.10);
  }
- const airTrajectory=`uniform float uTime,uStart,uPower,uViewportHeight;attribute vec4 dynamics,accents;varying float vFade,vWhite;
- vec3 spark(float tail){float head=max(0.,uTime-uStart-dynamics.w),age=max(0.,head-tail),spread=1.-exp(-age*2.2);
- vFade=pow(max(0.,1.-head/3.4),1.2)*smoothstep(0.,.06,uTime-uStart)*(.72+.28*sin(accents.z+uTime*27.));vWhite=accents.w;
- return vec3(dynamics.x*spread+accents.x*age*.22,dynamics.y*spread-.58*age*age,dynamics.z*spread);}`;
+ void main(){
+  float a=extras.y>.5?uPreviousAge:uAge,age=a-dynamics.x;
+  vSeed=accents.z;vKind=uKind;vHot=0.;vFade=0.;vLife=0.;vUv=position.xy*.5+.5;
+  vec3 p=positionAt(a),before=positionAt(a-.04);float width=1.,lengthScale=1.;
+  if(uKind<.5){
+   float pressure=emissionAt(dynamics.x,uRank),life=dynamics.y;
+   vLife=clamp(age/life,0.,1.);vFade=particleAlive(age,life,p.y)*step(extras.x,pressure)*pow(max(0.,1.-vLife),.48)*pressure;
+   width=accents.w;lengthScale=1.;
+  }else if(uKind<1.5){
+   age=a-dynamics.w;vLife=clamp(age/accents.x,0.,1.);vHot=accents.w;
+   vFade=particleAlive(age,accents.x,p.y+uHeight)*pow(max(0.,1.-vLife),.70);width=accents.y;lengthScale=1.45;
+  }else if(uKind<2.5){
+   float rise=clamp((age+.35)/.35,0.,1.);vLife=(1.-rise)*.45;
+   vFade=step(-.35,age)*(1.-smoothstep(-.01,.07,a))*pow(1.-dynamics.x/.13,1.5);width=.17;lengthScale=1.8;
+  }else if(uKind<3.5){
+   vFade=step(0.,a)*(1.-smoothstep(0.,.12,a));vLife=0.;width=.10+max(0.,a)*11.;
+  }else if(uKind<4.5){
+   float f=fract(sin(floor(uTime*30.)+accents.z)*43758.5453);
+   vFade=max(emissionAt(uAge,uRank),emissionAt(uPreviousAge,uRank))*(.72+.28*f);vLife=dynamics.x>.5?.27:0.;width=dynamics.y*(.84+.16*f);
+  }else{
+   float t=max(0.,age);vLife=clamp(t/4.8,0.,1.);vFade=step(0.,age)*sin(vLife*3.14159265)*.022;width=1.0+t*.35;
+  }
+  vFade*=uPower;vGrain=width;
+  vec4 mv=modelViewMatrix*vec4(p,1.),clip=projectionMatrix*mv;
+  vec4 prior=projectionMatrix*modelViewMatrix*vec4(before,1.);
+  float aspect=projectionMatrix[1][1]/projectionMatrix[0][0];vec2 resolution=vec2(uViewportHeight*aspect,uViewportHeight);
+  vec2 delta=(clip.xy/clip.w-prior.xy/prior.w)*resolution*.5;
+  float speed=length(delta);vec2 dir=speed>.001?delta/speed:vec2(0.,1.),normal=vec2(-dir.y,dir.x);
+  float radius=clamp(width*uViewportHeight/max(1.,-mv.z),.75,12.);
+  float streak=clamp(speed*.72*lengthScale+radius*1.8,2.,52.);
+  vec2 offset=normal*position.x*radius+dir*(position.y-.55)*streak;
+  if(uKind>2.5){
+   float size=width*uViewportHeight/max(1.,-mv.z);
+   offset=position.xy*size;
+   if(uKind>3.5&&uKind<4.5)offset=position.xy*size*vec2(.48,2.3);
+  }
+  clip.xy+=offset/resolution*2.*clip.w;gl_Position=clip;
+ }`;
+const fragmentShader=physicsShader+`
+ varying vec2 vUv;varying float vFade,vLife,vSeed,vKind,vHot,vGrain;
+ void main(){
+  if(vFade<.0001)discard;
+  vec2 p=vUv-.5;float alpha=0.;vec3 color=coolingColor(vLife);
+  if(vKind<2.5){
+   float taper=.16+.84*smoothstep(.02,.80,vUv.y);
+   float tail=exp(-p.x*p.x*22./(taper*taper))*smoothstep(0.,.20,vUv.y)*(1.-smoothstep(.75,.99,vUv.y));
+   float head=exp(-p.x*p.x*34.-pow((vUv.y-.78)*11.,2.));
+   float pop=step(.14,vGrain)*step(.72,fract(vSeed*.137))*smoothstep(.82,.84,vLife)*(1.-smoothstep(.94,.96,vLife))*pow(max(0.,sin(vLife*90.+vSeed)),16.);
+   color=mix(color,vec3(1.,.96,.84),pop*.85+vHot*.22);
+   color=mix(color,color*vec3(1.,.68,.40),clamp((.78-vUv.y)*.5,0.,.35));
+   alpha=(tail*.37+head*.92+head*pop*1.3)*vFade;
+  }else if(vKind<3.5){alpha=exp(-dot(p,p)*16.)*vFade;color=vec3(1.,.97,.87);}
+  else if(vKind<4.5){float taper=.12+.65*(1.-vUv.y);alpha=exp(-p.x*p.x*7./(taper*taper))*sin(vUv.y*3.14159265)*vFade*.55;}
+  else{float fog=exp(-dot(p,p)*7.)*(.8+.2*sin(vUv.x*19.+vUv.y*13.+vSeed));alpha=fog*vFade;color=vec3(.94,.75,.47);}
+  gl_FragColor=vec4(color,alpha);
+ }`;
+function quads(dynamics,accents,extras,uniforms,kind){
+ const geometry=new THREE.InstancedBufferGeometry();geometry.setAttribute('position',new THREE.Float32BufferAttribute([-1,-1,0,1,-1,0,1,1,0,-1,1,0],3));geometry.setIndex([0,1,2,0,2,3]);
+ geometry.setAttribute('dynamics',new THREE.InstancedBufferAttribute(new Float32Array(dynamics),4));geometry.setAttribute('accents',new THREE.InstancedBufferAttribute(new Float32Array(accents),4));geometry.setAttribute('extras',new THREE.InstancedBufferAttribute(new Float32Array(extras),2));geometry.instanceCount=dynamics.length/4;
+ const material=new THREE.ShaderMaterial({uniforms:{...uniforms,uKind:{value:kind}},vertexShader,fragmentShader,transparent:true,depthWrite:false,side:THREE.DoubleSide,forceSinglePass:true,blending:THREE.AdditiveBlending});
+ const mesh=new THREE.Mesh(geometry,material);mesh.frustumCulled=false;if(kind===5)mesh.renderOrder=-2;return mesh;
+}
+const uniformsFor=()=>({uTime:{value:0},uAge:{value:100},uPreviousAge:{value:100},uRank:{value:0},uPower:{value:0},uViewportHeight:{value:650},uRise:{value:6},uHeight:{value:10}});
+export function createStageFountains(parent){
+ const jets=[],airbursts=[],capacity=400,airCapacity=768;let narrow=false,lastTime=0,lastPyro=null,previous=-100;
+ for(let i=0;i<8;i++){
+  const group=new THREE.Group(),ds=[],as=[],es=[],u=uniformsFor();
+  for(let k=0;k<capacity;k++){const seed=k+i*capacity,speed=27.5+random(seed+3)*5.7,life=(speed+12.4/2.8)/12.4,core=k%5<3;
+   ds.push(random(seed+1)*2.03,life,speed,0);as.push(random(seed+7)*Math.PI*2,core?.045+random(seed+9)*.10:.45+random(seed+9)*.75,seed*3.2,core?.105:.14+random(seed+2)*.10);es.push(random(seed+11),k%2);}
+  const sparks=quads(ds,as,es,u,0);group.add(sparks);
+  const flame=quads([0,.21,0,0,1,.31,0,0],[0,0,i*1.7,0,0,0,i*1.7+4,0],[0,0,0,0],u,4);group.add(flame);
+  const smoke=quads([.2,0,0,0,.65,0,0,0,1.1,0,0,0],[i*.9,0,i*2.3,0,i*.9+2,0,i*2.3+1,0,i*.9+4,0,i*2.3+2,0],[0,0,0,1,0,0],u,5);group.add(smoke);
+  const nozzle=new THREE.Mesh(new THREE.CylinderGeometry(.10,.14,.19,10),new THREE.MeshStandardMaterial({color:'#303743',metalness:.8,roughness:.3}));nozzle.position.y=.1;group.add(nozzle);parent.add(group);group.visible=false;jets.push({group,sparks,flame,smoke,uniforms:u});
+ }
  for(let i=0;i<2;i++){
-  const group=new THREE.Group(),ds=[],as=[],ld=[],la=[];
-  for(let k=0;k<airCapacity;k++){const seed=k+i*airCapacity,angle=.04+random(seed+31)*Math.PI*.97,radius=4.2+random(seed+13)*2.6;
-   const d=[Math.cos(angle)*radius,Math.sin(angle)*radius*.8,(random(seed+9)-.5)*1.7,random(seed+12)*.09],a=[(random(seed+20)-.5)*2,.17+random(seed+21)*.18,seed*2.8,k%3?1:0];
-   ds.push(...d);as.push(...a);for(let j=0;j<2;j++){ld.push(...d);la.push(...a);}}
-  const uniforms={uTime:{value:0},uStart:{value:0},uPower:{value:0},uViewportHeight:{value:650}};
-  const points=particles(airCapacity,ds,as,uniforms,airTrajectory+`void main(){vec4 mv=modelViewMatrix*vec4(spark(0.),1.);gl_Position=projectionMatrix*mv;gl_PointSize=clamp(accents.y*uViewportHeight/max(1.,-mv.z),1.,15.);}`,sparkFragment);
-  const trails=particles(airCapacity*2,ld,la,uniforms,airTrajectory+`attribute float tail;varying float vTail;void main(){vTail=tail;gl_Position=projectionMatrix*modelViewMatrix*vec4(spark(tail*.16),1.);}`,trailFragment,true);
-  group.add(points,trails);parent.add(group);group.visible=false;airbursts.push({group,points,trails,uniforms});
+  const group=new THREE.Group(),ds=[],as=[],es=[],u=uniformsFor();
+  for(let k=0;k<airCapacity;k++){const seed=k+i*airCapacity,index=Math.floor(k/2),n=airCapacity/2,y=1-2*(index+.5)/n,phi=index*Math.PI*(3-Math.sqrt(5)),ring=Math.sqrt(1-y*y),inner=index%5===0,radius=(inner?1.6:4.3)+random(seed+21)*(inner?.6:2.4);
+   ds.push(Math.cos(phi)*ring*radius,y*radius,Math.sin(phi)*ring*radius,random(seed+12)*.035);as.push(inner?2.3:4.25,.10+random(seed+22)*.11,seed*2.8,inner?1:0);es.push(0,k%2);}
+  const sparks=quads(ds,as,es,u,1);group.add(sparks);
+  const cds=[],cas=[],ces=[];for(let k=0;k<64;k++){cds.push((k%32)/31*.12,0,0,0);cas.push(0,0,k*.6,0);ces.push(0,Math.floor(k/32));}
+  const comet=quads(cds,cas,ces,u,2),core=quads([0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,1],u,3);group.add(comet,core);parent.add(group);group.visible=false;airbursts.push({group,sparks,comet,core,uniforms:u});
  }
  function setLayout(value){narrow=value;const s=stageSpec(narrow),slots=stageFountainSlots(narrow);
-  jets.forEach((jet,i)=>{jet.enabled=i<slots.length;jet.group.visible=false;if(!jet.enabled)return;jet.group.position.fromArray(slots[i]);jet.uniforms.uSide.value=Math.sign(slots[i][0]);jet.points.geometry.setDrawRange(0,narrow?180:capacity);jet.trails.geometry.setDrawRange(0,(narrow?180:capacity)*2);});
-  airbursts.forEach((burst,i)=>{burst.group.position.set((i?1:-1)*(narrow?2.7:5.8),narrow?8.1:10.3,s.back+1.25);burst.group.scale.setScalar(narrow?.68:1);burst.points.geometry.setDrawRange(0,narrow?320:airCapacity);burst.trails.geometry.setDrawRange(0,(narrow?320:airCapacity)*2);});
+  jets.forEach((jet,i)=>{jet.enabled=i<slots.length;jet.group.visible=false;if(!jet.enabled)return;jet.group.position.fromArray(slots[i]);jet.uniforms.uRank.value=Math.floor(Math.abs(i-(slots.length-1)/2));jet.sparks.geometry.instanceCount=narrow?240:capacity;});
+  airbursts.forEach((burst,i)=>{const scale=narrow?.68:1;burst.group.position.set((i?1:-1)*(narrow?2.7:5.8),narrow?8.1:10.3,s.back+1.25);burst.group.scale.setScalar(scale);burst.uniforms.uHeight.value=burst.group.position.y/scale;burst.uniforms.uRise.value=(burst.group.position.y-2.7)/scale;burst.sparks.geometry.instanceCount=narrow?384:airCapacity;});
  }
- function update(time,fx,reduced,viewportHeight){lastTime=time;lastPyro=stagePyroAt(time,fx,narrow,reduced);
-  jets.forEach((jet,i)=>{const power=jet.enabled?lastPyro.powers[i]:0;jet.group.visible=power>.015;jet.uniforms.uTime.value=time;jet.uniforms.uPower.value=power;jet.uniforms.uViewportHeight.value=viewportHeight;jet.glow.material.opacity=power*.8;});
-  airbursts.forEach((burst,i)=>{burst.group.visible=lastPyro.airPowers[i]>0;burst.uniforms.uTime.value=time;burst.uniforms.uStart.value=lastPyro.airStarts[i];burst.uniforms.uPower.value=lastPyro.airPowers[i];burst.uniforms.uViewportHeight.value=viewportHeight;});
+ function update(time,fx,reduced,viewportHeight){lastTime=time;lastPyro=stagePyroAt(time,fx,narrow,reduced);previous=Math.max(-100,...fx.bursts.filter(t=>t<lastPyro.start));
+  jets.forEach(jet=>{const age=time-lastPyro.start,past=time-previous,rank=jet.uniforms.uRank.value,active=jet.enabled&&!reduced&&((age>=rank*.11&&age<5.1)||(past>=rank*.11&&past<5.1));jet.group.visible=active;
+   jet.uniforms.uTime.value=time;jet.uniforms.uAge.value=age;jet.uniforms.uPreviousAge.value=past;jet.uniforms.uPower.value=active?1:0;jet.uniforms.uViewportHeight.value=viewportHeight;});
+  airbursts.forEach((burst,i)=>{const age=time-lastPyro.airStarts[i],past=time-(previous+[.72,1.18][i]),active=!reduced&&((age>=-.35&&age<4.35)||(past>=-.35&&past<4.35));burst.group.visible=active;
+   burst.uniforms.uTime.value=time;burst.uniforms.uAge.value=age;burst.uniforms.uPreviousAge.value=past;burst.uniforms.uPower.value=active?1:0;burst.uniforms.uViewportHeight.value=viewportHeight;});
  }
- return {setLayout,update,get diagnostics(){return {motion:'vertex-shader',emitters:narrow?6:8,visible:jets.filter(j=>j.group.visible).length,particleCount:(narrow?6*180+2*320:8*capacity+2*airCapacity),time:lastTime,mode:lastPyro?.mode,flash:lastPyro?.flash||0,powers:lastPyro?.powers||[],positions:jets.filter(j=>j.enabled).map(j=>j.group.position.toArray()),airbursts:{emitters:2,visible:airbursts.filter(b=>b.group.visible).length,starts:lastPyro?.airStarts||[]}};}};
+ return {setLayout,update,get flow(){return lastPyro?.powers.reduce((a,b)=>a+b,0)/(narrow?6:8)||0;},get diagnostics(){const ages=airbursts.filter(b=>b.group.visible).flatMap(b=>[b.uniforms.uAge.value,b.uniforms.uPreviousAge.value]);return {motion:'vertex-shader',streaks:'instanced-quads',angularDistribution:'360-degree',cooling:'white-gold-copper-ember',groundCutoff:true,emitters:narrow?6:8,visible:jets.filter(j=>j.group.visible).length,particleCount:narrow?6*240+2*384:8*capacity+2*airCapacity,smokeClouds:(narrow?6:8)*3,time:lastTime,mode:lastPyro?.mode,flash:lastPyro?.flash||0,powers:lastPyro?.powers||[],attributeUpdates:[...jets,...airbursts].reduce((sum,j)=>sum+Object.values(j.sparks.geometry.attributes).reduce((n,a)=>n+a.version,0),0),positions:jets.filter(j=>j.enabled).map(j=>j.group.position.toArray()),airbursts:{emitters:2,visible:airbursts.filter(b=>b.group.visible).length,spherical:true,comets:ages.filter(a=>a>=-.35&&a<.07).length,cores:ages.filter(a=>a>=0&&a<.12).length,starts:lastPyro?.airStarts||[]}};}};
 }
