@@ -107,5 +107,8 @@ export function stageClimaxAt(score,time,mode='auto'){
  const chorusPower=chorus?Math.min(clamp((time-chorus.start)/.35),clamp((chorus.end-time)/2))*.9:0;
  const intensity=mode==='preview'?1:score.stageCues?.choruses.length?chorusPower:clamp((energy-cue.threshold)/.18);
  const starts=mode==='preview'?Array.from({length:3},(_,i)=>Math.floor(time/cue.period)*cue.period-i*cue.period):cue.bursts;
- return {energy,intensity,bursts:starts.filter(t=>t>=0&&time>=t&&time-t<5.5).sort((a,b)=>a-b).slice(-3)};
+ // A continuous spray has its own window; airbursts and flash keep their discrete cues.
+ const sprayChorus=score.stageCues?.choruses.findLast(c=>time>=c.start&&time<c.end+3.1),sprayStart=cue.bursts.findLast(t=>time>=t&&time-t<8.2);
+ const fountainWindow=mode==='preview'?{start:0,end:score.duration}:sprayChorus?{start:sprayChorus.start,end:sprayChorus.end}:!score.stageCues?.choruses.length&&sprayStart!==undefined?{start:sprayStart,end:sprayStart+5.1}:undefined;
+ return {energy,intensity,...(fountainWindow?{fountainWindow}:score.stageCues?.choruses.length?{fountainWindow:null}:{}),bursts:starts.filter(t=>t>=0&&time>=t&&time-t<5.5).sort((a,b)=>a-b).slice(-3)};
 }
