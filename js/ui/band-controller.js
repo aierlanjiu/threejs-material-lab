@@ -81,6 +81,7 @@ export async function createBandController({stage,state,getTime,getLyric=()=>'',
   const time=clock();conductor?.tick();const conducting=conductor?.snapshot;
   const solo=conducting?.soloGroup?(parts.find(p=>p.id===soloActor&&p.stemId===conducting.soloGroup)||parts.find(p=>p.stemId===conducting.soloGroup))?.id:null;
   const sampled=sampleBandEnsemble(data,parts,time,solo||focus);
+  if(data?.hybrid&&!conductReady)for(const sample of sampled.parts){if(parts.find(p=>p.id===sample.id)?.technique==='voice')continue;for(const key of ['activity','energy','attack','notePulse'])sample[key]=0;sample.notes=[];}
   if(canConduct())for(const sample of sampled.parts){const gain=conductor.gain(sample.stemId);sample.userMuted=!gain;for(const key of ['activity','energy','attack','notePulse'])sample[key]*=gain;if(!gain)sample.notes=[];}
   for(const sample of sampled.parts)sample.idle=state.isPlayingMusic&&time<(data?.duration||0);
   const effectsFrame=stageEffectsAt(data,time,settings.effects||'auto',reduced.matches?null:conducting?.effect);
@@ -96,7 +97,7 @@ export async function createBandController({stage,state,getTime,getLyric=()=>'',
   panel.querySelector('strong').textContent=`${part.name} · ${demo?part.instrument:part.label}`;panel.querySelector('small').textContent=demo?'编排演示':data?part.sourceLabel:'待接入';
   const playing=sampled.parts.filter(p=>p.activity>.18).length;
   const binding=songBindingSummary(data);
-  status.textContent=demo?`编排演示 · 未绑定当前歌曲 · ${playing}/${parts.length} 演奏`:
+  status.textContent=data?.hybrid&&!conductReady?(conductError||'正在准备乐队 · 原曲继续播放'):demo?`编排演示 · 未绑定当前歌曲 · ${playing}/${parts.length} 演奏`:
    data?.source==='arrangement'?`${data.title} · ${section} · ${playing}/${parts.length} 演奏${conducting?.remainingBeats?` · 手动接管 ${Math.ceil(conducting.remainingBeats/conducting.beatsPerBar)} 小节`:solo?' · 临时独奏':' · 自动演出'}`:
    data?`${data.title} · ${binding.estimated?`${binding.estimated} 组家族模型估计`:`${binding.verified} 声部已核验 · ${binding.pending} 待校验`}${binding.unresolved.length?' · 其余保留原曲':''} · ${playing} 演奏`:
    loadError||'正在读取本曲分谱';
