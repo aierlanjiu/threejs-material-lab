@@ -1,6 +1,6 @@
 # 律 · 《波莱罗》十人乐队与角色直接编排
 
-日期：2026-10-16（Asia/Shanghai）  
+日期：2026-10-16（Asia/Shanghai）<br>
 Agent：codex；交互方向：Stitch；角色命中层初始代码：AGY
 
 ## 本轮交付

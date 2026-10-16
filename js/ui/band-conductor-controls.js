@@ -156,7 +156,7 @@ export function createConductorControls(host, { onToggle, onSoloStart, onSoloEnd
     update(snapshot = {}) {
       const { ready = false, beat, section, soloId, soloGroup, muted = [], pending = [], message, pendingLabel, levels={} } = snapshot;
       if(!ready)releaseAll();
-      
+
       root.querySelectorAll('button').forEach(b => { b.disabled = !ready; });
 
       const text=pendingLabel||message||'点按下一拍进入/休止，长按临时主奏';
