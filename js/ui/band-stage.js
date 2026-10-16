@@ -132,11 +132,11 @@ export function createConcertStage(scene,{createMaterial,textureFor,onChange=()=
   box(width+.5,.16,.22,brass,0,s.rigHeight+.55,back+1);truss(width,s.rigHeight,back+.5);batchRods(root);setTheme(theme).catch(console.warn);
  }
  function update(time,fx,reduced=false,lighting={lift:.55,climax:0},viewportHeight=650,rows=[]){const s=stageSpec(narrow),amount=reduced?0:fx.intensity,lastLift=lighting.lift;lastLighting={lift:lastLift,climax:lighting.climax,flash:lighting.flash||0,section:lighting.section,drums:lighting.drums||0,bass:lighting.bass||0,rows};
-  fountains.update(time,fx,reduced,viewportHeight);
+  fountains.update(time,fx,reduced,viewportHeight,{power:lighting.wingPower||0,zones:lighting.wingZones||[]});
   spectrum.forEach((m,i)=>{const u=m.uniforms;u.uTime.value=time;u.uBass.value=lighting.bass||0;u.uDrums.value=lighting.drums||0;u.uRow.value=rows[i]||0;u.uFlash.value=lighting.flash||0;u.uReduced.value=reduced?1:0;});
   if(floorFlash){floorFlash.material.uniforms.uFlash.value=lighting.flash||0;floorFlash.material.uniforms.uTime.value=time;floorFlash.material.uniforms.uSpray.value=reduced?0:fountains.flow;}
   emissives.forEach((m,i)=>{if(m.isMeshBasicMaterial)m.opacity=.16+lastLift*.20+(lighting.climax||0)*.08;else m.emissiveIntensity=.65+lastLift*.85;});
-  if(screen)screen.material.color.setScalar(.68+lastLift*.20);
+  if(screen)screen.material.color.setScalar(.68+lastLift*.20-(lighting.wingPower||0)*.12);
   lamps.forEach((lamp,i)=>{lamp.intensity=65+lastLift*42+(lighting.impact||0)*35;lamp.target.position.x=(i?1:-1)*(narrow?2.5:5)+(reduced?0:Math.sin(time*.23+i)*1.2*lastLift);});
   glows.forEach((g,i)=>g.material.opacity=.35+lastLift*.35+(reduced?0:Math.sin(time*.5+i)*.04));
   beams.forEach((b,i)=>{const target=b.to.clone();target.x+=reduced?0:Math.sin(time*.24+i)*1.1*lastLift;const d=b.from.clone().sub(target);b.mesh.position.copy(b.from).add(target).multiplyScalar(.5);b.mesh.scale.y=d.length();b.mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());b.mesh.material.uniforms.opacity.value=.028+lastLift*.050+lighting.climax*.036;});

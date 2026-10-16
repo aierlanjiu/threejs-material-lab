@@ -64,7 +64,13 @@ export function layoutBand(count,formation,narrow=false,leadIndex=0,spread=1){
 const pose=()=>({position:[0,0,0],rotation:[0,0,0],scale:[1,1,1]});
 export function sampleBandMotion(sample,time,bpm=120,{technique='pluck',index=0,actorMotion=1,instrumentMotion=1,reduced=false}={}){
  const result={actor:pose(),instrument:pose(),group:pose()};
- const active=clamp(sample.activity||0);if(reduced||!active)return result;
+ const active=clamp(sample.activity||0);if(reduced)return result;
+ if(!active){
+  if(sample.idle){const phase=time*bpm/60*Math.PI+index*.71,a=clamp(actorMotion,0,2);
+   result.actor.position=[Math.sin(phase*.5)*.018*a,Math.sin(phase*.25)*.025*a,0];
+   result.actor.rotation=[Math.sin(phase)*.009*a,Math.sin(phase*.25)*.015*a,Math.sin(phase*.5)*.012*a];}
+  return result;
+ }
  const beat=Math.max(0,time)*(Number.isFinite(bpm)&&bpm>0?bpm:120)/60,phase=beat*Math.PI*2+index*.71;
  const attack=clamp(sample.attack||0),a=clamp(actorMotion,0,2),m=clamp(instrumentMotion,0,2);
  const sway=Math.sin(phase*.5)*active,breath=Math.sin(phase*.25)*active;

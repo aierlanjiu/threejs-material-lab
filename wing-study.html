@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>律 · 能量翼近景</title>
+  <link rel="icon" href="data:,">
+  <style>
+    :root{color-scheme:dark;font-family:system-ui,-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;background:#090d1c;color:#e7eff5}
+    *{box-sizing:border-box}body{margin:0}main{height:100svh;min-height:600px;display:grid;grid-template-rows:auto minmax(260px,1fr) auto}
+    header,footer{padding:20px 28px;position:relative;z-index:1}header{display:flex;justify-content:space-between;gap:16px;align-items:center}
+    h1{font-size:16px;font-weight:500;letter-spacing:.12em;margin:0}p{color:#8ea1b4;font-size:12px;margin:7px 0 0;line-height:1.6}
+    .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}button,select{font:inherit;font-size:12px;color:inherit;border:0;border-radius:8px;background:#ffffff0d;padding:10px 13px;min-height:40px;cursor:pointer}
+    button[aria-pressed=true]{background:#80e8ff24;color:#b5f6ff}button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid #85ddf0;outline-offset:4px}
+    #scene{position:relative;min-height:0;isolation:isolate}canvas{display:block;width:100%;height:100%}
+    footer{width:min(780px,100%);margin:auto}label{display:flex;gap:20px;align-items:center;font-size:12px;color:#a3b4c4;white-space:nowrap}input{width:100%;min-width:0;accent-color:#9ae8f4;min-height:32px}
+    .ticks{display:flex;justify-content:space-between;font-size:11px;color:#71879a;margin:2px 0 8px}#status{font-size:12px;color:#9fb5c7}
+    .reference{position:absolute;right:24px;top:0;width:180px;opacity:.8;z-index:2;cursor:pointer}.reference img{display:block;width:100%;border-radius:8px}.reference summary{font-size:11px;color:#9baebe;list-style:none;padding:8px 0}.reference[open]{width:min(340px,44vw)}
+    @media(max-width:650px){header,footer{padding:16px}header{align-items:flex-start;flex-direction:column;gap:12px}h1{font-size:14px}.controls{gap:6px}button,select{padding:9px 11px}.reference{right:16px;width:100px}.reference[open]{width:65vw}}
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div><h1>律 · 能量翼近景</h1><p>肩部生长 · Q 版翼展 · 白青亮芯</p></div>
+      <div class="controls">
+        <select id="actor" aria-label="预览角色"><option value="one-piece/luffy">路飞 · 主唱</option><option value="one-piece/usopp">乌索普 · 吉他</option></select>
+        <button id="hold" aria-pressed="true">完整展开</button><button id="play" aria-pressed="false">播放亮相</button>
+      </div>
+    </header>
+    <div id="scene"><details class="reference"><summary>查看参考图 ↗</summary><img src="./output/wing-alignment-20261016/reference.png" alt="用户参考图：白青色能量长翼"><p><a href="https://news.blizzard.com/en-us/article/13423479/tyrael-hero-spotlight" target="_blank" rel="noopener" style="color:#9ae8f4">泰瑞尔 · 暴雪官方参考 ↗</a></p></details></div>
+    <footer>
+      <label>亮相进度<input id="time" type="range" min="-.6" max="4.3" step=".01" value="1.4" aria-label="翼效时间轴"></label>
+      <div class="ticks"><span>聚光</span><span>强拍展翼</span><span>完整形态 · 约 3 秒</span><span>消散</span></div>
+      <div id="status" role="status">正在准备近景…</div>
+    </footer>
+  </main>
+  <script type="module">
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.166.1/+esm';
+    import {createEnergyWings,energyWingState,energyWingAttachment} from './js/ui/band-energy-wings.js';
+    import {bandPet} from './js/avatar/band-pets.js';
+    const $=id=>document.getElementById(id),container=$('scene');
+    const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputColorSpace=THREE.SRGBColorSpace;
+    container.prepend(renderer.domElement);
+    const scene=new THREE.Scene(),camera=new THREE.OrthographicCamera(-1.3,1.3,1.3,-.1,.01,20);
+    scene.background=new THREE.Color('#090d1c');camera.position.set(0,.59,5);camera.lookAt(0,.59,0);
+    const group=new THREE.Group();scene.add(group);
+    const wings=createEnergyWings(group),loader=new THREE.TextureLoader(),textures=new Map();
+    const art=new THREE.Mesh(new THREE.PlaneGeometry(.8,1),new THREE.MeshBasicMaterial({transparent:true,alphaTest:.035,depthWrite:false,toneMapped:false}));
+    // Composite the original sprite over the wings. Its faint transparent edge
+    // must not write a solid depth silhouette into the bright shoulder flare.
+    art.renderOrder=1;art.position.y=.44;group.add(art);
+    let playing=false,age=1.4,origin=0,flow=0,flowFrozen=false,previous=performance.now(),revision=0,ready=false,disposed=false;
+    const reduced=matchMedia('(prefers-reduced-motion:reduce)');
+    async function setActor(id){
+      const token=++revision;ready=false;
+      try{
+        if(!textures.has(id))textures.set(id,loader.loadAsync(bandPet(id).asset).then(texture=>{
+          texture.colorSpace=THREE.SRGBColorSpace;texture.repeat.set(.25,1);return texture;
+        }));
+        const texture=await textures.get(id);if(token!==revision||disposed)return;
+        art.material.map=texture;art.material.needsUpdate=true;ready=true;draw();
+      }catch(error){textures.delete(id);$('status').textContent='角色素材加载失败，请刷新重试';console.error(error);}
+    }
+    function resize(){
+      const width=container.clientWidth,height=container.clientHeight,aspect=width/height;
+      // Preserve the wing silhouette on narrow screens by pulling the view back.
+      const halfHeight=Math.max(.70,.93/aspect);
+      camera.left=-halfHeight*aspect;camera.right=halfHeight*aspect;camera.top=halfHeight;camera.bottom=-halfHeight;
+      camera.updateProjectionMatrix();renderer.setSize(width,height,false);draw();
+    }
+    function draw(){
+      if(!ready)return;
+      wings.update({time:flow,state:energyWingState(age),shoulder:energyWingAttachment($('actor').value)});renderer.render(scene,camera);
+      $('status').textContent=age<0?'背部聚光':age<.38?'强拍展开':age<3.25?'完整展开 · 连续亮芯与柔和外晕':age<4.3?'末梢消散':'亮相结束';
+    }
+    function setTime(value){age=Number(value);$('time').value=age;draw();}
+    function setPlaying(value,{keepFlow=false}={}){
+      playing=value;origin=performance.now()-((age+.6)*1000);
+      flowFrozen=!value&&!keepFlow;
+      $('play').setAttribute('aria-pressed',String(value));$('play').textContent=value?'暂停亮相':'播放亮相';
+      $('hold').setAttribute('aria-pressed',String(!value&&age===1.4));
+    }
+    $('actor').addEventListener('change',()=>setActor($('actor').value));
+    $('hold').addEventListener('click',()=>{setTime(1.4);setPlaying(false,{keepFlow:true});});
+    $('play').addEventListener('click',()=>{if(!playing)setTime(-.6);setPlaying(!playing);});
+    $('time').addEventListener('input',()=>{setPlaying(false);$('hold').setAttribute('aria-pressed','false');setTime($('time').value);});
+    const observer=new ResizeObserver(resize);observer.observe(container);
+    function frame(now){
+      if(disposed)return;requestAnimationFrame(frame);
+      const dt=Math.min((now-previous)/1000,.1);previous=now;
+      if(document.hidden)return;
+      if(!reduced.matches&&!flowFrozen)flow+=dt;
+      if(playing){setTime(Math.min(4.3,(now-origin)/1000-.6));if(age>=4.3)setPlaying(false);}
+      else draw();
+    }
+    window.luWingStudy={setTime(value){setPlaying(false);setTime(value);},setFlow(value){flowFrozen=true;flow=value;draw();},
+      get diagnostics(){return {ready,actor:$('actor').value,age,flow,playing,reduced:reduced.matches,...wings.diagnostics,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,aspect:camera.right/camera.top,width:container.clientWidth,height:container.clientHeight};}};
+    window.addEventListener('pagehide',()=>{disposed=true;observer.disconnect();wings.dispose();art.geometry.dispose();art.material.dispose();for(const promise of textures.values())promise.then(t=>t.dispose());renderer.dispose();},{once:true});
+    resize();await setActor($('actor').value);requestAnimationFrame(frame);
+  </script>
+</body>
+</html>

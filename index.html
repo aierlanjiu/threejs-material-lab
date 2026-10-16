@@ -2480,6 +2480,7 @@ body.immersive .stage-hud-right { top: max(12px, env(safe-area-inset-top)); righ
               <option value="preset_2">8: NEO SYNTH 80S (合成)</option>
               <option value="preset_3">9: DEEP SUB BASS (合成)</option>
               <optgroup data-theme="one-piece" label="海贼王 · 本机歌曲">
+                <option value="arrangement_bolero">波莱罗 · 十人改编</option>
                 <option value="anime_op_we_are">We Are! · 导入本机音频</option>
                 <option value="anime_op_over_the_top">OVER THE TOP · 导入本机音频</option>
                 <option value="anime_op_overtaken">Overtaken · 导入本机音频</option>
@@ -3603,7 +3604,13 @@ import { OutputPass } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examples/
 import { motionRise, motionLeave, motionTabSwitch, motionToast, motionTextMorph, haptic } from './js/ui/motion-adapter.js';
 import { KineticLyricsManager } from './js/ui/kinetic-lyrics.js?v=20261006-motion';
 import { VIDEO_PRESETS, drawPerformanceFrame } from './js/ui/recording-compositor.js';
+import { validateRecordedVideo } from './js/ui/recording-validation.js';
 import { createBandController } from './js/ui/band-controller.js';
+import { createProceduralBandLog } from './js/audio/band-procedural.js';
+import { createBandMixer } from './js/audio/band-mixer.js';
+import {perceptualLevel} from './js/ui/perceptual-math.js';
+import {installPerceptualUI} from './js/ui/lu-perceptual-ui.js';
+queueMicrotask(()=>{const cleanup=installPerceptualUI({isPlaying:()=>state.isPlayingMusic});window.addEventListener('pagehide',cleanup,{once:true});});
 import { applySurfaceContent } from './js/ui/cube-surface.js';
 let bandController = null;
 import { lyricCharacters, characterCues, characterCursorAt, lineProgressAt } from './js/ui/lyric-timing.js';
@@ -3904,6 +3911,7 @@ const state = {
     { title: 'CYBER CRYSTAL FLOW', isPreset: true, type: 'preset_1' },
     { title: 'NEO SYNTH WAVE 80S', isPreset: true, type: 'preset_2' },
     { title: 'DEEP SUB BASS 808', isPreset: true, type: 'preset_3' },
+    { title: '波莱罗 · 十人改编', src: './output/lu-band-arrangement/bolero-trial/bolero-pet-ensemble.mp3', type: 'arrangement_bolero', theme: 'one-piece', arrangement: true },
     { title: 'We Are! · 海贼王', type: 'anime_op_we_are', theme: 'one-piece', localOnly: true },
     { title: 'OVER THE TOP · 海贼王', type: 'anime_op_over_the_top', theme: 'one-piece', localOnly: true },
     { title: 'Overtaken · 海贼王', type: 'anime_op_overtaken', theme: 'one-piece', localOnly: true },
@@ -5795,7 +5803,7 @@ function updatePerformanceCapsule(now, track) {
     clearTimeout(capsuleChangeTimer);
     setText();
   }
-  const values = [state.bassEnergy, state.midEnergy, state.trebleEnergy, (state.bassEnergy + state.midEnergy) / 2];
+  const values = [state.bassEnergy, state.midEnergy, state.trebleEnergy, (state.bassEnergy + state.midEnergy) / 2].map(perceptualLevel);
   capsule.querySelectorAll('.performance-capsule-bars i').forEach((bar, index) => {
     const amplitude = playing && !prefersReducedMotion ? values[index] : 0;
     bar.style.transform = `scaleY(${(0.22 + Math.min(1, amplitude) * 0.78).toFixed(2)})`;
@@ -5874,10 +5882,13 @@ function initAudioEngine() {
   state.analyser = state.audioCtx.createAnalyser();
   state.analyser.fftSize = 128;
   state.analyser.smoothingTimeConstant = 0.75;
-  state.analyser.connect(state.audioCtx.destination);
+  state.masterOutput = state.audioCtx.createGain();
+  state.analyser.connect(state.masterOutput);
+  state.masterOutput.connect(state.audioCtx.destination);
   state.audioDataArray = new Uint8Array(state.analyser.frequencyBinCount);
 }
 
+const bandAudioMixer=createBandMixer({getContext:()=>{initAudioEngine();return state.audioCtx;},getOutput:()=>state.analyser,getTrack:()=>state.playlist[state.currentTrackIndex],getTime:getPlaybackTime});
 let bandMonitorBuffer=null,bandMonitorType='',bandMonitorId='mix',bandMonitorRevision=0,bandMonitorAbort=null;
 const bandMonitorCache=new Map();
 async function listenBandStem(stem){
@@ -5896,7 +5907,8 @@ async function listenBandStem(stem){
   }
   if(state.isPlayingMusic&&track?.buffer)startBufferPlayback(track,getPlaybackTime());
 }
-function startBufferPlayback(track, startPos = 0) {
+function startBufferPlayback(track, startPos = 0, {seek=false} = {}) {
+  bandController?.resetTransport({preserveChoices:!seek});
   if (state.currentAudioSource) {
     try { state.currentAudioSource.onended = null; state.currentAudioSource.stop(); } catch(e){}
     state.currentAudioSource = null;
@@ -5905,7 +5917,6 @@ function startBufferPlayback(track, startPos = 0) {
   source.buffer = bandMonitorType===track.type&&bandMonitorBuffer?bandMonitorBuffer:track.buffer;
   source.loop = (state.playbackOrderMode === 'one');
   source.loopEnd = Math.min(track.buffer.duration,source.buffer.duration);
-  source.connect(state.analyser);
 
   const dur = track.buffer.duration || 180;
   const offset = startPos % dur;
@@ -5914,10 +5925,12 @@ function startBufferPlayback(track, startPos = 0) {
       stepAvailableTrack(1, { autoEnded: true });
     }
   };
-  source.start(0, Math.min(offset,Math.max(0,source.buffer.duration-.01)));
+  const sourceOffset=Math.min(offset,Math.max(0,source.buffer.duration-.01));
+  const audioStart=bandAudioMixer.start(source,sourceOffset,dur,source.loop,state.isPlayingMusic&&state.audioReady);
+  source.start(audioStart.at,audioStart.offset);
   state.currentAudioSource = source;
-  state.playbackStartTime = state.audioCtx.currentTime;
-  state.playbackOffset = offset;
+  state.playbackStartTime = audioStart.at;
+  state.playbackOffset = audioStart.offset;
   state.audioReady = true;
   resetBeatClock();
   $('#nowPlayingText').textContent = `当前：${track.title}`;
@@ -5939,6 +5952,8 @@ function playTrackAtIndex(idx, resumeFromOffset = false) {
     }
 
     const normalizedIndex = (idx + state.playlist.length) % state.playlist.length;
+    const requestedTrack=state.playlist[normalizedIndex];
+    if(requestedTrack.arrangement){if(state.theme!==requestedTrack.theme)setLuTheme(requestedTrack.theme);kineticLyricsManager.setMode('band');}
     if (normalizedIndex !== state.currentTrackIndex) {
       state.playbackOffset = 0;
       state.playbackStartTime = 0;
@@ -5965,6 +5980,7 @@ function playTrackAtIndex(idx, resumeFromOffset = false) {
 
     if (!resumeFromOffset) {
       state.playbackOffset = 0;
+      bandController?.resetPerformance();
       state.beatPeriod = 60 / 124; // Initial estimate; detected onsets refine it after audio starts.
       state.beatCount = 0;
       state.beatAccumulator = 0.0;
@@ -6018,6 +6034,7 @@ function playTrackAtIndex(idx, resumeFromOffset = false) {
   }
 }
 
+let proceduralBandLog=null;
 function startProceduralElectronicBeat() {
   if (synthInterval) clearInterval(synthInterval);
   state.playbackStartTime = state.audioCtx.currentTime;
@@ -6027,6 +6044,11 @@ function startProceduralElectronicBeat() {
   let step = 0;
   const baseBpm = 124;
   const bpm = baseBpm;
+  if(proceduralBandLog?.score.trackId!==state.playlist[state.currentTrackIndex].type||state.playbackOffset<=0){
+    proceduralBandLog=createProceduralBandLog(state.playlist[state.currentTrackIndex],{duration:getTrackDuration(state.playlist[state.currentTrackIndex]),bpm});
+  }
+  bandAudioMixer.prepareProcedural(state.playlist[state.currentTrackIndex].type);
+  bandController?.resetTransport();
   const stepTime = (60 / bpm) / 4 * 1000;
   state.beatPeriod = 60 / bpm;
   state.beatOrigin = state.playbackOffset + stepTime / 1000;
@@ -6044,9 +6066,10 @@ function startProceduralElectronicBeat() {
       gain.gain.setValueAtTime(1.1, now);
       gain.gain.exponentialRampToValueAtTime(0.01, now + 0.16);
       osc.connect(gain);
-      gain.connect(state.analyser);
+      gain.connect(bandAudioMixer.proceduralBus('drums'));
       osc.start(now);
       osc.stop(now + 0.16);
+      proceduralBandLog.append({stemId:'drums',time:getPlaybackTime(),duration:.16,midi:36,velocity:1});
     }
 
     if (step % 8 === 4) {
@@ -6059,9 +6082,10 @@ function startProceduralElectronicBeat() {
       gain.gain.setValueAtTime(0.7, now);
       gain.gain.exponentialRampToValueAtTime(0.01, now + 0.13);
       noise.connect(gain);
-      gain.connect(state.analyser);
+      gain.connect(bandAudioMixer.proceduralBus('drums'));
       noise.start(now);
       noise.stop(now + 0.14);
+      proceduralBandLog.append({stemId:'drums',time:getPlaybackTime(),duration:.14,midi:38,velocity:.7});
     }
 
     if (step % 2 === 1) {
@@ -6073,9 +6097,10 @@ function startProceduralElectronicBeat() {
       gain.gain.setValueAtTime(0.4, now);
       gain.gain.exponentialRampToValueAtTime(0.01, now + 0.09);
       osc.connect(gain);
-      gain.connect(state.analyser);
+      gain.connect(bandAudioMixer.proceduralBus('synth-bass'));
       osc.start(now);
       osc.stop(now + 0.10);
+      proceduralBandLog.append({stemId:'synth-bass',time:getPlaybackTime(),duration:.10,frequency:note,velocity:.4});
     }
 
     step = (step + 1) % 32;
@@ -6092,6 +6117,8 @@ function pauseMusic() {
   }
   state.playbackStartTime = 0;
   state.audioReady = false;
+  bandController?.resetTransport({preserveChoices:true});
+  bandAudioMixer.stop();
 
   if (state.currentAudioSource) {
     try { state.currentAudioSource.stop(); } catch(e){}
@@ -6120,6 +6147,7 @@ function pauseMusic() {
 function stopMusic() {
   pauseMusic();
   state.playbackOffset = 0;
+  bandController?.resetPerformance();
   state.playbackStartTime = 0;
   state.beatCount = 0;
   state.isIntroPlaying = false;
@@ -6211,12 +6239,17 @@ async function toggleScreenRecording() {
     if (bandController?.enabled) bandController.drawRecording(outputContext);
     else drawPerformanceFrame(outputContext, sceneCanvas, stageWrapEl, kineticLyricsManager.mode);
     let stream;
-    try { stream = outputCanvas.captureStream(60); }
+    try {
+      stream = outputCanvas.captureStream(0);
+      if(typeof stream.getVideoTracks()[0]?.requestFrame!=='function'){
+        stream.getTracks().forEach(track=>track.stop());stream=outputCanvas.captureStream(30);
+      }
+    }
     catch (error) { console.error('Video capture unavailable:', error); showToast('视频画布无法录制'); setRecordUiState('error'); return; }
     let audioDestination = null;
     if (state.audioCtx && state.analyser) {
       audioDestination = state.audioCtx.createMediaStreamDestination();
-      state.analyser.connect(audioDestination);
+      state.masterOutput.connect(audioDestination);
       const audioTrack = audioDestination.stream.getAudioTracks()[0];
       if (audioTrack) stream.addTrack(audioTrack);
     }
@@ -6237,22 +6270,22 @@ async function toggleScreenRecording() {
       catch (fallbackError) {
         console.error('MediaRecorder unavailable:', fallbackError);
         stream.getTracks().forEach(track => track.stop());
-        if (audioDestination) state.analyser.disconnect(audioDestination);
+        if (audioDestination) state.masterOutput.disconnect(audioDestination);
         showToast('当前浏览器没有可用的视频编码器');
         setRecordUiState('error');
         return;
       }
     }
     state.mediaRecorder = recorder;
-    const session = { recorder, stream, audioDestination, frameId: 0 };
+    const session = { recorder, stream, audioDestination, frameId: 0,videoTrack:stream.getVideoTracks()[0] };
     activeRecording = session;
     const drawNextFrame = () => {
       if (activeRecording !== session) return;
       if (bandController?.enabled) bandController.drawRecording(outputContext);
       else drawPerformanceFrame(outputContext, renderer.domElement, stageWrapEl, kineticLyricsManager.mode);
+      session.videoTrack?.requestFrame?.();
       session.frameId = requestAnimationFrame(drawNextFrame);
     };
-    session.frameId = requestAnimationFrame(drawNextFrame);
     recorder.ondataavailable = e => {
       if (e.data && e.data.size > 0) state.recordedChunks.push(e.data);
     };
@@ -6264,7 +6297,7 @@ async function toggleScreenRecording() {
       $('#videoAspectSelect').disabled = false;
       $('#videoFormatSelect').disabled = false;
       stream.getTracks().forEach(track => track.stop());
-      if (audioDestination) state.analyser.disconnect(audioDestination);
+      if (audioDestination) state.masterOutput.disconnect(audioDestination);
       activeRecording = null;
       state.isRecording = false;
       state.mediaRecorder = null;
@@ -6279,6 +6312,7 @@ async function toggleScreenRecording() {
         if (!mime) throw new Error('Unrecognized video container');
         const ext = mime === 'video/mp4' ? 'mp4' : 'webm';
         const blob = new Blob(chunks, { type: mime });
+        await validateRecordedVideo(blob,preset);
         const url = URL.createObjectURL(blob);
         const now = new Date();
         const timeStr = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}${String(now.getSeconds()).padStart(2,'0')}`;
@@ -6306,12 +6340,13 @@ async function toggleScreenRecording() {
       setRecordUiState('error');
       if (recorder.state !== 'inactive') recorder.stop();
     };
-    try { recorder.start(250); }
+    recorder.onstart=()=>session.videoTrack?.requestFrame?.();
+    try { recorder.start(250);drawNextFrame(); }
     catch (error) {
       console.error('MediaRecorder could not start:', error);
       cancelAnimationFrame(session.frameId);
       stream.getTracks().forEach(track => track.stop());
-      if (audioDestination) state.analyser.disconnect(audioDestination);
+      if (audioDestination) state.masterOutput.disconnect(audioDestination);
       activeRecording = null;
       state.mediaRecorder = null;
       showToast('视频录制启动失败');
@@ -8136,8 +8171,9 @@ function animate(nowTimestamp) {
       const targetSec = (pct / 100) * dur;
       state.playbackOffset = targetSec;
       state.playbackStartTime = state.audioCtx ? state.audioCtx.currentTime : 0;
+      bandController?.resetTransport();
       if (state.isPlayingMusic && curTrack && curTrack.buffer) {
-        startBufferPlayback(curTrack, targetSec);
+        startBufferPlayback(curTrack, targetSec, {seek:true});
       }
     });
   }
@@ -10270,7 +10306,14 @@ const bandCubeDesign = {
     ui.ior.value,ui.thickness.value,ui.transmission.value,ui.dispersion.value,ui.envIntensity.value,
     state.layerMode,state.adhesionCraft,[...state.manualOptics]])
 };
-createBandController({stage:stageWrapEl,state,getTime:getPlaybackTime,getLyric:()=>getSynchronizedLyricContext(),getTrackLyrics:t=>t?.lyrics||SONG_LYRICS_MAP[t?.title]||[],pauseMusic,monitorStem:listenBandStem,cubeDesign:bandCubeDesign,requestMode:mode=>kineticLyricsManager.setMode(mode)}).then(controller=>{bandController=controller;window.luBand=controller;controller.setEnabled(kineticLyricsManager.mode==='band');}).catch(error=>{console.error('Band mode unavailable:',error);$('#bandStageSelect').disabled=true;});
+createBandController({stage:stageWrapEl,state,getTime:getPlaybackTime,getLyric:()=>getSynchronizedLyricContext(),getTrackLyrics:t=>t?.lyrics||SONG_LYRICS_MAP[t?.title]||[],getProceduralScore:()=>proceduralBandLog?.score,pauseMusic,monitorStem:listenBandStem,mixer:bandAudioMixer,getEffectsContext:()=>state.audioCtx,getEffectsOutput:()=>state.masterOutput,restartAudio:()=>{const track=state.playlist[state.currentTrackIndex];if(state.isPlayingMusic&&track?.buffer)startBufferPlayback(track,getPlaybackTime());},cubeDesign:bandCubeDesign,requestMode:mode=>kineticLyricsManager.setMode(mode)}).then(controller=>{bandController=controller;window.luBand=controller;
+ const requestedBand=new URLSearchParams(location.search).get('band');
+ const requestedBandTrack=requestedBand==='bolero'?'arrangement_bolero':requestedBand==='pianai'?'track_4':requestedBand;
+ if(requestedBandTrack&&state.playlist.some(t=>t.type===requestedBandTrack)){
+  const track=state.playlist.find(t=>t.type===requestedBandTrack);setLuTheme(track.theme||'one-piece');state.currentTrackIndex=state.playlist.indexOf(track);
+  state.songTitle=track.title;$('#playlistSelect').value=requestedBandTrack;$('#nowPlayingText').textContent=`当前：${state.songTitle}`;kineticLyricsManager.setMode('band');
+ }
+ controller.setEnabled(kineticLyricsManager.mode==='band');}).catch(error=>{console.error('Band mode unavailable:',error);$('#bandStageSelect').disabled=true;});
 window.luCubeIntro = createLuCubeIntro({
   THREE,
   manifest: AVATAR_MANIFEST,
@@ -10289,6 +10332,7 @@ setTimeout(() => kineticLyricsManager.prepareGravity(), 300);
 </script>
 <link rel="stylesheet" href="./css/lu-score-panel.css">
 <link rel="stylesheet" href="./css/lu-band.css">
+<link rel="stylesheet" href="./css/lu-perceptual-ui.css">
 <script type="module" src="./js/ui/score-panel.js"></script>
 <div id="toast" class="toast" role="status"></div>
 </body>

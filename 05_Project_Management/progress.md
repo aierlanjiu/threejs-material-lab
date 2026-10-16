@@ -2,26 +2,61 @@
 
 ## Current State
 
-- Action: codex 直接重绘纯享／机械魔方／反重力／乐队四套彩色 SVG，底栏与抽屉统一使用；修复 `body.class` 观察器与 `reveal()` 互相触发的菜单卡死，并修复窄屏底栏按钮遮挡与模式行换行。
-- Validation: 旧提交 `edc71e0` 在真实菜单点击时超时；Chrome 的 1440／390／342px 菜单、模式、键盘、按钮命中及播放自动隐藏／唤回回归通过，纯 SVG XML 与模块语法检查通过。实体手机未验。
-- Report: [彩色模式图标与菜单死循环修复](Reports/2026-10-14-lu-color-mode-menu-fix.md)。Agent: codex · 2026-10-14。
-- 上版记录修正：`edc71e0` 的四模式切换有通过日志，但菜单测试挂起并取消，因此其“工作台展开收起正常”验收结论撤回；当前真实回归证据见上方报告。
-- Action: 底部播放器中心三角微调左移居中；播放控件隐藏时歌词平滑回落底边合适位置；移动端控件消失时毛玻璃与阴影彻底消除并在唤起时平滑复原；底栏及播放列表头部补齐停止按钮。
-- Validation: 单元/时间轴测试、Playwright 实测停止按钮停止与重置、显隐歌词位置与底部毛玻璃样式计算、桌面及 390px/342px 窄屏适配通过。
-- Action: 底栏桌面主键 64px；手机高 84px、主键 48px；顺序／随机两态及录制子菜单，播放 3 秒隐藏。
-- Validation: 桌面／390／342px、显隐、键盘、三模式及双画幅有声 MP4 通过；真机待验。
-- Report: [播放区精修](Reports/2026-10-14-lu-apple-player-refinement.md)。Agent: codex · 2026-10-14。
-- 本地 `feat/band-prism-pet-stage` 已接入 29 个 pet、四／三层棱镜舞台与 8／6 组齐射；GPU 焰火已修正满容量循环喷流、副歌断流、圆芯与喷口火光／余烟，本机双画幅及有声导出通过，未发布，实体手机待验。
-- 乐队 V2 视觉升级与全量音乐已同步部署至 Pages：背景柔焦与对比度调谐、休止成员可见度提升（0.90/0.84）、演奏与主奏聚光灯与脚下光环增强、五官不过曝；全量 10 首主题音乐及 LRC 歌词、分谱 JSON/MIDI/MusicXML 接入并部署；全站加入双语版权与非商业免责声明（DISCLAIMER.md）。
-- 『律』主入口为 `index.html`：3D 物理材质与声波工作台、歌词同步、29 位角色实时表情；页面继续提供桌面与移动端操作。
-- 本地主入口已采用三套透明主题图按钮与同步律核图标；27 块入场魔方复用主场景圆角水晶及贴面，主视图取消两侧文字栏。入场标题与按钮已按主题增强对比度，本机十首主题曲已接入（含 One day），新增歌曲实际播放通过；验证与图片提示词见主题统一报告。
-- 机械魔方控件与运镜已修复并发布：手动波形／排布保持，三档、拍数、振幅、内容层级与工艺及光学参数实际生效；滚轮与基础 FOV 平滑同步。真实歌曲、有声录制与桌面／窄屏回归通过；实体手机待验。
-- 反重力控件代码已发布并通过本机播放／录制、主题表情、图片图集、层级工艺与窄屏取景验证；本机已有八首外文歌词提供中文／原文切换（301 句）。One day 音频已就绪，完整译词待原文／LRC；公开页面通过本机导入使用音频与歌词。
-- 『荔』主入口为 `mascot_studio.html`，快捷入口为 `li.html`；『弈律』主入口为 `xiangqi.html`，三者共用当前仓库。
-- 角色来源为用户提供的透明头像。运行资产在 `assets/live-avatars/`，实时渲染模块在 `js/avatar/live.js`，29 张独立 GIF 在本地 `output/live-avatar-gifs/`。
-- 本轮主题图、入场水晶、机械／反重力控件及运镜更新已同步到 Pages（代码 `f2d585a`）；构建成功、九个线上文件摘要一致，三主题／原生滚轮／390px 浏览器检查通过。
+- Action: 完成 16 首录音全曲原曲优先混音、三主题 48 份独立编配；点按停独立声部并减弱对应原曲声部，长按保留轻原曲背景。《波莱罗》与三个合成预设同步保留退出后的背景声。
+- Validation: 全曲时长／源摘要、382 份音频、48 份角色编制、实际 Web Audio 差分、四小节恢复、暂停／跳转及三主题桌面／触屏验证通过；既有舞台、翼、焰火与项目测试通过。
+- Status: 用户取消对照试听并授权直接完整制作、上传 GitHub；按此直接进入提交与发布。逐曲人工校谱／主观音色与实体手机性能未验收，不能由自动检查替代。
+- Report: [全曲原曲优先与独立角色混音](Reports/2026-10-16-lu-full-song-hybrid.md)。源码／部署读回记录位于 `output/band-hybrid-release/publication.json`。Agent: codex · 2026-10-16。
+
+## 本次更新 · 2026-10-16
+
+- Action: 完成暗色表面／Retina 发丝边、可打断物理弹簧、滚动羽化、短促歌词显影、独立频谱显示映射与界面轻音效选项。
+- Action: 接入前排焰火合成音效及持久开关、统一峰值事件和主唱／吉他纯粒子翼；沿用原 pet，保持角色命中区与脚下提醒避让。
+- Validation: 数值与既有声部／舞台回归、四种宽度、声像／静音、减少动效与触屏状态补验通过；M4 Metal 三主题预览及有声横竖导出约 45.1／49.7fps，实体手机待验，未提交／发布。
+- Report: [感知 UI、焰火音效与粒子翼](Reports/2026-10-16-lu-perceptual-ui-pyro-wings.md)；此前 [角色提醒底部避让](Reports/2026-10-16-lu-quiet-member-feedback.md) 的触屏同步缺口已在本轮补验。Agent: codex · 2026-10-16。
+
+## 羽翼参考图对齐 · 2026-10-16
+
+- Action: 用户近景验收通过后，将 Q 版肩部能量翼接入主唱／吉他全舞台，统一三秒保持与消散包络，加入角色遮挡、烟花聚焦及横竖屏取景。
+- Validation: 近景逐像素保持一致；四种宽度、触屏进退、五种队形／双画幅、三主题 demo、暂停／跳转／减少动效与相关回归通过；实际有声横竖导出约 49.18／49.82fps，实体手机待验。
+- Status: 主入口 `http://127.0.0.1:8000/index.html?intro=skip&band=bolero` 已更新，约 1:11.49 显示双翼；近景预览保留。本地交付完成，未提交／发布。
+- Report: [已验收能量翼接入全舞台](Reports/2026-10-16-lu-approved-wings-stage-integration.md)；[Q 版近景验收](Reports/2026-10-16-lu-q-pet-shoulder-wings.md) 保留。Agent: codex · 2026-10-16。
+
+## 《偏爱》原唱与合成伴奏试听 · 2026-10-16
+
+- Action: 按用户 grilling 确认制作原曲 0:37–1:36 的 59 秒试听：保留分离原唱，按现有十名 pet 配九条独立合成乐器，交付混音／纯伴奏／原曲对照与角色分轨包。
+- Validation: 十轨独立与加和、898 个 MIDI 合成音符及起止同步、三份主 MP3／十份角色 MP3、句尾与压缩包完整性通过；用户试听反馈不如原音乐，本版未通过听感验收。
+- Status: 保留本版及证据，停止其舞台接入；用户已选择 A 原曲优先，见后续试听。其余歌曲未批量改编，未提交／发布。
+- Report: [《偏爱》原唱与独立合成伴奏试听](Reports/2026-10-16-lu-pianai-hybrid-audition.md)。Agent: codex · 2026-10-16。
+
+## 《偏爱》原曲优先试听 · 2026-10-16
+
+- Action: 按用户选择 A 保留原版完整混音，只加罗宾两处轻竖琴、共四个音符；交付 59 秒新版／原曲对照、21.4 秒 A/B 与独立新增声部。
+- Validation: WAV 源片段保留、相加／移除新增声部、窗口外零样本差、MP3 时长／双声道及峰值通过；两版实际 MP3 均约 -14.0 LUFS，新版听感待用户验收。
+- Status: 原曲为整体控制组，可选竖琴独立；主播放器／舞台尚未接入，保留声音先行的阶段边界，未提交／发布。
+- Report: [《偏爱》原曲优先试听](Reports/2026-10-16-lu-pianai-original-first.md)；音频目录 `output/lu-band-arrangement/pianai-original-first/`。Agent: codex · 2026-10-16。
 
 ## Active Assets
+
+- 单曲舞台：`http://127.0.0.1:8000/index.html?intro=skip&band=bolero`，进入后点击原播放键开始；直接角色交互，无新增指挥面板。Web 十轨与事件在 `output/lu-band-arrangement/bolero-trial/web/`，本轮证据在 `output/playwright/band-direct-pets/`。
+- 用户已认可的改编试听：`output/lu-band-arrangement/bolero-trial/bolero-pet-ensemble.mp3`；快速合奏试听 `bolero-full-band-excerpt.mp3`，原 WAV／MIDI／事件保留。后续是否扩展其他曲目由用户决定。
+- 『律』主入口 `index.html`；本地预览 `http://127.0.0.1:8000/index.html?intro=skip`，选择「演出 → 乐队」。『荔』为 `mascot_studio.html`／`li.html`；『弈律』为 `xiangqi.html`，共用本仓库。
+- 29 位原 pet／头像／乐器：`assets/band-pets/`、`assets/live-avatars/`、`assets/instruments/`。声部匹配按已批准的乐器家族进行，证据不足的演员休止，不重绘角色或伪造谱面。
+- 实际声部数据：`output/lu-band-song-parts/`；校正汇总 `corrected-lu-band-mapping.json`，逐曲 `family-classification.json`／`family-bindings.json`。原 AGY 映射保留，实际共 137 段。人工校验入口 `band-review.html`。
+- 核心控制：`js/audio/band-conductor.js`、`band-mixer.js`、`band-arrangement.js`、`band-family-bindings.js`；直接角色交互 `js/ui/band-member-interactions.js`。分析与打包入口位于 `scripts/`；音频／权重／分析产物位于忽略目录 `output/`，发布前须明确打包依赖资产。
+- 当前验证证据：`output/playwright/band-conductor/`。有效样片为 `verified-landscape.mp4`／`verified-portrait.mp4`，含 H.264 与 AAC；不能以本轮软件 GPU 样片作为流畅度通过证据。
+
+## Recent Results
+
+- Action: 用实际 PCM 分类与分轨事件校正 16 首家族绑定，完成真实混音指挥、合拍登场／主奏接力／全员谢幕；补齐竖屏首帧与导出画面校验。Validation: 23/23 冲突修复回归、真实混音、指挥／彩蛋、三个预设及双画幅结构检查通过；人工乐器身份与硬件性能待验。Report: [本轮交付](Reports/2026-10-15-lu-conductor-easter-eggs.md)。Agent: codex · 2026-10-15。
+- Action: 重绘四模式彩色 SVG 并修复菜单观察器死循环与窄屏命中；撤回旧提交菜单通过结论。Validation: 1440／390／342px 原生菜单、模式、键盘及播放显隐通过。Report: [模式与菜单修复](Reports/2026-10-14-lu-color-mode-menu-fix.md)。Agent: codex · 2026-10-14。
+- Action: 精修底部播放器、歌词回落、手机毛玻璃显隐并补停止按钮。Validation: 单元／时间轴与桌面／390／342px 控件回归通过，实体手机待验。Report: [播放区精修](Reports/2026-10-14-lu-apple-player-refinement.md)。Agent: codex · 2026-10-14。
+- Action: 按已批准图片稿接入 29 个 pet／116 帧、双画幅棱镜舞台与三主题布景、高潮气泡／烟花。Validation: 三主题实景、播放／暂停／跳转、主入口与有声横竖录制通过（48.52／49.25 fps）；未发布，实体手机待验。Report: `Reports/2026-10-13-lu-pet-stage-implementation.md`。Agent: codex · 2026-10-13。
+- Action: 完成乐队 V2 视觉升级（背景柔焦、休止成员透光保真、主奏聚光灯/边光与舞台光环增强）、全量 10 首主题歌曲与声部谱面加入版本库、双语免责声明与弹窗交付，并部署至 GitHub Pages。Validation: 单元/时间轴测试、Playwright 控件回归、静态语法检查全数通过。Report: `Reports/2026-10-13-lu-band-v2-pages-release.md`。Agent: Antigravity (Gemini 3.8 Flash High) · 2026-10-13。
+- Action: 按已确认 V2 方案完成同级模式、29 人全员、材质状态、五队形、独立动作与全队／成员参数；修复窄窗口横屏录制谱窗和成片取景。Validation: 实际模式切换、1280／390px 五队形、九人阵列、跳转一致性、十曲时间轴、有声 1920×1080／1080×1920 MP4 通过；Astra 实景复核无交付阻碍，实体手机／人工校谱待验。Report: `Reports/2026-10-13-lu-band-v2.md`。Agent: codex · 2026-10-13。
+- Action: 完成五人乐队、三种追光、十曲音轨／谱面与正式播放组装；按用户反馈收紧桌面镜头并复用主舞台立方体工厂，修复本地声部试听跳转。Validation: 十曲源哈希、40 类音轨时长、MIDI／XML 与时间轴测试、桌面／390px 实景和有声横竖屏 MP4 通过；自动谱面／实体手机待人工验。Report: `Reports/2026-10-13-lu-band-performance.md`。Agent: codex · 2026-10-13。
+- Action: 按 Astra 极高设计方向制作 29 位角色专属乐器，AGY 输出 SVG 代码、codex 审阅整合；加入两种比例预览与主入口乐谱窗。Validation: 素材清单／SVG／语法通过，桌面与 390px 实景、1∶1／1∶0.4 比例及谱窗状态通过；实体手机未验，真实歌曲谱面与录制谱面未接入。Report: `Reports/2026-10-13-lu-ensemble-visual-phase1.md`。Agent: codex · 2026-10-13。
+
+## 历史报告索引
 
 - Action: [焰火密度与持续喷发修正](Reports/2026-10-14-lu-pyro-density-continuity.md)。Validation: 六项回归、三主题双画幅、断流／跳转及有声导出通过；证据 `output/lu-band/pyro-density/`。Agent: codex · 2026-10-14。
 - [律的演奏 pet 与棱镜舞台实现](Reports/2026-10-13-lu-pet-stage-implementation.md)；预览 `http://127.0.0.1:8000/band-study.html`，有声样片在 `output/lu-band/pet-stage-validation/`。
@@ -54,47 +89,13 @@
 - [荔竖屏宣传片报告](Reports/2026-09-18-li-codex-promo.md)
 - [完整旧进度无损归档](Reports/progress_full_archive_20260923_pre_live_avatars.md)：归档前 314 行、43,330 字节，SHA-256 为 `c4c5923145684e7a49420567c612d6280c1a727c1e5ce2109a948452e5240227`。
 
-## Recent Results
+## 月度历史索引
 
-- Action: 按已批准图片稿接入 29 个 pet／116 帧、双画幅棱镜舞台与三主题布景、高潮气泡／烟花。Validation: 三主题实景、播放／暂停／跳转、主入口与有声横竖录制通过（48.52／49.25 fps）；未发布，实体手机待验。Report: `Reports/2026-10-13-lu-pet-stage-implementation.md`。Agent: codex · 2026-10-13。
-- Action: 完成乐队 V2 视觉升级（背景柔焦、休止成员透光保真、主奏聚光灯/边光与舞台光环增强）、全量 10 首主题歌曲与声部谱面加入版本库、双语免责声明与弹窗交付，并部署至 GitHub Pages。Validation: 单元/时间轴测试、Playwright 控件回归、静态语法检查全数通过。Report: `Reports/2026-10-13-lu-band-v2-pages-release.md`。Agent: Antigravity (Gemini 3.8 Flash High) · 2026-10-13。
-- Action: 按已确认 V2 方案完成同级模式、29 人全员、材质状态、五队形、独立动作与全队／成员参数；修复窄窗口横屏录制谱窗和成片取景。Validation: 实际模式切换、1280／390px 五队形、九人阵列、跳转一致性、十曲时间轴、有声 1920×1080／1080×1920 MP4 通过；Astra 实景复核无交付阻碍，实体手机／人工校谱待验。Report: `Reports/2026-10-13-lu-band-v2.md`。Agent: codex · 2026-10-13。
-- Action: 完成五人乐队、三种追光、十曲音轨／谱面与正式播放组装；按用户反馈收紧桌面镜头并复用主舞台立方体工厂，修复本地声部试听跳转。Validation: 十曲源哈希、40 类音轨时长、MIDI／XML 与时间轴测试、桌面／390px 实景和有声横竖屏 MP4 通过；自动谱面／实体手机待人工验。Report: `Reports/2026-10-13-lu-band-performance.md`。Agent: codex · 2026-10-13。
-- Action: 按 Astra 极高设计方向制作 29 位角色专属乐器，AGY 输出 SVG 代码、codex 审阅整合；加入两种比例预览与主入口乐谱窗。Validation: 素材清单／SVG／语法通过，桌面与 390px 实景、1∶1／1∶0.4 比例及谱窗状态通过；实体手机未验，真实歌曲谱面与录制谱面未接入。Report: `Reports/2026-10-13-lu-ensemble-visual-phase1.md`。Agent: codex · 2026-10-13。
-
-- Action: 将本轮代码与三张主题图提交并上传 Pages，发布记录同步到 master。Validation: 构建与部署成功、九个线上文件摘要一致，实际浏览器三主题、反重力、原生滚轮及 390px 布局通过；完整音频与歌词保留本机，实体手机待验。Report: `Reports/2026-10-10-lu-pages-release.md`。Agent: codex · 2026-10-10。
-
-- Action: 完成反重力控件、主题过滤、切换预热及窄屏取景，接入 One day 与八首中文译词。Validation: 控件／运镜／歌词与实际 GPU 桌面窄屏、有声 MP4 通过；One day 译词待原文／LRC，实体手机待验。Report: `Reports/2026-10-10-lu-gravity-controls-full-requirements.md`。Agent: codex · 2026-10-10。
-
-- Action: 按「先只修机械魔方」修复控件与自动编排争用、波形／档位／拍数／振幅、空图片与三层三工艺、光学参数及按钮同步；此前已修复运镜／FOV 与反重力主题、录制切换预热。Validation: 机械功能、真实歌曲与九种工艺实际绘制、1440／390／342px 布局、有声 1080×1920 录制、图集及几何回归通过；换阵瞬时轻微穿插与实体手机缺口见报告。Report: `Reports/2026-10-10-lu-mechanical-controls-camera-fix.md`。Agent: codex · 2026-10-10。
-- Action: 调整三主题入场标题、图形周围局部明暗与按钮文字衬底，桌面标题上移；逐首复核本机九首歌曲实际播放。Validation: 六张桌面/手机实景无横向溢出，名称文字最不利衬底对比度为 8.17:1 以上；九首解码、时钟推进、输出波形及歌词加载通过。Report: `Reports/2026-10-10-lu-theme-art-crystal-unification.md`、`Reports/2026-10-10-lu-anime-theme-music-integration.md`。Agent: codex · 2026-10-10。
-- Action: 神龙直接作为入口主体，重做草帽航海与护额查克拉主题图并加入轻微视差；27 块入场复用主场景圆角水晶、六面表面着色，修正切主题旧纹理；移除左右文字栏并同步左上主题图。Validation: 三主题桌面/手机实景、390/1440px 入场与音效、减少动效及 1440/390/342px 工作台布局通过；实体手机待验，本次尚未发布。Report: `Reports/2026-10-10-lu-theme-art-crystal-unification.md`。Agent: codex · 2026-10-10。
-- Action: 独立复核 AGY 九首本机歌曲接入，修复单独上传 LRC 会以空文件覆盖已保存音频的缺陷，并让测试等待音频与歌词真正写入。Validation: 九首文件与歌词时钟、主题库导入和刷新恢复回归通过；全曲逐字听辨仍待人工抽检。Report: `Reports/2026-10-10-lu-anime-theme-music-integration.md`。Agent: codex · 2026-10-10。
-- Action: 本机取得海贼王/龙珠/火影九首动漫完整曲目并配齐逐行匹配LRC；纯器乐曲目规范标注器乐段落；修正音频与LRC并发上传竞态并支持IndexedDB歌词持久化；曲目存放于Git忽略的output/audio/，保留公开页面手动导入与降级。Validation: 9/9 物理文件与浏览器端到端时点验证（前奏/主歌/副歌）、主题库回归、WAV+LRC竞态测试及刷新恢复全部通过；纯器乐无编造歌词。Report: `Reports/2026-10-10-lu-anime-theme-music-integration.md`。Agent: AGY · 2026-10-10。
-- Action: 仅提取用户参考图的雕塑与反光材质，重做海青航海、翡翠神龙与纸面忍具三套双画幅背景；三个入口 cube 与中央实时魔方分别适配主题色，龙珠入口加入神龙。Validation: 三主题手机与桌面实景、390/1440px 入场和主题曲库回归通过；实体手机待验。Report: `Reports/2026-10-10-lu-anime-theme-intro.md`。Agent: codex · 2026-10-10。
-- Action: 按主题隔离角色、壁纸和曲库；补充龙珠／火影各五组竖横壁纸，增加每主题三首本机歌曲槽位与浏览器内保存；修复手机工作台遮挡。Validation: 主题切换、本机 WAV 导入及刷新恢复通过；原版音频未加入公开仓库。Report: `Reports/2026-10-10-lu-anime-theme-intro.md`。Agent: codex · 2026-10-10。
-- Action: 将律的魔方转层电子短音换为三段 CC0 真实魔方录音，按旋转时长播放齿位与落锁声；保留静音和素材失败降级。Validation: 390/1440px 与减少动效回归通过，三段录音解码及九次物理声音触发得到浏览器验证。Report: `Reports/2026-10-08-lu-expression-cube-intro.md`。Agent: codex · 2026-10-09。
-- Action: 用用户最终提供的透明底烟晶律核图统一替换旧图标，并将入场后的左上角迷你魔方改为该图标，保留魔方入场与重播。Validation: 图片 Alpha 通道、桌面/手机实景及 390/1440px/减少动效入场回归通过。Report: `Reports/2026-10-08-lu-expression-cube-intro.md`。Agent: codex · 2026-10-09。
-- Action: 用现有圆角 cube 材质和角色表情制作分层魔方入场；双画幅烟晶黑色背景与随魔方运动的 WebGL 暖光、地面反射联动，按参考材质设计魔方格面＋声波律核标记，归位后展开画布并散开小 cube。Validation: 桌面/手机实景、1440/390px 入场回归、既有工作台及双画幅录制通过；实体手机待验。Report: `Reports/2026-10-08-lu-expression-cube-intro.md`。Agent: codex · 2026-10-09。
-- Action: AGY 中断后接手律核单入口，将播放、演出、创作、录制控件集中到四面工作台，修复移动布局、非海报入口、录制状态与键盘焦点。Validation: 1440/390/342px 布局、双画幅真实录制、音乐编排与主画面几何回归通过；实体手机待验。Report: `Reports/2026-10-08-lu-core-handoff-completion.md`。Agent: codex · 2026-10-08。
-- Action: 将推文的原位状态切换与直接操控迁移到律的播放器、录制按钮、状态胶囊、工作台及检查器，保持对决海报和 WebGL 演出；手机抽屉限制在 35dvh 内并避让歌词。Validation: 双画幅真实录制、342px/1440px 布局、390px 控件及音乐编排回归通过；AGY 3.8 Flash High 方案审阅已参考，本次代码复核超时未取得结论。Report: `Reports/2026-10-08-lu-control-motion-adaptation.md`。Agent: codex · 2026-10-08。
-- Action: 修复海报模式覆盖手机沉浸状态的顶部 UI 隐藏和全屏尺寸；支持原生全屏与视口全屏退化，并核对线上动效与推文提示词的实际符合范围。Validation: 390×844 实景、342px 原生／退化全屏及退出回归、1440px 桌面布局通过；实体手机待验。Report: `Reports/2026-10-08-lu-mobile-immersive.md`。Agent: codex · 2026-10-08。
-- Action: 用五张既有对决海报统一律的界面语言，并生成对应桌面横幅；桌面 21:9、手机 9:16 按视口切换，歌词与操作控件避让原画。Validation: AGY 3.8 Flash High 只读审查、四种视口实景、双画幅录制与音乐编排回归通过；原生 21:9 录制性能及实体手机待验。Report: `Reports/2026-10-08-lu-battle-poster-ui.md`。Agent: codex · 2026-10-08。
-- Action: 基于《游京》手机实景制作 15 秒竖屏动效样片，让同一状态胶囊贯穿播放、节拍、歌词与录制，并交付封面。Validation: 1080×1920、30 fps、450 帧、有声视频与关键画面检查通过；源录制采用 540×960，实体手机及原生高分辨率性能待验。Report: `Reports/2026-10-07-lu-vertical-motion-study.md`。Agent: codex · 2026-10-07。
-- Action: 修复手机系统“减少动态效果”会无提示关停机械魔方及关闭歌词模式全部音乐编排的路径；主画面提供可持久保存的一键完整演出入口。Validation: 手机视口复现静止并通过真实点击恢复《游京》的 FOV、运镜和表情；两模式自动化回归通过，实体手机待验。Report: `Reports/2026-10-06-lu-mobile-motion-preference.md`。Agent: codex · 2026-10-06。
-- Action: 重新接通机械魔方与关闭模式的音乐节拍动作、乐章 FOV 镜头谱和音乐表情，并为窄镜头预留画幅。Validation: 先复现原版静态镜头，再通过新增回归测试、实际歌曲的手机视口播放、头像测试与几何检查；实体手机未验。Report: `Reports/2026-10-02-lu-music-choreography-regression.md`。Agent: codex · 2026-10-02。
-- Action: 恢复机械魔方和关闭歌词模式的可见运动与乐章材质切换；将手机反重力山体加高到 12 层／270 枚，并让旧歌词贴合山脊融入。Validation: 桌面与手机浏览器实景、乐章切换、歌词端到端和现有测试通过；实体手机未验。Report: `Reports/2026-10-01-lu-motion-mound-fix.md`。Agent: codex · 2026-10-01。
-- Action: 将律的主视窗与录制修复、4 个文档／依赖更新、441 个旧 OneWorks 文件删除同步至远端与 Pages。Validation: 测试与语法检查通过，Pages 构建成功，线上主页面与录制模块 HTTP 200 且新控件存在。Report: `Reports/2026-10-01-lu-remote-pages-release.md`。Agent: codex · 2026-10-01。
-- Action: 修复律的默认歌词显示、竖横屏画幅、录制歌词合成与编辑控件显隐，并按实际容器命名导出文件。Validation: 196 句歌词时钟、桌面/手机布局、双画幅 MP4 视频及有声视频流实测通过；帧率依浏览器。Report: `Reports/2026-10-01-lu-main-ui-recording.md`。Agent: codex · 2026-10-01。
-- Action: 修复律的界面遮挡、歌词模式镜头抖动、逐字进度、实时表情及底部魔方稳态动作；工作台改为可唤出的抽屉并统一苍耳今楷。Validation: 九条曲目 196 句、桌面/手机布局、头像动效、双歌词引擎与几何快速回归通过；逐字时间为行内估计。Report: `Reports/2026-09-23-lu-ui-lyrics-camera-expression.md`。Agent: codex · 2026-09-23。
-- Action: 平滑律的自动运镜并接通振幅/运动档位控制，修复角色眼神跟随、呼吸可见度与选中卡片实时预览。Validation: 头像与镜头回归、歌词双引擎、象棋测试及移动触控检查通过。Report: `Reports/2026-09-23-lu-camera-avatar-motion.md`。Agent: codex · 2026-09-23。
-- Action: 用 29 位透明角色实时层替换律的 OneWorks 角色链路，保留 3D 排布、音乐表情触发、注视及眨眼，并制作独立透明循环 GIF；旧运行资源隔离在 `/Users/papazed/Downloads/lu-oneworks-quarantine-20260923-075633/`。Validation: 29/29 实时绘制与 GIF 检查通过，桌面和手机页面无错误，歌词与象棋回归通过。Report: `Reports/2026-09-23-lu-live-avatars.md`。Agent: codex · 2026-09-23。
-- Action: 精准同步六首曲目的歌词时间轴，并约束反重力沙盒方块的数量与空间。Validation: 动态歌词端到端测试通过；详细原始记录见完整归档。Agent: Antigravity · 2026-09-23。
-- Action: 完成荔的 25.2 秒竖屏宣传片与封面。Validation: 帧数、二维码、音轨及画面抽检通过；详见宣传片报告。Agent: codex · 2026-09-18。
-- Action: 双旗舰页面与 GitHub Pages 工作流完成上线，律与荔双向入口可用。Validation: 历史上线记录与链接见完整归档。Agent: codex · 2026-09-18。
-- Action: 修复荔小星闪烁、角色口腔与面部材质问题。Validation: 历史验收记录见完整归档。Agent: codex · 2026-09-17。
+- 2026-10：本轮归档前完整进度 [progress_full_archive_20261015_before_conductor_delivery.md](Reports/progress_full_archive_20261015_before_conductor_delivery.md)，22,307 字节，SHA-256 `229ca79dda1b02cfaa48185fb9a86be8ff02032e6f79285c5fa1b8c513cfe0bf`。已回读验证后重建本索引。Agent: codex · 2026-10-15。
+- 2026-09 及以前：[完整旧进度无损归档](Reports/progress_full_archive_20260923_pre_live_avatars.md)，保留历史状态与验收记录。
 
 ## Next Action Rules
 
-- 关键变更在本页保留 3–5 条简短索引；验证细节写入 `Reports/`。
-- 继续工作前核对当前工作树与相关报告，保留未提交改动；需要清理旧资源时先核对备份与隔离路径。
+- 关键变更在本页保留 3–5 条简短索引；验证细节写入 `Reports/`。最近详细成果保留 5–8 条，长记录无损归档。
+- 继续工作前核对当前工作树与相关报告，保留未提交改动；清理旧资源前按用户规则完成备份与记录。
+- 继续保留原 pet；模型估计、人工核验、文件结构通过与硬件性能通过分别表述。正式发布前明确完整音频及分析数据的交付方式。

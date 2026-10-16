@@ -62,3 +62,190 @@
 .lu-band-lyric-zh[hidden]{display:none}
 @media(max-width:600px){.lu-band-lyric{bottom:76px;padding:4px 8px}.band-study .lu-band-lyric{bottom:36px}.lu-band-lyric-orig{font-size:15px}.lu-band-lyric-zh{font-size:12.5px}}
 @media(prefers-reduced-motion:reduce){.band-score-arrow{transition:none}}
+.band-review{max-width:1000px}.band-review audio{width:100%;margin:12px 0}.band-review-card{padding:16px;margin:14px 0;border:1px solid #ede2cf44;border-radius:3px;background:#111b2780}.band-review-card h2{font-size:18px;margin:0 0 8px}.band-review-card textarea{display:block;box-sizing:border-box;width:100%;margin:10px 0;padding:9px;background:#17171d;color:#ede2cf;border:1px solid #ede2cf44;font:inherit}.band-review-card summary{cursor:pointer;padding:8px 0}.band-review .lu-band-controls input{max-width:180px;min-height:32px;background:#17171d;color:#ede2cf;border:1px solid #ede2cf44;padding:3px 8px;font:inherit}.band-review-card label{font-size:13px;line-height:1.8}.band-review select{max-width:100%}.band-review button:disabled{opacity:.45}.band-review-card input[type=checkbox]{margin-right:6px}.band-review-card :focus-visible{outline:2px solid #b7e3ee;outline-offset:3px}
+
+/* Conductor controls are an optional overlay; pet art and stage layout stay intact. */
+.lu-conductor-dock{position:absolute;z-index:8;top:70px;right:16px;width:min(520px,calc(100% - 32px));color:#ede2cf;background:#111116e8;border:1px solid #cbbb9e55;border-radius:6px;font-size:12px;box-sizing:border-box}
+.lu-conductor-dock[hidden]{display:none!important}
+.lu-conductor-dock>summary{min-height:44px;padding:10px 12px;box-sizing:border-box;cursor:pointer;line-height:24px;user-select:none}
+.lu-conductor-dock>summary:focus-visible{outline:2px solid #cbbb9e;outline-offset:2px}
+.lu-conductor-dock>div{padding:0 6px 6px}
+.lu-conductor-dock:not([open])>div{display:none}
+.workbench-open .lu-conductor-dock,.inspector-open .lu-conductor-dock{display:none}
+@media(max-width:600px){.lu-conductor-dock{top:94px;left:12px;right:12px;width:auto}.lu-conductor-dock>summary{font-size:11px}}
+.lu-conductor-dock{position:fixed;z-index:24}
+.lue-core-open .lu-conductor-dock{display:none}
+@media(max-width:600px){.lu-conductor-dock{top:var(--conductor-top,calc(100dvh - 160px))}.lu-conductor-dock>summary{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lu-conductor-dock>div{padding:0 4px 4px}}
+
+/* Direct pet interaction: Stitch direction compiled by AGY. */
+.lu-band-member-interactions {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+  z-index:5;
+}
+
+.lu-pet-hit {
+  position: absolute;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  min-width: 44px;
+  min-height: 44px;
+  pointer-events: auto;
+  touch-action: none;
+  cursor: pointer;
+  outline: none;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s ease-out;
+}
+
+.lu-pet-hit:focus-visible {
+  outline: 1px solid rgba(247, 231, 206, 0.6);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.lu-pet-hit.lu-pet-clipped {
+  display: none !important;
+}
+
+.lu-pet-hit.lu-pet-dragging {
+  cursor: grabbing;
+}
+
+.lu-pet-hit.lu-pet-solo-active::before {
+  content: "";
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(247, 231, 206, 0.4) 0%, rgba(247, 231, 206, 0) 70%);
+  pointer-events: none;
+  animation: lu-pet-pulse 1.8s infinite ease-in-out;
+}
+
+.lu-pet-badge {
+  position: absolute;
+  left: var(--pet-badge-left, 50%);
+  top: calc(100% + 3px);
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 18px;
+  box-sizing: border-box;
+  padding: 2px 5px;
+  background: rgba(10, 14, 23, 0.38);
+  border-radius: 4px;
+  color: #e2daca;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 10px;
+  line-height: 14px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 140ms ease-out;
+}
+
+.lu-pet-hit:focus-visible .lu-pet-badge,
+.lu-pet-hit.lu-pet-pressed .lu-pet-badge,
+.lu-pet-hit.lu-pet-show-badge .lu-pet-badge {
+  opacity: 0.78;
+}
+
+/* Dense formations keep the pet silhouettes clear; state remains in the button label. */
+.lu-pet-hit.lu-pet-badge-blocked .lu-pet-badge {
+  visibility: hidden;
+}
+
+.lu-pet-hit.lu-pet-show-badge .lu-pet-name {
+  display: none;
+}
+
+.lu-pet-name {
+  color: inherit;
+}
+
+.lu-pet-status {
+  font-weight: 500;
+  color: inherit;
+  font-size: inherit;
+}
+
+.lu-pet-status.lu-pet-status-muted {
+  color: #bbc7d0;
+}
+
+.lu-pet-status.lu-pet-status-solo {
+  color: #f0d6ab;
+}
+
+.lu-pet-status.lu-pet-status-pending {
+  color: #e4ceae;
+}
+
+.lu-pet-hint {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #f7e7ce;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  padding: 6px 14px;
+  background: rgba(10, 14, 23, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(247, 231, 206, 0.2);
+  border-radius: 9999px;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 10;
+  opacity: 1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  max-width:calc(100% - 24px);
+  box-sizing:border-box;
+  text-align:center;
+  font-size:11px;
+}
+
+.lu-pet-hint.lu-pet-hint-fade {
+  opacity: 0.18;
+}
+
+@keyframes lu-pet-pulse {
+  0%, 100% {
+    transform: scale(0.95);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.85;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lu-pet-hit,
+  .lu-pet-badge,
+  .lu-pet-hint {
+    transition: none !important;
+  }
+  .lu-pet-hit.lu-pet-solo-active::before {
+    animation: none !important;
+  }
+}

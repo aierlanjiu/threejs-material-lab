@@ -78,7 +78,8 @@ export function stageLightingAt(score,time,fx,reduced=false){
  const start=fx.bursts.length?Math.max(...fx.bursts):undefined,impact=reduced||start===undefined?0:clamp(1-(time-start)/.42);
  const chorus=score?.stageCues?.choruses.find(c=>time>=c.start&&time<c.end),chorusView=reduced?0:chorus?Math.min(clamp((time-chorus.start)/2),clamp((chorus.end-time)/2)):climax;
  const section=time<6?'intro':chorusView>.1?'chorus':'verse',verse=reduced?0:clamp((time-6)/4)*(1-chorusView);
- const drums=score?.stems?.find(s=>s.id==='drums'),bass=score?.stems?.find(s=>s.id==='bass');
+ const stems=score?.hybrid?.originalStems||score?.stems;
+ const drums=stems?.find(s=>s.id==='drums'||s.instrumentId==='drums'),bass=stems?.find(s=>s.id==='bass'||s.instrumentId==='bass');
  return {lift:reduced?.55:(.42+fx.energy*.34+climax*.24)*(.70+.30*opening)*(.55+.45*ending),climax,
   impact,flash:stagePyroAt(time,fx,false,reduced).flash,section,chorusView,verse,
   drums:reduced?0:stemAttackAt(drums,time),bass:reduced?0:Math.max(stemLevelAt(bass,time)*.65,stemAttackAt(bass,time)),
@@ -88,7 +89,7 @@ export function stageLightingAt(score,time,fx,reduced=false){
 function energyAt(score,time){
  if(!score?.stems?.length||time<0||time>=score.duration)return 0;
  let total=0,weight=0;
- for(const stem of score.stems){const envelope=stem.envelope||[];if(!envelope.length)continue;
+ for(const stem of score.hybrid?.originalStems||score.stems){const envelope=stem.envelope||[];if(!envelope.length)continue;
   let lo=0,hi=envelope.length;while(lo<hi){const mid=(lo+hi)>>1;if(envelope[mid].time<=time)lo=mid+1;else hi=mid;}
   const a=envelope[Math.max(0,lo-1)],b=envelope[Math.min(envelope.length-1,lo)];
   const value=a.value+(b.value-a.value)*clamp((time-a.time)/Math.max(.001,b.time-a.time));

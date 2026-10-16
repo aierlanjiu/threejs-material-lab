@@ -42,14 +42,10 @@ const bad=normalizeBandSettings({actorSize:999,instrumentSize:NaN,actorMotion:-1
 assert.equal(bad.actorSize,1.6);assert.equal(bad.instrumentSize,.8);assert.equal(bad.actorMotion,0);assert.equal(bad.formation,'auto');assert.equal(bad.overrides['one-piece/luffy'].gap,.6);assert.equal(bad.overrides['../secret'],undefined);
 if(process.argv.includes('--analysis')){
  const real=JSON.parse(readFileSync(new URL('../output/lu-band/anime_op_we_are/score.json',import.meta.url)));
- const realParts=compileBandParts(real,'one-piece');assert.equal(realParts.length,10);assert.ok(realParts.every(p=>p.events.length>0));
- const guitar=realParts.find(p=>p.id.endsWith('/usopp')),harp=realParts.find(p=>p.id.endsWith('/robin'));
- assert.notDeepEqual(guitar.events,harp.events,'shared source must yield distinct assigned notes');
- const sharedNotes=realParts.filter(p=>p.stemId==='other').flatMap(p=>p.events);
- assert.equal(new Set(sharedNotes).size,sharedNotes.length,'automatic shared-source parts must not duplicate note events');
- const extra={...real,stems:[...real.stems,{...real.stems.find(s=>s.id==='other'),id:'piano',label:'键盘音轨'}]};
- const custom=compileBandParts(extra,'one-piece',{'one-piece/law':{stem:'piano',technique:'keys'}}).find(p=>p.id.endsWith('/law'));
- assert.equal(custom.stemId,'piano');assert.equal(custom.events.length,extra.stems.at(-1).events.length,'additional source counts are not fixed to four');
- console.log('PASS real-song part assignment, distinct shared-source notes and expandable source mapping');
+ const realParts=compileBandParts(real,'one-piece');assert.equal(realParts.length,10);
+ assert.ok(realParts.every(p=>p.events.length===0),'legacy four-source data is not proof of per-instrument actor bindings');
+ const custom=compileBandParts(real,'one-piece',{'one-piece/law':{stem:'other',technique:'keys'}});
+ assert.ok(custom.every(p=>p.events.length===0),'visual overrides cannot bypass actual-song verification');
+ console.log('PASS legacy analysis and custom overrides cannot fabricate per-instrument performances');
 }
 console.log('PASS 29-member rosters, five formations, independent gestures, quiet states, seek determinism and setting limits');

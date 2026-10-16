@@ -30,9 +30,24 @@ const designs = [
   ['naruto/jiraiya','自来也','卷轴三味线','polyphonic','#b77d76','卷轴琴头与蛤蟆拨片'],
   ['naruto/pain','佩恩','六管管风琴','polyphonic','#9b819f','六根高低音管']
 ];
+const kinds={
+ 'one-piece/luffy':'vocals','one-piece/zoro':'bass','one-piece/nami':'accordion','one-piece/sanji':'drums',
+ 'one-piece/chopper':'marimba','one-piece/robin':'harp','one-piece/usopp':'guitar','one-piece/ace':'saxophone','one-piece/law':'synthesizer','one-piece/shanks':'cello',
+ 'dragon-ball/goku':'vocals','dragon-ball/vegeta':'guitar','dragon-ball/bulma':'synthesizer','dragon-ball/krillin':'hand-drums',
+ 'dragon-ball/piccolo':'flute','dragon-ball/frieza':'theremin','dragon-ball/cell':'synthesizer','dragon-ball/gohan':'piano','dragon-ball/buu':'tuba','dragon-ball/trunks':'synthesizer',
+ 'naruto/naruto':'vocals','naruto/sasuke':'guitar','naruto/sakura':'snare','naruto/itachi':'shakuhachi',
+ 'naruto/gaara':'udu','naruto/ninja-06':'ocarina','naruto/madara':'taiko','naruto/jiraiya':'shamisen','naruto/pain':'organ'
+};
+const musicalFamilies={vocals:'vocals',bass:'plucked_strings',guitar:'plucked_strings',harp:'plucked_strings',shamisen:'plucked_strings',
+ drums:'percussion','hand-drums':'percussion',snare:'percussion',udu:'percussion',taiko:'percussion',marimba:'percussion',
+ piano:'keys',synthesizer:'keys',organ:'keys',accordion:'keys',theremin:'electronic',
+ saxophone:'winds',flute:'winds',tuba:'winds',shakuhachi:'winds',ocarina:'winds',cello:'bowed_strings'};
 export const INSTRUMENTS = Object.freeze(designs.map(([id,name,instrument,family,accent,motif]) => Object.freeze({
   id, name, instrument, family, accent, motif, theme: id.split('/')[0],
+  instrumentKind:kinds[id],musicalFamily:musicalFamilies[kinds[id]],
   asset: new URL(`../../assets/instruments/${id.replace('/','-')}.svg`, import.meta.url).href
 })));
 export const instrumentById = id => INSTRUMENTS.find(item => item.id === id);
 export const instrumentsForTheme = theme => INSTRUMENTS.filter(item => item.theme === theme);
+export const instrumentFamily = kind => musicalFamilies[kind]||kind;
+export const matchesInstrumentFamily = (actor,kind) => Boolean(actor)&&actor.musicalFamily===instrumentFamily(kind);
