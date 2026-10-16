@@ -28,6 +28,7 @@ export function createBandHybridAudio({getContext,getOutput,getTime=()=>0}){
   if(autoAt!==null&&autoAt>target+.045){p.setValueAtTime(value,autoAt);p.linearRampToValueAtTime(after,autoAt+.045);}
  }
  function schedule(at=getContext().currentTime,restoreAt=null){if(!score)return;
+  if(!ready){if(originalGain)ramp(originalGain,1,at);return;}
   if(restoreAt===null&&restoreTime!==null)restoreAt=getContext().currentTime+Math.max(0,restoreTime-getTime());
   const levels=hybridLevels(score,theme,policy,enabled),auto=hybridLevels(score,theme,{muted:[],soloGroup:null},enabled);
   if(originalGain)ramp(originalGain,levels.bed,at,auto.bed,restoreAt);
