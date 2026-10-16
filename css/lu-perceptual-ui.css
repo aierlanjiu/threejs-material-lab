@@ -1,0 +1,57 @@
+/* One perimeter per surface. Inner groups use luminance, not nested frames. */
+.lu-perceptual-ui {
+  color-scheme: dark;
+  --lu-hairline: 1px;
+  --lu-surface-1: rgb(255 255 255 / .04);
+  --lu-surface-2: rgb(255 255 255 / .065);
+  --lu-surface-3: rgb(255 255 255 / .10);
+}
+@media (min-resolution: 2dppx) { .lu-perceptual-ui { --lu-hairline: .5px; } }
+.lu-perceptual-ui :is(#luAppleDock,#lueCoreDrawer,#inspectorPanel,.lu-apple-playlist-popover,.lu-apple-record-popover) {
+  border-color: transparent;
+  box-shadow: inset 0 0 0 var(--lu-hairline) rgb(255 255 255 / .20), 0 12px 32px #0003;
+  -webkit-font-smoothing: antialiased;
+}
+.lu-perceptual-ui #luAppleDock { transition-property: opacity, transform; }
+.lu-perceptual-ui :is(#lueCoreDrawer,#applePlaylistPopover,#appleRecordPopover) { transform-origin: 50% 100%; }
+.lu-perceptual-ui #luAppleDock[data-dock-state="orb"] { width: 72px; height: 72px; padding: 8px; border-radius: 50%; }
+.lu-perceptual-ui :is(#lueCoreDrawer,#inspectorPanel) :is(.dock-section,.lue-create-card,.waveform-board,.motion-card,.bottom-dynamic-dock) {
+  border: 0; box-shadow: none; background: var(--lu-surface-1);
+}
+.lu-perceptual-ui :is(#lueCoreDrawer,#inspectorPanel) :is(.dock-section,.lue-create-card) { border-radius: 10px; }
+.lu-perceptual-ui :is(#lueCoreDrawer,#inspectorPanel) :is(.pill-btn,.motion-card,.waveform-board,.lue-facet-tab,.lue-facet-close) { border-color: transparent; }
+.lu-perceptual-ui :is(#lueCoreDrawer,#inspectorPanel) :is(button,.lue-create-card):hover { background-color: var(--lu-surface-3); }
+.lu-perceptual-ui #kineticModeSwitcher { background: var(--lu-surface-2); border: 0; box-shadow: none; }
+.lu-perceptual-ui .band-v2-controls .lu-band-members button { border: 0; border-radius: 8px; background: var(--lu-surface-1); color: #e1e4e9; font: inherit; font-size: 12px; }
+.lu-perceptual-ui .band-v2-controls .lu-band-members button[aria-pressed="true"] { background: var(--lu-surface-3); }
+.lu-perceptual-ui .band-v2-controls .lu-band-controls label { white-space: nowrap; }
+.lu-perceptual-ui :is(.lu-scroll-feather,.lu-band-members) { scrollbar-width: thin; scrollbar-color: #ffffff35 transparent; }
+.lu-perceptual-ui :is(.lu-apple-icon-btn,.lu-apple-play-btn,#luAppleOrbBtn,.kinetic-mode-btn,.lue-facet-tab):active { transform: none; }
+.lu-perceptual-ui :is(.lu-apple-track-title,.lu-band-lyric-orig) { font-weight: 500; }
+.lu-perceptual-ui .lu-band-lyric-zh { font-weight: 500; }
+.lu-scroll-feather {
+  --lu-fade-top: 0px; --lu-fade-bottom: 0px;
+  mask-image: linear-gradient(to bottom,
+    transparent, #0000000d calc(var(--lu-fade-top)*.15), #00000026 calc(var(--lu-fade-top)*.30),
+    #0000004d calc(var(--lu-fade-top)*.45), #00000080 calc(var(--lu-fade-top)*.60),
+    #000000b3 calc(var(--lu-fade-top)*.75), #000000d9 calc(var(--lu-fade-top)*.87), #000 var(--lu-fade-top),
+    #000 calc(100% - var(--lu-fade-bottom)), #000000d9 calc(100% - var(--lu-fade-bottom)*.87),
+    #000000b3 calc(100% - var(--lu-fade-bottom)*.75), #00000080 calc(100% - var(--lu-fade-bottom)*.60),
+    #0000004d calc(100% - var(--lu-fade-bottom)*.45), #00000026 calc(100% - var(--lu-fade-bottom)*.30),
+    #0000000d calc(100% - var(--lu-fade-bottom)*.15), transparent);
+}
+.lu-scroll-feather:has(:focus-visible) { mask-image: none; }
+.lu-ui-sound-setting { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 4px 10px; color: #c9cad2; font-size: 12px; }
+.lu-ui-sound-setting input { accent-color: #c5ddea; }
+@keyframes lu-lyric-focus { from { opacity: .3; filter: blur(2.5px); transform: translateY(3px); } to { opacity: 1; filter: blur(0); transform: translateY(0); } }
+.lu-lyric-focusing { animation: lu-lyric-focus 180ms cubic-bezier(.16,1,.3,1) both; }
+/* A single quiet sweep when a track or state changes. */
+@keyframes lu-quiet-sheen { from { background-position: 140% 0; } to { background-position: -50% 0; } }
+.lu-track-sheen { background: linear-gradient(105deg,#d5d5dd 32%,#fff 48%,#d5d5dd 64%); background-size: 220% 100%; background-clip: text; -webkit-background-clip: text; color: transparent; animation: lu-quiet-sheen 1100ms cubic-bezier(.714,.121,.211,.888) 1; }
+.lu-perceptual-ui #luAppleOrbBtn::after { content: ""; position: absolute; inset: 3px; border-radius: 50%; background: linear-gradient(105deg,transparent 30%,#ffffff26 48%,transparent 65%); background-size: 220% 100%; pointer-events: none; animation: lu-quiet-sheen 1100ms cubic-bezier(.714,.121,.211,.888) 1; }
+.lu-band-pyro-toggle { position: absolute; z-index: 7; right: 12px; top: 12px; display: inline-flex; align-items: center; gap: 7px; min-height: 44px; padding: 0 12px; border: 0; border-radius: 22px; background: #121b28b8; box-shadow: inset 0 0 0 var(--lu-hairline,1px) #d4e5f42b; color: #e1e6eb; font: 11px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif; cursor: pointer; }
+.lu-band-pyro-toggle[aria-pressed="false"] { color: #a7b1bb; }
+.lu-band-pyro-toggle:focus-visible { outline: 2px solid #b7e3ee; outline-offset: 3px; }
+.lu-band-pyro-toggle[hidden] { display: none; }
+.recording-preview .lu-band-pyro-toggle,.lue-core-open .lu-band-pyro-toggle { visibility: hidden; }
+@media (prefers-reduced-motion: reduce) { .lu-lyric-focusing,.lu-track-sheen,.lu-perceptual-ui #luAppleOrbBtn::after { animation: none; filter: none; } }

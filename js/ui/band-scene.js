@@ -1,10 +1,12 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.166.1/+esm';
 import {bandRoster} from '../audio/band-parts.js';
 import {formationAt,sampleBandMotion,bandEase} from '../audio/band-layout.js';
-import {stageSpec,stageBandLayout,stageHeightAt,stageClimaxAt,stageLightingAt} from '../audio/band-stage-layout.js';
+import {stageSpec,stageBandLayout,stageHeightAt,stageLightingAt} from '../audio/band-stage-layout.js';
 import {bandPet,petFrameAt} from '../avatar/band-pets.js';
 import {defaultBandSettings,settingsForMember} from './band-settings.js';
 import {createConcertStage} from './band-stage.js';
+import {createEnergyWings,energyWingAttachment} from './band-energy-wings.js';
+import {particleWingState,stageEffectsAt} from '../audio/band-effects-timeline.js';
 
 export async function createBandScene(container,{safeTop=0,safeBottom=15,cubeDesign=null}={}){
  const renderer=new THREE.WebGLRenderer({alpha:false,antialias:true,preserveDrawingBuffer:true});
@@ -29,7 +31,23 @@ export async function createBandScene(container,{safeTop=0,safeBottom=15,cubeDes
   attenuationColor:new THREE.Color('#dae3ed'),attenuationDistance:3,iridescence:.32,iridescenceIOR:1.35,iridescenceThicknessRange:[90,320],clearcoat:1,clearcoatRoughness:0,transparent:true,opacity:.86,side:THREE.DoubleSide,envMapIntensity:1.1});m.userData.family='prism';return m;};
  const theatre=createConcertStage(scene,{createMaterial:()=>cubeDesign?.createStageMaterial?.()||defaultPrism(),textureFor,onChange:()=>{if(active)render();}});
  let members=[],theme='one-piece',narrow=false,active=false,revision=0,disposed=false,last=null,designKey=cubeDesign?.getKey?.()||'prism',captureSize=null;
- let lastUpdateKey='',lastCameraFit=null;
+ let lastUpdateKey='',lastCameraFit=null,placementRevision=0,drag=null;
+ const placements=new Map();
+ const limits=()=>({x:narrow?5.6:10.5,back:-3.7,front:narrow?6.3:8.1});
+ function placed(point){const l=limits(),s=stageSpec(narrow),x=point.x*l.x;
+  let z=l.back+point.z*(l.front-l.back);
+  if(!narrow)z=Math.min(z,s.back+Math.sqrt(Math.max(0,s.radii[0]**2-x*x))-.7);
+  return [x,stageHeightAt(x,z,narrow)+.045,z];}
+ function rayPoint(x,y,plane){const rect=renderer.domElement.getBoundingClientRect(),ray=new THREE.Raycaster();
+  ray.setFromCamera(new THREE.Vector2((x-rect.left)/rect.width*2-1,1-(y-rect.top)/rect.height*2),camera);
+  return ray.ray.intersectPlane(plane,new THREE.Vector3());}
+ function startDrag(id,x,y){const member=members.find(m=>m.role.id===id);if(!member)return;
+  const plane=new THREE.Plane(new THREE.Vector3(0,1,0),-member.group.position.y),hit=rayPoint(x,y,plane);if(!hit)return;
+  drag={id,plane,hit,origin:member.group.position.clone(),previous:placements.get(id)};}
+ function moveDrag(id,x,y){if(drag?.id!==id)return;const hit=rayPoint(x,y,drag.plane);if(!hit)return;const l=limits(),p=drag.origin.clone().add(hit.sub(drag.hit));
+  placements.set(id,{x:THREE.MathUtils.clamp(p.x/l.x,-1,1),z:THREE.MathUtils.clamp((p.z-l.back)/(l.front-l.back),0,1)});placementRevision++;lastUpdateKey='';}
+ function endDrag(id,{cancelled=false}={}){if(drag?.id!==id)return;if(cancelled){if(drag.previous)placements.set(id,drag.previous);else placements.delete(id);}drag=null;placementRevision++;lastUpdateKey='';}
+ function resetPositions(){placements.clear();drag=null;placementRevision++;lastUpdateKey='';}
  const dimensions=()=>captureSize?{w:captureSize.logicalWidth,h:captureSize.logicalHeight}:{w:container.clientWidth,h:container.clientHeight};
  const haloCanvas=document.createElement('canvas');haloCanvas.width=haloCanvas.height=128;
  const hc=haloCanvas.getContext('2d'),gradient=hc.createRadialGradient(64,64,4,64,64,64);
@@ -42,7 +60,7 @@ export async function createBandScene(container,{safeTop=0,safeBottom=15,cubeDes
  }
  const leadLight=new THREE.SpotLight(0xffedcd,0,90,.35,.85,1.5);scene.add(leadLight,leadLight.target);
  function disposeGroup(group){group.traverse(o=>{o.geometry?.dispose();o.material?.dispose();o.customDepthMaterial?.dispose();});}
- function releaseMembers(){for(const m of members){scene.remove(m.group);disposeGroup(m.group);m.texture.dispose();m.labelTexture.dispose();}members=[];}
+ function releaseMembers(){for(const m of members){m.wings?.dispose();scene.remove(m.group);disposeGroup(m.group);m.texture.dispose();m.labelTexture.dispose();}members=[];}
  function labelFor(role){const canvas=document.createElement('canvas');canvas.width=384;canvas.height=64;const ctx=canvas.getContext('2d');
   ctx.font='500 29px sans-serif';ctx.textAlign='center';ctx.fillStyle='#f2e7d5';ctx.shadowColor='#15101a';ctx.shadowBlur=6;ctx.fillText(role.name,192,42);const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;return texture;}
  async function configure(nextTheme=theme){
@@ -59,14 +77,16 @@ export async function createBandScene(container,{safeTop=0,safeBottom=15,cubeDes
    const reflection=new THREE.Mesh(new THREE.PlaneGeometry(1,1),reflectionMaterial);group.add(reflection);
    const shadow=new THREE.Mesh(new THREE.PlaneGeometry(2.4,1.4),new THREE.MeshBasicMaterial({map:haloTexture,color:'#08111f',transparent:true,opacity:.48,depthWrite:false}));shadow.rotation.x=-Math.PI/2;shadow.position.y=.05;group.add(shadow);
    const labelTexture=labelFor(role),label=new THREE.Sprite(new THREE.SpriteMaterial({map:labelTexture,transparent:true,depthWrite:false,toneMapped:false}));label.scale.set(2.3,.38,1);group.add(label);
-   return {role,pet,group,body,art,reflection,shadow,label,labelTexture,texture,frame:0,sample:null,pose:null};
+   const wings=['vocals','guitar'].includes(role.instrumentKind)?createEnergyWings(group,{samples:144,compactSamples:96}):null;
+   return {role,pet,group,body,art,reflection,shadow,label,labelTexture,texture,wings,frame:0,sample:null,pose:null};
   });
   resize();await theatre.setTheme(theme);if(active)render();
  }
- function fitCamera(layouts,settings,lighting){
+ function fitCamera(layouts,settings,lighting,wingState){
   const angle=THREE.MathUtils.degToRad((narrow?36:24)-(lighting.chorusView||0)*(narrow?4:5)),up=new THREE.Vector3(0,Math.cos(angle),-Math.sin(angle)),out=new THREE.Vector3(0,Math.sin(angle),Math.cos(angle)),points=[];
   for(const positions of layouts)positions.forEach((p,i)=>{const v=settingsForMember(settings,members[i].role.id),h=3.05*v.actorSize;
    for(const x of [-h*.47,h*.47])for(const y of [0,h+.12])points.push(new THREE.Vector3(p[0]+x,p[1]+y,p[2]));});
+  if(wingState?.power>.01)for(const positions of layouts)positions.forEach((p,i)=>{if(!members[i].wings||last?.frame.parts[i]?.userMuted)return;const h=3.05*settingsForMember(settings,members[i].role.id).actorSize,w=h*.78*wingState.spread*wingState.power;for(const x of [-w,w])for(const y of [.10,.87])points.push(new THREE.Vector3(p[0]+x,p[1]+h*y,p[2]));});
   const s=stageSpec(narrow);
   if(narrow){points.push(new THREE.Vector3(0,0,s.front+.3));}
   else for(const x of [-s.width/2-.8,s.width/2+.8])for(const y of [0,s.rigHeight+.8])points.push(new THREE.Vector3(x,y,s.back-1.5));
@@ -89,19 +109,24 @@ export async function createBandScene(container,{safeTop=0,safeBottom=15,cubeDes
   const end=target.clone();end.y+=(member?.art.scale.y||3.3)+.15;
   const start=spot.light.position,direction=start.clone().sub(end),length=direction.length();spot.beam.position.copy(start).add(end).multiplyScalar(.5);spot.beam.scale.y=length;spot.beam.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),direction.normalize());spot.beam.material.uniforms.uOpacity.value=power?Math.min(.14,.08+power*.05):0;spot.beam.material.uniforms.uTint.value.copy(color);spot.beam.visible=power>.07;
  }
- function update(frame,{settings=defaultBandSettings(),focus=null,reduced=false,score=null,parts=[]}={}){
+ function update(frame,{settings=defaultBandSettings(),focus=null,reduced=false,score=null,parts=[],easterEgg=null,effectsFrame=null}={}){
   if(!members.length||disposed)return;
-  const updateKey=`${frame.time}|${focus}|${reduced}|${JSON.stringify(settings)}|${cubeDesign?.getKey?.()||designKey}`;
+  const updateKey=`${frame.time}|${focus}|${reduced}|${placementRevision}|${frame.parts.map(p=>p.activity.toFixed(3)+':'+Boolean(p.userMuted)).join(',')}|${easterEgg?.id||''}|${easterEgg?.time||0}|${JSON.stringify(settings)}|${cubeDesign?.getKey?.()||designKey}`;
   if(updateKey===lastUpdateKey&&last?.options.score===score&&last?.options.parts===parts)return;
-  lastUpdateKey=updateKey;last={frame,options:{settings,focus,reduced,score,parts}};
-  const fx=stageClimaxAt(score,frame.time,settings.effects||'auto'),lighting=stageLightingAt(score,frame.time,fx,reduced);
+  lastUpdateKey=updateKey;last={frame,options:{settings,focus,reduced,score,parts,easterEgg}};
+  const fx=effectsFrame||stageEffectsAt(score,frame.time,settings.effects||'auto',reduced?null:easterEgg);
+  const wingState=particleWingState(score,frame.time,{mode:settings.effects,reduced});
+  const lighting=stageLightingAt(score,frame.time,fx,reduced);
+  const wingFocus=members.some((m,i)=>m.wings&&!frame.parts[i]?.userMuted&&(parts[i]?.events?.length||score?.source==='demo'))?wingState.power:0;
+  lighting.flash=(lighting.flash||0)*(1-wingFocus*.6);
   fill.intensity=2.1+(lighting.flash||0)*.9;fill.color.set('#ffe8ce').lerp(new THREE.Color('#ffcc82'),(lighting.flash||0)*.45);renderer.toneMappingExposure=1+(lighting.flash||0)*.16;
   const nextKey=cubeDesign?.getKey?.()||designKey;if(nextKey!==designKey){designKey=nextKey;theatre.refreshMaterial();}
   const moving=settings.lightMode==='move',leader=Math.max(0,frame.leadIndex),previousLeader=Math.max(0,frame.previousLeadIndex);
   const formation=formationAt(frame.time,score,focus||moving?'solo':settings.formation);
   const spread=settings.spread*(narrow?.90:1),from=stageBandLayout(members.length,formation.previousId,narrow,moving?previousLeader:leader,spread),to=stageBandLayout(members.length,formation.id,narrow,leader,spread);
   const next=stageBandLayout(members.length,formation.nextId,narrow,Math.max(0,frame.nextLeadIndex),spread);
-  fitCamera([from,to,next],settings,lighting);
+  const manual=to.map((p,i)=>placements.has(members[i].role.id)?placed(placements.get(members[i].role.id)):p);
+  fitCamera([from,to,next,manual],settings,lighting,wingState);
   members.forEach((member,i)=>{
    const sample=frame.parts[i]||{activity:0,energy:0,attack:0,notePulse:0,lead:false},part=parts[i]||member.role,v=settingsForMember(settings,member.role.id);
    const progress=moving&&frame.previousLeadIndex>=0?bandEase((frame.time-(frame.section?.start||0))/1.6):formation.mix;
@@ -109,6 +134,7 @@ export async function createBandScene(container,{safeTop=0,safeBottom=15,cubeDes
    member.group.position.fromArray(from[i]).lerp(new THREE.Vector3(...to[i]),mix);
    member.group.position.x+=Math.sign(member.group.position.x)*v.gap*.6;
    member.group.position.y=stageHeightAt(member.group.position.x,member.group.position.z,narrow)+.045;
+   if(placements.has(member.role.id))member.group.position.fromArray(placed(placements.get(member.role.id)));
    const pose=sampleBandMotion(sample,frame.time,score?.bpmEstimate||120,{technique:part.technique,index:i,actorMotion:v.actorMotion,instrumentMotion:v.instrumentMotion,reduced});
    member.body.position.set(pose.actor.position[0],pose.actor.position[1]*.7,0);
    member.body.rotation.z=pose.actor.rotation[2]+(sample.attack||0)*THREE.MathUtils.degToRad(v.instrumentRotation)*.08*v.instrumentSize;
@@ -123,6 +149,16 @@ export async function createBandScene(container,{safeTop=0,safeBottom=15,cubeDes
    member.label.position.set(0,h+.2,.36);member.label.visible=!!focus&&focus===member.role.id;member.label.material.opacity=1;
    member.shadow.scale.setScalar(v.actorSize);member.shadow.material.opacity=.40+sample.activity*.09;
    member.sample=sample;member.pose=pose;
+  });
+  scene.updateMatrixWorld(true);camera.updateMatrixWorld(true);
+  const occluders=wingState.power>.005?members.map(m=>{const box=new THREE.Box3().setFromObject(m.body),points=[];for(const x of [box.min.x,box.max.x])for(const y of [box.min.y,box.max.y])for(const z of [box.min.z,box.max.z])points.push(new THREE.Vector3(x,y,z).project(camera));return {left:Math.min(...points.map(p=>p.x)),right:Math.max(...points.map(p=>p.x)),bottom:Math.min(...points.map(p=>p.y)),top:Math.max(...points.map(p=>p.y))};}):[];
+  members.forEach((m,i)=>m.wings?.update({time:frame.time,state:(!m.sample?.userMuted&&(parts[i]?.events?.length||score?.source==='demo'))?wingState:{power:0},narrow,height:m.art.scale.y,body:m.body,art:m.art,shoulder:energyWingAttachment(m.role.id),occluders:occluders.filter((_,j)=>j!==i)}));
+  lighting.wingPower=wingFocus;
+  lighting.wingZones=members.filter(m=>m.wings?.mesh.visible).map(m=>{
+   const mesh=m.wings.mesh,points=[];mesh.updateWorldMatrix(true,false);
+   for(const x of [-.78,.78])for(const y of [.08,.87])points.push(new THREE.Vector3(x,y,-.05).applyMatrix4(mesh.matrixWorld).project(camera));
+   const left=Math.min(...points.map(p=>p.x)),right=Math.max(...points.map(p=>p.x)),bottom=Math.min(...points.map(p=>p.y)),top=Math.max(...points.map(p=>p.y));
+   return {x:(left+right)/2,y:(bottom+top)/2,width:Math.max(.02,(right-left)/2),height:Math.max(.02,(top-bottom)/2)};
   });
   spots.forEach((spot,i)=>setSpot(spot,null,0,new THREE.Color('#ffe6c4'),i));
   if(settings.lightMode==='multi')members.forEach((m,i)=>setSpot(spots[i],m,m.sample.activity*(m.sample.lead?1.2:.65),new THREE.Color('#ffe4bd').lerp(new THREE.Color(m.role.accent),.2),i));
@@ -139,23 +175,28 @@ export async function createBandScene(container,{safeTop=0,safeBottom=15,cubeDes
  }
  function render(){if(!disposed)renderer.render(scene,camera);}
  const observer=new ResizeObserver(resize);observer.observe(container);
- const raycaster=new THREE.Raycaster();renderer.domElement.addEventListener('pointerup',event=>{
-  if(!active||captureSize)return;const r=renderer.domElement.getBoundingClientRect();raycaster.setFromCamera(new THREE.Vector2((event.clientX-r.left)/r.width*2-1,1-(event.clientY-r.top)/r.height*2),camera);
+ const raycaster=new THREE.Raycaster();
+ function pickMember(clientX,clientY){
+  if(!active)return null;const r=renderer.domElement.getBoundingClientRect();raycaster.setFromCamera(new THREE.Vector2((clientX-r.left)/r.width*2-1,1-(clientY-r.top)/r.height*2),camera);
   const hits=raycaster.intersectObjects(members.map(m=>m.art));
   for(const hit of hits){const member=members.find(m=>m.art===hit.object);
    if(!member.hitCanvas){const c=document.createElement('canvas');c.width=member.texture.image.width;c.height=member.texture.image.height;
     const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(member.texture.image,0,0);member.hitCanvas={c,ctx};}
    const uv=hit.uv.clone();member.texture.transformUv(uv);const {c,ctx}=member.hitCanvas;
    if(ctx.getImageData(Math.min(c.width-1,Math.floor(uv.x*c.width)),Math.min(c.height-1,Math.floor(uv.y*c.height)),1,1).data[3]<40)continue;
-   renderer.domElement.dispatchEvent(new CustomEvent('band-member-select',{detail:member.role.id}));break;
+   return member.role.id;
   }
+  return null;
+ }
+ renderer.domElement.addEventListener('pointerup',event=>{
+  const id=pickMember(event.clientX,event.clientY);if(id)renderer.domElement.dispatchEvent(new CustomEvent('band-member-select',{detail:id}));
  });
  function setActive(value){active=value;container.hidden=!value;if(value){resize();render();}}
  function setCaptureSize(width,height,logicalWidth,logicalHeight){if(captureSize?.width===width&&captureSize?.height===height)return;captureSize={width,height,logicalWidth,logicalHeight};renderer.setPixelRatio(1);resize();}
  function endCapture(){if(!captureSize)return;captureSize=null;renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));resize();}
  function dispose(){disposed=true;observer.disconnect();releaseMembers();theatre.dispose();environment.dispose();haloTexture.dispose();scene.traverse(o=>{o.geometry?.dispose();o.material?.dispose();});for(const t of textures.values())t.then(texture=>texture.dispose()).catch(()=>{});renderer.dispose();renderer.domElement.remove();}
  const currentFormation=()=>last?formationAt(last.frame.time,last.options.score,last.options.focus||last.options.settings.lightMode==='move'?'solo':last.options.settings.formation).id:null;
- return {configure,update,resize,setActive,setCaptureSize,endCapture,dispose,canvas:renderer.domElement,get captureActive(){return !!captureSize;},get formation(){return currentFormation();},get diagnostics(){return {active,theme,narrow,captureSize,formation:currentFormation(),stage:theatre.diagnostics,petCount:members.length,
+ return {configure,update,resize,setActive,setCaptureSize,endCapture,dispose,pickMember,startDrag,moveDrag,endDrag,resetPositions,canvas:renderer.domElement,get narrow(){return narrow;},get captureActive(){return !!captureSize;},get formation(){return currentFormation();},get diagnostics(){return {active,theme,narrow,captureSize,formation:currentFormation(),stage:theatre.diagnostics,petCount:members.length,wings:{...particleWingState(last?.options.score,last?.frame.time||0,{mode:last?.options.settings.effects,reduced:last?.options.reduced}),members:members.filter(m=>m.wings).map(m=>({id:m.role.id,...m.wings.diagnostics}))},placements:Object.fromEntries(placements),dragging:drag?.id||null,
   cueSource:last?.options.score?.stageCues?.source||'demo',chorusCandidates:last?.options.score?.stageCues?.choruses||[],camera:{position:camera.position.toArray(),fov:camera.fov,aspect:camera.aspect,...lastCameraFit},beams:spots.map(s=>s.beam.visible?s.beam.material.uniforms.uOpacity.value:0),members:members.map(m=>{const box=new THREE.Box3().setFromObject(m.body),points=[];for(const x of [box.min.x,box.max.x])for(const y of [box.min.y,box.max.y])for(const z of [box.min.z,box.max.z])points.push(new THREE.Vector3(x,y,z).project(camera));
    return {id:m.role.id,technique:m.role.technique,activity:m.sample?.activity||0,position:m.group.position.toArray(),petFrame:m.frame,asset:m.pet.asset,actorRotation:m.art.rotation.toArray().slice(0,3),instrumentRotation:m.body.rotation.toArray().slice(0,3),actorScale:m.art.scale.toArray(),instrumentScale:m.body.scale.toArray(),actorFade:m.art.material.opacity,
     bounds:{left:Math.min(...points.map(p=>p.x)),right:Math.max(...points.map(p=>p.x)),top:Math.max(...points.map(p=>p.y)),bottom:Math.min(...points.map(p=>p.y))}};}),lights:spots.map(s=>s.light.intensity),drawCalls:renderer.info.render.calls};}};

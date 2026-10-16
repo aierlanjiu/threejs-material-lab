@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>律 · 逐曲声部校验</title><link rel="stylesheet" href="./css/lu-instrument-study.css"><link rel="stylesheet" href="./css/lu-band.css"></head>
+<body><main class="band-study band-review"><header><a href="./index.html?intro=skip">← 返回律</a><h1>逐曲声部校验</h1><p>对比原曲与分离音轨，确认乐器身份、演奏时间和对应演员。</p></header>
+<div class="band-study-toolbar"><label>歌曲 <select id="reviewTrack" aria-label="校验歌曲"></select></label><span id="reviewStatus" role="status" aria-live="polite">正在读取候选</span></div>
+<p class="band-study-note">候选来自模型分离，尚未等同原始多轨。确认前请检查串音、漏声部、起奏与停奏；待校验声部不会驱动演员。确认记录保存在当前浏览器，音源或音轨改变后失效。</p>
+<audio id="reviewPlayer" controls preload="none" aria-label="原曲与分离音轨对照播放器"></audio>
+<section id="reviewParts" aria-label="声部校验列表"></section>
+<div class="lu-band-controls"><label>校验人 <input id="reviewer" value="zedpapa" aria-label="校验人" maxlength="80"></label><button id="saveReview" type="button" disabled>保存本曲校验</button><button id="exportReview" type="button" disabled>导出校验记录</button><a href="./band-study.html">查看乐队舞台 ↗</a></div>
+<p id="reviewResult" class="band-study-note" role="status" aria-live="polite"></p>
+</main><script type="module" src="./js/ui/band-review.js"></script></body></html>

@@ -1,5 +1,9 @@
 import {instrumentById} from '../avatar/instrument-manifest.js';
 import {sampleBandFrame} from './band-timeline.js';
+import {songPartsForTheme,SONG_INSTRUMENTS} from './band-song-parts.js';
+import {generatedPartsForTheme} from './band-procedural.js';
+import {familyPartsForTheme} from './band-family-bindings.js';
+import {arrangementPartsForTheme} from './band-arrangement.js';
 
 // These are stage arrangements of measured notes, not additional separated instruments.
 const definitions={
@@ -36,6 +40,11 @@ export const BAND_TECHNIQUES=Object.freeze([
 ].map(([id,label])=>Object.freeze({id,label})));
 
 export function compileBandParts(score,theme,overrides={}){
+ const resolveActual=()=>{const human=songPartsForTheme(score,theme,bandRoster(theme));return score?.familyBindings?familyPartsForTheme(score,theme,bandRoster(theme)).map((part,i)=>human[i].bindingStatus==='verified'?human[i]:part):human;};
+ if(score?.source!=='demo')return (score?.source==='arrangement'?arrangementPartsForTheme(score,theme,bandRoster(theme)):score?.source==='procedural'?generatedPartsForTheme(score,theme,bandRoster(theme),SONG_INSTRUMENTS):resolveActual()).map(part=>{
+  let end=0;return {...part,endPrefix:part.events.map(e=>(end=Math.max(end,e.end))),
+   sectionWeights:(score?.sections||[]).map(section=>part.events.reduce((sum,e)=>sum+Math.max(0,Math.min(e.end,section.end)-Math.max(e.start,section.start))*e.velocity,0))};
+ });
  const parts=bandRoster(theme).map(role=>{
   const custom=overrides[role.id]||{},stemId=custom.stem||role.stem,stem=score?.stems.find(s=>s.id===stemId);
   const events=(stem?.events||[]).filter(e=>custom.stem||(
@@ -72,6 +81,11 @@ export function sampleBandPart(part,time,sourceFrame,duration=Infinity){
  const empty={id:part.id,stemId:part.stemId,activity:0,energy:0,attack:0,notePulse:0,notes:[],lead:false};
  if(time>=duration||time<0)return empty;
  const source=sourceFrame.stems[part.stemId]||{energy:0},tail=part.percussion?.2:.42;
+ if(part.modelIntervals&&!part.modelIntervals.some(([a,b])=>a<=time&&time<b))return empty;
+ if(part.activitySource==='envelope'){
+  const energy=source.energy>.12?source.energy:0;
+  return {...empty,activity:smooth(energy),energy,attack:source.onset||0,notePulse:energy};
+ }
  let level=0,attack=0;const notes=[];
  for(let i=upperBound(part.events,time)-1;i>=0;i--){
   if(part.endPrefix[i]<time-tail)break;
@@ -80,7 +94,7 @@ export function sampleBandPart(part,time,sourceFrame,duration=Infinity){
   if(time<e.end){notes.push(e);level=Math.max(level,e.velocity*smooth(dt/.085));}
   else if(time-e.end<tail)level=Math.max(level,e.velocity*(1-smooth((time-e.end)/tail)));
  }
- const activity=smooth(level*1.65)*(.35+.65*source.energy);
+ const activity=part.modelIntervals&&source.energy<=.12?0:smooth(level*1.65)*(.35+.65*source.energy);
  return {...empty,notes,activity,energy:source.energy,attack:clamp(attack*1.8),notePulse:clamp(level*1.65)};
 }
 export function sampleBandEnsemble(score,parts,time,focus=null){
@@ -88,6 +102,12 @@ export function sampleBandEnsemble(score,parts,time,focus=null){
  const samples=parts.map(p=>sampleBandPart(p,frame.time,frame,score?.duration||0));
  const sectionIndex=score?.sections.indexOf(frame.section)??-1;
  const leaderAt=index=>{let winner=-1,best=0;const source=score?.sections[index]?.lead;
+  if(score?.hybrid){const desired=score.sections[index]?.leadInstrument;
+   for(let i=0;i<parts.length;i++){const p=parts[i],matches=p.instrumentId===desired||(desired==='bass'&&p.instrumentId==='tuba')||(desired==='piano'&&p.technique==='keys');
+    const weight=p.technique==='voice'?(score.stems.find(s=>s.id===p.stemId)?.envelope.filter(e=>score.sections[index]?.start<=e.time&&e.time<score.sections[index]?.end).reduce((n,e)=>n+e.value,0)||0):(p.sectionWeights[index]||0);
+    if(matches&&weight>best){best=weight;winner=i;}}
+   return winner;
+  }
   for(let i=0;i<parts.length;i++)if(parts[i].stemId===source){const weight=(parts[i].sectionWeights[index]||0)*(parts[i].technique==='voice'?1.25:parts[i].technique==='keys'?.72:1);if(weight>best){best=weight;winner=i;}}return winner;};
  let leadIndex=focus?parts.findIndex(p=>p.id===focus):leaderAt(sectionIndex);
  if(leadIndex>=0)samples[leadIndex].lead=true;

@@ -13,6 +13,7 @@
  */
 
 import { haptic } from './motion-adapter.js';
+import {focusLyricText} from './lu-perceptual-ui.js';
 import { AVATAR_MANIFEST } from '../../assets/live-avatars/manifest.js';
 
 const isReducedMotion = () => {
@@ -93,7 +94,7 @@ export class SlotTextLyricsEngine {
     }
     if (this.subLineEl) {
       const sub = (secondaryText && secondaryText !== activeText) ? secondaryText : '';
-      if (this.subLineEl.textContent !== sub) this.subLineEl.textContent = sub;
+      focusLyricText(this.subLineEl,sub);
       this.subLineEl.hidden = !sub;
       this.subLineEl.style.setProperty('--lyric-progress', `${(Math.max(0, Math.min(1, Number(progressInLine) || 0)) * 100).toFixed(1)}%`);
     }
@@ -109,6 +110,7 @@ export class SlotTextLyricsEngine {
     this.currentLineKey = lineKey;
     this.currentText = activeText || '';
     this.renderActiveLine(this.currentText, beatPeriod);
+    if(this.currentText&&!isReducedMotion()){const a=this.activeLineEl.animate([{opacity:.4,filter:'blur(2.5px)'},{opacity:1,filter:'blur(0px)'}],{duration:180,easing:'ease-out'});a.id='lu-lyric-focus';}
     this.updateProgress(progressInLine, characterCursor);
   }
 

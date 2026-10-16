@@ -8,14 +8,15 @@ export function parseBandLrc(text){
  }return lines.sort((a,b)=>a.time-b.time);
 }
 export function buildBandCues(score,lyrics=[]){
- const drums=score.stems.find(s=>s.id==='drums'),vocals=score.stems.find(s=>s.id==='vocals'),duration=score.duration;
+ const stems=score.hybrid?.originalStems||score.stems;
+ const drums=stems.find(s=>s.id==='drums'),vocals=stems.find(s=>s.id==='vocals'),duration=score.duration;
  const usable=lyrics.filter(l=>l.time<duration&&!/前奏|间奏|器乐|无人声|intro|instrumental|outro/i.test(l.text));
  const normal=l=>l.text.toLowerCase().replace(/[\p{P}\p{Z}\s]/gu,''),groups=new Map();
  for(const l of usable){const text=normal(l);if(text.length<6)continue;if(!groups.has(text))groups.set(text,[]);groups.get(text).push(l.time);}
  const repeats=usable.filter(l=>groups.get(normal(l))?.some(t=>Math.abs(t-l.time)>18));
  const energy=(stem,start,end)=>mean((stem?.envelope||[]).filter(p=>p.time>=start&&p.time<end).map(p=>p.value));
  const windows=[];
- for(let t=0;t<duration;t+=2){const end=Math.min(duration,t+8),drumEnergy=energy(drums,t,end),voice=energy(vocals,t,end),total=mean(score.stems.map(s=>energy(s,t,end)));
+ for(let t=0;t<duration;t+=2){const end=Math.min(duration,t+8),drumEnergy=energy(drums,t,end),voice=energy(vocals,t,end),total=mean(stems.map(s=>energy(s,t,end)));
   const onsets=(drums?.onsets||[]).filter(o=>o.time>=t&&o.time<end&&o.strength>.55),lines=usable.filter(l=>l.time>=t&&l.time<end),repeated=repeats.filter(l=>l.time>=t&&l.time<end);
   windows.push({start:t,end,total,drumEnergy,voice,density:onsets.length/(end-t),lines:lines.length,repeat:repeated.length});
  }
@@ -49,7 +50,7 @@ export function buildBandCues(score,lyrics=[]){
  return {source:choruses.length?'lrc-repetition-and-drum-onsets':'energy-fallback',choruses,segments,bursts,lyricLines:usable.length,repeatedLines:repeats.length};
 }
 export function computeVocalLineSpans(score,lyrics=[]){
- const vocals=score?.stems?.find(s=>s.id==='vocals'),env=vocals?.envelope||[],duration=Number(score?.duration)||240;
+ const vocals=(score?.hybrid?.originalStems||score?.stems)?.find(s=>s.id==='vocals'),env=vocals?.envelope||[],duration=Number(score?.duration)||240;
  return lyrics.map((line,index)=>{
   const start=Math.max(0,Number(line?.time)||0),nextTime=Math.max(start+.3,Number(lyrics[index+1]?.time??duration));
   if(/前奏|间奏|尾奏|器乐|无人声|intro|instrumental|outro/i.test(line?.text||''))return {vocalStart:start,end:nextTime};

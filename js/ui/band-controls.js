@@ -1,6 +1,15 @@
 import {bandRoster,BAND_TECHNIQUES} from '../audio/band-parts.js';
 import {BAND_FORMATIONS} from '../audio/band-layout.js';
 import {BAND_PRESETS,BAND_FIELDS,normalizeBandSettings,settingsForMember,saveBandSettings} from './band-settings.js';
+import {songBindingSummary} from '../audio/band-song-parts.js';
+
+export function createPyroSoundToggle(host,{settings,onChange,storageKey='lu_band_v2'}) {
+ const button=document.createElement('button');button.type='button';button.className='lu-band-pyro-toggle';
+ button.setAttribute('aria-label','焰火音效');host.append(button);
+ function render(){const value=String(settings.pyroSound!==false);if(button.getAttribute('aria-pressed')!==value){button.setAttribute('aria-pressed',value);button.textContent=`焰火音效 ${value==='true'?'开':'关'}`;}}
+ button.addEventListener('click',()=>{settings.pyroSound=settings.pyroSound===false;saveBandSettings(settings,storageKey);render();onChange?.();});render();
+ return {button,render,dispose(){button.remove();}};
+}
 
 export function createBandControls(host,{settings,getTheme,getScore,onChange,onFocus,onListen=null,storageKey='lu_band_v2'}){
  host.classList.add('band-v2-controls');
@@ -8,7 +17,8 @@ export function createBandControls(host,{settings,getTheme,getScore,onChange,onF
   <label>队形<select data-control="formation" aria-label="乐队队形"><option value="auto">自动编排</option></select></label>
   <label>灯光<select data-control="lightMode" aria-label="乐队聚光调度"><option value="follow">单灯主奏</option><option value="move">人入光 · 追光</option><option value="multi">多灯合奏</option></select></label>
   <label>高潮点缀<select data-control="effects" aria-label="高潮点缀"><option value="auto">随音乐</option><option value="off">关闭</option><option value="preview">预览气泡与烟花</option></select></label>
-  <label data-listen-controls hidden>声部试听<select data-control="listen" aria-label="声部试听"><option value="mix">完整混音</option></select><small data-listen-status aria-live="polite"></small></label>
+  <label data-listen-controls hidden>声部校验试听<select data-control="listen" aria-label="声部试听"><option value="mix">完整混音</option></select><small data-listen-status aria-live="polite"></small></label>
+  <a href="./band-review.html">逐曲声部校验 ↗</a>
   <a href="./band-study.html">独立预览 ↗</a></div>
  <div class="lu-band-members" data-members aria-label="乐队成员视觉聚焦"></div>
  <p class="lu-band-detail" data-part-detail></p>
@@ -45,6 +55,8 @@ export function createBandControls(host,{settings,getTheme,getScore,onChange,onF
   for(const key of ['formation','lightMode','effects','preset'])find(key).value=settings[key];find('contrast').checked=settings.contrast;find('target').value=target;
   const custom=settings.overrides[target]||{};find('stem').value=custom.stem||'';find('technique').value=custom.technique||'';
   host.querySelector('[data-source-controls]').hidden=!target;
+  find('stem').disabled=disabled||getScore()?.source!=='demo';find('technique').disabled=disabled||getScore()?.source!=='demo';
+  host.querySelector('[data-edit-note]').textContent=getScore()?.source==='demo'?'演示可自由编配；成员微调覆盖全队设置。':'实际歌曲按逐曲核验绑定声部；成员微调只改变外观和动作幅度。';
   host.querySelector('[data-action="reset"]').textContent=target?'还原此成员':'还原全队预设';
   const name=bandRoster(getTheme()).find(r=>r.id===target)?.name;
   host.querySelector('[data-adjustment-summary]').textContent=name?`${name}${Object.keys(custom).length?' · 已微调':''}`:BAND_PRESETS[settings.preset].label;
@@ -53,8 +65,8 @@ export function createBandControls(host,{settings,getTheme,getScore,onChange,onF
  function renderDetail(){
   const part=parts.find(p=>p.id===focus),role=bandRoster(getTheme()).find(r=>r.id===focus);
   host.querySelector('[data-part-detail]').textContent=part?
-   `${role.name} · ${role.instrument} · ${part.sourceLabel}${part.shared&&part.stemId!=='other'?' · 共享音轨':''} · 视觉聚焦不改变音频`:
-   `${bandRoster(getTheme()).length} 位成员 · 分谱按乐器编配 · 音轨来源保留独立／共享标识`;
+   `${role.name} · ${getScore()?.source==='demo'?role.instrument:part.label} · ${part.sourceLabel}${part.shared&&part.stemId!=='other'?' · 共享音轨':''} · 视觉聚焦不改变音频`:
+   `${bandRoster(getTheme()).length} 位成员 · ${getScore()?.source==='demo'?'演示编配':songBindingSummary(getScore()).reason}`;
  }
  function rebuildMembers(){
   const roster=bandRoster(getTheme());theme=getTheme();membersHost.replaceChildren();find('target').replaceChildren(new Option('全队',''));
@@ -72,7 +84,10 @@ export function createBandControls(host,{settings,getTheme,getScore,onChange,onF
   const score=getScore(),sourceKey=(score?.trackId||score?.source||'pending')+'|'+getTheme()+'|'+(score?.stems.map(s=>s.id).join(',')||'');
   if(lastSourceKey!==sourceKey){lastSourceKey=sourceKey;++listenRevision;host.querySelector('[data-listen-status]').textContent='';find('stem').replaceChildren(new Option('按乐器编配',''));
    find('listen').replaceChildren(new Option('完整混音','mix'));for(const stem of score?.stems||[]){find('stem').append(new Option(stem.label,stem.id));if(stem.audio)find('listen').append(new Option(stem.label,stem.id));}}
-  find('listen').disabled=disabled||score?.source!=='analysis';
+ find('listen').disabled=disabled||score?.source!=='analysis';
+ for(const button of membersHost.querySelectorAll('[data-member]')){
+  const part=parts.find(p=>p.id===button.dataset.member);if(part)button.title=getScore()?.source==='demo'?part.instrument:`${part.label} · ${part.sourceLabel}`;
+ }
   renderEditor();renderDetail();
  }
  membersHost.addEventListener('click',event=>{const button=event.target.closest('button[data-member]');if(button&&!disabled)setFocus(button.dataset.member);});
