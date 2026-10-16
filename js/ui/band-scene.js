@@ -77,7 +77,8 @@ export async function createBandScene(container,{safeTop=0,safeBottom=15,cubeDes
    const reflection=new THREE.Mesh(new THREE.PlaneGeometry(1,1),reflectionMaterial);group.add(reflection);
    const shadow=new THREE.Mesh(new THREE.PlaneGeometry(2.4,1.4),new THREE.MeshBasicMaterial({map:haloTexture,color:'#08111f',transparent:true,opacity:.48,depthWrite:false}));shadow.rotation.x=-Math.PI/2;shadow.position.y=.05;group.add(shadow);
    const labelTexture=labelFor(role),label=new THREE.Sprite(new THREE.SpriteMaterial({map:labelTexture,transparent:true,depthWrite:false,toneMapped:false}));label.scale.set(2.3,.38,1);group.add(label);
-   const wings=['vocals','guitar'].includes(role.instrumentKind)?createEnergyWings(group,{samples:144,compactSamples:96}):null;
+   // The roster starts with the singer and the two front-line partners in every theme.
+   const wings=i<3?createEnergyWings(group,{samples:144,compactSamples:96}):null;
    return {role,pet,group,body,art,reflection,shadow,label,labelTexture,texture,wings,frame:0,sample:null,pose:null};
   });
   resize();await theatre.setTheme(theme);if(active)render();
@@ -117,7 +118,8 @@ export async function createBandScene(container,{safeTop=0,safeBottom=15,cubeDes
   const fx=effectsFrame||stageEffectsAt(score,frame.time,settings.effects||'auto',reduced?null:easterEgg);
   const wingState=particleWingState(score,frame.time,{mode:settings.effects,reduced});
   const lighting=stageLightingAt(score,frame.time,fx,reduced);
-  const wingFocus=members.some((m,i)=>m.wings&&!frame.parts[i]?.userMuted&&(parts[i]?.events?.length||score?.source==='demo'))?wingState.power:0;
+  // Climax wings are stage decoration; recorded vocals correctly have no MIDI events.
+  const wingFocus=members.some((m,i)=>m.wings&&!frame.parts[i]?.userMuted)?wingState.power:0;
   lighting.flash=(lighting.flash||0)*(1-wingFocus*.6);
   fill.intensity=2.1+(lighting.flash||0)*.9;fill.color.set('#ffe8ce').lerp(new THREE.Color('#ffcc82'),(lighting.flash||0)*.45);renderer.toneMappingExposure=1+(lighting.flash||0)*.16;
   const nextKey=cubeDesign?.getKey?.()||designKey;if(nextKey!==designKey){designKey=nextKey;theatre.refreshMaterial();}
@@ -152,7 +154,7 @@ export async function createBandScene(container,{safeTop=0,safeBottom=15,cubeDes
   });
   scene.updateMatrixWorld(true);camera.updateMatrixWorld(true);
   const occluders=wingState.power>.005?members.map(m=>{const box=new THREE.Box3().setFromObject(m.body),points=[];for(const x of [box.min.x,box.max.x])for(const y of [box.min.y,box.max.y])for(const z of [box.min.z,box.max.z])points.push(new THREE.Vector3(x,y,z).project(camera));return {left:Math.min(...points.map(p=>p.x)),right:Math.max(...points.map(p=>p.x)),bottom:Math.min(...points.map(p=>p.y)),top:Math.max(...points.map(p=>p.y))};}):[];
-  members.forEach((m,i)=>m.wings?.update({time:frame.time,state:(!m.sample?.userMuted&&(parts[i]?.events?.length||score?.source==='demo'))?wingState:{power:0},narrow,height:m.art.scale.y,body:m.body,art:m.art,shoulder:energyWingAttachment(m.role.id),occluders:occluders.filter((_,j)=>j!==i)}));
+  members.forEach((m,i)=>m.wings?.update({time:frame.time,state:!m.sample?.userMuted?wingState:{power:0},narrow,height:m.art.scale.y,body:m.body,art:m.art,shoulder:energyWingAttachment(m.role.id),occluders:occluders.filter((_,j)=>j!==i)}));
   lighting.wingPower=wingFocus;
   lighting.wingZones=members.filter(m=>m.wings?.mesh.visible).map(m=>{
    const mesh=m.wings.mesh,points=[];mesh.updateWorldMatrix(true,false);
