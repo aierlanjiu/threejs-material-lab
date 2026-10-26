@@ -6,6 +6,9 @@
   <link rel="icon" type="image/png" href="./assets/lu-core-emblem.png" />
   <link rel="apple-touch-icon" href="./assets/lu-core-emblem.png" />
   <title>『 律 』LÜ - 3D 物理材质与全变量声波共振工作台</title>
+  <script type="importmap">
+    {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.166.1/+esm"}}
+  </script>
   <style>
     @font-face {
       font-family: "TsangerJinKai02";
@@ -3594,7 +3597,7 @@ BEAT</textarea>
   </div>
 </div>
 <script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.166.1/+esm';
+import * as THREE from 'three';
 import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/controls/OrbitControls.js/+esm';
 import { RoomEnvironment } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/environments/RoomEnvironment.js/+esm';
 import { RoundedBoxGeometry } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/geometries/RoundedBoxGeometry.js/+esm';
@@ -3610,7 +3613,7 @@ import { createBandController } from './js/ui/band-controller.js';
 import { createProceduralBandLog } from './js/audio/band-procedural.js';
 import { createBandMixer } from './js/audio/band-mixer.js';
 import {perceptualLevel} from './js/ui/perceptual-math.js';
-import {installPerceptualUI} from './js/ui/lu-perceptual-ui.js';
+import {installPerceptualUI,runStageViewTransition} from './js/ui/lu-perceptual-ui.js';
 queueMicrotask(()=>{const cleanup=installPerceptualUI({isPlaying:()=>state.isPlayingMusic});window.addEventListener('pagehide',cleanup,{once:true});});
 import { applySurfaceContent } from './js/ui/cube-surface.js';
 let bandController = null;
@@ -10251,13 +10254,13 @@ if (typeof kineticLyricsManager !== 'undefined' && kineticLyricsManager) {
       syncContentPresentationControls();
     },
     canChangeMode: () => !state.isRecording,
-    onModeChange: mode => {
+    onModeChange: mode => runStageViewTransition(() => {
       bandController?.setEnabled(mode === 'band');
       syncModeControlAvailability();
       syncContentPresentationControls();
       rebuildMatrix();
       updateAppleModeUI(mode);
-    },
+    }),
     onGravityEnter: () => {
       pendingFrameDistance = null;
       focusBreath = null;

@@ -1191,7 +1191,26 @@ html.lu-perceptual-ui[data-lu-input-modality="keyboard"] :is(#performanceCapsule
   }
 }
 
+@keyframes lu-stage-mode-enter {
+  from { opacity: .58; }
+  to { opacity: 1; }
+}
+/* Keep the existing system-motion opt-in below the core capsule's hit area. */
+body.poster-mode .stage-hud-left:has(#motionPreferenceBtn:not([hidden])) {
+  top: 76px !important;
+  left: 16px !important;
+}
+body.poster-mode #motionPreferenceBtn { max-width: calc(100vw - 32px); }
+body.lu-mode-transitioning .lu-band-scene,
+body.lu-mode-transitioning #stage > canvas,
+body.lu-mode-transitioning #canvas-container {
+  animation: lu-stage-mode-enter 260ms cubic-bezier(.16,1,.3,1);
+}
+
 @media (prefers-reduced-motion: reduce) {
+  body.lu-mode-transitioning .lu-band-scene,
+  body.lu-mode-transitioning #stage > canvas,
+  body.lu-mode-transitioning #canvas-container { animation: none; }
   .lu-lyric-focusing,
   .lu-track-sheen,
   .lu-perceptual-ui #luAppleOrbBtn::after {

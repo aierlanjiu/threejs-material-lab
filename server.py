@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-弈律 · 本地 HTTP 服务 (带 SharedArrayBuffer 所需 COOP / COEP 响应头)
+律 / 荔 · 本地 HTTP 服务与伴侣语音接口
 """
 import http.server
 import socketserver
@@ -72,8 +72,8 @@ def run_server(port=PORT):
     socketserver.TCPServer.allow_reuse_address = True
     with socketserver.ThreadingTCPServer(("", port), COOPCOEPRequestHandler) as httpd:
         print(f"=========================================================")
-        print(f"  弈律 3D 中国象棋 本地服务已启动")
-        print(f"  URL: http://localhost:{port}/xiangqi.html")
+        print(f"  律 / 荔 本地服务已启动")
+        print(f"  URL: http://localhost:{port}/index.html")
         print(f"  COOP: same-origin | COEP: require-corp (WASM 多线程已启用)")
         print(f"=========================================================")
         try:

@@ -11,7 +11,63 @@ export async function verifiedAudio(ctx, item, signal) {
 
 export function createBandSamplePlayer(ctx,output){
   let parts=[],banks=null,buffers=new Map(),timer=null,transport=null,scheduled=0;
-  const voices=new Set(),buses=new Map(),cursors=new Map();
+  const voices=new Set(),buses=new Map(),cursors=new Map(),spatialNodes=new Map(),spatialState=new Map();
+  function setAudioParam(param,value){
+    if(!param||!Number.isFinite(value))return;
+    const now=ctx?.currentTime||0;
+    if(ctx?.state==='running'&&typeof param.setTargetAtTime==='function'){
+      if(typeof param.cancelAndHoldAtTime==='function')param.cancelAndHoldAtTime(now);
+      else param.cancelScheduledValues?.(now);
+      param.setTargetAtTime(value,now,.024);
+    }else{
+      param.cancelScheduledValues?.(now);
+      param.setValueAtTime?.(value,now);
+      param.value=value;
+    }
+  }
+  function applyNodeSpatial(id,sp){
+    const chain=spatialNodes.get(id);if(!chain||!sp)return;
+    setAudioParam(chain.depth?.gain,sp.depthGain??1);
+    if(chain.shelf)setAudioParam(chain.shelf.gain,sp.shelfDb??0);
+    if(chain.panner)setAudioParam(chain.panner.pan,sp.pan??0);
+  }
+  function createSpatialBus(id){
+    const bus=ctx.createGain();bus.gain.value=0;
+    const depth=ctx.createGain();depth.gain.value=1;
+    const shelf=typeof ctx.createBiquadFilter==='function'?ctx.createBiquadFilter():null;
+    if(shelf){shelf.type='highshelf';shelf.frequency.value=3200;shelf.gain.value=0;}
+    const warm=typeof ctx.createBiquadFilter==='function'?ctx.createBiquadFilter():null;
+    if(warm){warm.type='lowpass';warm.frequency.value=8600;warm.Q.value=.707;}
+    const panner=typeof ctx.createStereoPanner==='function'?ctx.createStereoPanner():null;
+    if(panner)panner.pan.value=0;
+    bus.connect(depth);
+    let tail=depth;
+    if(shelf){tail.connect(shelf);tail=shelf;}
+    if(warm){tail.connect(warm);tail=warm;}
+    if(panner){tail.connect(panner);tail=panner;}
+    tail.connect(output);
+    buses.set(id,bus);
+    spatialNodes.set(id,{bus,depth,shelf,warm,panner});
+    const sp=spatialState.get(id)||{xNorm:0,zNorm:.5,pan:0,depthGain:1,shelfDb:0};
+    spatialState.set(id,sp);
+    applyNodeSpatial(id,sp);
+  }
+  function disconnectBuses(){
+    for(const chain of spatialNodes.values()){
+      try{chain.bus.disconnect();chain.depth.disconnect();chain.shelf?.disconnect();chain.warm?.disconnect();chain.panner?.disconnect();}catch{}
+    }
+    for(const bus of buses.values()){try{bus.disconnect();}catch{}}
+    spatialNodes.clear();buses.clear();
+  }
+  function setSpatial(map={}){
+    if(!map||typeof map!=='object')return;
+    for(const [id,sp] of Object.entries(map)){
+      if(!sp||typeof sp!=='object')continue;
+      const next={xNorm:sp.xNorm??0,zNorm:sp.zNorm??.5,pan:sp.pan??0,depthGain:sp.depthGain??1,shelfDb:sp.shelfDb??0,memberId:sp.memberId||null};
+      spatialState.set(id,next);
+      applyNodeSpatial(id,next);
+    }
+  }
   function stop(){
     clearInterval(timer);timer=null;transport=null;cursors.clear();
     for(const voice of voices){try{voice.source.stop();}catch{}voice.source.disconnect();voice.gain.disconnect();}
@@ -55,12 +111,12 @@ export function createBandSamplePlayer(ctx,output){
   }
   return {
     async configure(score,theme,signal){
-      stop();for(const bus of buses.values())bus.disconnect();buses.clear();buffers.clear();
+      stop();disconnectBuses();buffers.clear();
       const response=await fetch(score.hybrid.bankManifest,{signal});if(!response.ok)throw new Error('乐器音色清单无法读取');banks=await response.json();
       const ids=new Set(score.arrangement.themes[theme].map(p=>p.stemId));
       parts=score.stems.filter(p=>ids.has(p.id)&&p.instrumentId!=='vocals');
       const needed=new Map();
-      for(const part of parts){const bus=ctx.createGain();bus.gain.value=0;bus.connect(output);buses.set(part.id,bus);
+      for(const part of parts){createSpatialBus(part.id);
         for(const e of part.events){const sample=sampleFor(part,e.midi);needed.set(sample.audio,sample);}}
       // Bound decode pressure instead of starting hundreds of decoders together.
       const queue=[...needed.values()];let next=0;
@@ -72,8 +128,9 @@ export function createBandSamplePlayer(ctx,output){
         cursors.set(part.id,{index,cycle:0});}
       pump();timer=setInterval(()=>pump(),40);
     },
+    setSpatial,
     get buses(){return buses;},pump,stop,
-    get diagnostics(){return {scheduled,activeVoices:voices.size,decodedSamples:buffers.size,running:Boolean(transport)};},
-    dispose(){stop();for(const bus of buses.values())bus.disconnect();buses.clear();buffers.clear();}
+    get diagnostics(){return {scheduled,activeVoices:voices.size,decodedSamples:buffers.size,running:Boolean(transport),spatial:Object.fromEntries(spatialState)};},
+    dispose(){stop();disconnectBuses();buffers.clear();spatialState.clear();}
   };
 }

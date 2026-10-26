@@ -3,6 +3,17 @@ import {haptic} from './motion-adapter.js';
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 const hermit = t => t * t * (3 - 2 * t);
+let stageTransitionTimer=0;
+export function runStageViewTransition(callback) {
+  // Engine state and DOM mutations must finish before this function returns.
+  const result=callback();
+  const disabled=new URLSearchParams(location.search).get('transitions');
+  if(reduced.matches||['off','0'].includes(disabled)||/(?:^|;\s*)lu_transitions=(?:off|0)(?:;|$)/.test(document.cookie)||document.documentElement.dataset.luInputModality==='keyboard')return result;
+  if(!document.body.classList.contains('lu-mode-transitioning'))document.body.classList.add('lu-mode-transitioning');
+  clearTimeout(stageTransitionTimer);stageTransitionTimer=setTimeout(()=>document.body.classList.remove('lu-mode-transitioning'),280);
+  return result;
+}
+window.luRunStageTransition=runStageViewTransition;
 
 function spring(initial, draw, parameters = SPRINGS.panel) {
   let state = {value: initial, velocity: 0}, target = initial, frame = 0, last = 0;

@@ -8,7 +8,7 @@
 
 ## 🌟 项目双旗舰架构
 
-本项目为纯前端轻量 WebGL / Three.js 架构，包含两大旗舰体验与一套衍生棋局：
+本项目为纯前端轻量 WebGL / Three.js 架构，包含两大旗舰体验：
 
 1. 🌰 **『 荔 』(LI) · 暖光藏品伴侣室 (`mascot_studio.html`)**：
    - 具身 3D 萌系潮玩伴侣（荔小卫 / 荔小星）
@@ -19,8 +19,6 @@
    - 统摄音频实时 FFT 频谱分析与声波频率律动（6 大声波物理矩阵形态）
    - 12 款纯净 PBR 物理材质（色散、IOR、体积衰减吸收、各向异性真丝）
    - 3D 激光内雕、活体表情注视跟随、编排运镜导演与 60FPS 母带录制直出 MP4
-3. ♟️ **『 弈律 』· 3D 中国象棋 (`xiangqi.html`)**：
-   - 复用 LÜ 物理材质与影棚柔光的东方藏品级 3D 象棋对弈引擎
 
 ---
 
@@ -110,7 +108,6 @@
 - 🌰 **『 荔 』(LI) · 暖光藏品伴侣室**：[https://aierlanjiu.github.io/threejs-material-lab/mascot_studio.html](https://aierlanjiu.github.io/threejs-material-lab/mascot_studio.html)
   - 极简短链入口：[https://aierlanjiu.github.io/threejs-material-lab/li.html](https://aierlanjiu.github.io/threejs-material-lab/li.html)
 - 💎 **『 律 』(LÜ) · 3D 物理材质与声波共振工作台**：[https://aierlanjiu.github.io/threejs-material-lab/](https://aierlanjiu.github.io/threejs-material-lab/)
-- ♟️ **『 弈律 』· 3D 中国象棋**：[https://aierlanjiu.github.io/threejs-material-lab/xiangqi.html](https://aierlanjiu.github.io/threejs-material-lab/xiangqi.html)
 
 ---
 
@@ -159,3 +156,9 @@ python3 -m http.server 8089
 - **Web Audio API** / AnalyserNode (实时 FFT 声波特征提取与参数联动)
 - **MediaRecorder** / WebCodecs / MP4 muxer (60FPS 母带录制直出)
 - **Design System** / Studio Bauhaus Light / Translucent Milk-Glass / Full SVG Vector Suite
+
+## 开发与测试
+
+`npm start` 启动律／荔的本地服务；`npm test` 执行 14 项乐队回归，测试输入随源码保存；`npm run check` 检查关键模块语法并执行乐队测试。
+
+启动本地服务后可用 `npm run test:e2e` 运行律的浏览器回归。浏览器及网络环境需能访问页面使用的 Three.js CDN。
