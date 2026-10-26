@@ -8,6 +8,8 @@ try {
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('http://localhost:8000/index.html?intro=skip', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => Boolean(window.luDiagnostics && window.state?.bgImageTexture));
+  await page.waitForFunction(() => Boolean(window.luBand && window.luApplePlayer));
+  await page.evaluate(() => kineticLyricsManager.setMode('slot'));
 
   const capsule = page.locator('#performanceCapsule');
   const originalWidth = await capsule.evaluate(element => element.getBoundingClientRect().width);
@@ -43,10 +45,10 @@ try {
   await page.locator('#lueTabChoreo').click();
   const geometry = await page.evaluate(() => {
     const drawer = document.querySelector('#lueCoreDrawer').getBoundingClientRect();
-    const lyric = document.querySelector('#cubeLyricsDeck').getBoundingClientRect();
+    const lyric = document.querySelector('.cube-lyrics-deck').getBoundingClientRect();
     return { drawerHeight: drawer.height, viewportHeight: innerHeight, drawerBottom: drawer.bottom, lyricTop: lyric.top };
   });
-  assert(geometry.drawerHeight / geometry.viewportHeight <= .35, 'mobile drawer exceeds 35dvh');
+  assert(geometry.drawerHeight <= Math.min(520, geometry.viewportHeight - 120), 'mobile drawer exceeds the current safe height');
   assert(geometry.drawerBottom <= geometry.lyricTop, 'drawer covers the lyric rail');
   await page.locator('#wavePatternGroup [data-pattern="heartbeat"]').click();
   assert.equal(await page.locator('#wavePatternGroup [data-pattern="heartbeat"]').getAttribute('aria-pressed'), 'true');

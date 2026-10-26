@@ -3,11 +3,11 @@
 //   (2) 可重抽——换种子后排布必须真的变了
 //   (3) 清空后不留残影
 // 用法: node test/lu/album-blindbox.test.js
-// 依赖: 已在 127.0.0.1:8099 提供 index.html 的静态服务 (可用 LU_URL 覆盖)
+// 依赖: 已在 localhost:8000 提供 index.html 的静态服务 (可用 LU_URL 覆盖)
 import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
 
-const BASE = process.env.LU_URL || 'http://127.0.0.1:8099/';
+const BASE = process.env.LU_URL || 'http://localhost:8000/';
 
 // 在页面内造 N 张纯色 PNG，直接塞进 input.files，避免依赖磁盘素材
 const makeAlbum = async ({ count }) => {
@@ -109,6 +109,8 @@ const run = async () => {
   await page.goto(BASE + 'index.html?intro=skip', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.luDiagnostics && window.state
     && window.luDiagnostics.matrixGroup && window.luDiagnostics.matrixGroup.children.length > 0, { timeout: 30000 });
+  await page.waitForFunction(() => window.luBand && window.luApplePlayer);
+  await page.evaluate(() => kineticLyricsManager.setMode('slot'));
   // 刻意不启用 CDP 虚拟时钟：createImageBitmap 在 'advance' 策略下不会 resolve，
   // 会让整个导入流程静默挂死（本测试初版就是这样超时的）。全程走真实时钟。
 

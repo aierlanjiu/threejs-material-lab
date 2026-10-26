@@ -10,6 +10,8 @@ try {
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('http://localhost:8000/index.html?intro=skip', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => Boolean(window.luDiagnostics));
+  await page.waitForFunction(() => Boolean(window.luBand && window.luApplePlayer));
+  await page.evaluate(() => kineticLyricsManager.setMode('slot'));
 
   assert.equal(await page.locator('.kinetic-mode-btn[data-mode="slot"]').getAttribute('aria-checked'), 'true');
 
@@ -33,7 +35,7 @@ try {
   // 切换演出面 -> 进入沉浸模式 -> 点击极简胶囊退出
   await page.locator('#lueTabChoreo').click();
   await page.locator('#immersiveToggle').click();
-  await page.waitForFunction(() => document.body.classList.contains('immersive'));
+  await page.waitForFunction(() => document.body.classList.contains('immersive') && document.querySelector('#performanceCapsuleLabel')?.textContent === '退出沉浸');
   assert.equal(await page.locator('#performanceCapsuleLabel').innerText(), '退出沉浸');
   assert.equal(await page.locator('#stageHudLeft').isVisible(), false);
   await page.waitForTimeout(200);

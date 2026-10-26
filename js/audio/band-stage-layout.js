@@ -1,5 +1,46 @@
 // Stage geometry and animation derive from the song clock, including after a seek.
+import {bandBeatAt} from './band-beat.js';
 const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+export const stageLimits=narrow=>({x:narrow?5.6:10.5,back:-3.7,front:narrow?6.3:8.1});
+export function spatialStageAt(x=0,z=0,narrow=false){
+ const l=stageLimits(narrow),xNorm=clamp((Number(x)||0)/l.x,-1,1);
+ const zNorm=clamp(((Number(z)||0)-l.back)/Math.max(.001,l.front-l.back),0,1);
+ const pan=Math.round(clamp(xNorm*.85,-.85,.85)*1000)/1000;
+ const depthGain=Math.round((.88+.24*zNorm)*1000)/1000;
+ const shelfDb=Math.round((-2.2+5*zNorm)*100)/100;
+ return {xNorm:Math.round(xNorm*1000)/1000,zNorm:Math.round(zNorm*1000)/1000,pan,depthGain,shelfDb};
+}
+export function spatialStemMap(members=[],parts=[],{narrow=false,draggingId=null,placedIds=[]}={}){
+ const placedOrder=Array.isArray(placedIds)?placedIds:[...placedIds],buckets=new Map();
+ members.forEach((m,i)=>{
+  const id=m.id||m.role?.id,pos=m.position||m.group?.position?.toArray?.()||[0,0,0];
+  const sp=m.spatial||spatialStageAt(pos[0],pos[2],narrow);
+  const part=parts.find(p=>p.id===id)||parts[i];
+  const keys=[...new Set([part?.stemId,part?.originalStemId,id].filter(Boolean))];
+  const placedIdx=placedOrder.indexOf(id);
+  const weight=draggingId===id?200:placedIdx>=0?(20+placedIdx*12):(m.userMuted?.08:(.35+(m.activity||0)));
+  for(const key of keys){
+   const cur=buckets.get(key)||{w:0,xNorm:0,zNorm:0,pan:0,depthGain:0,shelfDb:0,memberId:id,maxW:-1};
+   cur.w+=weight;cur.xNorm+=sp.xNorm*weight;cur.zNorm+=sp.zNorm*weight;
+   cur.pan+=sp.pan*weight;cur.depthGain+=sp.depthGain*weight;cur.shelfDb+=sp.shelfDb*weight;
+   if(weight>=cur.maxW){cur.maxW=weight;cur.memberId=id;}
+   buckets.set(key,cur);
+  }
+ });
+ const result={};
+ for(const [key,b] of buckets){
+  const inv=1/Math.max(.0001,b.w);
+  result[key]={
+   xNorm:Math.round(b.xNorm*inv*1000)/1000,
+   zNorm:Math.round(b.zNorm*inv*1000)/1000,
+   pan:Math.round(clamp(b.pan*inv,-.85,.85)*1000)/1000,
+   depthGain:Math.round(clamp(b.depthGain*inv,.82,1.18)*1000)/1000,
+   shelfDb:Math.round(clamp(b.shelfDb*inv,-3.5,4)*100)/100,
+   memberId:b.memberId
+  };
+ }
+ return result;
+}
 export const stageSpec=narrow=>narrow?
  {shape:'rectangular',levels:3,width:14.4,back:-5.2,front:7.1,step:1.08,fronts:[7.1,2.9,-1.3],widths:[14.4,13.6,12.8],rigHeight:13.2}:
  {shape:'semicircular',levels:4,width:28,back:-4.8,front:9.2,step:.72,radii:[14,10.4,6.8,3.2],rigHeight:9.5};
@@ -80,8 +121,10 @@ export function stageLightingAt(score,time,fx,reduced=false){
  const section=time<6?'intro':chorusView>.1?'chorus':'verse',verse=reduced?0:clamp((time-6)/4)*(1-chorusView);
  const stems=score?.hybrid?.originalStems||score?.stems;
  const drums=stems?.find(s=>s.id==='drums'||s.instrumentId==='drums'),bass=stems?.find(s=>s.id==='bass'||s.instrumentId==='bass');
- return {lift:reduced?.55:(.42+fx.energy*.34+climax*.24)*(.70+.30*opening)*(.55+.45*ending),climax,
+ const beat=bandBeatAt(score,time),beatPulse=reduced?0:beat.pulse,downbeat=reduced?0:beat.downbeat;
+ return {lift:reduced?.55:(.42+fx.energy*.34+climax*.24+downbeat*.06)*(.70+.30*opening)*(.55+.45*ending),climax,
   impact,flash:stagePyroAt(time,fx,false,reduced).flash,section,chorusView,verse,
+  beat:beatPulse,downbeat,beatPhase:reduced?0:beat.phase,beatIndex:beat.index,
   drums:reduced?0:stemAttackAt(drums,time),bass:reduced?0:Math.max(stemLevelAt(bass,time)*.65,stemAttackAt(bass,time)),
   cameraScale:reduced?1:1.012-verse*.018+chorusView*.04+Math.sin(time*.27)*.014,
   cameraShift:reduced?0:Math.sin(time*.14)*.38*(1-chorusView*.65),cameraLift:reduced?0:Math.sin(time*.11)*.13};

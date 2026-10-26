@@ -44,8 +44,9 @@ try {
     assert.match(plate, width <= 760 ? /lu-intro-d-one-piece-portrait\.png/ : /lu-intro-d-one-piece-wide\.png/,
       'the static D backdrop should match the viewport');
     assert.equal(await page.evaluate(() => window.luCubeIntro.backdropMode), 'static-image');
-    assert.equal(await page.locator('#luIntroOverlay canvas').count(), 1,
+    assert.equal(await page.locator('#luIntroOverlay canvas:not(.lu-intro-dither-canvas)').count(), 1,
       'the static backdrop must not create a second WebGL renderer');
+    assert.equal(await page.locator('.lu-intro-dither-canvas').evaluate(canvas => Boolean(canvas.getContext('2d'))), true, 'film grain must remain a 2D canvas');
     assert.deepEqual(await page.locator('#luIntroThemeSelect img').evaluateAll(images =>
       images.map(image => image.complete && image.naturalWidth > 0)), [true, true, true],
       'all three theme buttons need their theme-specific artwork');

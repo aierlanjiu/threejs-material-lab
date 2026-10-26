@@ -6,6 +6,9 @@
   <link rel="icon" type="image/png" href="./assets/lu-core-emblem.png" />
   <link rel="apple-touch-icon" href="./assets/lu-core-emblem.png" />
   <title>『 律 』LÜ - 3D 物理材质与全变量声波共振工作台</title>
+  <script type="importmap">
+    {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.166.1/+esm"}}
+  </script>
   <style>
     @font-face {
       font-family: "TsangerJinKai02";
@@ -3582,6 +3585,7 @@ BEAT</textarea>
       <button id="disclaimerClose" style="background:transparent; border:none; color:var(--muted,#9aa0aa); cursor:pointer; font-size:20px; padding:0 4px;">✕</button>
     </div>
     <div class="disclaimer-content" style="color:#dcd6cb;">
+      <p><a href="./assets/models/band-concert/credits.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">舞台模型作者与授权</a>：第三方模型独立适用各自许可证，不受下述非商业说明的额外限制。</p>
       <p style="margin-top:0;"><strong>1. 项目性质</strong><br>本项目（『 律 』LÜ / Three.js Material Lab）为个人非商业性质的 WebGL 3D 物理材质、音频流实时分析与动效呈现技术探索项目，旨在展示前端图形学与音频驱动视觉的交互实验。</p>
       <p><strong>2. 知识产权与版权归属</strong><br>站内所包含的所有动漫主题歌曲、原声音频片段、歌词原文与翻译、以及角色艺术设计等视听素材，其著作权与全部知识产权均归属于原作者、词曲创作者、唱片公司、出品委员会及动画制作方（包括但不限于东映动画、集英社、Pierrot、avex、Aniplex、Sony Music 等权利人）所有。</p>
       <p><strong>3. 严格禁止商业用途</strong><br>本项目代码与页面严禁用于任何形式的商业盈利、广告宣传或收费分发活动。所有音频及视觉资源仅供技术学习、代码交流与学术研究目的合理使用。</p>
@@ -3593,7 +3597,7 @@ BEAT</textarea>
   </div>
 </div>
 <script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.166.1/+esm';
+import * as THREE from 'three';
 import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/controls/OrbitControls.js/+esm';
 import { RoomEnvironment } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/environments/RoomEnvironment.js/+esm';
 import { RoundedBoxGeometry } from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/geometries/RoundedBoxGeometry.js/+esm';
@@ -3609,7 +3613,7 @@ import { createBandController } from './js/ui/band-controller.js';
 import { createProceduralBandLog } from './js/audio/band-procedural.js';
 import { createBandMixer } from './js/audio/band-mixer.js';
 import {perceptualLevel} from './js/ui/perceptual-math.js';
-import {installPerceptualUI} from './js/ui/lu-perceptual-ui.js';
+import {installPerceptualUI,runStageViewTransition} from './js/ui/lu-perceptual-ui.js';
 queueMicrotask(()=>{const cleanup=installPerceptualUI({isPlaying:()=>state.isPlayingMusic});window.addEventListener('pagehide',cleanup,{once:true});});
 import { applySurfaceContent } from './js/ui/cube-surface.js';
 let bandController = null;
@@ -10250,13 +10254,13 @@ if (typeof kineticLyricsManager !== 'undefined' && kineticLyricsManager) {
       syncContentPresentationControls();
     },
     canChangeMode: () => !state.isRecording,
-    onModeChange: mode => {
+    onModeChange: mode => runStageViewTransition(() => {
       bandController?.setEnabled(mode === 'band');
       syncModeControlAvailability();
       syncContentPresentationControls();
       rebuildMatrix();
       updateAppleModeUI(mode);
-    },
+    }),
     onGravityEnter: () => {
       pendingFrameDistance = null;
       focusBreath = null;

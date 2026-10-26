@@ -19,7 +19,7 @@ const physicsShader=`
   return vec3(direction.x*spread,direction.y*spread-willow*a*a,direction.z*spread);
  }
  vec3 coolingColor(float life){
-  vec3 hot=vec3(.94,.98,1.),gold=vec3(1.,.8235,.4784),copper=vec3(.8784,.3255,.1098),ember=vec3(.16,.022,.006);
+  vec3 hot=vec3(1.,1.,1.),gold=vec3(1.15,.88,.42),copper=vec3(.94,.38,.12),ember=vec3(.16,.022,.006);
   if(life<.18)return hot;
   if(life<.60)return mix(hot,gold,(life-.18)/.42);
   if(life<.85)return mix(gold,copper,(life-.60)/.25);
@@ -113,11 +113,11 @@ const fragmentShader=physicsShader+`
    float tail=exp(-p.x*p.x*22./(taper*taper))*smoothstep(0.,.20,vUv.y)*(1.-smoothstep(.75,.99,vUv.y));
    float head=starCore(p.x,vUv.y-.775,vAspect);
    float pop=step(.14,vGrain)*step(.72,fract(vSeed*.137))*smoothstep(.82,.84,vLife)*(1.-smoothstep(.94,.96,vLife))*pow(max(0.,sin(vLife*90.+vSeed)),16.);
-   color=mix(color,vec3(1.,.96,.84),pop*.85+vHot*.22);
-   color=mix(color,color*vec3(1.,.68,.40),clamp((.78-vUv.y)*.5,0.,.35));
-   alpha=(tail*.37+head*.92+head*pop*1.3)*vFade;
-  }else if(vKind<3.5){alpha=exp(-dot(p,p)*16.)*vFade;color=vec3(1.,.97,.87);}
-  else if(vKind<4.5){float taper=.12+.65*(1.-vUv.y);alpha=exp(-p.x*p.x*7./(taper*taper))*sin(vUv.y*3.14159265)*vFade*.55;}
+   color=mix(color,vec3(1.35,1.25,1.0),pop*.9+vHot*.35);
+   color=mix(color,color*vec3(1.1,.62,.30),clamp((.78-vUv.y)*.5,0.,.35));
+   alpha=(tail*.48+head*1.35+head*pop*2.0)*vFade*1.3;
+  }else if(vKind<3.5){alpha=exp(-dot(p,p)*16.)*vFade*1.35;color=vec3(1.4,1.3,1.1);}
+  else if(vKind<4.5){float taper=.12+.65*(1.-vUv.y);alpha=exp(-p.x*p.x*7./(taper*taper))*sin(vUv.y*3.14159265)*vFade*.75;}
   else{float fog=exp(-dot(p,p)*7.)*(.8+.2*sin(vUv.x*19.+vUv.y*13.+vSeed));alpha=fog*vFade;color=vec3(.94,.75,.47);}
   gl_FragColor=vec4(color,alpha);
  }`;

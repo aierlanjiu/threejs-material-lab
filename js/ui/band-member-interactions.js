@@ -4,6 +4,7 @@ export function createBandMemberInteractions(host, { onToggle, onSoloStart, onSo
   host.classList.add('lu-band-member-interactions');
 
   const hintEl = document.createElement('div');
+  const setClass = (el, name, value) => { if (el.classList.contains(name) !== value) el.classList.toggle(name, value); };
   hintEl.className = 'lu-pet-hint';
   hintEl.setAttribute('role', 'status');
   hintEl.textContent = '点按进退 · 按住独奏 · 拖动换位';
@@ -76,6 +77,7 @@ export function createBandMemberInteractions(host, { onToggle, onSoloStart, onSo
       const p = partsMap.get(id);
       if (p) {
         item.btn.setAttribute('aria-label', p.name || p.label || id);
+        item.lastAriaLabel = null;
         item.nameSpan.textContent = p.label || p.name || id;
       }
     }
@@ -304,7 +306,8 @@ export function createBandMemberInteractions(host, { onToggle, onSoloStart, onSo
     }
 
     currentView = { ...view, visible, enabled };
-    host.style.display = visible ? '' : 'none';
+    const display = visible ? '' : 'none';
+    if (host.style.display !== display) host.style.display = display;
 
     const members = view.members || [];
     const mutedIds = new Set(view.mutedIds || []);
@@ -336,7 +339,8 @@ export function createBandMemberInteractions(host, { onToggle, onSoloStart, onSo
 
       const { btn, nameSpan, statusSpan } = record;
       const part = partsMap.get(id);
-      nameSpan.textContent = part?.name || id;
+      const name = part?.name || id;
+      if (nameSpan.textContent !== name) nameSpan.textContent = name;
 
       const bounds = member.bounds || { left: -0.1, right: 0.1, top: 0.1, bottom: -0.1 };
       const pxLeft = ((bounds.left + 1) / 2) * hostW;
@@ -346,22 +350,22 @@ export function createBandMemberInteractions(host, { onToggle, onSoloStart, onSo
 
       const rawW = Math.abs(pxRight - pxLeft);
       const rawH = Math.abs(pxBottom - pxTop);
-      const btnW = Math.max(44, rawW);
-      const btnH = Math.max(44, rawH);
+      const halfPixel = value => Math.round(value * 2) / 2;
+      const btnW = halfPixel(Math.max(44, rawW));
+      const btnH = halfPixel(Math.max(44, rawH));
       const cx = (pxLeft + pxRight) / 2;
       const cy = (pxTop + pxBottom) / 2;
-      const btnLeft = cx - btnW / 2;
-      const btnTop = cy - btnH / 2;
+      const btnLeft = halfPixel(cx - btnW / 2);
+      const btnTop = halfPixel(cy - btnH / 2);
 
       const isClipped = btnLeft + btnW < 0 || btnLeft > hostW || btnTop + btnH < 0 || btnTop > hostH;
       if (isClipped) {
-        btn.classList.add('lu-pet-clipped');
+        setClass(btn, 'lu-pet-clipped', true);
       } else {
-        btn.classList.remove('lu-pet-clipped');
-        btn.style.left = `${btnLeft}px`;
-        btn.style.top = `${btnTop}px`;
-        btn.style.width = `${btnW}px`;
-        btn.style.height = `${btnH}px`;
+        setClass(btn, 'lu-pet-clipped', false);
+        for (const [key, prop, value] of [['lastLeft', 'left', btnLeft], ['lastTop', 'top', btnTop], ['lastW', 'width', btnW], ['lastH', 'height', btnH]]) {
+          if (record[key] !== value) { btn.style[prop] = `${value}px`; record[key] = value; }
+        }
       }
 
       const isMuted = mutedIds.has(id);
@@ -370,8 +374,9 @@ export function createBandMemberInteractions(host, { onToggle, onSoloStart, onSo
       const isAudible = isSolo || (!soloId && !isMuted);
       if(lastMuted.has(id) && !isMuted && !soloId && remainingBeats<=0) returned.set(id,performance.now()+1500);
 
-      btn.setAttribute('aria-pressed', isAudible ? 'true' : 'false');
-      btn.disabled = !enabled;
+      const pressed = isAudible ? 'true' : 'false';
+      if (record.lastPressed !== pressed) { btn.setAttribute('aria-pressed', pressed); record.lastPressed = pressed; }
+      if (record.lastDisabled !== !enabled) { btn.disabled = !enabled; record.lastDisabled = !enabled; }
 
       let statusText = '';
       let statusClass = '';
@@ -392,23 +397,21 @@ export function createBandMemberInteractions(host, { onToggle, onSoloStart, onSo
         }
       }
 
-      if (statusText) {
-        statusSpan.textContent = statusText;
-        statusSpan.className = `lu-pet-status ${statusClass}`;
-        statusSpan.style.display = '';
-      } else {
-        statusSpan.textContent = '';
-        statusSpan.style.display = 'none';
-      }
-
-      if(!statusText && (returned.get(id)||0)>performance.now()) {statusSpan.textContent='自动接回';statusSpan.style.display='';}
+      if (!statusText && (returned.get(id)||0)>performance.now()) statusText = '自动接回';
+      if (record.lastStatusText !== statusText) { statusSpan.textContent = statusText; record.lastStatusText = statusText; }
+      const nextStatusClass = `lu-pet-status${statusClass ? ' '+statusClass : ''}`;
+      if (record.lastStatusClass !== nextStatusClass) { statusSpan.className = nextStatusClass; record.lastStatusClass = nextStatusClass; }
+      const statusDisplay = statusText ? '' : 'none';
+      if (statusSpan.style.display !== statusDisplay) statusSpan.style.display = statusDisplay;
       const showBadge = Boolean(isSolo || isPending || isMuted || (returned.get(id)||0)>performance.now());
-      btn.classList.toggle('lu-pet-show-badge', showBadge);
+      setClass(btn, 'lu-pet-show-badge', showBadge);
       const label = statusSpan.textContent || (isAudible ? '已加入' : '休止');
-      btn.setAttribute('aria-label', `${part?.name || id} · ${part?.label || ''} · ${label}`);
+      const ariaLabel = `${part?.name || id} · ${part?.label || ''} · ${label}`;
+      if (record.lastAriaLabel !== ariaLabel) { btn.setAttribute('aria-label', ariaLabel); record.lastAriaLabel = ariaLabel; }
 
       const badgeLeft = Math.max(edge, Math.min(hostW - badgeWidth - edge, cx - badgeWidth / 2));
-      btn.style.setProperty('--pet-badge-left', `${badgeLeft + badgeWidth / 2 - btnLeft}px`);
+      const badgeOffset = halfPixel(badgeLeft + badgeWidth / 2 - btnLeft);
+      if (record.lastBadgeOffset !== badgeOffset) { btn.style.setProperty('--pet-badge-left', `${badgeOffset}px`); record.lastBadgeOffset = badgeOffset; }
       layouts.push({ id, btn, isClipped,
         left: btnLeft, right: btnLeft + btnW, top: btnTop, bottom: btnTop + btnH,
         badge: { left: badgeLeft, right: badgeLeft + badgeWidth, top: btnTop + btnH + badgeGap, bottom: btnTop + btnH + badgeGap + badgeHeight },
@@ -423,7 +426,7 @@ export function createBandMemberInteractions(host, { onToggle, onSoloStart, onSo
       const blocked = layout.isClipped || layout.badge.bottom > hostH - edge ||
         layouts.some(other => other.id !== layout.id && !other.isClipped && overlaps(layout.badge, other)) ||
         placed.some(other => overlaps(layout.badge, other));
-      layout.btn.classList.toggle('lu-pet-badge-blocked', blocked);
+      setClass(layout.btn, 'lu-pet-badge-blocked', blocked);
       if (!blocked && layout.showing) placed.push(layout.badge);
     }
     lastMuted=mutedIds;

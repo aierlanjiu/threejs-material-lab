@@ -5,6 +5,10 @@ const browser = await chromium.launch({ headless: true });
 try {
   const page = await browser.newPage();
   const errors = [];
+  const instrumentalTranslations = [];
+  page.on('request', request => {
+    if (request.url().endsWith('/anime_op_overtaken.zh.lrc')) instrumentalTranslations.push(request.url());
+  });
   page.on('pageerror', error => errors.push(error.message));
   await page.addInitScript(() => {
     window.requestAnimationFrame = callback => { if (callback.name === 'animate') window.luTestFrame = callback; return 1; };
@@ -19,6 +23,7 @@ try {
     });
   const result = await page.evaluate(async () => {
     const { loadLocalThemeTranslation } = await import('./js/audio/local-theme-library.js');
+    const instrumental = await loadLocalThemeTranslation('anime_op_overtaken', '[00:00.00]纯音乐');
     const translated = state.playlist.filter(t => t.translatedLyrics?.length);
     const rows = [];
     for (const track of translated) {
@@ -51,7 +56,7 @@ try {
     textarea.value = '[00:00.00]上一首的内容';
     playTrackAtIndex(state.playlist.findIndex(t => t.type === 'anime_op_one_day'));
     const oneDayAt60 = getSynchronizedLyricContext(60);
-    return { rows, mismatch, custom, oneDayActive: oneDayAt60.activeText, oneDayOrig: oneDayAt60.originalText, oneDayBilingual: oneDayAt60.bilingual, textarea: textarea.value,
+    return { rows, mismatch, instrumental, custom, oneDayActive: oneDayAt60.activeText, oneDayOrig: oneDayAt60.originalText, oneDayBilingual: oneDayAt60.bilingual, textarea: textarea.value,
       status: document.querySelector('#lyricsStatusBadge').textContent };
   });
   assert.equal(result.rows.reduce((n, t) => n + t.lines, 0), 337);
@@ -92,5 +97,7 @@ try {
   assert.match(languageControl.chineseSub, /ありったけ/);
   assert.ok(languageControl.builtin.every(text => /[\u4e00-\u9fff]/u.test(text)));
   assert.deepEqual(errors, []);
+  assert.equal(result.instrumental, '');
+  assert.deepEqual(instrumentalTranslations, [], 'Instrumental tracks must not request a translation asset');
   console.log('LÜ 337 translated lines across 9 vocal anime tracks (including One day), bilingual companion lines, and audio PASS', JSON.stringify({ ...result, audio, languageControl }));
 } finally { await browser.close(); }

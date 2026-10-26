@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>律 · 主题切换回归</title>
+<style>body{margin:24px;background:#0b1016;color:#f3eadb;font:14px/1.6 system-ui}button{min-height:44px;padding:0 16px;font:inherit}#stage{width:min(680px,90vw);height:420px;position:relative}canvas{width:100%;height:100%;display:block}pre{white-space:pre-wrap}</style>
+<h1>主题切换回归</h1>
+<p>复现 10 人主题保留第 10 位主奏的旧帧后切换到 9 人火影。检查真实 WebGL 场景和布景主题。</p>
+<button id="run">运行主题切换回归</button><pre id="result" role="status">就绪</pre><div id="stage"></div>
+<script type="module">
+import {createBandScene} from '../js/ui/band-scene.js';
+import {defaultBandSettings} from '../js/ui/band-settings.js';
+import {createBandDemoScore} from '../js/audio/band-timeline.js';
+import {compileBandParts,sampleBandEnsemble} from '../js/audio/band-parts.js';
+const host=document.getElementById('stage'),button=document.getElementById('run'),result=document.getElementById('result');
+let scene;
+button.onclick=async()=>{
+ button.disabled=true;result.textContent='运行中';
+ try{
+  scene?.dispose();host.replaceChildren();
+  scene=await createBandScene(host,{concertLook:'obsidian'});scene.setActive(true);
+  const score=createBandDemoScore(),settings=defaultBandSettings(),observed=[];
+  await scene.configure('one-piece');
+  const oldParts=compileBandParts(score,'one-piece'),oldFrame=sampleBandEnsemble(score,oldParts,6);
+  oldFrame.leadIndex=9;oldFrame.previousLeadIndex=9;oldFrame.nextLeadIndex=9;
+  scene.update(oldFrame,{settings,score,parts:oldParts});
+  // configure() resizes with the previous frame before applying the new backdrop.
+  for(const theme of ['naruto','dragon-ball','one-piece','naruto']){
+   await scene.configure(theme);
+   const parts=compileBandParts(score,theme),frame=sampleBandEnsemble(score,parts,6);
+   frame.leadIndex=9;frame.previousLeadIndex=9;frame.nextLeadIndex=9;
+   scene.update(frame,{settings,score,parts});
+   const d=scene.diagnostics;
+   if(d.theme!==theme||d.stage.props.theme!==theme)throw Error('角色与布景主题不一致');
+   if(d.petCount!==(theme==='naruto'?9:10))throw Error('角色数量改变');
+   observed.push({theme:d.theme,propsTheme:d.stage.props.theme,count:d.petCount});
+  }
+  result.textContent='PASS '+JSON.stringify(observed,null,2);
+ }catch(error){result.textContent='FAIL '+error.stack;}
+ finally{button.disabled=false;}
+};
+</script>
+</html>

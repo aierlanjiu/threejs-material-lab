@@ -249,3 +249,68 @@
     animation: none !important;
   }
 }
+
+/* Concert reading lane: original performers remain clear above the lyrics. */
+body.poster-mode.lu-band-mode #stageWrap .lu-band-lyric {
+  left: 16px;
+  right: 16px;
+  bottom: calc(4% + 8px) !important;
+  min-height: 40px;
+  margin: 0;
+  padding: 4px 8px;
+  justify-content: center;
+  gap: 4px;
+  background: none;
+  text-shadow: 0 2px 12px #0008;
+  transition: opacity 180ms ease;
+}
+body.lu-band-mode .lu-band-lyric-orig {
+  font-family: "TsangerJinKai02", "KaiTi", "PingFang SC", serif;
+  font-size: 22px;
+  line-height: 1.4;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--band-paper, #f3eadb);
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  filter: none;
+  text-wrap: balance;
+}
+body.lu-band-mode .lu-band-lyric-zh { font-size: 14px; line-height: 1.5; color: var(--band-muted, #b8b6b0); letter-spacing: 0; }
+body.lu-band-mode .lu-pet-hint {
+  bottom: 8px;
+  font-family: var(--band-ui-font);
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0;
+  color: var(--band-muted, #b8b6b0);
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  padding: 2px 8px;
+  transition: opacity 220ms ease;
+}
+body.lu-band-mode .lu-pet-hint.lu-pet-hint-fade { opacity: 0; }
+body.lu-band-mode .lu-band-pyro-toggle { color: var(--band-muted); background: #161c23e0; font: 12px var(--band-ui-font); box-shadow: inset 0 0 0 var(--lu-hairline, 1px) #f3eadb20; }
+body.lu-band-mode .lu-band-pyro-toggle:focus-visible { outline-color: var(--band-accent); }
+body.lu-band-mode .lu-band-controls :is(button, select),
+body.lu-band-mode .band-adjustments summary {
+  min-height: 44px;
+  font: 14px var(--band-ui-font);
+}
+body.lu-band-mode .lu-band-controls { color: var(--band-muted); font-family: var(--band-ui-font); }
+body.lu-band-mode .band-v2-controls .lu-band-detail { font-size: 12px; }
+@media (max-width: 760px) {
+  body.poster-mode.lu-band-mode #stageWrap .lu-band-lyric { min-height: 36px; left: 8px; right: 8px; padding-inline: 0; bottom: 12% !important; }
+  body.poster-mode.lu-band-mode #stageWrap .lu-band-lyric[data-bilingual="true"] { bottom: 8px !important; }
+  body.lu-band-mode .lu-band-lyric-orig { font-size: 18px; }
+  body.lu-band-mode .lu-band-lyric-zh { font-size: 12px; }
+  body.lu-band-mode .lu-pet-hint { bottom: 8px; font-size: 12px; }
+  body.lu-band-mode .lu-band-pyro-toggle { top: 8px; right: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.lu-band-mode :is(.lu-band-lyric, .lu-pet-hint) { transition: none; }
+}

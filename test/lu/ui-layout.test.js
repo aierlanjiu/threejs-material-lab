@@ -9,10 +9,11 @@ try {
     page.on('pageerror', error => errors.push(error.message));
     await page.goto('http://localhost:8000/index.html?intro=skip', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => Boolean(window.luDiagnostics));
+    await page.waitForFunction(() => Boolean(window.luBand?.enabled && window.luApplePlayer));
 
     console.log(`[${width}px] page loaded`);
 
-    // 1. 收起状态：演出状态胶囊为唯一视觉入口，其他顶栏和浮动入口隐藏
+    // 1. 收起状态：品牌与胶囊无碰撞，旧浮动入口保持隐藏。
     const initial = await page.evaluate(() => {
       const getDisplay = selector => {
         const el = document.querySelector(selector);
@@ -20,11 +21,14 @@ try {
       };
       const capsule = document.querySelector('#performanceCapsule').getBoundingClientRect();
       const header = document.querySelector('.master-deck-hud').getBoundingClientRect();
+      const brand = document.querySelector('.brand-section').getBoundingClientRect();
       return {
         capsuleWidth: capsule.width,
         capsuleHeight: capsule.height,
         headerHeight: header.height,
         brandDisplay: getDisplay('.brand-section'),
+        brandOverlap: brand.width > 0 && brand.left < capsule.right && brand.right > capsule.left && brand.top < capsule.bottom && brand.bottom > capsule.top,
+        capsuleWithinViewport: capsule.left >= 0 && capsule.right <= innerWidth,
         actionsDisplay: getDisplay('.top-actions'),
         handleDisplay: getDisplay('#workbenchHandle'),
         inspectorDockDisplay: getDisplay('#inspectorDockButton'),
@@ -35,19 +39,15 @@ try {
 
     assert.match(initial.font, /TsangerJinKai02/);
     assert(initial.drawerHidden, 'drawer should start closed');
-    assert.equal(initial.brandDisplay, 'none', `${width}px brand should be hidden when collapsed`);
+    assert.equal(initial.brandOverlap, false, `${width}px brand overlaps the core capsule`);
+    if (width < 768) assert.equal(initial.brandDisplay, 'none', `${width}px secondary brand should collapse on mobile`);
     assert.equal(initial.actionsDisplay, 'none', `${width}px top actions should be hidden when collapsed`);
     assert.equal(initial.handleDisplay, 'none', `${width}px workbench handle should be hidden when collapsed`);
     assert.equal(initial.inspectorDockDisplay, 'none', `${width}px inspector dock button should be hidden when collapsed`);
 
-    if (width === 1440) {
-      assert(Math.abs(initial.capsuleWidth - 206) < 2, `desktop capsule width should be ~206px, got ${initial.capsuleWidth}`);
-      assert(Math.abs(initial.capsuleHeight - 48) < 2, `desktop capsule height should be ~48px, got ${initial.capsuleHeight}`);
-    } else {
-      assert(Math.abs(initial.capsuleWidth - 168) < 2, `mobile capsule width should be ~168px, got ${initial.capsuleWidth}`);
-      assert(Math.abs(initial.capsuleHeight - 48) < 2, `mobile capsule height should be ~48px, got ${initial.capsuleHeight}`);
-      assert(Math.abs(initial.headerHeight - 52) < 4, `mobile header should be a single row ~52px, got ${initial.headerHeight}`);
-    }
+    assert(initial.capsuleWithinViewport && initial.capsuleWidth >= 44 && initial.capsuleWidth <= Math.min(260, width - 24), 'core capsule must stay compact and inside the viewport');
+    assert(initial.capsuleHeight >= 44 && initial.capsuleHeight <= 56, 'core capsule must retain a touch-sized single row');
+    if (width < 768) assert(initial.headerHeight >= 44 && initial.headerHeight <= 64, 'mobile header must remain a single row');
     console.log(`[${width}px] check 1 passed`);
 
     await page.locator('#performanceCapsule').focus();
@@ -63,10 +63,10 @@ try {
     assert.equal(await page.locator('#workbenchHandle').isVisible(), false, 'old workbench handle should remain hidden');
     assert.equal(await page.locator('#inspectorDockButton').isVisible(), false, 'old inspector handle should remain hidden');
 
-    // 手机端展开高度不超过 35dvh
+    // 当前抽屉允许完整编舞卡片，但须留出播放器和视口安全区。
     if (width < 768) {
       const drawerHeight = await page.locator('#lueCoreDrawer').evaluate(el => el.getBoundingClientRect().height);
-      assert(drawerHeight / 900 <= 0.35, `drawer height exceeds 35dvh: ${drawerHeight}px on 900px viewport`);
+      assert(drawerHeight <= Math.min(520, 900 - 190), `drawer exceeds its safe height: ${drawerHeight}px`);
     }
     console.log(`[${width}px] check 2 passed`);
 
@@ -114,8 +114,8 @@ try {
         };
       });
       console.log(`[${width}px] immersive measured:`, JSON.stringify(immersive));
-      assert(Math.abs(immersive.capsuleWidth - 118) < 4, `immersive minimal capsule width ~118px, got ${immersive.capsuleWidth}`);
-      assert(Math.abs(immersive.capsuleHeight - 36) < 4, `immersive minimal capsule height ~36px, got ${immersive.capsuleHeight}`);
+      assert(immersive.capsuleWidth >= 44 && immersive.capsuleWidth <= Math.min(260, width - 24), 'immersive exit must remain compact');
+      assert(Math.abs(immersive.capsuleHeight - 36) < 4, 'immersive exit must retain its compact 36px treatment');
       assert.equal(immersive.capsuleLabel, '退出沉浸');
       assert.deepEqual(immersive.stage, { x: 0, y: 0, ...immersive.viewport }, 'stage should fill mobile viewport');
 

@@ -1,12 +1,12 @@
 // 静息待机态回归：确认装置在"未演奏"时自主呼吸，且与演奏态干净交接。
 // 用法: node test/lu/idle-rest-state.test.js
-// 依赖: 已在 127.0.0.1:8099 提供 index.html 的静态服务 (可用 LU_URL 覆盖)
+// 依赖: 已在 localhost:8000 提供 index.html 的静态服务 (可用 LU_URL 覆盖)
 // 说明: headless 下 rAF 会被节流到 1~2fps，因此与既有几何回归一致，用 CDP 虚拟时钟驱动；
 //       所有判据都按"帧数"而不是墙上时间计，避免受渲染速度影响。
 import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
 
-const BASE = process.env.LU_URL || 'http://127.0.0.1:8099/';
+const BASE = process.env.LU_URL || 'http://localhost:8000/';
 const FRAMES = Number(process.env.LU_IDLE_FRAMES || 600);
 
 // 页面内探针：逐帧采样静息包络与实体实际位移，不依赖音频文件
@@ -54,6 +54,8 @@ const launch = async () => {
   await page.goto(BASE + 'index.html?intro=skip', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.luDiagnostics && window.state
     && window.luDiagnostics.matrixGroup && window.luDiagnostics.matrixGroup.children.length > 0, { timeout: 30000 });
+  await page.waitForFunction(() => window.luBand && window.luApplePlayer);
+  await page.evaluate(() => kineticLyricsManager.setMode('slot'));
   const cdp = await page.context().newCDPSession(page);
   await cdp.send('Emulation.setVirtualTimePolicy', { policy: 'advance', budget: 3_600_000 });
   return { browser, page, errors };

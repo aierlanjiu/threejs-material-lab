@@ -19,7 +19,9 @@ try {
   });
   await page.goto('http://localhost:8000/index.html?intro=skip', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => Boolean(window.luDiagnostics && window.__luFrame));
+  await page.evaluate(() => kineticLyricsManager.prepareGravity());
   const result = await page.evaluate(() => {
+    kineticLyricsManager.setMode('slot');
     window.luDiagnostics.composer.render = () => {};
     const enhanced = window.parseLrcString('[00:01.00]<00:01.00>你<00:01.30>好');
     state.lyricOffsetMs = 0;
@@ -101,6 +103,7 @@ try {
       gravityEarlySung, gravityLateSung, gravitySeekBackSung, gravityEarlyCursor: context.characterCursor, gravityLateCursor: laterContext.characterCursor,
       slotBefore, slotAfter, before, after, afterLine };
   });
+  console.log('Lyric clock diagnostic', JSON.stringify(result));
   assert.deepEqual(result.failures, [], `timeline mapping errors: ${result.failures.join('; ')}`);
   assert.deepEqual(result.enhanced, [{ time: 1, text: '你好', charTimes: [1, 1.3] }]);
   assert.equal(result.inspected, 196);
