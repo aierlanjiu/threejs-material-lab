@@ -1,0 +1,476 @@
+{
+  "version": 1,
+  "trackId": "anime_nr_blue_bird",
+  "sourceSha256": "c4a98cbafc6a347e26e16e5c12c5d56792bfa81f6f74bdbca50f5a63021feed6",
+  "audioDigests": {
+    "drums": "1f8dfbbfb6cfffd5867a2fd1cf7ab145ba0b2640d2c7eff8d7b50629a908f152",
+    "bass": "f3b42f399be83c3ad8db034947c8c980c0f7b4d822c9cca10eda569df25d3132",
+    "other": "1975054644462ca2ebae514cd9a6e3145c83c72c3545e831bc2fe2c9a3af0f73",
+    "vocals": "0b001bd52a7b5c6d2de2e7ce6f905b22342edff525cf88114e333d07d6e40fcc",
+    "guitar": "b2ded4c77b5f1ffab203874c203eaf85b6447fdc82e12d465d7fe0f67b22df27",
+    "piano": "627d3c41b59a25cccbf0c39811b24acdedfbcd15fbda70763666230e05e0a712"
+  },
+  "method": "AST-family-classification-and-measured-stem-events-v1",
+  "nativeAudioListeningVerified": false,
+  "notice": "模型估计；音色类别按10秒音频窗口分析，实际动作由分轨事件和能量驱动。共享伴奏的多个家族联动控制，未声称各乐器独立分离。",
+  "sections": [
+    {
+      "start": 0.0,
+      "end": 28.5,
+      "label": "前奏",
+      "activeFamilies": [
+        "vocals",
+        "percussion",
+        "bass",
+        "plucked_strings",
+        "keys",
+        "winds"
+      ]
+    },
+    {
+      "start": 28.5,
+      "end": 53.5,
+      "label": "主歌",
+      "activeFamilies": [
+        "vocals",
+        "percussion",
+        "bass",
+        "plucked_strings",
+        "keys"
+      ]
+    },
+    {
+      "start": 53.5,
+      "end": 86.5,
+      "label": "副歌",
+      "activeFamilies": [
+        "vocals",
+        "percussion",
+        "bass",
+        "plucked_strings",
+        "keys",
+        "bowed_strings"
+      ]
+    },
+    {
+      "start": 86.5,
+      "end": 93.0,
+      "label": "间奏",
+      "activeFamilies": [
+        "percussion",
+        "bass",
+        "plucked_strings",
+        "keys"
+      ]
+    },
+    {
+      "start": 93.0,
+      "end": 117.0,
+      "label": "主歌",
+      "activeFamilies": [
+        "vocals",
+        "percussion",
+        "bass",
+        "plucked_strings",
+        "keys"
+      ]
+    },
+    {
+      "start": 117.0,
+      "end": 153.0,
+      "label": "副歌",
+      "activeFamilies": [
+        "vocals",
+        "percussion",
+        "bass",
+        "plucked_strings",
+        "keys",
+        "bowed_strings"
+      ]
+    },
+    {
+      "start": 153.0,
+      "end": 171.0,
+      "label": "间奏",
+      "activeFamilies": [
+        "percussion",
+        "bass",
+        "plucked_strings",
+        "keys",
+        "winds"
+      ]
+    },
+    {
+      "start": 171.0,
+      "end": 184.5,
+      "label": "主歌",
+      "activeFamilies": [
+        "vocals",
+        "percussion",
+        "bass",
+        "plucked_strings",
+        "keys"
+      ]
+    },
+    {
+      "start": 184.5,
+      "end": 208.5,
+      "label": "副歌",
+      "activeFamilies": [
+        "vocals",
+        "percussion",
+        "bass",
+        "plucked_strings",
+        "keys",
+        "bowed_strings"
+      ]
+    },
+    {
+      "start": 208.5,
+      "end": 218.6,
+      "label": "尾奏",
+      "activeFamilies": [
+        "percussion",
+        "plucked_strings"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "id": "drums-percussion",
+      "stemId": "drums",
+      "instrumentId": "drums",
+      "familyId": "percussion",
+      "actors": {
+        "one-piece": "sanji",
+        "dragon-ball": "krillin",
+        "naruto": "sakura"
+      },
+      "status": "estimated",
+      "activeIntervals": [
+        [
+          15.0,
+          209.5
+        ]
+      ],
+      "activitySource": "events",
+      "sharedAudio": false,
+      "review": {
+        "reviewer": "AST AudioSet model + measured stem activity",
+        "method": "local-PCM-family-cross-check",
+        "at": "2026-10-15T06:20:34.586395+00:00"
+      },
+      "evidence": {
+        "model": "MIT/ast-finetuned-audioset-10-10-0.4593",
+        "revision": "f826b80d28226b62986cc218e5cec390b1096902",
+        "classificationSha256": "eb53dbe6af0dcb397e4ec55b97b01b15b7b1bcdec80b26087e8bb6e65e3c6b73",
+        "audioSha256": "1f8dfbbfb6cfffd5867a2fd1cf7ab145ba0b2640d2c7eff8d7b50629a908f152",
+        "score": 0.83419
+      }
+    },
+    {
+      "id": "bass-bass",
+      "stemId": "bass",
+      "instrumentId": "bass",
+      "familyId": "bass",
+      "actors": {
+        "one-piece": "zoro",
+        "dragon-ball": null,
+        "naruto": "jiraiya"
+      },
+      "status": "estimated",
+      "activeIntervals": [
+        [
+          6.1,
+          13.3
+        ],
+        [
+          15.4,
+          159.3
+        ],
+        [
+          160.2,
+          161.1
+        ],
+        [
+          165.4,
+          166.1
+        ],
+        [
+          166.5,
+          166.8
+        ],
+        [
+          167.2,
+          211.7
+        ]
+      ],
+      "activitySource": "events",
+      "sharedAudio": false,
+      "review": {
+        "reviewer": "AST AudioSet model + measured stem activity",
+        "method": "local-PCM-family-cross-check",
+        "at": "2026-10-15T06:20:34.587047+00:00"
+      },
+      "evidence": {
+        "model": "MIT/ast-finetuned-audioset-10-10-0.4593",
+        "revision": "f826b80d28226b62986cc218e5cec390b1096902",
+        "classificationSha256": "eb53dbe6af0dcb397e4ec55b97b01b15b7b1bcdec80b26087e8bb6e65e3c6b73",
+        "audioSha256": "f3b42f399be83c3ad8db034947c8c980c0f7b4d822c9cca10eda569df25d3132",
+        "score": 0.88988
+      }
+    },
+    {
+      "id": "other-winds",
+      "stemId": "other",
+      "instrumentId": null,
+      "familyId": "winds",
+      "actors": {
+        "one-piece": "ace",
+        "dragon-ball": "piccolo",
+        "naruto": "itachi"
+      },
+      "status": "estimated",
+      "activeIntervals": [
+        [
+          14.9,
+          26.0
+        ],
+        [
+          82.8,
+          83.4
+        ],
+        [
+          84.2,
+          91.9
+        ],
+        [
+          200.0,
+          213.8
+        ]
+      ],
+      "activitySource": "envelope",
+      "sharedAudio": true,
+      "review": {
+        "reviewer": "AST AudioSet model + measured stem activity",
+        "method": "local-PCM-family-cross-check",
+        "at": "2026-10-15T06:20:34.587340+00:00"
+      },
+      "evidence": {
+        "model": "MIT/ast-finetuned-audioset-10-10-0.4593",
+        "revision": "f826b80d28226b62986cc218e5cec390b1096902",
+        "classificationSha256": "eb53dbe6af0dcb397e4ec55b97b01b15b7b1bcdec80b26087e8bb6e65e3c6b73",
+        "audioSha256": "1975054644462ca2ebae514cd9a6e3145c83c72c3545e831bc2fe2c9a3af0f73",
+        "score": 0.65315
+      }
+    },
+    {
+      "id": "other-bowed_strings",
+      "stemId": "other",
+      "instrumentId": null,
+      "familyId": "bowed_strings",
+      "actors": {
+        "one-piece": "shanks",
+        "dragon-ball": null,
+        "naruto": null
+      },
+      "status": "estimated",
+      "activeIntervals": [
+        [
+          24.0,
+          28.9
+        ],
+        [
+          130.5,
+          131.2
+        ],
+        [
+          131.9,
+          132.0
+        ],
+        [
+          134.3,
+          134.5
+        ],
+        [
+          135.3,
+          136.1
+        ],
+        [
+          200.0,
+          210.0
+        ]
+      ],
+      "activitySource": "envelope",
+      "sharedAudio": true,
+      "review": {
+        "reviewer": "AST AudioSet model + measured stem activity",
+        "method": "local-PCM-family-cross-check",
+        "at": "2026-10-15T06:20:34.587567+00:00"
+      },
+      "evidence": {
+        "model": "MIT/ast-finetuned-audioset-10-10-0.4593",
+        "revision": "f826b80d28226b62986cc218e5cec390b1096902",
+        "classificationSha256": "eb53dbe6af0dcb397e4ec55b97b01b15b7b1bcdec80b26087e8bb6e65e3c6b73",
+        "audioSha256": "1975054644462ca2ebae514cd9a6e3145c83c72c3545e831bc2fe2c9a3af0f73",
+        "score": 0.69311
+      }
+    },
+    {
+      "id": "vocals-vocals",
+      "stemId": "vocals",
+      "instrumentId": "vocals",
+      "familyId": "vocals",
+      "actors": {
+        "one-piece": "luffy",
+        "dragon-ball": "goku",
+        "naruto": "naruto"
+      },
+      "status": "estimated",
+      "activeIntervals": [
+        [
+          2.8,
+          5.4
+        ],
+        [
+          5.8,
+          11.6
+        ],
+        [
+          12.2,
+          15.9
+        ],
+        [
+          28.0,
+          41.7
+        ],
+        [
+          42.1,
+          45.0
+        ],
+        [
+          45.5,
+          55.8
+        ],
+        [
+          56.4,
+          62.0
+        ],
+        [
+          62.6,
+          68.4
+        ],
+        [
+          69.0,
+          74.7
+        ],
+        [
+          75.4,
+          85.5
+        ],
+        [
+          91.1,
+          104.8
+        ],
+        [
+          105.5,
+          108.1
+        ],
+        [
+          108.7,
+          119.0
+        ],
+        [
+          119.6,
+          125.3
+        ],
+        [
+          125.9,
+          131.6
+        ],
+        [
+          132.2,
+          137.8
+        ],
+        [
+          138.5,
+          142.3
+        ],
+        [
+          154.7,
+          171.2
+        ],
+        [
+          171.6,
+          177.3
+        ],
+        [
+          177.9,
+          183.7
+        ],
+        [
+          184.3,
+          189.9
+        ],
+        [
+          190.6,
+          201.7
+        ],
+        [
+          210.7,
+          213.8
+        ]
+      ],
+      "activitySource": "events",
+      "sharedAudio": false,
+      "review": {
+        "reviewer": "AST AudioSet model + measured stem activity",
+        "method": "local-PCM-family-cross-check",
+        "at": "2026-10-15T06:20:34.588125+00:00"
+      },
+      "evidence": {
+        "model": "MIT/ast-finetuned-audioset-10-10-0.4593",
+        "revision": "f826b80d28226b62986cc218e5cec390b1096902",
+        "classificationSha256": "eb53dbe6af0dcb397e4ec55b97b01b15b7b1bcdec80b26087e8bb6e65e3c6b73",
+        "audioSha256": "0b001bd52a7b5c6d2de2e7ce6f905b22342edff525cf88114e333d07d6e40fcc",
+        "score": 0.2916
+      }
+    },
+    {
+      "id": "guitar-plucked_strings",
+      "stemId": "guitar",
+      "instrumentId": "guitar",
+      "familyId": "plucked_strings",
+      "actors": {
+        "one-piece": "usopp",
+        "dragon-ball": "vegeta",
+        "naruto": "sasuke"
+      },
+      "status": "estimated",
+      "activeIntervals": [
+        [
+          3.3,
+          12.3
+        ],
+        [
+          12.8,
+          211.2
+        ]
+      ],
+      "activitySource": "events",
+      "sharedAudio": false,
+      "review": {
+        "reviewer": "AST AudioSet model + measured stem activity",
+        "method": "local-PCM-family-cross-check",
+        "at": "2026-10-15T06:20:34.588755+00:00"
+      },
+      "evidence": {
+        "model": "MIT/ast-finetuned-audioset-10-10-0.4593",
+        "revision": "f826b80d28226b62986cc218e5cec390b1096902",
+        "classificationSha256": "eb53dbe6af0dcb397e4ec55b97b01b15b7b1bcdec80b26087e8bb6e65e3c6b73",
+        "audioSha256": "b2ded4c77b5f1ffab203874c203eaf85b6447fdc82e12d465d7fe0f67b22df27",
+        "score": 0.70459
+      }
+    }
+  ]
+}

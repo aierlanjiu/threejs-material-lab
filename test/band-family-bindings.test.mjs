@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import {validateFamilyBindings} from '../js/audio/band-family-bindings.js';
 import {compileBandParts,sampleBandEnsemble} from '../js/audio/band-parts.js';
 import {songBindingSummary} from '../js/audio/band-song-parts.js';
-const root=new URL('../output/lu-band-song-parts/',import.meta.url);
+const root=new URL('./fixtures/band-family-bindings/',import.meta.url);
 if(!fs.existsSync(new URL('family-binding-summary.json',root)))throw new Error('Generate the actual family analysis first');
 for(const {trackId} of JSON.parse(fs.readFileSync(new URL('family-binding-summary.json',root)))){
  const score=JSON.parse(fs.readFileSync(new URL(`${trackId}/score.json`,root)));

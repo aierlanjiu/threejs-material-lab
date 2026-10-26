@@ -1,0 +1,6686 @@
+{
+  "version": 1,
+  "inputSha256": "4afd878e8df42428ee05149e3f15d37c8f47c344849d1cec7fd1b60d5b17b8d2",
+  "method": "source-hash, interval validation, measured separated-signal activity and existing LRC cross-check",
+  "nativeAudioClaimVerified": false,
+  "instrumentIdentityVerified": false,
+  "notice": "AGY self-reported audioReceived/confidence are not listening evidence. Signal activity may include separation leakage. Proposed intervals are candidates, not human-approved transcriptions.",
+  "tracks": [
+    {
+      "trackId": "anime_db_chala",
+      "sourceSha256": "c9ad4ae91d8fdea87a2b35eda94d59f2af3dfd4e832a787b86c767c59cf454a5",
+      "structurePassed": true,
+      "errors": [],
+      "warnings": [],
+      "comparison": {
+        "vocals": {
+          "separatedEnergyOutsideAnnotation": 0.0138,
+          "stemId": "vocals"
+        },
+        "bass": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "bass"
+        },
+        "percussion": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "drums"
+        },
+        "plucked_strings": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "guitar"
+        },
+        "keys": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "piano"
+        }
+      },
+      "lyricSignalConflicts": [],
+      "measuredActivityCandidates": [
+        {
+          "family": "vocals",
+          "stemId": "vocals",
+          "intervals": [
+            [
+              13.5,
+              13.8
+            ],
+            [
+              16.0,
+              47.7
+            ],
+            [
+              49.0,
+              51.0
+            ],
+            [
+              52.1,
+              82.9
+            ],
+            [
+              99.4,
+              123.1
+            ],
+            [
+              123.6,
+              130.0
+            ],
+            [
+              131.1,
+              133.3
+            ],
+            [
+              134.2,
+              139.1
+            ],
+            [
+              139.8,
+              187.9
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "bass",
+          "stemId": "bass",
+          "intervals": [
+            [
+              2.1,
+              43.4
+            ],
+            [
+              44.0,
+              46.4
+            ],
+            [
+              47.1,
+              90.6
+            ],
+            [
+              99.5,
+              125.6
+            ],
+            [
+              126.2,
+              128.6
+            ],
+            [
+              129.3,
+              193.8
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "percussion",
+          "stemId": "drums",
+          "intervals": [
+            [
+              1.5,
+              90.3
+            ],
+            [
+              99.3,
+              191.4
+            ],
+            [
+              193.0,
+              193.8
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "plucked_strings",
+          "stemId": "guitar",
+          "intervals": [
+            [
+              0.6,
+              1.7
+            ],
+            [
+              2.7,
+              3.5
+            ],
+            [
+              4.6,
+              8.6
+            ],
+            [
+              10.1,
+              17.7
+            ],
+            [
+              19.0,
+              19.2
+            ],
+            [
+              22.9,
+              23.1
+            ],
+            [
+              28.7,
+              29.2
+            ],
+            [
+              41.0,
+              41.3
+            ],
+            [
+              42.1,
+              49.0
+            ],
+            [
+              50.7,
+              52.0
+            ],
+            [
+              53.7,
+              54.8
+            ],
+            [
+              56.2,
+              58.1
+            ],
+            [
+              67.9,
+              68.4
+            ],
+            [
+              75.7,
+              76.0
+            ],
+            [
+              76.4,
+              80.0
+            ],
+            [
+              81.3,
+              90.7
+            ],
+            [
+              94.6,
+              100.0
+            ],
+            [
+              101.2,
+              101.5
+            ],
+            [
+              102.0,
+              102.3
+            ],
+            [
+              104.5,
+              105.4
+            ],
+            [
+              107.6,
+              109.0
+            ],
+            [
+              110.8,
+              111.6
+            ],
+            [
+              123.2,
+              124.1
+            ],
+            [
+              124.9,
+              131.3
+            ],
+            [
+              132.9,
+              134.3
+            ],
+            [
+              136.0,
+              137.0
+            ],
+            [
+              138.4,
+              140.3
+            ],
+            [
+              143.1,
+              143.7
+            ],
+            [
+              145.1,
+              145.7
+            ],
+            [
+              146.3,
+              150.6
+            ],
+            [
+              153.2,
+              171.0
+            ],
+            [
+              177.1,
+              178.5
+            ],
+            [
+              179.7,
+              184.9
+            ],
+            [
+              185.3,
+              194.9
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "keys",
+          "stemId": "piano",
+          "intervals": [],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        }
+      ],
+      "unisolatedFamilies": [
+        "winds"
+      ]
+    },
+    {
+      "trackId": "anime_db_dandan",
+      "sourceSha256": "1c5014b52690bbfefe61a795866573cf87927870d36f6d7d8411e83f0efe7a8a",
+      "structurePassed": true,
+      "errors": [],
+      "warnings": [],
+      "comparison": {
+        "vocals": {
+          "separatedEnergyOutsideAnnotation": 0.0132,
+          "stemId": "vocals"
+        },
+        "bass": {
+          "separatedEnergyOutsideAnnotation": 0.0205,
+          "stemId": "bass"
+        },
+        "percussion": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "drums"
+        },
+        "plucked_strings": {
+          "separatedEnergyOutsideAnnotation": 0.0256,
+          "stemId": "guitar"
+        },
+        "keys": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "piano"
+        }
+      },
+      "lyricSignalConflicts": [],
+      "measuredActivityCandidates": [
+        {
+          "family": "vocals",
+          "stemId": "vocals",
+          "intervals": [
+            [
+              4.0,
+              11.2
+            ],
+            [
+              11.7,
+              22.2
+            ],
+            [
+              26.3,
+              39.0
+            ],
+            [
+              39.4,
+              90.6
+            ],
+            [
+              91.1,
+              101.9
+            ],
+            [
+              127.4,
+              140.0
+            ],
+            [
+              140.5,
+              184.0
+            ],
+            [
+              184.6,
+              194.7
+            ],
+            [
+              195.4,
+              202.8
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "bass",
+          "stemId": "bass",
+          "intervals": [
+            [
+              0.4,
+              3.9
+            ],
+            [
+              5.0,
+              8.2
+            ],
+            [
+              8.7,
+              16.5
+            ],
+            [
+              17.9,
+              101.6
+            ],
+            [
+              104.7,
+              124.3
+            ],
+            [
+              129.3,
+              209.6
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "percussion",
+          "stemId": "drums",
+          "intervals": [
+            [
+              0.4,
+              22.5
+            ],
+            [
+              24.8,
+              67.6
+            ],
+            [
+              68.1,
+              100.7
+            ],
+            [
+              101.1,
+              104.3
+            ],
+            [
+              104.7,
+              109.3
+            ],
+            [
+              109.9,
+              168.7
+            ],
+            [
+              169.2,
+              197.8
+            ],
+            [
+              199.1,
+              204.8
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "plucked_strings",
+          "stemId": "guitar",
+          "intervals": [
+            [
+              0.2,
+              101.1
+            ],
+            [
+              101.5,
+              210.5
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "keys",
+          "stemId": "piano",
+          "intervals": [
+            [
+              6.8,
+              8.0
+            ],
+            [
+              9.5,
+              13.2
+            ],
+            [
+              23.0,
+              26.7
+            ],
+            [
+              27.5,
+              28.0
+            ],
+            [
+              29.3,
+              29.8
+            ],
+            [
+              31.1,
+              31.6
+            ],
+            [
+              32.9,
+              33.8
+            ],
+            [
+              34.7,
+              37.1
+            ],
+            [
+              38.4,
+              39.3
+            ],
+            [
+              42.0,
+              42.3
+            ],
+            [
+              47.4,
+              48.3
+            ],
+            [
+              49.2,
+              49.7
+            ],
+            [
+              50.1,
+              50.6
+            ],
+            [
+              51.0,
+              51.9
+            ],
+            [
+              52.8,
+              53.9
+            ],
+            [
+              57.8,
+              58.5
+            ],
+            [
+              60.9,
+              67.8
+            ],
+            [
+              69.1,
+              69.3
+            ],
+            [
+              101.6,
+              103.0
+            ],
+            [
+              104.0,
+              106.6
+            ],
+            [
+              112.4,
+              120.5
+            ],
+            [
+              120.9,
+              122.4
+            ],
+            [
+              123.2,
+              127.7
+            ],
+            [
+              128.6,
+              129.3
+            ],
+            [
+              130.4,
+              131.3
+            ],
+            [
+              132.2,
+              132.8
+            ],
+            [
+              134.0,
+              134.6
+            ],
+            [
+              135.8,
+              138.6
+            ],
+            [
+              139.4,
+              140.4
+            ],
+            [
+              141.3,
+              142.0
+            ],
+            [
+              143.0,
+              144.0
+            ],
+            [
+              144.4,
+              145.8
+            ],
+            [
+              146.7,
+              147.6
+            ],
+            [
+              148.0,
+              149.4
+            ],
+            [
+              150.3,
+              151.7
+            ],
+            [
+              152.1,
+              153.1
+            ],
+            [
+              153.9,
+              156.5
+            ],
+            [
+              157.5,
+              159.7
+            ],
+            [
+              162.1,
+              169.7
+            ],
+            [
+              170.1,
+              171.1
+            ],
+            [
+              175.9,
+              181.8
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        }
+      ],
+      "unisolatedFamilies": [
+        "bowed_strings"
+      ]
+    },
+    {
+      "trackId": "anime_db_makafushigi",
+      "sourceSha256": "e544a97e4b2464390a5b713e4526eeb16e784041754834190cf488fe32d29c57",
+      "structurePassed": true,
+      "errors": [],
+      "warnings": [
+        "vocals: 18.7% of active separated-signal energy falls outside supplied intervals"
+      ],
+      "comparison": {
+        "vocals": {
+          "separatedEnergyOutsideAnnotation": 0.1871,
+          "stemId": "vocals"
+        },
+        "bass": {
+          "separatedEnergyOutsideAnnotation": 0.0043,
+          "stemId": "bass"
+        },
+        "percussion": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "drums"
+        },
+        "plucked_strings": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "guitar"
+        },
+        "keys": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "piano"
+        }
+      },
+      "lyricSignalConflicts": [],
+      "measuredActivityCandidates": [
+        {
+          "family": "vocals",
+          "stemId": "vocals",
+          "intervals": [
+            [
+              10.3,
+              11.4
+            ],
+            [
+              12.0,
+              13.1
+            ],
+            [
+              13.8,
+              16.6
+            ],
+            [
+              17.2,
+              18.6
+            ],
+            [
+              19.1,
+              20.2
+            ],
+            [
+              20.6,
+              23.6
+            ],
+            [
+              24.0,
+              34.4
+            ],
+            [
+              35.0,
+              37.8
+            ],
+            [
+              38.7,
+              41.4
+            ],
+            [
+              42.2,
+              48.6
+            ],
+            [
+              49.2,
+              51.9
+            ],
+            [
+              52.8,
+              62.8
+            ],
+            [
+              63.4,
+              66.2
+            ],
+            [
+              66.9,
+              69.7
+            ],
+            [
+              70.4,
+              73.4
+            ],
+            [
+              74.1,
+              80.0
+            ],
+            [
+              81.2,
+              82.3
+            ],
+            [
+              82.9,
+              84.0
+            ],
+            [
+              84.7,
+              87.0
+            ],
+            [
+              88.2,
+              89.4
+            ],
+            [
+              90.0,
+              91.1
+            ],
+            [
+              91.5,
+              94.5
+            ],
+            [
+              94.9,
+              105.7
+            ],
+            [
+              112.7,
+              113.1
+            ],
+            [
+              114.6,
+              114.8
+            ],
+            [
+              118.6,
+              121.9
+            ],
+            [
+              125.5,
+              128.3
+            ],
+            [
+              129.0,
+              134.4
+            ],
+            [
+              134.8,
+              139.0
+            ],
+            [
+              139.7,
+              142.5
+            ],
+            [
+              143.0,
+              156.6
+            ],
+            [
+              157.3,
+              160.2
+            ],
+            [
+              160.8,
+              163.8
+            ],
+            [
+              164.5,
+              170.7
+            ],
+            [
+              171.5,
+              174.4
+            ],
+            [
+              175.1,
+              177.4
+            ],
+            [
+              178.5,
+              179.8
+            ],
+            [
+              180.2,
+              181.4
+            ],
+            [
+              182.2,
+              184.7
+            ],
+            [
+              185.3,
+              195.2
+            ],
+            [
+              196.2,
+              197.5
+            ],
+            [
+              198.1,
+              199.2
+            ],
+            [
+              199.7,
+              202.4
+            ],
+            [
+              203.3,
+              204.6
+            ],
+            [
+              205.0,
+              206.3
+            ],
+            [
+              206.7,
+              209.7
+            ],
+            [
+              210.1,
+              220.5
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "bass",
+          "stemId": "bass",
+          "intervals": [
+            [
+              1.4,
+              1.8
+            ],
+            [
+              2.2,
+              4.1
+            ],
+            [
+              5.0,
+              8.7
+            ],
+            [
+              10.3,
+              11.2
+            ],
+            [
+              11.8,
+              13.1
+            ],
+            [
+              13.9,
+              14.3
+            ],
+            [
+              14.8,
+              15.2
+            ],
+            [
+              15.6,
+              16.6
+            ],
+            [
+              17.4,
+              18.3
+            ],
+            [
+              18.9,
+              20.1
+            ],
+            [
+              21.0,
+              21.4
+            ],
+            [
+              21.9,
+              22.3
+            ],
+            [
+              22.7,
+              27.2
+            ],
+            [
+              27.6,
+              34.4
+            ],
+            [
+              35.9,
+              37.1
+            ],
+            [
+              37.7,
+              38.8
+            ],
+            [
+              39.4,
+              40.6
+            ],
+            [
+              41.2,
+              48.6
+            ],
+            [
+              50.1,
+              51.3
+            ],
+            [
+              51.8,
+              53.0
+            ],
+            [
+              53.6,
+              54.8
+            ],
+            [
+              55.4,
+              82.2
+            ],
+            [
+              82.7,
+              84.0
+            ],
+            [
+              84.8,
+              85.2
+            ],
+            [
+              85.7,
+              86.1
+            ],
+            [
+              86.5,
+              87.5
+            ],
+            [
+              88.3,
+              89.3
+            ],
+            [
+              89.8,
+              91.1
+            ],
+            [
+              91.9,
+              92.3
+            ],
+            [
+              92.8,
+              98.1
+            ],
+            [
+              98.5,
+              105.5
+            ],
+            [
+              106.1,
+              116.9
+            ],
+            [
+              123.7,
+              125.2
+            ],
+            [
+              126.4,
+              127.5
+            ],
+            [
+              128.0,
+              129.2
+            ],
+            [
+              129.8,
+              131.0
+            ],
+            [
+              131.6,
+              139.0
+            ],
+            [
+              139.7,
+              139.9
+            ],
+            [
+              140.4,
+              141.7
+            ],
+            [
+              142.2,
+              143.4
+            ],
+            [
+              144.0,
+              145.2
+            ],
+            [
+              145.8,
+              172.5
+            ],
+            [
+              173.1,
+              174.3
+            ],
+            [
+              175.2,
+              175.6
+            ],
+            [
+              176.1,
+              176.5
+            ],
+            [
+              176.9,
+              177.9
+            ],
+            [
+              178.7,
+              179.7
+            ],
+            [
+              180.2,
+              181.4
+            ],
+            [
+              182.3,
+              182.7
+            ],
+            [
+              183.2,
+              183.6
+            ],
+            [
+              184.0,
+              197.3
+            ],
+            [
+              197.9,
+              199.1
+            ],
+            [
+              200.0,
+              202.7
+            ],
+            [
+              203.5,
+              204.5
+            ],
+            [
+              205.0,
+              206.3
+            ],
+            [
+              207.1,
+              208.4
+            ],
+            [
+              208.8,
+              213.3
+            ],
+            [
+              213.7,
+              218.0
+            ],
+            [
+              218.5,
+              220.1
+            ],
+            [
+              222.0,
+              226.5
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "percussion",
+          "stemId": "drums",
+          "intervals": [
+            [
+              0.5,
+              30.2
+            ],
+            [
+              30.9,
+              37.2
+            ],
+            [
+              37.6,
+              40.8
+            ],
+            [
+              41.2,
+              51.4
+            ],
+            [
+              51.8,
+              53.2
+            ],
+            [
+              53.6,
+              54.9
+            ],
+            [
+              55.4,
+              101.0
+            ],
+            [
+              101.8,
+              117.2
+            ],
+            [
+              121.1,
+              127.6
+            ],
+            [
+              128.0,
+              131.2
+            ],
+            [
+              131.6,
+              141.8
+            ],
+            [
+              142.2,
+              143.6
+            ],
+            [
+              144.0,
+              145.3
+            ],
+            [
+              145.8,
+              191.5
+            ],
+            [
+              192.2,
+              216.3
+            ],
+            [
+              217.0,
+              218.8
+            ],
+            [
+              219.4,
+              222.3
+            ],
+            [
+              223.0,
+              226.7
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "plucked_strings",
+          "stemId": "guitar",
+          "intervals": [
+            [
+              7.4,
+              8.2
+            ],
+            [
+              8.7,
+              9.0
+            ],
+            [
+              13.9,
+              16.4
+            ],
+            [
+              17.7,
+              17.9
+            ],
+            [
+              19.2,
+              19.8
+            ],
+            [
+              21.0,
+              24.4
+            ],
+            [
+              26.9,
+              28.0
+            ],
+            [
+              29.9,
+              31.2
+            ],
+            [
+              33.4,
+              35.0
+            ],
+            [
+              36.0,
+              36.4
+            ],
+            [
+              37.8,
+              38.3
+            ],
+            [
+              39.5,
+              39.8
+            ],
+            [
+              41.3,
+              41.5
+            ],
+            [
+              42.0,
+              46.0
+            ],
+            [
+              46.4,
+              48.6
+            ],
+            [
+              50.6,
+              51.1
+            ],
+            [
+              51.9,
+              52.2
+            ],
+            [
+              52.8,
+              53.0
+            ],
+            [
+              53.9,
+              54.2
+            ],
+            [
+              60.1,
+              63.6
+            ],
+            [
+              69.7,
+              70.1
+            ],
+            [
+              76.9,
+              82.0
+            ],
+            [
+              83.0,
+              84.2
+            ],
+            [
+              84.8,
+              87.5
+            ],
+            [
+              88.3,
+              88.8
+            ],
+            [
+              90.4,
+              91.3
+            ],
+            [
+              91.9,
+              95.9
+            ],
+            [
+              97.0,
+              99.4
+            ],
+            [
+              100.2,
+              105.6
+            ],
+            [
+              106.0,
+              114.6
+            ],
+            [
+              116.4,
+              118.1
+            ],
+            [
+              125.2,
+              125.8
+            ],
+            [
+              128.2,
+              128.4
+            ],
+            [
+              129.0,
+              129.3
+            ],
+            [
+              137.7,
+              138.3
+            ],
+            [
+              141.1,
+              141.4
+            ],
+            [
+              148.2,
+              150.2
+            ],
+            [
+              150.6,
+              154.2
+            ],
+            [
+              166.2,
+              167.7
+            ],
+            [
+              168.1,
+              172.5
+            ],
+            [
+              173.6,
+              174.6
+            ],
+            [
+              175.1,
+              177.9
+            ],
+            [
+              182.2,
+              185.8
+            ],
+            [
+              187.6,
+              189.3
+            ],
+            [
+              191.1,
+              196.9
+            ],
+            [
+              200.0,
+              202.7
+            ],
+            [
+              203.8,
+              204.3
+            ],
+            [
+              205.5,
+              206.5
+            ],
+            [
+              207.0,
+              210.7
+            ],
+            [
+              213.3,
+              214.0
+            ],
+            [
+              215.4,
+              220.4
+            ],
+            [
+              221.2,
+              221.6
+            ],
+            [
+              222.0,
+              226.5
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "keys",
+          "stemId": "piano",
+          "intervals": [],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        }
+      ],
+      "unisolatedFamilies": [
+        "winds"
+      ]
+    },
+    {
+      "trackId": "anime_nr_blue_bird",
+      "sourceSha256": "c4a98cbafc6a347e26e16e5c12c5d56792bfa81f6f74bdbca50f5a63021feed6",
+      "structurePassed": true,
+      "errors": [],
+      "warnings": [
+        "vocals: 15.9% of active separated-signal energy falls outside supplied intervals",
+        "keys: 22.1% of active separated-signal energy falls outside supplied intervals",
+        "existing vocal lyric markers and measured vocal signal conflict with supplied rest intervals"
+      ],
+      "comparison": {
+        "vocals": {
+          "separatedEnergyOutsideAnnotation": 0.1586,
+          "stemId": "vocals"
+        },
+        "bass": {
+          "separatedEnergyOutsideAnnotation": 0.0125,
+          "stemId": "bass"
+        },
+        "percussion": {
+          "separatedEnergyOutsideAnnotation": 0.0003,
+          "stemId": "drums"
+        },
+        "plucked_strings": {
+          "separatedEnergyOutsideAnnotation": 0.01,
+          "stemId": "guitar"
+        },
+        "keys": {
+          "separatedEnergyOutsideAnnotation": 0.2212,
+          "stemId": "piano"
+        }
+      },
+      "lyricSignalConflicts": [
+        {
+          "time": 27.95,
+          "vocalEnvelopePeak": 0.9446
+        },
+        {
+          "time": 91.12,
+          "vocalEnvelopePeak": 0.8752
+        },
+        {
+          "time": 154.78,
+          "vocalEnvelopePeak": 0.7851
+        },
+        {
+          "time": 161.05,
+          "vocalEnvelopePeak": 0.8557
+        },
+        {
+          "time": 168.55,
+          "vocalEnvelopePeak": 0.9126
+        }
+      ],
+      "measuredActivityCandidates": [
+        {
+          "family": "vocals",
+          "stemId": "vocals",
+          "intervals": [
+            [
+              2.8,
+              5.3
+            ],
+            [
+              5.9,
+              11.5
+            ],
+            [
+              12.2,
+              15.9
+            ],
+            [
+              28.0,
+              41.7
+            ],
+            [
+              42.3,
+              44.8
+            ],
+            [
+              45.5,
+              55.7
+            ],
+            [
+              56.4,
+              62.0
+            ],
+            [
+              62.6,
+              68.3
+            ],
+            [
+              69.1,
+              74.6
+            ],
+            [
+              75.4,
+              85.4
+            ],
+            [
+              91.1,
+              104.8
+            ],
+            [
+              105.6,
+              108.0
+            ],
+            [
+              108.7,
+              118.9
+            ],
+            [
+              119.6,
+              125.3
+            ],
+            [
+              125.9,
+              131.5
+            ],
+            [
+              132.2,
+              137.8
+            ],
+            [
+              138.5,
+              142.2
+            ],
+            [
+              154.7,
+              171.1
+            ],
+            [
+              171.6,
+              177.2
+            ],
+            [
+              177.9,
+              183.6
+            ],
+            [
+              184.3,
+              189.9
+            ],
+            [
+              190.6,
+              201.5
+            ],
+            [
+              213.5,
+              213.8
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "bass",
+          "stemId": "bass",
+          "intervals": [
+            [
+              7.5,
+              13.0
+            ],
+            [
+              15.4,
+              159.1
+            ],
+            [
+              160.3,
+              161.1
+            ],
+            [
+              165.4,
+              166.1
+            ],
+            [
+              166.5,
+              166.8
+            ],
+            [
+              167.2,
+              210.7
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "percussion",
+          "stemId": "drums",
+          "intervals": [
+            [
+              15.2,
+              39.6
+            ],
+            [
+              40.4,
+              97.1
+            ],
+            [
+              97.5,
+              98.7
+            ],
+            [
+              99.1,
+              101.8
+            ],
+            [
+              102.2,
+              209.3
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "plucked_strings",
+          "stemId": "guitar",
+          "intervals": [
+            [
+              3.4,
+              5.9
+            ],
+            [
+              6.5,
+              8.4
+            ],
+            [
+              9.7,
+              10.0
+            ],
+            [
+              10.4,
+              10.7
+            ],
+            [
+              11.2,
+              11.6
+            ],
+            [
+              12.8,
+              210.8
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "keys",
+          "stemId": "piano",
+          "intervals": [
+            [
+              3.3,
+              3.7
+            ],
+            [
+              4.1,
+              5.3
+            ],
+            [
+              7.1,
+              7.7
+            ],
+            [
+              8.1,
+              20.3
+            ],
+            [
+              20.8,
+              22.3
+            ],
+            [
+              22.7,
+              25.3
+            ],
+            [
+              37.1,
+              38.2
+            ],
+            [
+              39.4,
+              40.6
+            ],
+            [
+              41.3,
+              42.1
+            ],
+            [
+              42.5,
+              46.4
+            ],
+            [
+              47.6,
+              47.9
+            ],
+            [
+              48.6,
+              50.5
+            ],
+            [
+              101.8,
+              104.4
+            ],
+            [
+              104.9,
+              105.6
+            ],
+            [
+              106.0,
+              106.3
+            ],
+            [
+              109.1,
+              109.5
+            ],
+            [
+              110.8,
+              112.6
+            ],
+            [
+              140.7,
+              166.2
+            ],
+            [
+              206.1,
+              206.5
+            ],
+            [
+              207.2,
+              213.8
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        }
+      ],
+      "unisolatedFamilies": [
+        "winds",
+        "bowed_strings"
+      ]
+    },
+    {
+      "trackId": "anime_nr_sign",
+      "sourceSha256": "661e5a209714a079334e265ae8a1f2f165f874052405ac748772c0eda8a49d40",
+      "structurePassed": true,
+      "errors": [],
+      "warnings": [
+        "vocals: 16.3% of active separated-signal energy falls outside supplied intervals",
+        "existing vocal lyric markers and measured vocal signal conflict with supplied rest intervals"
+      ],
+      "comparison": {
+        "vocals": {
+          "separatedEnergyOutsideAnnotation": 0.1634,
+          "stemId": "vocals"
+        },
+        "bass": {
+          "separatedEnergyOutsideAnnotation": 0.0535,
+          "stemId": "bass"
+        },
+        "percussion": {
+          "separatedEnergyOutsideAnnotation": 0.0787,
+          "stemId": "drums"
+        },
+        "plucked_strings": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "guitar"
+        },
+        "keys": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "piano"
+        }
+      },
+      "lyricSignalConflicts": [
+        {
+          "time": 25.88,
+          "vocalEnvelopePeak": 1.0
+        },
+        {
+          "time": 27.98,
+          "vocalEnvelopePeak": 0.6853
+        },
+        {
+          "time": 98.67,
+          "vocalEnvelopePeak": 0.9854
+        },
+        {
+          "time": 101.31,
+          "vocalEnvelopePeak": 0.8737
+        },
+        {
+          "time": 104.18,
+          "vocalEnvelopePeak": 1.0
+        },
+        {
+          "time": 155.1,
+          "vocalEnvelopePeak": 0.9747
+        },
+        {
+          "time": 157.61,
+          "vocalEnvelopePeak": 1.0
+        },
+        {
+          "time": 160.43,
+          "vocalEnvelopePeak": 0.9665
+        }
+      ],
+      "measuredActivityCandidates": [
+        {
+          "family": "vocals",
+          "stemId": "vocals",
+          "intervals": [
+            [
+              1.1,
+              4.2
+            ],
+            [
+              4.6,
+              7.5
+            ],
+            [
+              7.9,
+              10.7
+            ],
+            [
+              11.1,
+              13.0
+            ],
+            [
+              16.0,
+              24.8
+            ],
+            [
+              25.5,
+              36.4
+            ],
+            [
+              36.8,
+              41.8
+            ],
+            [
+              42.2,
+              57.7
+            ],
+            [
+              58.1,
+              78.8
+            ],
+            [
+              79.8,
+              108.8
+            ],
+            [
+              109.2,
+              119.6
+            ],
+            [
+              120.0,
+              130.0
+            ],
+            [
+              131.0,
+              139.2
+            ],
+            [
+              139.9,
+              141.1
+            ],
+            [
+              141.7,
+              142.1
+            ],
+            [
+              142.6,
+              143.6
+            ],
+            [
+              144.1,
+              144.6
+            ],
+            [
+              145.3,
+              147.3
+            ],
+            [
+              147.9,
+              150.0
+            ],
+            [
+              150.6,
+              166.7
+            ],
+            [
+              168.5,
+              210.8
+            ],
+            [
+              211.9,
+              216.2
+            ],
+            [
+              217.2,
+              221.5
+            ],
+            [
+              223.4,
+              225.3
+            ],
+            [
+              226.1,
+              230.4
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "bass",
+          "stemId": "bass",
+          "intervals": [
+            [
+              3.9,
+              4.9
+            ],
+            [
+              5.3,
+              6.1
+            ],
+            [
+              6.8,
+              8.2
+            ],
+            [
+              8.8,
+              9.3
+            ],
+            [
+              10.4,
+              11.6
+            ],
+            [
+              16.0,
+              58.1
+            ],
+            [
+              59.1,
+              109.3
+            ],
+            [
+              110.2,
+              168.5
+            ],
+            [
+              178.9,
+              190.0
+            ],
+            [
+              191.0,
+              230.7
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "percussion",
+          "stemId": "drums",
+          "intervals": [
+            [
+              2.2,
+              2.5
+            ],
+            [
+              5.3,
+              5.8
+            ],
+            [
+              7.1,
+              8.0
+            ],
+            [
+              8.7,
+              9.0
+            ],
+            [
+              10.3,
+              10.6
+            ],
+            [
+              11.8,
+              12.2
+            ],
+            [
+              13.3,
+              57.9
+            ],
+            [
+              59.1,
+              82.8
+            ],
+            [
+              83.3,
+              134.0
+            ],
+            [
+              134.5,
+              168.3
+            ],
+            [
+              178.9,
+              220.1
+            ],
+            [
+              220.7,
+              230.5
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "plucked_strings",
+          "stemId": "guitar",
+          "intervals": [
+            [
+              2.2,
+              58.1
+            ],
+            [
+              59.1,
+              109.2
+            ],
+            [
+              109.9,
+              134.2
+            ],
+            [
+              135.0,
+              168.5
+            ],
+            [
+              169.5,
+              190.0
+            ],
+            [
+              190.9,
+              230.8
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "keys",
+          "stemId": "piano",
+          "intervals": [],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        }
+      ],
+      "unisolatedFamilies": [
+        "bowed_strings"
+      ]
+    },
+    {
+      "trackId": "anime_nr_silhouette",
+      "sourceSha256": "148960182d562fef839216f9f8b1b51d8ed6b920e7a04ec261b85b1b8c25a2a4",
+      "structurePassed": true,
+      "errors": [],
+      "warnings": [
+        "vocals: 18.5% of active separated-signal energy falls outside supplied intervals",
+        "existing vocal lyric markers and measured vocal signal conflict with supplied rest intervals"
+      ],
+      "comparison": {
+        "vocals": {
+          "separatedEnergyOutsideAnnotation": 0.1854,
+          "stemId": "vocals"
+        },
+        "bass": {
+          "separatedEnergyOutsideAnnotation": 0.0022,
+          "stemId": "bass"
+        },
+        "percussion": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "drums"
+        },
+        "plucked_strings": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "guitar"
+        },
+        "keys": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "piano"
+        }
+      },
+      "lyricSignalConflicts": [
+        {
+          "time": 22.72,
+          "vocalEnvelopePeak": 1.0
+        },
+        {
+          "time": 26.79,
+          "vocalEnvelopePeak": 1.0
+        },
+        {
+          "time": 92.08,
+          "vocalEnvelopePeak": 0.9658
+        },
+        {
+          "time": 141.05,
+          "vocalEnvelopePeak": 1.0
+        },
+        {
+          "time": 144.71,
+          "vocalEnvelopePeak": 0.9791
+        },
+        {
+          "time": 149.43,
+          "vocalEnvelopePeak": 0.9561
+        },
+        {
+          "time": 153.54,
+          "vocalEnvelopePeak": 1.0
+        }
+      ],
+      "measuredActivityCandidates": [
+        {
+          "family": "vocals",
+          "stemId": "vocals",
+          "intervals": [
+            [
+              22.7,
+              24.6
+            ],
+            [
+              25.1,
+              34.9
+            ],
+            [
+              35.5,
+              75.3
+            ],
+            [
+              77.8,
+              79.6
+            ],
+            [
+              80.3,
+              90.0
+            ],
+            [
+              90.4,
+              130.4
+            ],
+            [
+              141.0,
+              206.6
+            ],
+            [
+              207.0,
+              213.1
+            ],
+            [
+              213.5,
+              214.4
+            ],
+            [
+              214.9,
+              215.8
+            ],
+            [
+              216.2,
+              217.1
+            ],
+            [
+              217.5,
+              218.4
+            ],
+            [
+              218.8,
+              219.7
+            ],
+            [
+              220.1,
+              222.3
+            ],
+            [
+              222.7,
+              223.7
+            ],
+            [
+              224.1,
+              224.8
+            ],
+            [
+              231.7,
+              232.0
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "bass",
+          "stemId": "bass",
+          "intervals": [
+            [
+              7.2,
+              11.9
+            ],
+            [
+              12.3,
+              77.1
+            ],
+            [
+              77.8,
+              154.1
+            ],
+            [
+              155.2,
+              224.8
+            ],
+            [
+              229.9,
+              235.4
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "percussion",
+          "stemId": "drums",
+          "intervals": [
+            [
+              0.5,
+              11.9
+            ],
+            [
+              12.3,
+              77.0
+            ],
+            [
+              77.5,
+              154.7
+            ],
+            [
+              155.2,
+              235.4
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "plucked_strings",
+          "stemId": "guitar",
+          "intervals": [
+            [
+              1.8,
+              154.1
+            ],
+            [
+              155.2,
+              235.4
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        }
+      ],
+      "unisolatedFamilies": []
+    },
+    {
+      "trackId": "anime_op_one_day",
+      "sourceSha256": "bc9625cbd39c20a50ff36dc4dcb82499ce2b087a8c1281478da8e0c021d46665",
+      "structurePassed": true,
+      "errors": [],
+      "warnings": [],
+      "comparison": {
+        "vocals": {
+          "separatedEnergyOutsideAnnotation": 0.0298,
+          "stemId": "vocals"
+        },
+        "bass": {
+          "separatedEnergyOutsideAnnotation": 0.0737,
+          "stemId": "bass"
+        },
+        "percussion": {
+          "separatedEnergyOutsideAnnotation": 0.0369,
+          "stemId": "drums"
+        },
+        "plucked_strings": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "guitar"
+        },
+        "keys": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "piano"
+        }
+      },
+      "lyricSignalConflicts": [],
+      "measuredActivityCandidates": [
+        {
+          "family": "vocals",
+          "stemId": "vocals",
+          "intervals": [
+            [
+              26.4,
+              29.4
+            ],
+            [
+              30.4,
+              34.9
+            ],
+            [
+              35.8,
+              40.2
+            ],
+            [
+              41.2,
+              53.0
+            ],
+            [
+              53.4,
+              58.1
+            ],
+            [
+              58.7,
+              69.3
+            ],
+            [
+              69.7,
+              93.5
+            ],
+            [
+              104.8,
+              107.8
+            ],
+            [
+              108.5,
+              113.1
+            ],
+            [
+              113.6,
+              118.4
+            ],
+            [
+              119.4,
+              136.5
+            ],
+            [
+              136.9,
+              221.1
+            ],
+            [
+              231.8,
+              232.3
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "bass",
+          "stemId": "bass",
+          "intervals": [
+            [
+              2.4,
+              68.9
+            ],
+            [
+              69.8,
+              253.3
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "percussion",
+          "stemId": "drums",
+          "intervals": [
+            [
+              1.7,
+              22.2
+            ],
+            [
+              26.7,
+              27.5
+            ],
+            [
+              28.0,
+              28.3
+            ],
+            [
+              28.7,
+              28.9
+            ],
+            [
+              29.4,
+              29.6
+            ],
+            [
+              30.7,
+              30.9
+            ],
+            [
+              31.4,
+              32.3
+            ],
+            [
+              33.4,
+              33.7
+            ],
+            [
+              34.1,
+              34.3
+            ],
+            [
+              34.8,
+              35.0
+            ],
+            [
+              35.4,
+              35.7
+            ],
+            [
+              36.1,
+              36.4
+            ],
+            [
+              36.8,
+              37.7
+            ],
+            [
+              38.1,
+              38.3
+            ],
+            [
+              38.8,
+              39.0
+            ],
+            [
+              39.5,
+              39.7
+            ],
+            [
+              40.8,
+              41.0
+            ],
+            [
+              41.5,
+              41.7
+            ],
+            [
+              42.2,
+              43.1
+            ],
+            [
+              43.5,
+              43.7
+            ],
+            [
+              44.9,
+              45.1
+            ],
+            [
+              45.6,
+              45.8
+            ],
+            [
+              46.2,
+              49.8
+            ],
+            [
+              50.9,
+              51.2
+            ],
+            [
+              51.6,
+              51.8
+            ],
+            [
+              52.3,
+              52.5
+            ],
+            [
+              53.0,
+              53.9
+            ],
+            [
+              54.3,
+              54.5
+            ],
+            [
+              55.0,
+              55.2
+            ],
+            [
+              56.3,
+              56.6
+            ],
+            [
+              57.0,
+              57.9
+            ],
+            [
+              58.4,
+              59.3
+            ],
+            [
+              60.4,
+              60.6
+            ],
+            [
+              61.1,
+              61.3
+            ],
+            [
+              61.7,
+              62.0
+            ],
+            [
+              62.4,
+              62.6
+            ],
+            [
+              63.1,
+              63.3
+            ],
+            [
+              63.8,
+              105.9
+            ],
+            [
+              108.3,
+              108.5
+            ],
+            [
+              109.4,
+              110.5
+            ],
+            [
+              111.6,
+              111.8
+            ],
+            [
+              112.3,
+              112.5
+            ],
+            [
+              113.6,
+              113.8
+            ],
+            [
+              114.3,
+              114.6
+            ],
+            [
+              115.0,
+              115.9
+            ],
+            [
+              116.3,
+              116.5
+            ],
+            [
+              120.4,
+              121.3
+            ],
+            [
+              123.1,
+              123.3
+            ],
+            [
+              123.8,
+              124.0
+            ],
+            [
+              124.4,
+              128.0
+            ],
+            [
+              129.2,
+              129.4
+            ],
+            [
+              129.8,
+              130.1
+            ],
+            [
+              131.2,
+              132.1
+            ],
+            [
+              132.5,
+              132.8
+            ],
+            [
+              133.2,
+              133.4
+            ],
+            [
+              135.2,
+              138.1
+            ],
+            [
+              139.9,
+              140.2
+            ],
+            [
+              142.0,
+              165.2
+            ],
+            [
+              165.6,
+              220.4
+            ],
+            [
+              224.2,
+              244.8
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "plucked_strings",
+          "stemId": "guitar",
+          "intervals": [
+            [
+              2.4,
+              251.6
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "keys",
+          "stemId": "piano",
+          "intervals": [],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        }
+      ],
+      "unisolatedFamilies": [
+        "bowed_strings"
+      ]
+    },
+    {
+      "trackId": "anime_op_over_the_top",
+      "sourceSha256": "fa47b7d557c4365de40517a0b334f216ded474376c9433e802dfa64d78d9b3ea",
+      "structurePassed": true,
+      "errors": [],
+      "warnings": [],
+      "comparison": {
+        "vocals": {
+          "separatedEnergyOutsideAnnotation": 0.0025,
+          "stemId": "vocals"
+        },
+        "bass": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "bass"
+        },
+        "percussion": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "drums"
+        },
+        "plucked_strings": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "guitar"
+        },
+        "keys": {
+          "separatedEnergyOutsideAnnotation": 0.0182,
+          "stemId": "piano"
+        }
+      },
+      "lyricSignalConflicts": [],
+      "measuredActivityCandidates": [
+        {
+          "family": "vocals",
+          "stemId": "vocals",
+          "intervals": [
+            [
+              1.1,
+              10.3
+            ],
+            [
+              18.8,
+              20.0
+            ],
+            [
+              20.4,
+              20.7
+            ],
+            [
+              26.2,
+              29.3
+            ],
+            [
+              30.8,
+              34.1
+            ],
+            [
+              34.9,
+              46.5
+            ],
+            [
+              48.2,
+              57.5
+            ],
+            [
+              57.9,
+              69.2
+            ],
+            [
+              70.5,
+              85.3
+            ],
+            [
+              85.7,
+              107.9
+            ],
+            [
+              116.8,
+              119.8
+            ],
+            [
+              121.3,
+              124.6
+            ],
+            [
+              125.4,
+              136.4
+            ],
+            [
+              138.6,
+              147.6
+            ],
+            [
+              148.5,
+              159.9
+            ],
+            [
+              161.1,
+              198.5
+            ],
+            [
+              220.7,
+              222.9
+            ],
+            [
+              225.3,
+              227.2
+            ],
+            [
+              230.0,
+              234.0
+            ],
+            [
+              234.4,
+              236.5
+            ],
+            [
+              238.8,
+              242.2
+            ],
+            [
+              243.6,
+              248.4
+            ],
+            [
+              249.4,
+              258.8
+            ],
+            [
+              259.3,
+              297.5
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "bass",
+          "stemId": "bass",
+          "intervals": [
+            [
+              8.0,
+              70.7
+            ],
+            [
+              71.1,
+              75.1
+            ],
+            [
+              75.8,
+              93.3
+            ],
+            [
+              93.8,
+              222.4
+            ],
+            [
+              223.0,
+              230.0
+            ],
+            [
+              234.1,
+              247.3
+            ],
+            [
+              247.7,
+              250.4
+            ],
+            [
+              258.8,
+              267.8
+            ],
+            [
+              268.4,
+              297.6
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "percussion",
+          "stemId": "drums",
+          "intervals": [
+            [
+              1.2,
+              1.4
+            ],
+            [
+              3.5,
+              4.3
+            ],
+            [
+              6.3,
+              6.6
+            ],
+            [
+              8.6,
+              140.2
+            ],
+            [
+              140.6,
+              141.2
+            ],
+            [
+              141.6,
+              154.4
+            ],
+            [
+              154.8,
+              218.9
+            ],
+            [
+              220.1,
+              221.7
+            ],
+            [
+              222.1,
+              229.8
+            ],
+            [
+              233.5,
+              249.5
+            ],
+            [
+              266.5,
+              267.5
+            ],
+            [
+              268.1,
+              296.8
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "plucked_strings",
+          "stemId": "guitar",
+          "intervals": [
+            [
+              6.5,
+              229.9
+            ],
+            [
+              234.4,
+              250.4
+            ],
+            [
+              260.8,
+              261.1
+            ],
+            [
+              262.9,
+              263.1
+            ],
+            [
+              263.8,
+              268.0
+            ],
+            [
+              268.4,
+              297.3
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "keys",
+          "stemId": "piano",
+          "intervals": [
+            [
+              3.5,
+              4.0
+            ],
+            [
+              4.5,
+              5.2
+            ],
+            [
+              5.8,
+              7.2
+            ],
+            [
+              29.5,
+              31.9
+            ],
+            [
+              32.9,
+              35.9
+            ],
+            [
+              37.5,
+              39.7
+            ],
+            [
+              43.7,
+              45.4
+            ],
+            [
+              45.9,
+              54.5
+            ],
+            [
+              55.6,
+              56.0
+            ],
+            [
+              66.9,
+              68.0
+            ],
+            [
+              68.4,
+              70.4
+            ],
+            [
+              72.6,
+              73.1
+            ],
+            [
+              74.8,
+              75.1
+            ],
+            [
+              76.0,
+              76.8
+            ],
+            [
+              104.2,
+              105.1
+            ],
+            [
+              110.5,
+              111.3
+            ],
+            [
+              119.0,
+              119.4
+            ],
+            [
+              119.8,
+              122.3
+            ],
+            [
+              123.5,
+              126.5
+            ],
+            [
+              127.5,
+              130.3
+            ],
+            [
+              134.9,
+              143.1
+            ],
+            [
+              143.9,
+              147.5
+            ],
+            [
+              159.3,
+              161.0
+            ],
+            [
+              162.1,
+              162.6
+            ],
+            [
+              168.2,
+              168.8
+            ],
+            [
+              171.1,
+              171.5
+            ],
+            [
+              174.4,
+              177.0
+            ],
+            [
+              180.2,
+              180.7
+            ],
+            [
+              193.5,
+              198.5
+            ],
+            [
+              202.7,
+              203.3
+            ],
+            [
+              221.8,
+              222.8
+            ],
+            [
+              229.8,
+              235.7
+            ],
+            [
+              247.1,
+              249.9
+            ],
+            [
+              250.3,
+              252.0
+            ],
+            [
+              252.5,
+              267.6
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        }
+      ],
+      "unisolatedFamilies": [
+        "winds"
+      ]
+    },
+    {
+      "trackId": "anime_op_overtaken",
+      "sourceSha256": "2696df92ea57484d4daa39e60f4f601bfb6696b7980aa2371bdfa396792ca7a9",
+      "structurePassed": true,
+      "errors": [],
+      "warnings": [],
+      "comparison": {
+        "vocals": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "vocals"
+        },
+        "bass": {
+          "separatedEnergyOutsideAnnotation": 0.0244,
+          "stemId": "bass"
+        },
+        "percussion": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "drums"
+        },
+        "plucked_strings": {
+          "separatedEnergyOutsideAnnotation": 1.0,
+          "stemId": "guitar"
+        },
+        "keys": {
+          "separatedEnergyOutsideAnnotation": 1.0,
+          "stemId": "piano"
+        }
+      },
+      "lyricSignalConflicts": [],
+      "measuredActivityCandidates": [
+        {
+          "family": "bass",
+          "stemId": "bass",
+          "intervals": [
+            [
+              17.2,
+              25.0
+            ],
+            [
+              35.4,
+              40.8
+            ],
+            [
+              41.4,
+              42.7
+            ],
+            [
+              45.9,
+              46.3
+            ],
+            [
+              46.8,
+              47.4
+            ],
+            [
+              48.0,
+              48.6
+            ],
+            [
+              49.2,
+              49.6
+            ],
+            [
+              52.8,
+              65.3
+            ],
+            [
+              76.4,
+              77.0
+            ],
+            [
+              89.2,
+              90.1
+            ],
+            [
+              91.1,
+              91.3
+            ],
+            [
+              95.8,
+              97.4
+            ],
+            [
+              97.8,
+              99.5
+            ],
+            [
+              100.3,
+              100.6
+            ],
+            [
+              109.1,
+              109.5
+            ],
+            [
+              111.3,
+              111.7
+            ],
+            [
+              112.2,
+              112.8
+            ],
+            [
+              114.2,
+              115.8
+            ],
+            [
+              116.7,
+              117.3
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "percussion",
+          "stemId": "drums",
+          "intervals": [
+            [
+              2.9,
+              91.1
+            ],
+            [
+              91.5,
+              106.2
+            ],
+            [
+              106.7,
+              109.7
+            ],
+            [
+              110.7,
+              119.0
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        }
+      ],
+      "unisolatedFamilies": [
+        "winds",
+        "bowed_strings"
+      ]
+    },
+    {
+      "trackId": "anime_op_we_are",
+      "sourceSha256": "6c7d5d76c78381a3caec37c2624275ffc0fc23149d958dfe56a7debc0c09b1fc",
+      "structurePassed": true,
+      "errors": [],
+      "warnings": [],
+      "comparison": {
+        "vocals": {
+          "separatedEnergyOutsideAnnotation": 0.0162,
+          "stemId": "vocals"
+        },
+        "bass": {
+          "separatedEnergyOutsideAnnotation": 0.0026,
+          "stemId": "bass"
+        },
+        "percussion": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "drums"
+        },
+        "plucked_strings": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "guitar"
+        },
+        "keys": {
+          "separatedEnergyOutsideAnnotation": 0.0124,
+          "stemId": "piano"
+        }
+      },
+      "lyricSignalConflicts": [],
+      "measuredActivityCandidates": [
+        {
+          "family": "vocals",
+          "stemId": "vocals",
+          "intervals": [
+            [
+              16.6,
+              17.3
+            ],
+            [
+              29.1,
+              29.7
+            ],
+            [
+              31.0,
+              43.3
+            ],
+            [
+              48.6,
+              50.3
+            ],
+            [
+              51.4,
+              53.3
+            ],
+            [
+              54.2,
+              56.0
+            ],
+            [
+              56.4,
+              59.0
+            ],
+            [
+              60.0,
+              61.8
+            ],
+            [
+              62.5,
+              70.3
+            ],
+            [
+              72.1,
+              85.0
+            ],
+            [
+              86.7,
+              97.6
+            ],
+            [
+              98.0,
+              108.8
+            ],
+            [
+              109.6,
+              110.4
+            ],
+            [
+              121.0,
+              121.3
+            ],
+            [
+              130.2,
+              130.4
+            ],
+            [
+              132.0,
+              134.3
+            ],
+            [
+              145.6,
+              147.5
+            ],
+            [
+              148.5,
+              150.6
+            ],
+            [
+              151.4,
+              153.2
+            ],
+            [
+              153.6,
+              156.1
+            ],
+            [
+              157.1,
+              159.0
+            ],
+            [
+              159.6,
+              167.5
+            ],
+            [
+              169.2,
+              174.6
+            ],
+            [
+              175.0,
+              182.0
+            ],
+            [
+              183.8,
+              194.8
+            ],
+            [
+              195.2,
+              208.3
+            ],
+            [
+              209.6,
+              220.5
+            ],
+            [
+              220.9,
+              233.4
+            ],
+            [
+              235.2,
+              236.2
+            ],
+            [
+              238.1,
+              239.0
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "bass",
+          "stemId": "bass",
+          "intervals": [
+            [
+              6.7,
+              11.0
+            ],
+            [
+              12.8,
+              58.7
+            ],
+            [
+              59.1,
+              102.9
+            ],
+            [
+              103.4,
+              109.2
+            ],
+            [
+              110.0,
+              132.1
+            ],
+            [
+              132.7,
+              193.3
+            ],
+            [
+              193.8,
+              220.8
+            ],
+            [
+              221.4,
+              232.0
+            ],
+            [
+              232.8,
+              238.7
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "percussion",
+          "stemId": "drums",
+          "intervals": [
+            [
+              1.0,
+              108.9
+            ],
+            [
+              109.5,
+              131.9
+            ],
+            [
+              132.5,
+              144.4
+            ],
+            [
+              144.8,
+              231.7
+            ],
+            [
+              232.3,
+              238.6
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "plucked_strings",
+          "stemId": "guitar",
+          "intervals": [
+            [
+              13.2,
+              16.1
+            ],
+            [
+              16.8,
+              27.8
+            ],
+            [
+              28.2,
+              36.4
+            ],
+            [
+              39.2,
+              39.8
+            ],
+            [
+              42.0,
+              48.7
+            ],
+            [
+              49.5,
+              49.7
+            ],
+            [
+              50.3,
+              54.9
+            ],
+            [
+              55.9,
+              56.8
+            ],
+            [
+              57.8,
+              59.9
+            ],
+            [
+              61.9,
+              62.8
+            ],
+            [
+              65.0,
+              65.9
+            ],
+            [
+              69.6,
+              70.1
+            ],
+            [
+              71.1,
+              73.3
+            ],
+            [
+              78.2,
+              81.4
+            ],
+            [
+              81.9,
+              82.3
+            ],
+            [
+              83.6,
+              96.2
+            ],
+            [
+              97.2,
+              102.2
+            ],
+            [
+              102.6,
+              130.2
+            ],
+            [
+              130.6,
+              131.5
+            ],
+            [
+              133.7,
+              145.7
+            ],
+            [
+              146.7,
+              147.0
+            ],
+            [
+              147.5,
+              151.7
+            ],
+            [
+              152.3,
+              152.8
+            ],
+            [
+              153.2,
+              155.7
+            ],
+            [
+              156.4,
+              157.3
+            ],
+            [
+              158.8,
+              165.4
+            ],
+            [
+              166.4,
+              168.5
+            ],
+            [
+              169.0,
+              169.5
+            ],
+            [
+              169.9,
+              178.5
+            ],
+            [
+              180.0,
+              219.6
+            ],
+            [
+              220.0,
+              228.9
+            ],
+            [
+              229.6,
+              230.0
+            ],
+            [
+              231.1,
+              232.2
+            ],
+            [
+              233.3,
+              234.1
+            ],
+            [
+              235.2,
+              236.4
+            ],
+            [
+              236.8,
+              238.5
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "keys",
+          "stemId": "piano",
+          "intervals": [
+            [
+              15.7,
+              31.2
+            ],
+            [
+              34.3,
+              34.6
+            ],
+            [
+              35.9,
+              52.5
+            ],
+            [
+              53.4,
+              56.4
+            ],
+            [
+              57.1,
+              65.2
+            ],
+            [
+              65.6,
+              83.1
+            ],
+            [
+              83.6,
+              87.5
+            ],
+            [
+              88.5,
+              89.5
+            ],
+            [
+              91.7,
+              92.2
+            ],
+            [
+              92.9,
+              104.8
+            ],
+            [
+              105.5,
+              106.5
+            ],
+            [
+              107.1,
+              107.5
+            ],
+            [
+              110.0,
+              150.0
+            ],
+            [
+              150.5,
+              153.6
+            ],
+            [
+              154.3,
+              155.3
+            ],
+            [
+              155.7,
+              156.6
+            ],
+            [
+              157.2,
+              160.4
+            ],
+            [
+              164.8,
+              165.3
+            ],
+            [
+              165.7,
+              166.0
+            ],
+            [
+              166.6,
+              186.7
+            ],
+            [
+              187.3,
+              187.7
+            ],
+            [
+              189.0,
+              189.3
+            ],
+            [
+              194.3,
+              199.8
+            ],
+            [
+              204.3,
+              204.6
+            ],
+            [
+              208.4,
+              208.8
+            ],
+            [
+              209.4,
+              210.4
+            ],
+            [
+              212.1,
+              212.4
+            ],
+            [
+              212.9,
+              213.2
+            ],
+            [
+              214.7,
+              223.3
+            ],
+            [
+              230.0,
+              231.8
+            ],
+            [
+              232.9,
+              235.2
+            ],
+            [
+              235.7,
+              238.7
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        }
+      ],
+      "unisolatedFamilies": [
+        "winds"
+      ]
+    },
+    {
+      "trackId": "track_0",
+      "sourceSha256": "4cdf4f3668507ca0df13e28b146318d69645eada60ec581959c4b26c6bfbe1e8",
+      "structurePassed": true,
+      "errors": [],
+      "warnings": [
+        "vocals: 20.9% of active separated-signal energy falls outside supplied intervals",
+        "percussion: 11.4% of active separated-signal energy falls outside supplied intervals",
+        "existing vocal lyric markers and measured vocal signal conflict with supplied rest intervals"
+      ],
+      "comparison": {
+        "vocals": {
+          "separatedEnergyOutsideAnnotation": 0.2095,
+          "stemId": "vocals"
+        },
+        "bass": {
+          "separatedEnergyOutsideAnnotation": 0.0501,
+          "stemId": "bass"
+        },
+        "percussion": {
+          "separatedEnergyOutsideAnnotation": 0.1143,
+          "stemId": "drums"
+        },
+        "plucked_strings": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "guitar"
+        },
+        "keys": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "piano"
+        }
+      },
+      "lyricSignalConflicts": [
+        {
+          "time": 93.94,
+          "vocalEnvelopePeak": 0.8412
+        },
+        {
+          "time": 97.61,
+          "vocalEnvelopePeak": 0.9261
+        },
+        {
+          "time": 101.34,
+          "vocalEnvelopePeak": 1.0
+        }
+      ],
+      "measuredActivityCandidates": [
+        {
+          "family": "vocals",
+          "stemId": "vocals",
+          "intervals": [
+            [
+              0.5,
+              6.8
+            ],
+            [
+              7.8,
+              10.3
+            ],
+            [
+              14.6,
+              17.5
+            ],
+            [
+              18.1,
+              21.3
+            ],
+            [
+              21.7,
+              25.0
+            ],
+            [
+              25.4,
+              28.4
+            ],
+            [
+              29.0,
+              32.4
+            ],
+            [
+              33.1,
+              50.9
+            ],
+            [
+              51.6,
+              59.9
+            ],
+            [
+              60.7,
+              82.5
+            ],
+            [
+              82.9,
+              88.9
+            ],
+            [
+              90.2,
+              93.2
+            ],
+            [
+              93.7,
+              144.8
+            ],
+            [
+              146.2,
+              152.0
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "bass",
+          "stemId": "bass",
+          "intervals": [
+            [
+              3.5,
+              5.7
+            ],
+            [
+              13.3,
+              13.6
+            ],
+            [
+              14.8,
+              16.2
+            ],
+            [
+              17.0,
+              18.0
+            ],
+            [
+              31.5,
+              34.4
+            ],
+            [
+              34.8,
+              37.4
+            ],
+            [
+              38.7,
+              41.2
+            ],
+            [
+              41.7,
+              42.1
+            ],
+            [
+              43.0,
+              45.9
+            ],
+            [
+              46.3,
+              51.0
+            ],
+            [
+              55.8,
+              60.1
+            ],
+            [
+              63.2,
+              91.4
+            ],
+            [
+              92.7,
+              95.5
+            ],
+            [
+              105.6,
+              137.0
+            ],
+            [
+              147.4,
+              153.0
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "percussion",
+          "stemId": "drums",
+          "intervals": [
+            [
+              17.0,
+              19.2
+            ],
+            [
+              31.5,
+              33.6
+            ],
+            [
+              35.0,
+              36.1
+            ],
+            [
+              39.1,
+              39.6
+            ],
+            [
+              42.4,
+              43.5
+            ],
+            [
+              46.3,
+              48.5
+            ],
+            [
+              50.2,
+              51.7
+            ],
+            [
+              55.7,
+              64.3
+            ],
+            [
+              64.7,
+              66.1
+            ],
+            [
+              66.8,
+              67.1
+            ],
+            [
+              67.5,
+              67.9
+            ],
+            [
+              68.4,
+              69.8
+            ],
+            [
+              70.5,
+              70.8
+            ],
+            [
+              71.2,
+              71.6
+            ],
+            [
+              72.1,
+              73.5
+            ],
+            [
+              74.2,
+              74.5
+            ],
+            [
+              74.9,
+              75.3
+            ],
+            [
+              75.8,
+              78.2
+            ],
+            [
+              78.6,
+              79.1
+            ],
+            [
+              79.5,
+              80.9
+            ],
+            [
+              81.6,
+              81.8
+            ],
+            [
+              82.3,
+              82.7
+            ],
+            [
+              83.2,
+              85.5
+            ],
+            [
+              86.0,
+              86.4
+            ],
+            [
+              86.9,
+              88.2
+            ],
+            [
+              88.7,
+              91.1
+            ],
+            [
+              92.7,
+              94.8
+            ],
+            [
+              103.7,
+              108.5
+            ],
+            [
+              109.1,
+              110.4
+            ],
+            [
+              111.1,
+              111.4
+            ],
+            [
+              111.8,
+              112.2
+            ],
+            [
+              112.8,
+              114.1
+            ],
+            [
+              114.8,
+              115.1
+            ],
+            [
+              115.5,
+              115.9
+            ],
+            [
+              116.4,
+              117.7
+            ],
+            [
+              118.5,
+              123.3
+            ],
+            [
+              123.8,
+              125.1
+            ],
+            [
+              125.9,
+              126.2
+            ],
+            [
+              126.6,
+              127.0
+            ],
+            [
+              127.5,
+              129.9
+            ],
+            [
+              130.3,
+              130.7
+            ],
+            [
+              131.2,
+              132.5
+            ],
+            [
+              133.0,
+              133.6
+            ],
+            [
+              134.0,
+              134.4
+            ],
+            [
+              134.9,
+              136.6
+            ],
+            [
+              137.0,
+              137.8
+            ],
+            [
+              147.1,
+              153.6
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "plucked_strings",
+          "stemId": "guitar",
+          "intervals": [
+            [
+              28.1,
+              28.4
+            ],
+            [
+              29.1,
+              29.5
+            ],
+            [
+              30.0,
+              31.4
+            ],
+            [
+              31.9,
+              46.1
+            ],
+            [
+              46.6,
+              48.0
+            ],
+            [
+              55.7,
+              60.1
+            ],
+            [
+              64.0,
+              91.2
+            ],
+            [
+              96.3,
+              98.9
+            ],
+            [
+              100.1,
+              102.7
+            ],
+            [
+              103.7,
+              136.0
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "keys",
+          "stemId": "piano",
+          "intervals": [
+            [
+              2.2,
+              3.1
+            ],
+            [
+              5.9,
+              6.3
+            ],
+            [
+              9.6,
+              14.7
+            ],
+            [
+              15.1,
+              30.8
+            ],
+            [
+              32.7,
+              33.1
+            ],
+            [
+              47.0,
+              50.0
+            ],
+            [
+              51.0,
+              52.8
+            ],
+            [
+              59.0,
+              60.4
+            ],
+            [
+              135.2,
+              140.3
+            ],
+            [
+              140.7,
+              142.5
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        }
+      ],
+      "unisolatedFamilies": [
+        "winds"
+      ]
+    },
+    {
+      "trackId": "track_1",
+      "sourceSha256": "bd766bfef9a553ee3d5d0e4064a2dd9350ad54015a73a98c8118ec4c698cd7da",
+      "structurePassed": true,
+      "errors": [],
+      "warnings": [],
+      "comparison": {
+        "vocals": {
+          "separatedEnergyOutsideAnnotation": 0.0204,
+          "stemId": "vocals"
+        },
+        "bass": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "bass"
+        },
+        "percussion": {
+          "separatedEnergyOutsideAnnotation": 0.0271,
+          "stemId": "drums"
+        },
+        "plucked_strings": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "guitar"
+        },
+        "keys": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "piano"
+        }
+      },
+      "lyricSignalConflicts": [],
+      "measuredActivityCandidates": [
+        {
+          "family": "vocals",
+          "stemId": "vocals",
+          "intervals": [
+            [
+              35.1,
+              38.1
+            ],
+            [
+              39.8,
+              44.5
+            ],
+            [
+              47.6,
+              50.5
+            ],
+            [
+              51.3,
+              52.8
+            ],
+            [
+              53.3,
+              55.7
+            ],
+            [
+              59.8,
+              63.3
+            ],
+            [
+              64.1,
+              69.4
+            ],
+            [
+              71.3,
+              74.4
+            ],
+            [
+              74.8,
+              77.5
+            ],
+            [
+              77.9,
+              80.4
+            ],
+            [
+              80.9,
+              92.9
+            ],
+            [
+              94.3,
+              99.2
+            ],
+            [
+              101.0,
+              112.3
+            ],
+            [
+              112.9,
+              117.9
+            ],
+            [
+              119.0,
+              124.6
+            ],
+            [
+              125.2,
+              132.2
+            ],
+            [
+              133.6,
+              136.9
+            ],
+            [
+              138.2,
+              143.0
+            ],
+            [
+              145.9,
+              148.9
+            ],
+            [
+              149.8,
+              153.7
+            ],
+            [
+              158.2,
+              161.7
+            ],
+            [
+              162.5,
+              168.1
+            ],
+            [
+              169.7,
+              191.6
+            ],
+            [
+              192.6,
+              197.5
+            ],
+            [
+              199.2,
+              215.7
+            ],
+            [
+              217.1,
+              222.8
+            ],
+            [
+              223.3,
+              232.0
+            ],
+            [
+              277.1,
+              277.4
+            ],
+            [
+              281.5,
+              290.4
+            ],
+            [
+              291.4,
+              296.4
+            ],
+            [
+              298.0,
+              314.5
+            ],
+            [
+              315.8,
+              321.7
+            ],
+            [
+              322.1,
+              330.0
+            ],
+            [
+              356.2,
+              356.8
+            ],
+            [
+              357.5,
+              363.8
+            ],
+            [
+              365.9,
+              367.1
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "bass",
+          "stemId": "bass",
+          "intervals": [
+            [
+              59.9,
+              62.6
+            ],
+            [
+              63.0,
+              65.6
+            ],
+            [
+              66.0,
+              67.9
+            ],
+            [
+              69.0,
+              82.1
+            ],
+            [
+              82.9,
+              85.6
+            ],
+            [
+              87.1,
+              88.5
+            ],
+            [
+              93.6,
+              94.4
+            ],
+            [
+              96.8,
+              99.1
+            ],
+            [
+              99.5,
+              100.4
+            ],
+            [
+              112.1,
+              112.9
+            ],
+            [
+              115.2,
+              115.8
+            ],
+            [
+              117.9,
+              122.2
+            ],
+            [
+              123.7,
+              129.2
+            ],
+            [
+              158.5,
+              159.7
+            ],
+            [
+              161.4,
+              163.0
+            ],
+            [
+              163.6,
+              165.8
+            ],
+            [
+              167.5,
+              170.2
+            ],
+            [
+              182.0,
+              182.4
+            ],
+            [
+              182.8,
+              183.2
+            ],
+            [
+              185.4,
+              186.6
+            ],
+            [
+              188.9,
+              189.3
+            ],
+            [
+              191.6,
+              192.8
+            ],
+            [
+              193.5,
+              199.6
+            ],
+            [
+              201.2,
+              201.4
+            ],
+            [
+              216.1,
+              221.4
+            ],
+            [
+              221.8,
+              227.7
+            ],
+            [
+              256.9,
+              257.1
+            ],
+            [
+              258.7,
+              265.4
+            ],
+            [
+              265.8,
+              267.6
+            ],
+            [
+              268.7,
+              271.3
+            ],
+            [
+              272.0,
+              274.2
+            ],
+            [
+              275.4,
+              281.9
+            ],
+            [
+              284.2,
+              298.8
+            ],
+            [
+              299.2,
+              300.5
+            ],
+            [
+              301.1,
+              303.7
+            ],
+            [
+              304.1,
+              304.7
+            ],
+            [
+              305.3,
+              305.6
+            ],
+            [
+              306.0,
+              307.3
+            ],
+            [
+              308.3,
+              318.9
+            ],
+            [
+              320.6,
+              329.2
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "percussion",
+          "stemId": "drums",
+          "intervals": [
+            [
+              0.3,
+              0.5
+            ],
+            [
+              83.2,
+              85.1
+            ],
+            [
+              92.1,
+              92.3
+            ],
+            [
+              108.1,
+              109.7
+            ],
+            [
+              122.9,
+              123.3
+            ],
+            [
+              129.1,
+              129.7
+            ],
+            [
+              135.2,
+              135.8
+            ],
+            [
+              141.4,
+              143.3
+            ],
+            [
+              147.5,
+              149.6
+            ],
+            [
+              153.6,
+              154.8
+            ],
+            [
+              176.7,
+              176.9
+            ],
+            [
+              181.8,
+              183.3
+            ],
+            [
+              185.4,
+              186.0
+            ],
+            [
+              191.5,
+              192.1
+            ],
+            [
+              196.6,
+              198.3
+            ],
+            [
+              201.2,
+              201.4
+            ],
+            [
+              203.8,
+              204.4
+            ],
+            [
+              206.3,
+              207.7
+            ],
+            [
+              209.9,
+              210.5
+            ],
+            [
+              216.0,
+              216.6
+            ],
+            [
+              221.0,
+              221.6
+            ],
+            [
+              225.7,
+              225.9
+            ],
+            [
+              227.2,
+              227.7
+            ],
+            [
+              256.1,
+              257.5
+            ],
+            [
+              258.5,
+              259.0
+            ],
+            [
+              259.6,
+              260.2
+            ],
+            [
+              261.2,
+              261.7
+            ],
+            [
+              264.6,
+              266.3
+            ],
+            [
+              267.3,
+              268.1
+            ],
+            [
+              269.2,
+              269.5
+            ],
+            [
+              270.8,
+              271.2
+            ],
+            [
+              271.9,
+              272.5
+            ],
+            [
+              273.9,
+              274.2
+            ],
+            [
+              275.0,
+              275.6
+            ],
+            [
+              276.9,
+              277.1
+            ],
+            [
+              278.1,
+              278.7
+            ],
+            [
+              280.2,
+              282.2
+            ],
+            [
+              283.1,
+              283.8
+            ],
+            [
+              284.2,
+              284.8
+            ],
+            [
+              285.8,
+              287.9
+            ],
+            [
+              289.2,
+              291.0
+            ],
+            [
+              291.9,
+              294.0
+            ],
+            [
+              295.4,
+              297.1
+            ],
+            [
+              298.1,
+              300.1
+            ],
+            [
+              301.5,
+              303.3
+            ],
+            [
+              304.0,
+              306.8
+            ],
+            [
+              307.5,
+              308.2
+            ],
+            [
+              308.6,
+              309.3
+            ],
+            [
+              310.1,
+              312.2
+            ],
+            [
+              313.6,
+              315.6
+            ],
+            [
+              316.3,
+              318.6
+            ],
+            [
+              319.8,
+              321.8
+            ],
+            [
+              322.9,
+              324.7
+            ],
+            [
+              326.1,
+              326.4
+            ],
+            [
+              355.4,
+              356.5
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "plucked_strings",
+          "stemId": "guitar",
+          "intervals": [
+            [
+              25.0,
+              27.2
+            ],
+            [
+              27.6,
+              29.5
+            ],
+            [
+              91.2,
+              94.4
+            ],
+            [
+              103.9,
+              104.7
+            ],
+            [
+              106.1,
+              107.5
+            ],
+            [
+              109.0,
+              115.3
+            ],
+            [
+              116.4,
+              116.7
+            ],
+            [
+              117.3,
+              117.5
+            ],
+            [
+              123.9,
+              125.8
+            ],
+            [
+              131.6,
+              131.9
+            ],
+            [
+              132.3,
+              133.6
+            ],
+            [
+              158.4,
+              158.8
+            ],
+            [
+              159.2,
+              163.6
+            ],
+            [
+              183.1,
+              185.3
+            ],
+            [
+              193.1,
+              194.0
+            ],
+            [
+              207.3,
+              207.6
+            ],
+            [
+              208.0,
+              209.6
+            ],
+            [
+              210.1,
+              210.4
+            ],
+            [
+              215.1,
+              216.5
+            ],
+            [
+              245.9,
+              255.3
+            ],
+            [
+              256.9,
+              273.9
+            ],
+            [
+              275.6,
+              276.5
+            ],
+            [
+              279.0,
+              280.4
+            ],
+            [
+              281.8,
+              288.3
+            ],
+            [
+              289.5,
+              290.0
+            ],
+            [
+              307.1,
+              307.5
+            ],
+            [
+              311.3,
+              311.7
+            ],
+            [
+              312.5,
+              315.8
+            ],
+            [
+              316.9,
+              318.0
+            ],
+            [
+              318.5,
+              318.8
+            ],
+            [
+              320.0,
+              324.8
+            ],
+            [
+              352.8,
+              360.1
+            ],
+            [
+              362.3,
+              364.9
+            ],
+            [
+              367.8,
+              372.7
+            ],
+            [
+              373.3,
+              373.6
+            ],
+            [
+              379.6,
+              383.2
+            ],
+            [
+              384.6,
+              390.6
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "keys",
+          "stemId": "piano",
+          "intervals": [
+            [
+              9.1,
+              11.6
+            ],
+            [
+              12.2,
+              17.3
+            ],
+            [
+              18.4,
+              23.8
+            ],
+            [
+              24.5,
+              34.0
+            ],
+            [
+              35.2,
+              37.6
+            ],
+            [
+              38.4,
+              49.5
+            ],
+            [
+              50.6,
+              84.7
+            ],
+            [
+              86.8,
+              87.0
+            ],
+            [
+              87.5,
+              121.9
+            ],
+            [
+              122.9,
+              123.2
+            ],
+            [
+              123.7,
+              124.8
+            ],
+            [
+              127.6,
+              128.9
+            ],
+            [
+              129.8,
+              163.2
+            ],
+            [
+              163.6,
+              184.2
+            ],
+            [
+              184.7,
+              185.3
+            ],
+            [
+              185.8,
+              220.5
+            ],
+            [
+              221.0,
+              227.3
+            ],
+            [
+              227.7,
+              228.3
+            ],
+            [
+              228.8,
+              240.2
+            ],
+            [
+              241.3,
+              246.5
+            ],
+            [
+              247.6,
+              269.5
+            ],
+            [
+              270.0,
+              272.6
+            ],
+            [
+              273.2,
+              273.4
+            ],
+            [
+              273.9,
+              274.2
+            ],
+            [
+              274.7,
+              275.8
+            ],
+            [
+              276.6,
+              282.3
+            ],
+            [
+              283.8,
+              285.5
+            ],
+            [
+              286.9,
+              304.2
+            ],
+            [
+              304.7,
+              317.1
+            ],
+            [
+              317.5,
+              317.9
+            ],
+            [
+              322.1,
+              323.3
+            ],
+            [
+              323.7,
+              324.3
+            ],
+            [
+              328.0,
+              357.5
+            ],
+            [
+              358.0,
+              369.9
+            ],
+            [
+              371.4,
+              371.7
+            ],
+            [
+              372.2,
+              372.6
+            ],
+            [
+              375.0,
+              375.7
+            ],
+            [
+              377.3,
+              379.3
+            ],
+            [
+              381.6,
+              382.8
+            ],
+            [
+              383.3,
+              383.6
+            ],
+            [
+              384.0,
+              384.4
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        }
+      ],
+      "unisolatedFamilies": [
+        "winds",
+        "bowed_strings"
+      ]
+    },
+    {
+      "trackId": "track_2",
+      "sourceSha256": "82a3b6c1dc938d9edd87eb57b48f3103064d92f91d7fcbcba506e4f973e5b51b",
+      "structurePassed": true,
+      "errors": [],
+      "warnings": [],
+      "comparison": {
+        "vocals": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "vocals"
+        },
+        "bass": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "bass"
+        },
+        "percussion": {
+          "separatedEnergyOutsideAnnotation": 0.0017,
+          "stemId": "drums"
+        },
+        "plucked_strings": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "guitar"
+        },
+        "keys": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "piano"
+        }
+      },
+      "lyricSignalConflicts": [],
+      "measuredActivityCandidates": [
+        {
+          "family": "vocals",
+          "stemId": "vocals",
+          "intervals": [
+            [
+              1.6,
+              5.6
+            ],
+            [
+              9.9,
+              13.7
+            ],
+            [
+              14.1,
+              17.6
+            ],
+            [
+              18.3,
+              22.3
+            ],
+            [
+              26.6,
+              28.9
+            ],
+            [
+              29.8,
+              34.3
+            ],
+            [
+              34.8,
+              51.1
+            ],
+            [
+              68.5,
+              72.6
+            ],
+            [
+              76.7,
+              78.9
+            ],
+            [
+              80.3,
+              84.4
+            ],
+            [
+              85.1,
+              89.6
+            ],
+            [
+              93.4,
+              95.9
+            ],
+            [
+              97.0,
+              117.9
+            ],
+            [
+              124.5,
+              124.8
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "bass",
+          "stemId": "bass",
+          "intervals": [
+            [
+              5.3,
+              7.6
+            ],
+            [
+              9.5,
+              11.9
+            ],
+            [
+              12.3,
+              101.9
+            ],
+            [
+              102.3,
+              107.1
+            ],
+            [
+              107.5,
+              141.6
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "percussion",
+          "stemId": "drums",
+          "intervals": [
+            [
+              0.2,
+              0.7
+            ],
+            [
+              8.7,
+              44.5
+            ],
+            [
+              44.9,
+              52.9
+            ],
+            [
+              53.3,
+              55.0
+            ],
+            [
+              55.4,
+              57.1
+            ],
+            [
+              57.5,
+              65.4
+            ],
+            [
+              65.8,
+              111.3
+            ],
+            [
+              111.7,
+              119.7
+            ],
+            [
+              120.1,
+              121.8
+            ],
+            [
+              122.2,
+              130.1
+            ],
+            [
+              130.5,
+              132.2
+            ],
+            [
+              132.6,
+              135.3
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "plucked_strings",
+          "stemId": "guitar",
+          "intervals": [
+            [
+              1.1,
+              14.5
+            ],
+            [
+              15.3,
+              35.1
+            ],
+            [
+              35.6,
+              36.2
+            ],
+            [
+              36.6,
+              39.3
+            ],
+            [
+              39.8,
+              40.3
+            ],
+            [
+              40.7,
+              69.0
+            ],
+            [
+              71.3,
+              73.4
+            ],
+            [
+              74.1,
+              77.2
+            ],
+            [
+              77.9,
+              81.0
+            ],
+            [
+              82.6,
+              85.7
+            ],
+            [
+              86.1,
+              87.6
+            ],
+            [
+              88.9,
+              93.9
+            ],
+            [
+              94.3,
+              101.9
+            ],
+            [
+              102.4,
+              102.9
+            ],
+            [
+              103.4,
+              106.0
+            ],
+            [
+              106.5,
+              107.1
+            ],
+            [
+              107.6,
+              146.1
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        }
+      ],
+      "unisolatedFamilies": []
+    },
+    {
+      "trackId": "track_3",
+      "sourceSha256": "93d911eb8aa258bb97abdf83b69757dd00bf83617e586d4c56ccd7df95fb94df",
+      "structurePassed": true,
+      "errors": [],
+      "warnings": [],
+      "comparison": {
+        "vocals": {
+          "separatedEnergyOutsideAnnotation": 0.0007,
+          "stemId": "vocals"
+        },
+        "bass": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "bass"
+        },
+        "percussion": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "drums"
+        },
+        "plucked_strings": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "guitar"
+        },
+        "keys": {
+          "separatedEnergyOutsideAnnotation": 1.0,
+          "stemId": "piano"
+        }
+      },
+      "lyricSignalConflicts": [],
+      "measuredActivityCandidates": [
+        {
+          "family": "vocals",
+          "stemId": "vocals",
+          "intervals": [
+            [
+              14.3,
+              20.7
+            ],
+            [
+              21.8,
+              24.9
+            ],
+            [
+              25.6,
+              30.2
+            ],
+            [
+              31.8,
+              35.7
+            ],
+            [
+              38.0,
+              42.7
+            ],
+            [
+              44.2,
+              48.2
+            ],
+            [
+              63.2,
+              68.5
+            ],
+            [
+              68.9,
+              88.0
+            ],
+            [
+              122.0,
+              147.4
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "bass",
+          "stemId": "bass",
+          "intervals": [
+            [
+              13.6,
+              51.6
+            ],
+            [
+              57.0,
+              60.9
+            ],
+            [
+              61.3,
+              90.7
+            ],
+            [
+              94.1,
+              111.3
+            ],
+            [
+              111.9,
+              114.4
+            ],
+            [
+              115.0,
+              117.7
+            ],
+            [
+              118.1,
+              120.8
+            ],
+            [
+              121.2,
+              155.4
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "percussion",
+          "stemId": "drums",
+          "intervals": [
+            [
+              13.6,
+              14.6
+            ],
+            [
+              15.9,
+              17.0
+            ],
+            [
+              17.5,
+              18.2
+            ],
+            [
+              19.0,
+              19.2
+            ],
+            [
+              19.8,
+              20.8
+            ],
+            [
+              22.1,
+              23.2
+            ],
+            [
+              23.6,
+              24.4
+            ],
+            [
+              25.2,
+              51.5
+            ],
+            [
+              57.0,
+              58.5
+            ],
+            [
+              59.5,
+              64.6
+            ],
+            [
+              65.1,
+              65.6
+            ],
+            [
+              66.3,
+              67.6
+            ],
+            [
+              68.4,
+              69.0
+            ],
+            [
+              69.4,
+              70.7
+            ],
+            [
+              71.3,
+              72.1
+            ],
+            [
+              72.5,
+              73.8
+            ],
+            [
+              74.2,
+              77.0
+            ],
+            [
+              77.5,
+              86.4
+            ],
+            [
+              90.6,
+              91.3
+            ],
+            [
+              93.7,
+              96.6
+            ],
+            [
+              97.2,
+              103.2
+            ],
+            [
+              103.8,
+              110.6
+            ],
+            [
+              111.0,
+              113.7
+            ],
+            [
+              114.1,
+              117.5
+            ],
+            [
+              117.9,
+              120.6
+            ],
+            [
+              121.0,
+              135.4
+            ],
+            [
+              135.8,
+              136.6
+            ],
+            [
+              137.1,
+              137.7
+            ],
+            [
+              138.3,
+              144.6
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "plucked_strings",
+          "stemId": "guitar",
+          "intervals": [
+            [
+              0.8,
+              25.7
+            ],
+            [
+              26.2,
+              50.7
+            ],
+            [
+              51.2,
+              147.0
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        }
+      ],
+      "unisolatedFamilies": []
+    },
+    {
+      "trackId": "track_4",
+      "sourceSha256": "b297b04e97f6e0f6d57daa8f2f714ff4c7242e2e0cd0447923bcf38032c1ad9e",
+      "structurePassed": true,
+      "errors": [],
+      "warnings": [],
+      "comparison": {
+        "vocals": {
+          "separatedEnergyOutsideAnnotation": 0.0246,
+          "stemId": "vocals"
+        },
+        "bass": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "bass"
+        },
+        "percussion": {
+          "separatedEnergyOutsideAnnotation": 0.0002,
+          "stemId": "drums"
+        },
+        "plucked_strings": {
+          "separatedEnergyOutsideAnnotation": 0.0258,
+          "stemId": "guitar"
+        },
+        "keys": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "piano"
+        }
+      },
+      "lyricSignalConflicts": [],
+      "measuredActivityCandidates": [
+        {
+          "family": "vocals",
+          "stemId": "vocals",
+          "intervals": [
+            [
+              15.0,
+              17.6
+            ],
+            [
+              18.4,
+              21.5
+            ],
+            [
+              22.2,
+              23.2
+            ],
+            [
+              24.0,
+              25.9
+            ],
+            [
+              28.8,
+              31.9
+            ],
+            [
+              32.7,
+              36.1
+            ],
+            [
+              37.3,
+              40.7
+            ],
+            [
+              42.4,
+              49.2
+            ],
+            [
+              49.6,
+              67.8
+            ],
+            [
+              69.0,
+              88.0
+            ],
+            [
+              88.7,
+              94.6
+            ],
+            [
+              97.2,
+              99.9
+            ],
+            [
+              100.7,
+              103.8
+            ],
+            [
+              104.3,
+              105.7
+            ],
+            [
+              106.3,
+              108.3
+            ],
+            [
+              111.0,
+              114.1
+            ],
+            [
+              114.9,
+              118.4
+            ],
+            [
+              119.6,
+              123.1
+            ],
+            [
+              124.5,
+              131.3
+            ],
+            [
+              131.9,
+              177.4
+            ],
+            [
+              178.7,
+              197.7
+            ],
+            [
+              198.2,
+              204.5
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "bass",
+          "stemId": "bass",
+          "intervals": [
+            [
+              41.2,
+              163.4
+            ],
+            [
+              165.1,
+              192.6
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "percussion",
+          "stemId": "drums",
+          "intervals": [
+            [
+              37.8,
+              38.4
+            ],
+            [
+              38.9,
+              39.2
+            ],
+            [
+              39.9,
+              40.1
+            ],
+            [
+              40.6,
+              40.9
+            ],
+            [
+              41.6,
+              41.9
+            ],
+            [
+              42.5,
+              43.6
+            ],
+            [
+              45.1,
+              45.3
+            ],
+            [
+              46.4,
+              47.0
+            ],
+            [
+              47.6,
+              47.8
+            ],
+            [
+              48.5,
+              48.8
+            ],
+            [
+              49.4,
+              50.5
+            ],
+            [
+              51.9,
+              52.2
+            ],
+            [
+              52.8,
+              54.0
+            ],
+            [
+              54.9,
+              55.6
+            ],
+            [
+              56.2,
+              57.3
+            ],
+            [
+              58.4,
+              59.0
+            ],
+            [
+              59.6,
+              60.7
+            ],
+            [
+              61.4,
+              62.5
+            ],
+            [
+              63.1,
+              64.2
+            ],
+            [
+              64.6,
+              65.9
+            ],
+            [
+              66.5,
+              67.9
+            ],
+            [
+              68.6,
+              69.4
+            ],
+            [
+              69.9,
+              71.0
+            ],
+            [
+              71.6,
+              72.8
+            ],
+            [
+              73.4,
+              74.5
+            ],
+            [
+              75.1,
+              76.2
+            ],
+            [
+              76.8,
+              77.9
+            ],
+            [
+              78.5,
+              79.6
+            ],
+            [
+              80.2,
+              81.6
+            ],
+            [
+              82.4,
+              83.0
+            ],
+            [
+              84.1,
+              84.8
+            ],
+            [
+              85.8,
+              86.5
+            ],
+            [
+              87.5,
+              88.2
+            ],
+            [
+              89.6,
+              89.9
+            ],
+            [
+              90.9,
+              91.6
+            ],
+            [
+              93.1,
+              93.3
+            ],
+            [
+              94.4,
+              95.0
+            ],
+            [
+              96.5,
+              97.5
+            ],
+            [
+              98.2,
+              98.5
+            ],
+            [
+              99.1,
+              100.2
+            ],
+            [
+              101.6,
+              101.9
+            ],
+            [
+              102.3,
+              103.6
+            ],
+            [
+              105.1,
+              105.3
+            ],
+            [
+              105.7,
+              106.1
+            ],
+            [
+              106.8,
+              107.0
+            ],
+            [
+              108.1,
+              110.5
+            ],
+            [
+              110.9,
+              111.2
+            ],
+            [
+              111.9,
+              112.2
+            ],
+            [
+              112.8,
+              113.9
+            ],
+            [
+              116.0,
+              117.3
+            ],
+            [
+              118.8,
+              119.0
+            ],
+            [
+              119.4,
+              120.7
+            ],
+            [
+              121.8,
+              122.5
+            ],
+            [
+              122.9,
+              124.2
+            ],
+            [
+              124.8,
+              125.9
+            ],
+            [
+              128.2,
+              129.3
+            ],
+            [
+              131.6,
+              132.8
+            ],
+            [
+              134.2,
+              134.5
+            ],
+            [
+              135.1,
+              136.2
+            ],
+            [
+              137.2,
+              137.9
+            ],
+            [
+              138.5,
+              139.6
+            ],
+            [
+              140.2,
+              141.3
+            ],
+            [
+              142.4,
+              143.0
+            ],
+            [
+              144.1,
+              144.8
+            ],
+            [
+              145.4,
+              146.5
+            ],
+            [
+              146.9,
+              148.2
+            ],
+            [
+              148.8,
+              150.2
+            ],
+            [
+              150.9,
+              151.6
+            ],
+            [
+              152.2,
+              153.3
+            ],
+            [
+              154.4,
+              155.0
+            ],
+            [
+              155.6,
+              156.8
+            ],
+            [
+              157.4,
+              158.5
+            ],
+            [
+              159.1,
+              160.2
+            ],
+            [
+              160.8,
+              161.9
+            ],
+            [
+              162.5,
+              163.6
+            ],
+            [
+              164.6,
+              165.3
+            ],
+            [
+              166.4,
+              167.0
+            ],
+            [
+              167.6,
+              168.7
+            ],
+            [
+              169.4,
+              170.5
+            ],
+            [
+              171.1,
+              172.2
+            ],
+            [
+              172.8,
+              173.9
+            ],
+            [
+              174.3,
+              175.6
+            ],
+            [
+              176.2,
+              177.6
+            ],
+            [
+              178.4,
+              179.0
+            ],
+            [
+              179.6,
+              180.7
+            ],
+            [
+              181.4,
+              182.5
+            ],
+            [
+              183.1,
+              184.2
+            ],
+            [
+              184.8,
+              185.9
+            ],
+            [
+              186.5,
+              187.6
+            ],
+            [
+              188.2,
+              189.3
+            ],
+            [
+              189.9,
+              191.3
+            ],
+            [
+              192.1,
+              192.8
+            ],
+            [
+              193.8,
+              194.5
+            ],
+            [
+              195.5,
+              196.2
+            ],
+            [
+              197.2,
+              197.9
+            ],
+            [
+              199.3,
+              199.6
+            ],
+            [
+              200.6,
+              201.3
+            ],
+            [
+              204.1,
+              204.7
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "plucked_strings",
+          "stemId": "guitar",
+          "intervals": [
+            [
+              6.3,
+              10.9
+            ],
+            [
+              11.4,
+              13.2
+            ],
+            [
+              14.2,
+              18.0
+            ],
+            [
+              18.5,
+              19.0
+            ],
+            [
+              19.4,
+              26.7
+            ],
+            [
+              27.9,
+              38.1
+            ],
+            [
+              39.5,
+              40.6
+            ],
+            [
+              41.5,
+              53.9
+            ],
+            [
+              54.3,
+              88.5
+            ],
+            [
+              89.7,
+              92.2
+            ],
+            [
+              93.2,
+              95.3
+            ],
+            [
+              96.5,
+              109.4
+            ],
+            [
+              110.2,
+              195.0
+            ],
+            [
+              196.6,
+              197.0
+            ],
+            [
+              199.3,
+              200.3
+            ],
+            [
+              200.9,
+              201.9
+            ],
+            [
+              204.4,
+              205.3
+            ],
+            [
+              206.4,
+              207.6
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "keys",
+          "stemId": "piano",
+          "intervals": [
+            [
+              0.5,
+              6.3
+            ],
+            [
+              7.1,
+              12.9
+            ],
+            [
+              14.2,
+              27.4
+            ],
+            [
+              27.9,
+              60.8
+            ],
+            [
+              62.2,
+              71.1
+            ],
+            [
+              82.6,
+              87.4
+            ],
+            [
+              88.0,
+              88.4
+            ],
+            [
+              89.4,
+              94.1
+            ],
+            [
+              96.5,
+              104.7
+            ],
+            [
+              105.1,
+              107.9
+            ],
+            [
+              108.5,
+              111.5
+            ],
+            [
+              111.9,
+              117.6
+            ],
+            [
+              118.0,
+              121.8
+            ],
+            [
+              123.1,
+              127.7
+            ],
+            [
+              128.1,
+              135.4
+            ],
+            [
+              136.7,
+              137.6
+            ],
+            [
+              172.1,
+              173.6
+            ],
+            [
+              176.0,
+              189.6
+            ],
+            [
+              192.5,
+              198.5
+            ],
+            [
+              199.1,
+              205.0
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        }
+      ],
+      "unisolatedFamilies": [
+        "bowed_strings"
+      ]
+    },
+    {
+      "trackId": "track_5",
+      "sourceSha256": "e6bda40f7d1a9af3222d498aea0ec366fd1bda918cfd0bc66662b75cef8c2501",
+      "structurePassed": true,
+      "errors": [],
+      "warnings": [],
+      "comparison": {
+        "vocals": {
+          "separatedEnergyOutsideAnnotation": 0.0146,
+          "stemId": "vocals"
+        },
+        "bass": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "bass"
+        },
+        "percussion": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "drums"
+        },
+        "plucked_strings": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "guitar"
+        },
+        "keys": {
+          "separatedEnergyOutsideAnnotation": 0.0,
+          "stemId": "piano"
+        }
+      },
+      "lyricSignalConflicts": [],
+      "measuredActivityCandidates": [
+        {
+          "family": "vocals",
+          "stemId": "vocals",
+          "intervals": [
+            [
+              18.6,
+              20.7
+            ],
+            [
+              22.5,
+              24.6
+            ],
+            [
+              25.1,
+              28.7
+            ],
+            [
+              29.3,
+              32.2
+            ],
+            [
+              33.2,
+              36.2
+            ],
+            [
+              37.1,
+              39.6
+            ],
+            [
+              40.6,
+              43.6
+            ],
+            [
+              44.5,
+              45.6
+            ],
+            [
+              65.1,
+              67.1
+            ],
+            [
+              67.7,
+              70.5
+            ],
+            [
+              71.5,
+              78.3
+            ],
+            [
+              80.5,
+              82.6
+            ],
+            [
+              83.2,
+              86.1
+            ],
+            [
+              87.4,
+              92.5
+            ],
+            [
+              94.2,
+              100.2
+            ],
+            [
+              101.9,
+              107.8
+            ],
+            [
+              109.6,
+              113.1
+            ],
+            [
+              114.4,
+              116.9
+            ],
+            [
+              117.4,
+              123.6
+            ],
+            [
+              156.1,
+              162.2
+            ],
+            [
+              163.8,
+              169.9
+            ],
+            [
+              171.6,
+              175.1
+            ],
+            [
+              176.4,
+              178.8
+            ],
+            [
+              179.3,
+              185.4
+            ],
+            [
+              187.1,
+              190.8
+            ],
+            [
+              191.9,
+              194.2
+            ],
+            [
+              194.8,
+              201.5
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "bass",
+          "stemId": "bass",
+          "intervals": [],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "percussion",
+          "stemId": "drums",
+          "intervals": [],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "plucked_strings",
+          "stemId": "guitar",
+          "intervals": [
+            [
+              35.2,
+              35.8
+            ],
+            [
+              64.2,
+              67.2
+            ],
+            [
+              68.4,
+              69.1
+            ],
+            [
+              70.3,
+              70.6
+            ],
+            [
+              71.4,
+              71.7
+            ],
+            [
+              72.2,
+              73.6
+            ],
+            [
+              76.1,
+              77.4
+            ],
+            [
+              77.9,
+              78.7
+            ],
+            [
+              79.7,
+              83.3
+            ],
+            [
+              86.4,
+              87.4
+            ],
+            [
+              99.0,
+              107.1
+            ],
+            [
+              117.6,
+              120.0
+            ],
+            [
+              129.5,
+              132.4
+            ],
+            [
+              133.9,
+              134.6
+            ],
+            [
+              135.1,
+              137.8
+            ],
+            [
+              141.7,
+              144.9
+            ],
+            [
+              152.3,
+              155.2
+            ],
+            [
+              157.1,
+              168.2
+            ],
+            [
+              168.7,
+              172.1
+            ],
+            [
+              175.8,
+              184.3
+            ],
+            [
+              196.1,
+              200.1
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        },
+        {
+          "family": "keys",
+          "stemId": "piano",
+          "intervals": [
+            [
+              0.3,
+              17.2
+            ],
+            [
+              17.7,
+              30.5
+            ],
+            [
+              30.9,
+              81.0
+            ],
+            [
+              81.4,
+              199.1
+            ],
+            [
+              200.6,
+              201.2
+            ],
+            [
+              201.6,
+              202.2
+            ],
+            [
+              202.6,
+              203.4
+            ],
+            [
+              204.5,
+              207.1
+            ],
+            [
+              208.4,
+              210.7
+            ],
+            [
+              212.2,
+              216.4
+            ]
+          ],
+          "provenance": "measured-model-separated-signal",
+          "status": "candidate"
+        }
+      ],
+      "unisolatedFamilies": []
+    }
+  ],
+  "summary": {
+    "tracks": 16,
+    "sections": 137,
+    "structurePassed": 16,
+    "tracksWithTimingWarnings": 5,
+    "lyricSignalConflicts": 23
+  }
+}

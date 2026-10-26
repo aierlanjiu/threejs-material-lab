@@ -1,0 +1,293 @@
+{
+  "version": 1,
+  "trackId": "track_5",
+  "sourceSha256": "e6bda40f7d1a9af3222d498aea0ec366fd1bda918cfd0bc66662b75cef8c2501",
+  "audioDigests": {
+    "drums": "a1fb8088cdbb7c80499e112cdbc235892007865283a027799bad5d709d5fd1ab",
+    "bass": "58903b0073743583253e4746582b4dcf8186d75d887473a70cc548c3b0585a8f",
+    "other": "8f08a48530ab3580a8dd1f77cca716704fb244aaabe516874fa2181e24823122",
+    "vocals": "d8fa5c5dc6ad057f78c5d5cf0196d9d399f098cf4ab63c534cfb55472e2b1d69",
+    "guitar": "8146cc8136a5d982df3c44a5a8a2afab3e3add0f431dda7715f0e64ca76981d8",
+    "piano": "be0503a441c2abad87a902c01df8c688253902942071a7667dd46696fe71d06b"
+  },
+  "method": "AST-family-classification-and-measured-stem-events-v1",
+  "nativeAudioListeningVerified": false,
+  "notice": "模型估计；音色类别按10秒音频窗口分析，实际动作由分轨事件和能量驱动。共享伴奏的多个家族联动控制，未声称各乐器独立分离。",
+  "sections": [
+    {
+      "start": 0.0,
+      "end": 18.5,
+      "label": "前奏",
+      "activeFamilies": [
+        "plucked_strings",
+        "keys",
+        "percussion",
+        "bass"
+      ]
+    },
+    {
+      "start": 18.5,
+      "end": 65.4,
+      "label": "主歌",
+      "activeFamilies": [
+        "vocals",
+        "plucked_strings",
+        "keys",
+        "bass",
+        "percussion"
+      ]
+    },
+    {
+      "start": 65.4,
+      "end": 95.1,
+      "label": "主歌",
+      "activeFamilies": [
+        "vocals",
+        "plucked_strings",
+        "keys",
+        "bass",
+        "percussion"
+      ]
+    },
+    {
+      "start": 95.1,
+      "end": 128.0,
+      "label": "副歌",
+      "activeFamilies": [
+        "vocals",
+        "plucked_strings",
+        "keys",
+        "bass",
+        "percussion"
+      ]
+    },
+    {
+      "start": 128.0,
+      "end": 157.0,
+      "label": "间奏",
+      "activeFamilies": [
+        "plucked_strings",
+        "keys",
+        "bass",
+        "percussion"
+      ]
+    },
+    {
+      "start": 157.0,
+      "end": 188.0,
+      "label": "副歌",
+      "activeFamilies": [
+        "vocals",
+        "plucked_strings",
+        "keys",
+        "bass",
+        "percussion"
+      ]
+    },
+    {
+      "start": 188.0,
+      "end": 215.0,
+      "label": "副歌",
+      "activeFamilies": [
+        "vocals",
+        "plucked_strings",
+        "keys",
+        "bass",
+        "percussion"
+      ]
+    },
+    {
+      "start": 215.0,
+      "end": 225.98,
+      "label": "尾奏",
+      "activeFamilies": [
+        "vocals",
+        "plucked_strings",
+        "keys",
+        "percussion"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "id": "other-bowed_strings",
+      "stemId": "other",
+      "instrumentId": null,
+      "familyId": "bowed_strings",
+      "actors": {
+        "one-piece": "shanks",
+        "dragon-ball": null,
+        "naruto": null
+      },
+      "status": "estimated",
+      "activeIntervals": [
+        [
+          49.2,
+          60.1
+        ],
+        [
+          60.6,
+          62.2
+        ],
+        [
+          64.8,
+          130.0
+        ],
+        [
+          136.0,
+          187.1
+        ]
+      ],
+      "activitySource": "envelope",
+      "sharedAudio": true,
+      "review": {
+        "reviewer": "AST AudioSet model + measured stem activity",
+        "method": "local-PCM-family-cross-check",
+        "at": "2026-10-15T06:20:34.739507+00:00"
+      },
+      "evidence": {
+        "model": "MIT/ast-finetuned-audioset-10-10-0.4593",
+        "revision": "f826b80d28226b62986cc218e5cec390b1096902",
+        "classificationSha256": "ac0735fd1aaaf38f6a0a4598bdc71880fc6f34dc3db780b84faea77c63cf1431",
+        "audioSha256": "8f08a48530ab3580a8dd1f77cca716704fb244aaabe516874fa2181e24823122",
+        "score": 0.82316
+      }
+    },
+    {
+      "id": "guitar-plucked_strings",
+      "stemId": "guitar",
+      "instrumentId": "guitar",
+      "familyId": "plucked_strings",
+      "actors": {
+        "one-piece": "usopp",
+        "dragon-ball": "vegeta",
+        "naruto": "sasuke"
+      },
+      "status": "estimated",
+      "activeIntervals": [
+        [
+          29.4,
+          29.9
+        ],
+        [
+          31.2,
+          31.3
+        ],
+        [
+          35.1,
+          36.1
+        ],
+        [
+          64.2,
+          67.5
+        ],
+        [
+          68.3,
+          69.3
+        ],
+        [
+          70.3,
+          70.6
+        ],
+        [
+          71.4,
+          73.6
+        ],
+        [
+          74.2,
+          74.3
+        ],
+        [
+          74.8,
+          74.9
+        ],
+        [
+          75.3,
+          75.5
+        ],
+        [
+          76.1,
+          78.8
+        ],
+        [
+          79.7,
+          83.3
+        ],
+        [
+          86.4,
+          88.1
+        ],
+        [
+          89.4,
+          89.6
+        ],
+        [
+          99.0,
+          107.1
+        ],
+        [
+          117.2,
+          120.3
+        ],
+        [
+          129.5,
+          132.8
+        ],
+        [
+          133.4,
+          137.8
+        ],
+        [
+          139.2,
+          139.4
+        ],
+        [
+          141.7,
+          145.4
+        ],
+        [
+          146.9,
+          147.1
+        ],
+        [
+          152.3,
+          155.5
+        ],
+        [
+          157.1,
+          172.2
+        ],
+        [
+          173.9,
+          174.8
+        ],
+        [
+          175.5,
+          184.4
+        ],
+        [
+          196.1,
+          200.5
+        ],
+        [
+          212.3,
+          212.4
+        ]
+      ],
+      "activitySource": "events",
+      "sharedAudio": false,
+      "review": {
+        "reviewer": "AST AudioSet model + measured stem activity",
+        "method": "local-PCM-family-cross-check",
+        "at": "2026-10-15T06:20:34.739813+00:00"
+      },
+      "evidence": {
+        "model": "MIT/ast-finetuned-audioset-10-10-0.4593",
+        "revision": "f826b80d28226b62986cc218e5cec390b1096902",
+        "classificationSha256": "ac0735fd1aaaf38f6a0a4598bdc71880fc6f34dc3db780b84faea77c63cf1431",
+        "audioSha256": "8146cc8136a5d982df3c44a5a8a2afab3e3add0f431dda7715f0e64ca76981d8",
+        "score": 0.34701
+      }
+    }
+  ]
+}
