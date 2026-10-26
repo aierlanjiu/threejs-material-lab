@@ -26,4 +26,13 @@
 
 ## 发布状态
 
-发布前验证完成；源码推送、Pages 构建及公开资源摘要读回待执行。最终提交、构建状态与摘要保存在 output/pages-release-20261026-154632/，完成后更新本节。
+已发布：[打开律](https://aierlanjiu.github.io/threejs-material-lab/)。
+
+- 源码快照：`bf30a61e4a229bcda80605f2dc0936481307ebca`，分支 `release/lu-pages-20261026-154632`。
+- Pages 提交：`1598eda7fd22ec5875c38374528e1fefb69e0146`；GitHub Pages API 回读为 `built`。
+- 构建、部署、构建状态回报三个 Actions job 全部成功：[构建记录](https://github.com/aierlanjiu/threejs-material-lab/actions/runs/40289107489)。
+- 从公开普通 URL 读回 46 个文件，全部 SHA-256 与发布源码一致，覆盖当前改动的 42 个运行文件及原有混音器、两份谱面和《偏爱》完整 MP3。
+- 运行树 `1043621354` 字节。部署仅更改 gh-pages 和独立源码快照分支，原工作区 HEAD 与并发开发内容保持。
+- 发布前 Pages 基线 `7e49dd4be84fe0cc85332a63c9ded8b7f5ae8805`，本地恢复引用 `backup/pages-before-20261026-154632`。未进行回滚。
+
+完整 API、文件摘要、测试日志与备份位于 `output/pages-release-20261026-154632/`。
