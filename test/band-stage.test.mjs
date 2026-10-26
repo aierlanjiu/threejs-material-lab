@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import {stageSpec,stageBandLayout,stageHeightAt,stageClimaxAt,stageLightingAt,petFrameAt} from '../js/audio/band-stage-layout.js';
+import {bandBeatAt} from '../js/audio/band-beat.js';
+import {sampleBandMotion} from '../js/audio/band-layout.js';
 import {BAND_PETS} from '../js/avatar/band-pets.js';
 
 assert.equal(BAND_PETS.length,29);
@@ -32,7 +34,15 @@ for(const narrow of [true,false]){
  const signatures=new Set(['arc','terrace','ring','wings','solo'].map(f=>JSON.stringify(stageBandLayout(10,f,narrow))));assert.equal(signatures.size,5);
 }
 assert.equal(petFrameAt(3.125,150,.9),petFrameAt(3.125,150,.9),'sprite selection follows the song time, not wall time');
-const score={duration:30,bpmEstimate:120,stems:[{id:'drums',envelope:[{time:0,value:.1},{time:8,value:.1},{time:12,value:1},{time:16,value:1},{time:20,value:.1},{time:30,value:.1}]}]};
+const score={duration:30,bpmEstimate:120,beatTimes:[0,.5,1,1.5,2,2.5,3],timeSignature:[4,4],stems:[{id:'drums',envelope:[{time:0,value:.1},{time:8,value:.1},{time:12,value:1},{time:16,value:1},{time:20,value:.1},{time:30,value:.1}]}]};
+const downbeatAccent=bandBeatAt(score,2.01);
+const offbeatAccent=bandBeatAt(score,2.51);
+assert.equal(downbeatAccent.index,4);assert.ok(downbeatAccent.downbeat>.9&&downbeatAccent.pulse>.9);
+assert.equal(offbeatAccent.index,5);assert.equal(offbeatAccent.downbeat,0);assert.ok(offbeatAccent.pulse>.9);
+assert.deepEqual(bandBeatAt(score,2.01),downbeatAccent,'beat grid lookup is deterministic across seeks');
+const basePose=sampleBandMotion({activity:.8,attack:.2},2.01,120,{technique:'pluck',index:1});
+const accentedPose=sampleBandMotion({activity:.8,attack:.2},2.01,120,{technique:'pluck',index:1,beatPulse:downbeatAccent.pulse,downbeat:downbeatAccent.downbeat});
+assert.ok(Math.abs(accentedPose.instrument.rotation[2])>Math.abs(basePose.instrument.rotation[2]),'beat accents amplify active instrument motion');
 assert.deepEqual(stageClimaxAt(score,2),{energy:.1,intensity:0,bursts:[]});
 const peak=stageClimaxAt(score,14.5);assert.ok(peak.intensity>0&&peak.bursts.length>0);
 stageClimaxAt(score,29);assert.deepEqual(stageClimaxAt(score,14.5),peak,'seeking back must reconstruct the same fireworks');
@@ -43,4 +53,6 @@ const light=stageLightingAt(score,14.5,peak);assert.ok(light.lift>stageLightingA
 assert.deepEqual(stageLightingAt(score,14.5,peak),light,'camera and lights must be reconstructed by song time after a seek');
 assert.equal(stageLightingAt(score,14.5,peak,true).cameraShift,0);
 assert.equal(stageLightingAt(score,14.5,peak,true).climax,0);
-console.log('PASS 29 unique pets, grounded half-circle/rectangular stages, note-driven frames, quiet/reduced states and seek-stable climax effects');
+assert.equal(stageLightingAt(score,2.01,stageClimaxAt(score,2.01),true).beat,0);
+assert.equal(stageLightingAt(score,2.01,stageClimaxAt(score,2.01),true).downbeat,0);
+console.log('PASS 29 unique pets, grounded half-circle/rectangular stages, note-driven frames, beat-grid accents, quiet/reduced states and seek-stable climax effects');

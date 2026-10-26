@@ -1318,25 +1318,25 @@ body.immersive .lue-core-drawer { display: none !important; }
 
 /* Daily player: one transport row, one timeline, and two secondary actions. */
 .lu-apple-dock {
-  width: min(760px, calc(100vw - 32px));
-  height: 128px;
-  padding: 10px 20px;
-  bottom: max(20px, env(safe-area-inset-bottom));
+  width: min(720px, calc(100vw - 32px));
+  height: 88px;
+  padding: 8px 18px 10px;
+  bottom: max(16px, env(safe-area-inset-bottom));
   box-sizing: border-box;
   border-radius: 26px;
-  background: linear-gradient(155deg, rgba(48, 48, 54, .85), rgba(23, 23, 28, .88));
-  border-color: rgba(255, 255, 255, .16);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18), 0 16px 48px rgba(0, 0, 0, .36);
+  background: linear-gradient(155deg, rgba(36, 38, 46, .82), rgba(18, 20, 26, .86));
+  border-color: rgba(255, 255, 255, .14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), 0 18px 48px rgba(0, 0, 0, .42);
   overflow: visible;
-  transition: opacity 220ms ease-out, visibility 220ms ease-out, transform 240ms cubic-bezier(.2, .8, .2, 1);
+  transition: opacity 240ms cubic-bezier(.22, 1, .36, 1), visibility 240ms ease-out, transform 280ms cubic-bezier(.22, 1, .36, 1);
   font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", sans-serif;
-  backdrop-filter: blur(18px) saturate(120%);
-  -webkit-backdrop-filter: blur(18px) saturate(120%);
+  backdrop-filter: blur(26px) saturate(165%);
+  -webkit-backdrop-filter: blur(26px) saturate(165%);
 }
 .lu-apple-dock[data-dock-state="expanded"] {
-  width: min(760px, calc(100vw - 32px));
-  height: 128px;
-  padding: 10px 20px;
+  width: min(720px, calc(100vw - 32px));
+  height: 88px;
+  padding: 8px 18px 10px;
 }
 .lu-apple-dock[data-visibility="hidden"] {
   opacity: 0;
@@ -1351,47 +1351,47 @@ body.immersive .lue-core-drawer { display: none !important; }
 body.poster-mode:not(.lue-core-open) :is(.lu-band-score, .lu-band-status, #luScorePanel) { visibility: hidden; pointer-events: none; }
 
 #cubeLyricsDeck {
-  transition: margin-bottom 260ms cubic-bezier(.2, .8, .2, 1);
+  transition: margin-bottom 260ms cubic-bezier(.22, 1, .36, 1);
 }
 .stageWrap:has(.mode-slot) #stage {
-  transition: height 260ms cubic-bezier(.2, .8, .2, 1);
+  transition: height 260ms cubic-bezier(.22, 1, .36, 1);
 }
 .lu-band-lyric {
-  transition: bottom 260ms cubic-bezier(.2, .8, .2, 1);
+  transition: bottom 260ms cubic-bezier(.22, 1, .36, 1);
 }
 
-body.poster-mode:not(.recording-preview):not(.lu-record-menu-open):not(.apple-dock-hidden):not(:has(#luAppleDock[data-visibility="hidden"])) .stageWrap:has(.mode-slot) #stage { height: calc(100% - 158px); }
-body.poster-mode:not(.recording-preview):not(.lu-record-menu-open):not(.apple-dock-hidden):not(:has(#luAppleDock[data-visibility="hidden"])) #cubeLyricsDeck { margin-bottom: 158px; }
+body.poster-mode:not(.recording-preview):not(.lu-record-menu-open):not(.apple-dock-hidden):not(:has(#luAppleDock[data-visibility="hidden"])) .stageWrap:has(.mode-slot) #stage { height: 100% !important; }
+body.poster-mode:not(.recording-preview):not(.lu-record-menu-open):not(.apple-dock-hidden):not(:has(#luAppleDock[data-visibility="hidden"])) #cubeLyricsDeck { margin-bottom: 112px; }
 body.poster-mode:is(.apple-dock-hidden, :has(#luAppleDock[data-visibility="hidden"])) .stageWrap:has(.mode-slot) #stage { height: 100% !important; }
 body.poster-mode:is(.apple-dock-hidden, :has(#luAppleDock[data-visibility="hidden"])) #cubeLyricsDeck { margin-bottom: 24px !important; }
 body.poster-mode:is(.apple-dock-hidden, :has(#luAppleDock[data-visibility="hidden"])) .lu-band-lyric { bottom: 42px !important; }
 .lu-apple-dock .lu-apple-capsule-body {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  grid-template-rows: 72px 24px;
+  grid-template-rows: 48px 18px;
   grid-template-areas: "track transport actions" "timeline timeline timeline";
-  gap: 4px 14px;
+  gap: 2px 14px;
   opacity: 1;
   transform: none;
   transition: none;
 }
-.lu-apple-transport-cluster { grid-area: transport; gap: 10px; }
+.lu-apple-transport-cluster { grid-area: transport; gap: 6px; }
 .lu-apple-actions-cluster { grid-area: actions; justify-self: end; gap: 6px; }
 .lu-apple-icon-btn {
   width: 44px !important; min-width: 44px !important;
   height: 44px !important; min-height: 44px !important;
-  color: rgba(245, 245, 247, .78) !important;
+  color: rgba(245, 245, 247, .82) !important;
   transform: none;
 }
-.lu-apple-icon-btn svg { width: 21px; height: 21px; }
+.lu-apple-icon-btn svg { width: 20px; height: 20px; }
 .lu-apple-play-btn {
-  width: 64px !important; min-width: 64px !important;
-  height: 64px !important; min-height: 64px !important;
+  width: 46px !important; min-width: 46px !important;
+  height: 46px !important; min-height: 46px !important;
   background: linear-gradient(#fff, #ececef) !important;
   color: #17171c !important;
-  box-shadow: inset 0 1px 0 #fff, 0 5px 16px rgba(0, 0, 0, .28), 0 0 28px rgba(255, 255, 255, .10);
+  box-shadow: inset 0 1px 0 #fff, 0 5px 16px rgba(0, 0, 0, .28), 0 0 24px rgba(255, 255, 255, .12);
 }
-.lu-apple-play-btn svg { width: 27px; height: 27px; }
+.lu-apple-play-btn svg { width: 22px; height: 22px; }
 #applePlayIcon { transform: translateX(0.6px); }
 .lu-apple-play-btn:active, .lu-apple-icon-btn:active { transform: scale(.97); }
 .lu-apple-dock :is(button, input):focus-visible,
@@ -1511,7 +1511,7 @@ button.lu-apple-track-zone {
   }
   .lu-apple-playlist-popover { bottom: max(108px, calc(env(safe-area-inset-bottom) + 100px)); max-height: min(50dvh, 420px); }
   body.poster-mode:not(.apple-dock-hidden):not(:has(#luAppleDock[data-visibility="hidden"])) .lu-band-lyric { bottom: 102px; }
-  body.poster-mode:not(.recording-preview):not(.lu-record-menu-open):not(.apple-dock-hidden):not(:has(#luAppleDock[data-visibility="hidden"])) .stageWrap:has(.mode-slot) #stage { height: calc(100% - 102px); }
+  body.poster-mode:not(.recording-preview):not(.lu-record-menu-open):not(.apple-dock-hidden):not(:has(#luAppleDock[data-visibility="hidden"])) .stageWrap:has(.mode-slot) #stage { height: 100% !important; }
   body.poster-mode:not(.recording-preview):not(.lu-record-menu-open):not(.apple-dock-hidden):not(:has(#luAppleDock[data-visibility="hidden"])) #cubeLyricsDeck { margin-bottom: 102px; }
   body.poster-mode:is(.apple-dock-hidden, :has(#luAppleDock[data-visibility="hidden"])) .stageWrap:has(.mode-slot) #stage { height: 100% !important; }
   body.poster-mode:is(.apple-dock-hidden, :has(#luAppleDock[data-visibility="hidden"])) #cubeLyricsDeck { margin-bottom: 24px !important; }
@@ -1620,3 +1620,496 @@ button.lu-apple-track-zone {
   }
 }
 
+/* LÜ concert: the performance, lyric lane and transport have separate space. */
+body.lu-band-mode {
+  --band-ink: #0b1016;
+  --band-surface: #161c23;
+  --band-paper: #f3eadb;
+  --band-muted: #b8b6b0;
+  --band-accent: #c9a66f;
+  --band-edge: max(16px, env(safe-area-inset-bottom));
+  --band-dock-height: 152px;
+  --band-ui-gap: 16px;
+  --band-ui-font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", sans-serif;
+  background-color: var(--band-ink);
+}
+body.lu-band-mode:not(.immersive):not(.recording-preview):not(.apple-dock-hidden):has(#luAppleDock[data-visibility="visible"]) .app {
+  height: calc(100dvh - var(--band-dock-height) - var(--band-edge) - var(--band-ui-gap));
+}
+body.lu-band-mode .lu-apple-dock,
+body.lu-band-mode .lu-apple-dock[data-dock-state="expanded"] {
+  width: min(760px, calc(100vw - 40px));
+  height: var(--band-dock-height);
+  bottom: var(--band-edge);
+  padding: 10px 20px;
+  border: 0;
+  border-radius: 24px;
+  background: #161c23f5;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: inset 0 0 0 var(--lu-hairline, 1px) #f3eadb26, 0 8px 28px #0003;
+  color: var(--band-paper);
+  font-family: var(--band-ui-font);
+  --apple-pill-text: var(--band-paper);
+  --apple-pill-sub: var(--band-muted);
+}
+body.lu-band-mode .lu-apple-dock .lu-apple-capsule-body {
+  grid-template-rows: 44px 52px 24px;
+  grid-template-areas: "looks looks looks" "track transport actions" "timeline timeline timeline";
+  gap: 6px 12px;
+}
+body.lu-band-mode .lu-apple-transport-cluster { gap: 4px; }
+body.lu-band-mode .lu-apple-actions-cluster { gap: 4px; }
+body.lu-band-mode .lu-apple-dock .lu-apple-icon-btn,
+body.lu-band-mode #appleModeBtn,
+body.lu-band-mode #appleRecordMenuBtn {
+  width: 44px !important;
+  min-width: 44px !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  padding: 0 !important;
+  color: var(--band-paper) !important;
+  border-radius: 12px !important;
+  font: 14px var(--band-ui-font);
+  transition: background-color 160ms ease, color 160ms ease;
+}
+body.lu-band-mode #appleModeBtn,
+body.lu-band-mode #appleRecordMenuBtn { width: 72px !important; min-width: 72px !important; gap: 6px; }
+body.lu-band-mode .lu-apple-mode-label,
+body.lu-band-mode #appleRecordMenuBtn > span { font-size: 12px; }
+body.lu-band-mode .lu-apple-dock .lu-apple-play-btn {
+  width: 52px !important; min-width: 52px !important;
+  height: 52px !important; min-height: 52px !important;
+  color: var(--band-ink) !important;
+  background: var(--band-paper) !important;
+  box-shadow: 0 3px 12px #0003;
+}
+body.lu-band-mode .lu-apple-play-btn svg { width: 24px; height: 24px; }
+body.lu-band-mode .lu-apple-artwork { width: 32px; height: 32px; flex-basis: 32px; background: none; }
+body.lu-band-mode button.lu-apple-track-zone { min-height: 44px; font-family: var(--band-ui-font); justify-content: flex-start; text-align: left; }
+body.lu-band-mode .lu-apple-track-title { font-size: 14px !important; line-height: 20px; color: var(--band-paper); }
+body.lu-band-mode .lu-apple-track-copy { gap: 2px; }
+body.lu-band-mode .lu-apple-track-copy small,
+body.lu-band-mode .lu-apple-dock .lu-apple-track-time { font-size: 12px !important; line-height: 18px; color: var(--band-muted); }
+body.lu-band-mode .lu-apple-timeline { gap: 16px; }
+body.lu-band-mode .lu-apple-scrub-wrap { height: 24px; }
+body.lu-band-mode .lu-apple-scrub-input::-webkit-slider-runnable-track {
+  height: 2px;
+  background: linear-gradient(90deg, var(--band-accent) var(--capsule-progress), #f3eadb30 var(--capsule-progress));
+}
+body.lu-band-mode .lu-apple-scrub-input::-webkit-slider-thumb { width: 10px; height: 10px; margin-top: -4px; background: var(--band-paper); box-shadow: none; }
+body.lu-band-mode .lu-apple-scrub-input::-moz-range-progress { background: var(--band-accent); }
+body.lu-band-mode #appleOrderModeBtn[aria-pressed="true"] { background: #c9a66f26 !important; color: var(--band-accent) !important; }
+body.lu-band-mode .lu-apple-dock :is(button, input):focus-visible,
+body.lu-band-mode :is(.lue-core-drawer, .lu-apple-playlist-popover) :is(button, select, input):focus-visible {
+  outline: 2px solid var(--band-accent); outline-offset: 3px;
+}
+body.lu-band-mode .lu-apple-playlist-popover {
+  bottom: calc(var(--band-edge) + var(--band-dock-height) + 12px);
+  background: var(--band-surface);
+  color: var(--band-paper);
+  font-family: var(--band-ui-font);
+}
+body.lu-band-mode .lu-apple-dock .lu-track-sheen { background: none; color: var(--band-paper); animation: none; }
+body.poster-mode.lu-band-mode .performance-capsule,
+body.poster-mode.lu-band-mode .performance-capsule:is([data-state="beat"], [data-state="lyric"], [data-state="record"]) {
+  width: 224px !important; min-width: 224px !important; max-width: 224px !important;
+  flex-basis: 224px; height: 48px;
+  background: #161c23eb;
+  border-color: #f3eadb26;
+  box-shadow: none;
+  font-family: var(--band-ui-font);
+  transition: background-color 160ms ease;
+}
+body.lu-band-mode .performance-capsule-copy strong { font-size: 14px; line-height: 20px; font-weight: 500; }
+body.lu-band-mode .performance-capsule-copy small { font-size: 12px; line-height: 16px; color: var(--band-muted); }
+body.lu-band-mode .performance-capsule-bars i { background: var(--band-accent); }
+body.lu-band-mode .capsule-scrub-rail > i { background: var(--band-accent); }
+body.poster-mode.lu-band-mode #performanceCapsule:focus-visible { outline: 2px solid var(--band-accent); outline-offset: 3px; }
+body.lu-band-mode:not(.recording-preview):not(.lu-record-menu-open) .stageWrap { border: 0; background: transparent; }
+body.lu-band-mode:not(.recording-preview):not(.immersive) .lu-band-scene {
+  mask-image: linear-gradient(#000 calc(100% - 48px), transparent);
+}
+body.lu-band-mode .lue-core-drawer {
+  background: #151b23fc;
+  color: var(--band-paper);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  font: 14px/1.5 var(--band-ui-font);
+  border-radius: 16px;
+  box-shadow: inset 0 0 0 var(--lu-hairline, 1px) #f3eadb24, 0 16px 48px #0006;
+}
+body.lu-band-mode .lue-core-drawer :is(button, select, input, textarea) { font-family: var(--band-ui-font); }
+body.lu-band-mode .lue-facet-tabs { min-height: 52px; padding: 4px 8px; gap: 4px; background: #ffffff04; }
+body.lu-band-mode :is(.lue-facet-tab, .lue-facet-close) { min-height: 44px; min-width: 44px; font-size: 14px; color: var(--band-muted); }
+body.lu-band-mode .lue-facet-tab.active { color: var(--band-paper); background: #f3eadb12; box-shadow: none; }
+body.lu-band-mode .lue-facet-panels { padding: 16px; }
+body.lu-band-mode .lue-facet-panel { animation-duration: 220ms; }
+body.lu-band-mode .lue-facet-panel .deck-player {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  grid-template-rows: none !important;
+  gap: 12px !important;
+  min-height: 0 !important;
+}
+body.lu-band-mode .lue-facet-panel .deck-player > :is(.deck-info, .deck-controls, .time-rail-wrap, #playlistSelect) {
+  grid-column: 1 / -1; grid-row: auto;
+  min-width: 0 !important; max-width: none !important;
+  width: 100% !important; min-height: 36px !important;
+}
+body.lu-band-mode .lue-facet-panel .deck-player .deck-controls { min-height: 44px !important; justify-content: center !important; gap: 8px !important; }
+body.lu-band-mode .lue-facet-panel .deck-controls button { min-width: 44px !important; width: 44px !important; height: 44px !important; min-height: 44px !important; font-size: 14px !important; border-radius: 8px !important; }
+body.lu-band-mode .lue-facet-panel :is(.deck-title, #timeDisplay, .lue-sublabel) { font-size: 12px; color: var(--band-muted); }
+body.lu-band-mode .lue-facet-panel #playlistSelect { min-height: 44px !important; height: 44px; font-size: 14px; padding: 0 12px; background: #0b1016; color: var(--band-paper); border-radius: 8px; }
+body.lu-band-mode .lue-facet-panel .file-upload-wrap { grid-column: 1; grid-row: auto; width: auto !important; justify-self: start; }
+body.lu-band-mode .lue-facet-panel .file-upload-wrap .btn { min-width: 72px !important; min-height: 44px !important; height: 44px !important; font-size: 14px !important; }
+body.lu-band-mode #hudDisclaimerBtn { grid-column: 2; grid-row: auto; justify-self: end; width: auto !important; min-width: 60px; min-height: 44px; padding: 0 12px !important; font-size: 12px !important; background: none !important; border: 0 !important; color: var(--band-muted) !important; opacity: 1 !important; }
+body.lu-band-mode .lue-facet-tab.active::after { background: var(--band-accent); }
+body.lu-band-mode .lue-core-drawer input { accent-color: var(--band-accent); }
+body.lu-band-mode .lue-core-drawer input[type="range"] {
+  appearance: none; -webkit-appearance: none;
+  height: 24px !important; min-height: 24px !important;
+  padding: 0; border: 0; background: transparent; box-shadow: none;
+}
+body.lu-band-mode .lue-core-drawer input[type="range"]::-webkit-slider-runnable-track { height: 3px; border-radius: 2px; background: #f3eadb30; }
+body.lu-band-mode .lue-core-drawer input[type="range"]::-webkit-slider-thumb {
+  appearance: none; -webkit-appearance: none;
+  width: 11px; height: 11px; margin-top: -4px; border: 0; border-radius: 50%; background: var(--band-accent); box-shadow: none;
+}
+body.lu-band-mode .lue-core-drawer input[type="range"]::-moz-range-track { height: 3px; background: #f3eadb30; }
+body.lu-band-mode .lue-core-drawer input[type="range"]::-moz-range-thumb { width: 11px; height: 11px; border: 0; border-radius: 50%; background: var(--band-accent); }
+
+@media (max-width: 760px) {
+  body.lu-band-mode { --band-dock-height: 194px; --band-edge: max(12px, env(safe-area-inset-bottom)); --band-ui-gap: 12px; }
+  body.lu-band-mode .lu-apple-dock,
+  body.lu-band-mode .lu-apple-dock[data-dock-state="expanded"] { width: calc(100vw - 24px); padding: 8px 12px; border-radius: 20px; }
+  body.lu-band-mode .lu-apple-dock .lu-apple-capsule-body {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-rows: 44px 44px 52px 24px;
+    grid-template-areas: "looks looks looks looks looks looks" "track track track track stop order" "prev play play next mode record" "timeline timeline timeline timeline timeline timeline";
+    gap: 4px;
+  }
+  body.lu-band-mode .lu-apple-dock :is(.lu-apple-transport-cluster, .lu-apple-actions-cluster) { display: contents; }
+  body.lu-band-mode #applePrevBtn { grid-area: prev; }
+  body.lu-band-mode #applePlayPauseBtn { grid-area: play; justify-self: center; }
+  body.lu-band-mode #appleNextBtn { grid-area: next; }
+  body.lu-band-mode #appleStopBtn { grid-area: stop; }
+  body.lu-band-mode #appleOrderModeBtn { grid-area: order; }
+  body.lu-band-mode #appleModeBtn { grid-area: mode; }
+  body.lu-band-mode #appleRecordMenuBtn { grid-area: record; }
+  body.lu-band-mode #appleModeBtn,
+  body.lu-band-mode #appleRecordMenuBtn { width: 44px !important; min-width: 44px !important; justify-self: center; }
+  body.lu-band-mode .lu-apple-artwork { display: none; }
+  body.lu-band-mode .lu-apple-mode-label,
+  body.lu-band-mode #appleRecordMenuBtn > span { display: none; }
+  body.lu-band-mode .lu-apple-track-zone { padding: 0; }
+  body.lu-band-mode .lu-apple-timeline { gap: 12px; }
+  body.poster-mode.lu-band-mode .performance-capsule,
+  body.poster-mode.lu-band-mode .performance-capsule:is([data-state="beat"], [data-state="lyric"], [data-state="record"]) { width: 224px; }
+  body.lu-band-mode .lue-core-drawer { max-height: min(62dvh, calc(100dvh - 76px)) !important; }
+  body.lu-band-mode .lue-facet-panels { max-height: calc(62dvh - 52px); padding: 12px; }
+  body.lu-band-mode .lue-facet-tab { padding-inline: 6px; gap: 4px; }
+  body.lu-band-mode .lue-facet-tab svg { display: none; }
+  body.lu-band-mode .lue-facet-close { margin-left: auto; font-size: 12px; padding-inline: 8px; }
+}
+@media (max-width: 359px) {
+  body.lu-band-mode .lu-apple-dock,
+  body.lu-band-mode .lu-apple-dock[data-dock-state="expanded"] { width: calc(100vw - 16px); padding-inline: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.lu-band-mode :is(.lu-apple-dock, .lu-apple-icon-btn, .performance-capsule, .lue-core-drawer, .lue-facet-panel, .lu-apple-mode-icon) { transition: none !important; animation: none !important; }
+}
+
+
+/* Concert identity and transport hierarchy. Keep the existing controls and state. */
+body.poster-mode.lu-band-mode .master-deck-hud .brand-section {
+  display: flex !important;
+  position: absolute;
+  left: 50%;
+  top: 9px;
+  transform: translateX(-50%);
+  width: auto !important;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+}
+body.poster-mode.lu-band-mode .brand-section :is(.brand-glyph-box, .brand-tag, .brand-sub, .lu-disclaimer-btn) { display: none !important; }
+body.poster-mode.lu-band-mode .brand-section .brand-text { display: block !important; }
+body.poster-mode.lu-band-mode .brand-section .brand-title {
+  display: block;
+  font-family: "TsangerJinKai02", "KaiTi", serif;
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 500;
+  letter-spacing: .08em;
+  color: var(--band-paper);
+}
+body.lu-band-mode .lu-apple-track-title { font-size: 15px !important; font-weight: 600; letter-spacing: .015em; }
+body.lu-band-mode .lu-apple-track-copy small { line-height: 18px; }
+body.lu-band-mode .lu-apple-dock .lu-apple-track-time { font-variant-numeric: tabular-nums; letter-spacing: .03em; }
+body.lu-band-mode .lu-apple-dock .lu-apple-icon-btn { transition: background-color 160ms ease, color 160ms ease, transform 160ms ease; }
+body.lu-band-mode .lu-apple-dock .lu-apple-icon-btn:active { transform: scale(.94); }
+body.lu-band-mode .lu-apple-dock :is(button, input):focus-visible { outline: 2px solid var(--band-accent); outline-offset: 3px; }
+@media (hover:hover) {
+  body.lu-band-mode .lu-apple-dock .lu-apple-icon-btn:hover { background-color: #f3eadb14; }
+  body.lu-band-mode .lu-apple-dock .lu-apple-track-zone:hover { background: #f3eadb0a; border-radius: 10px; }
+  body.lu-band-mode .lu-apple-dock .lu-apple-play-btn:hover { box-shadow: 0 0 0 4px #c9a66f24, 0 3px 12px #0003; }
+}
+@media (max-width:760px) {
+  body.poster-mode.lu-band-mode .master-deck-hud .brand-section { left: auto; right: 16px; top: 14px; transform: none; }
+  body.poster-mode.lu-band-mode .brand-section .brand-title { font-size: 17px; letter-spacing: 0; line-height: 24px; }
+  body.lu-band-mode .lu-apple-dock .lu-apple-capsule-body {
+    grid-template-areas: "looks looks looks looks looks looks" "track track mode stop order record" "prev prev play play next next" "timeline timeline timeline timeline timeline timeline";
+  }
+  body.lu-band-mode #applePrevBtn,
+  body.lu-band-mode #appleNextBtn { justify-self: center; }
+  body.lu-band-mode .lu-apple-track-title { font-size: 14px !important; }
+}
+@media (max-width:359px) {
+  body.poster-mode.lu-band-mode .master-deck-hud .brand-section { right: 10px; }
+  body.poster-mode.lu-band-mode .brand-section .brand-title { font-size: 15px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  body.lu-band-mode .lu-apple-dock .lu-apple-icon-btn { transition: none !important; }
+  body.lu-band-mode .lu-apple-dock .lu-apple-icon-btn:active { transform: none; }
+}
+
+/* Equal-status outdoor festival looks. Full-bleed 3D water & compact glassmorphic player dock. */
+body.lu-band-mode[data-festival-look] {
+ --band-ink:#dbe6e1; --band-paper:#223d3b; --band-muted:#516864;
+ --band-accent:#cf6d49; --band-surface:#fbf6ec; --band-dock-height:86px;
+ background:var(--band-ink);
+}
+body.lu-band-mode[data-festival-look="island"] {
+ --band-ink:#e6cbb0; --band-paper:#1b3e44; --band-muted:#4d6563;
+ --band-accent:#dc6346; --band-surface:#fff2df;
+}
+body.lu-band-mode[data-festival-look]:not(.immersive):not(.recording-preview) .app {
+ grid-template-columns:minmax(0,1fr)!important;
+ grid-template-rows:minmax(0,1fr)!important;
+ padding:0!important;
+ gap:0!important;
+ height:100dvh!important;
+ background:var(--band-ink)!important;
+}
+body.lu-band-mode[data-festival-look]:not(.immersive):not(.recording-preview) .stage-cell {
+ grid-row:1!important;
+ grid-column:1!important;
+ width:100%;
+ height:100%;
+}
+body.lu-band-mode[data-festival-look] #stage,
+body.lu-band-mode[data-festival-look] .stage,
+body.lu-band-mode[data-festival-look] .stageWrap {background:var(--band-ink)!important;}
+body.lu-band-mode[data-festival-look] .lu-band-scene {
+ mask-image:none!important;
+ -webkit-mask-image:none!important;
+}
+body.lu-band-mode[data-festival-look]:not(.recording-preview):not(.lu-record-menu-open) .stageWrap {
+ width:100%!important;height:100%!important;max-width:none!important;aspect-ratio:auto!important;border-radius:0!important;
+}
+body.lu-band-mode[data-festival-look] .lu-apple-dock,
+body.lu-band-mode[data-festival-look] .lu-apple-dock[data-dock-state="expanded"] {
+ width:min(860px,calc(100vw - 32px));
+ height:var(--band-dock-height);
+ padding:9px 18px 7px;
+ border-radius:26px;
+ background:#fffaf1d6;
+ backdrop-filter:blur(28px) saturate(185%);
+ -webkit-backdrop-filter:blur(28px) saturate(185%);
+ box-shadow:inset 0 1px 0.5px #ffffffe6,inset 0 0 0 1px #2e524e2b,0 16px 40px #1e333029;
+}
+body.lu-band-mode[data-festival-look] .lu-apple-dock .lu-apple-capsule-body {
+ grid-template-columns:minmax(132px,1fr) auto auto auto;
+ grid-template-rows:46px 18px;
+ grid-template-areas:"track transport looks actions" "timeline timeline timeline timeline";
+ align-items:center;
+ gap:4px 12px;
+}
+body.lu-band-mode[data-festival-look] .lu-apple-artwork {
+ width:36px;height:36px;flex:0 0 36px;border-radius:50%;
+ box-shadow:0 0 0 1.5px #2e524e24,0 2px 6px #00000018;
+}
+body.lu-band-mode[data-festival-look] .lu-apple-dock .lu-apple-play-btn {
+ width:46px!important;min-width:46px!important;height:46px!important;min-height:46px!important;
+ background:var(--band-accent)!important;color:#fffaf2!important;
+ box-shadow:0 6px 16px #c85b4042,inset 0 1px 0.5px #ffffff66;
+}
+body.lu-band-mode[data-festival-look] #appleModeBtn,
+body.lu-band-mode[data-festival-look] #appleRecordMenuBtn {
+ width:68px!important;min-width:68px!important;gap:5px;
+}
+body.lu-band-mode[data-festival-look] .performance-capsule,
+body.lu-band-mode[data-festival-look] .performance-capsule:is([data-state="beat"],[data-state="lyric"],[data-state="record"]) {
+ background:#fff9efd9;
+ backdrop-filter:blur(24px) saturate(180%);
+ -webkit-backdrop-filter:blur(24px) saturate(180%);
+ border:1px solid #2e524e2e;
+ box-shadow:inset 0 1px 0.5px #ffffffd9,0 8px 24px #1f33301c;
+ color:var(--band-paper);
+}
+body.lu-band-mode[data-festival-look] .performance-capsule-copy strong {color:var(--band-paper);font-weight:600;}
+body.lu-band-mode[data-festival-look] .performance-capsule-cue {color:var(--band-paper);opacity:.78;}
+body.lu-band-mode[data-festival-look] .lu-band-pyro-toggle {
+ background:#fff9efd9;
+ backdrop-filter:blur(24px) saturate(180%);
+ -webkit-backdrop-filter:blur(24px) saturate(180%);
+ color:var(--band-paper);
+ border:1px solid #2e524e2e;
+ box-shadow:inset 0 1px 0.5px #ffffffd9,0 8px 24px #1f33301c;
+ font-weight:500;
+}
+body.poster-mode.lu-band-mode[data-festival-look] .brand-section .brand-title {
+ color:var(--band-paper);
+ font-weight:600;
+ letter-spacing:.12em;
+ text-shadow:0 1px 14px #fffcf5eb,0 0 3px #fffcf5cc;
+}
+body.lu-band-mode[data-festival-look] .lu-band-lyric {
+ bottom:112px;
+ background:none;
+ color:var(--band-paper);
+ text-shadow:0 1px 16px #fffcf5f2,0 0 5px #fffcf5eb;
+}
+body.lu-band-mode[data-festival-look] .lu-band-lyric-orig {
+ background:none;
+ -webkit-text-fill-color:var(--band-paper);
+ color:var(--band-paper);
+ font-weight:650;
+ letter-spacing:.03em;
+ filter:drop-shadow(0 1px 10px #fffbf0e6);
+}
+body.lu-band-mode[data-festival-look] .lu-band-lyric-zh {
+ color:var(--band-muted);
+ font-weight:550;
+ text-shadow:0 1px 10px #fffbf0e6;
+}
+body.lu-band-mode[data-festival-look] .lu-apple-scrub-input::-webkit-slider-runnable-track {
+ height:3px;
+ background:linear-gradient(90deg,var(--band-accent) var(--capsule-progress),#2e524e33 var(--capsule-progress));
+}
+body.lu-band-mode[data-festival-look] .lu-apple-scrub-input::-webkit-slider-thumb {
+ background:var(--band-accent);
+ box-shadow:0 1px 4px #8c3d2555;
+}
+body.lu-band-mode[data-festival-look] .lue-core-drawer,
+body.lu-band-mode[data-festival-look] :is(.lu-apple-playlist-popover,.lu-apple-record-popover) {
+ background:var(--band-surface);
+ color:var(--band-paper);
+ border:1px solid #2e524e38;
+ box-shadow:0 18px 44px #1d302e2e;
+}
+body.lu-band-mode[data-festival-look] .lue-facet-tabs {background:#345b550d;}
+body.lu-band-mode[data-festival-look] .lue-facet-tab.active {background:#345b551a;}
+body.lu-band-mode[data-festival-look] :is(.lue-facet-panel select,.lu-band-controls select,.lu-band-controls button) {
+ background:#fffaf1;color:var(--band-paper);border-color:#2e524e42;
+}
+.lu-festival-switch {display:none;}
+body.lu-band-mode .lu-festival-switch {
+ display:inline-flex;
+ grid-area:looks;
+ position:relative;
+ justify-self:center;
+ align-items:center;
+ gap:2px;
+ padding:0 3px;
+ background:#345b5517;
+ border:1px solid #2e524e2b;
+ border-radius:999px;
+}
+.lu-festival-switch button {
+ min-height:44px;
+ min-width:78px;
+ padding:0 13px;
+ border:0;
+ border-radius:999px;
+ background:transparent;
+ color:#3c5955;
+ font:600 12.5px var(--band-ui-font);
+ cursor:pointer;
+ white-space:nowrap;
+ transition:background-color 160ms ease,color 160ms ease,box-shadow 160ms ease;
+}
+.lu-festival-switch button[aria-pressed="true"] {
+ background:#2d544f;
+ color:#fff9ef;
+ box-shadow:0 2px 8px #1f3c3838;
+}
+body.lu-band-mode[data-festival-look="island"] .lu-festival-switch button[aria-pressed="true"] {
+ background:#234c52;
+}
+.lu-festival-switch button:focus-visible {outline:2px solid var(--band-accent);outline-offset:3px;}
+body.recording-preview .lu-festival-switch {display:none;}
+@media(max-width:760px){
+ body.lu-band-mode[data-festival-look] {--band-dock-height:136px;}
+ body.lu-band-mode[data-festival-look] .master-deck-hud {
+  position:fixed!important;
+  top:max(8px,env(safe-area-inset-top));
+  left:10px;
+  right:10px;
+  z-index:120;
+  height:44px!important;
+  min-height:44px!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+ }
+ body.lu-band-mode[data-festival-look] .lu-band-pyro-toggle {
+  top:max(56px,calc(env(safe-area-inset-top) + 48px))!important;
+  right:10px!important;
+ }
+ body.lu-band-mode[data-festival-look] .lu-apple-dock,
+ body.lu-band-mode[data-festival-look] .lu-apple-dock[data-dock-state="expanded"] {
+  width:calc(100vw - 20px);
+  height:var(--band-dock-height);
+  padding:8px 10px 6px;
+  border-radius:22px;
+ }
+ body.lu-band-mode[data-festival-look] .lu-apple-dock .lu-apple-capsule-body {
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  grid-template-rows:44px 46px 20px;
+  grid-template-areas:"track track order looks looks looks" "prev play next stop mode record" "timeline timeline timeline timeline timeline timeline";
+  gap:4px 3px;
+ }
+ body.lu-band-mode[data-festival-look] #appleModeBtn,
+ body.lu-band-mode[data-festival-look] #appleRecordMenuBtn {
+  width:44px!important;min-width:44px!important;justify-self:center;
+ }
+ body.lu-band-mode .lu-festival-switch {
+  width:100%;justify-self:stretch;padding:0 2px;gap:2px;box-sizing:border-box;
+ }
+ .lu-festival-switch button {
+  flex:1 1 0;min-width:64px;padding:0 6px;font-size:12px;
+ }
+ body.lu-band-mode[data-festival-look] .lu-band-lyric {bottom:154px;}
+}
+@media(max-width:359px){
+ body.lu-band-mode[data-festival-look] .lu-apple-dock,
+ body.lu-band-mode[data-festival-look] .lu-apple-dock[data-dock-state="expanded"] {
+  width:calc(100vw - 12px);padding-inline:6px;
+ }
+ body.lu-band-mode[data-festival-look] .lu-apple-dock .lu-apple-capsule-body {gap:4px 2px;}
+}
+@media(prefers-reduced-motion:reduce){.lu-festival-switch button {transition:none;}}
+@media(forced-colors:active){
+ .lu-festival-switch,
+ body.lu-band-mode[data-festival-look] :is(.lu-apple-dock,.performance-capsule,.lu-band-pyro-toggle) {
+  border:1px solid CanvasText;
+ }
+ .lu-festival-switch button[aria-pressed="true"] {
+  outline:2px solid Highlight;outline-offset:-2px;
+ }
+}
+
+body.lu-band-mode[data-festival-look] :is(.lu-band-controls,.lu-band-detail,.lu-apple-record-options>span) {color:var(--band-muted);}
+body.lu-band-mode[data-festival-look] .lu-apple-aspect-group {background:#345b5514;border:1px solid #2e524e24;}
+body.lu-band-mode[data-festival-look] .lu-apple-aspect-group button {color:var(--band-paper);}
+body.lu-band-mode[data-festival-look] .lu-apple-aspect-group button[aria-pressed="true"] {background:#2d544f;color:#fff9ee;box-shadow:none;}
+body.lu-band-mode[data-festival-look] .lu-apple-popover-header .lu-apple-icon-btn {color:var(--band-paper);}
+body.lu-band-mode[data-festival-look] .lu-apple-record-start {background:var(--band-accent);color:#fff9ee;}
+body.lu-band-mode[data-festival-look] :is(.lu-apple-song-item,.lu-apple-import-trigger) {color:var(--band-paper)!important;}
+body.lu-band-mode[data-festival-look] .lu-apple-song-item:is(:hover,.active) {background:#345b5516!important;}
+body.lu-band-mode[data-festival-look] .lu-apple-song-tag {background:#345b5512;color:var(--band-muted);}

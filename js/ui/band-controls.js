@@ -6,9 +6,13 @@ import {songBindingSummary} from '../audio/band-song-parts.js';
 export function createPyroSoundToggle(host,{settings,onChange,storageKey='lu_band_v2'}) {
  const button=document.createElement('button');button.type='button';button.className='lu-band-pyro-toggle';
  button.setAttribute('aria-label','焰火音效');host.append(button);
- function render(){const value=String(settings.pyroSound!==false);if(button.getAttribute('aria-pressed')!==value){button.setAttribute('aria-pressed',value);button.textContent=`焰火音效 ${value==='true'?'开':'关'}`;}}
+ const styles=document.createElement('div');styles.className='lu-festival-switch';styles.setAttribute('role','group');styles.setAttribute('aria-label','舞台风格');
+ styles.innerHTML='<button type="button" data-look="cream">奶油棱镜</button><button type="button" data-look="island">日落海岛</button>';(document.getElementById('luAppleCapsuleBody')||host).append(styles);
+ for(const option of styles.querySelectorAll('button'))option.addEventListener('click',()=>{settings.stageLook=option.dataset.look;saveBandSettings(settings,storageKey);render();onChange?.();});
+
+ function render(){const look=settings.stageLook||'cream';document.body.dataset.festivalLook=look;for(const option of styles.querySelectorAll('button'))option.setAttribute('aria-pressed',String(option.dataset.look===look));const value=String(settings.pyroSound!==false);if(button.getAttribute('aria-pressed')!==value){button.setAttribute('aria-pressed',value);button.textContent=`焰火音效 ${value==='true'?'开':'关'}`;}}
  button.addEventListener('click',()=>{settings.pyroSound=settings.pyroSound===false;saveBandSettings(settings,storageKey);render();onChange?.();});render();
- return {button,render,dispose(){button.remove();}};
+ return {button,render,dispose(){button.remove();styles.remove();delete document.body.dataset.festivalLook;}};
 }
 
 export function createBandControls(host,{settings,getTheme,getScore,onChange,onFocus,onListen=null,storageKey='lu_band_v2'}){

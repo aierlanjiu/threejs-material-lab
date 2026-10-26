@@ -62,7 +62,7 @@ export function layoutBand(count,formation,narrow=false,leadIndex=0,spread=1){
  return positions;
 }
 const pose=()=>({position:[0,0,0],rotation:[0,0,0],scale:[1,1,1]});
-export function sampleBandMotion(sample,time,bpm=120,{technique='pluck',index=0,actorMotion=1,instrumentMotion=1,reduced=false}={}){
+export function sampleBandMotion(sample,time,bpm=120,{technique='pluck',index=0,actorMotion=1,instrumentMotion=1,reduced=false,beatPulse=0,downbeat=0}={}){
  const result={actor:pose(),instrument:pose(),group:pose()};
  const active=clamp(sample.activity||0);if(reduced)return result;
  if(!active){
@@ -72,8 +72,8 @@ export function sampleBandMotion(sample,time,bpm=120,{technique='pluck',index=0,
   return result;
  }
  const beat=Math.max(0,time)*(Number.isFinite(bpm)&&bpm>0?bpm:120)/60,phase=beat*Math.PI*2+index*.71;
- const attack=clamp(sample.attack||0),a=clamp(actorMotion,0,2),m=clamp(instrumentMotion,0,2);
- const sway=Math.sin(phase*.5)*active,breath=Math.sin(phase*.25)*active;
+ const attack=clamp((sample.attack||0)+beatPulse*.14+downbeat*.12),a=clamp(actorMotion,0,2),m=clamp(instrumentMotion,0,2);
+ const sway=Math.sin(phase*.5)*active,breath=(Math.sin(phase*.25)*.82+beatPulse*.18)*active;
  result.actor.position=[sway*.035*a,Math.abs(breath)*.035*a,0];
  result.actor.rotation=[-active*.03*a,sway*.035*a,sway*.025*a];
  const p=result.instrument;
