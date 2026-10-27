@@ -2737,6 +2737,7 @@ body.immersive .stage-hud-right { top: max(12px, env(safe-area-inset-top)); righ
               <button type="button" class="btn" id="luCoreReplay">重看表情魔方入场</button>
               <button type="button" class="btn" id="luCoreMute" aria-pressed="true">入场音效：开</button>
             </div>
+            <a href="./band-film.html" class="btn lue-related-link" id="luCoreFilm">▷ 乐队模式 · 观看短片</a>
             <a href="./mascot_studio.html" class="btn lue-related-link" id="navToLiBtn" title="前往『 荔 』(LI) 3D 陪伴工作室">
               <span aria-hidden="true">🌰</span> 荔 / LI 工作室
             </a>
@@ -3521,6 +3522,11 @@ BEAT</textarea>
 
 </div>
 
+<style id="lu-film-entry-styles">
+.lu-film-intro-link{position:absolute;z-index:8;left:max(24px,env(safe-area-inset-left));bottom:max(24px,env(safe-area-inset-bottom));display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:10px 15px;border:1px solid var(--lu-intro-control-line,rgba(255,255,255,.3));border-radius:24px;background:var(--lu-intro-control-surface,rgba(5,27,39,.88));color:var(--lu-intro-ink,#f4fbf7);font-family:inherit;font-size:13px;font-weight:500;line-height:1.4;text-decoration:none;backdrop-filter:blur(12px)}
+.lu-film-intro-link:focus-visible{outline:3px solid var(--lu-theme-edge,#6bc5d1);outline-offset:4px}
+.lu-film-intro-link svg{width:17px;height:17px;fill:currentColor}
+</style>
 <section class="lu-intro-overlay" id="luIntroOverlay" role="dialog" aria-modal="true" aria-labelledby="luIntroHeading">
   <div class="lu-intro-curtain" aria-hidden="true"><i></i><i></i></div>
   <div class="lu-intro-wordmark" id="luIntroWordmark" aria-hidden="true">ONE PIECE</div>
@@ -3546,6 +3552,7 @@ BEAT</textarea>
     </div>
     <p class="lu-intro-sr-only" id="luIntroStatus" role="status">点击魔方，唤醒律</p>
   </div>
+  <a class="lu-film-intro-link" href="./band-film.html" id="luIntroFilm"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7Z"/></svg>观看 30 秒短片</a>
   <button type="button" class="lu-intro-skip" id="luIntroSkip">跳过</button>
 </section>
 
