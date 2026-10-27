@@ -6,9 +6,14 @@
 
 ---
 
-## 乐队模式短片
+## 🎬 乐队模式短片 (Band Mode Film)
 
-[观看或下载 30 秒短片](assets/film/band-mode-20261027.mp4) · 1920×1080 / 60 fps
+[![律 · 乐队模式短片](assets/film/band-mode-preview.gif)](https://aierlanjiu.github.io/threejs-material-lab/band-film.html)
+
+> **“把世界，奏成你的乐队。29 位乐手 · 3 个阵容 · 2 种舞台 · 1080p 60fps 原片”**
+
+- ▷ **[在浏览器全屏在线观看（1080p / 60 fps）](https://aierlanjiu.github.io/threejs-material-lab/band-film.html)**（原生播放器，秒开无需下载）
+- 📥 **[直接下载 40MB 母带 MP4 原片](https://raw.githubusercontent.com/aierlanjiu/threejs-material-lab/master/assets/film/band-mode-20261027.mp4)**
 
 
 ## 🌟 项目双旗舰架构
