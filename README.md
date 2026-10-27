@@ -105,6 +105,11 @@
 
 ## 🌐 在线体验 (GitHub Pages)
 
+🎬 **[观看「律」乐队模式 30 秒短片](https://aierlanjiu.github.io/threejs-material-lab/band-film.html)** · 1080p / 60 fps
+
+[![律 · 乐队模式短片](assets/film/band-mode-20261027.jpg)](https://aierlanjiu.github.io/threejs-material-lab/band-film.html)
+
+
 - 🌰 **『 荔 』(LI) · 暖光藏品伴侣室**：[https://aierlanjiu.github.io/threejs-material-lab/mascot_studio.html](https://aierlanjiu.github.io/threejs-material-lab/mascot_studio.html)
   - 极简短链入口：[https://aierlanjiu.github.io/threejs-material-lab/li.html](https://aierlanjiu.github.io/threejs-material-lab/li.html)
 - 💎 **『 律 』(LÜ) · 3D 物理材质与声波共振工作台**：[https://aierlanjiu.github.io/threejs-material-lab/](https://aierlanjiu.github.io/threejs-material-lab/)
