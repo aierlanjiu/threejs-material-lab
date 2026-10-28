@@ -54,7 +54,9 @@
 }
 @media (max-width:760px) {
   .lu-effect-study main { padding:24px 20px 36px; }
-  .lu-effect-study header { align-items:flex-start; margin-bottom:24px; }
+  .lu-effect-study header { display:block; position:relative; margin-bottom:24px; }
+  .lu-effect-study header > label { position:absolute; top:0; right:0; }
+  .lu-effect-study h1 { margin-top:32px; }
   .lu-effect-preview { aspect-ratio:2/3; max-height:65dvh; }
   .lu-effect-row { grid-template-columns:114px minmax(0,1fr); }
   .lu-effect-slider { gap:8px; }
