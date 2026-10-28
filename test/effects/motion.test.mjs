@@ -5,11 +5,13 @@ import { createEffectLayer } from '../../js/effects/effect-layer.js';
 
 test('scene-directed motion reuses sampled frames and stops for static, reduced motion, hidden and destroyed layers', async () => {
   const saved = new Map(), raf = new Map(), listeners = new Map();
-  let nextRAF = 0, reads = 0, masks = 0, copies = [], clock = 1000, frameAlphas = [], warmOnly = false;
+  let nextRAF = 0, reads = 0, masks = 0, copies = [], clock = 1000, frameAlphas = [], warmOnly = false, phaseHashes = [];
   const preference = { matches: false, addEventListener: (_, fn) => { preference.change = fn; }, removeEventListener: () => {} };
   const output = [];
   const context = () => ({
-    clearRect() {}, fillRect() {}, drawImage(source, ...args) { if (args.length === 8) copies.push(args.slice(4, 6)); if (source?.getContext?.('2d').hasGlyphs) frameAlphas.push(this.globalAlpha ?? 1); }, putImageData() {}, fillText() { this.hasGlyphs = true; }, beginPath() {}, fill() {},
+    clearRect() {}, fillRect() {}, drawImage(source, ...args) { if (args.length === 8) copies.push(args.slice(4, 6)); if (source?.getContext?.('2d').hasGlyphs) frameAlphas.push(this.globalAlpha ?? 1); },
+    putImageData({ data }) { let hash = 0; for (const byte of data) hash = (hash * 31 + byte) >>> 0; phaseHashes.push(hash); },
+    fillText() { this.hasGlyphs = true; }, beginPath() {}, fill() {},
     roundRect() { throw new Error('local windows must not be painted'); },
     createLinearGradient() { return { addColorStop() {} }; },
     measureText() { return { width: 7, actualBoundingBoxAscent: 9, actualBoundingBoxDescent: 2 }; },
@@ -65,7 +67,13 @@ test('scene-directed motion reuses sampled frames and stops for static, reduced 
     preference.matches = false; preference.change(); await settle(); assert.equal(raf.size, 1);
     document.hidden = true; tick(performance.now() + 1000); assert.equal(raf.size, 0);
     document.hidden = false; listeners.get('visibilitychange')(); await settle(); assert.equal(raf.size, 1);
-    store.select('dither'); await settle(); assert.equal(raf.size, 1);
+    phaseHashes = []; store.select('dither'); await settle(); assert.equal(raf.size, 1);
+    assert.equal(phaseHashes.length, 4, 'Dither prepares four block frames');
+    assert(new Set(phaseHashes).size > 1, 'Dither must change its quantization pattern');
+    const ditherReads = reads, cachedFrames = phaseHashes.length;
+    tick(performance.now() + 100); tick(performance.now() + 100);
+    assert.equal(reads, ditherReads, 'Dither motion must not resample the source');
+    assert.equal(phaseHashes.length, cachedFrames, 'Dither motion must reuse cached block frames');
     store.update('motion', false); await settle(); assert.equal(raf.size, 0);
     store.select('ascii'); await settle(); assert.equal(raf.size, 1);
     store.toggle(false); await settle(); assert.equal(raf.size, 0); assert.equal(output[0].hidden, true);
@@ -75,6 +83,9 @@ test('scene-directed motion reuses sampled frames and stops for static, reduced 
     store.update('palette', 'amber'); layer.render(); assert.equal(raf.size, 1, 'crossfade must still run without motion content');
     const fadeStart = clock; for (let i = 1; i <= 10; i++) tick(fadeStart + i * 16);
     assert.equal(raf.size, 0, 'empty-content crossfade must finish without restarting animation');
+    store.select('dither'); layer.render();
+    const ditherFade = clock; for (let i = 1; i <= 10; i++) tick(ditherFade + i * 16);
+    assert.equal(raf.size, 0, 'warm-only Dither must finish fading and stop too');
     layer.destroy(); layer = null; assert.equal(raf.size, 0); assert.equal(listeners.size, 0);
   } finally {
     layer?.destroy();

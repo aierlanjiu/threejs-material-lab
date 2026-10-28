@@ -19,9 +19,9 @@ export function createEffectPanel({ element, store }) {
     for (const button of element.querySelectorAll('[data-filter]')) button.setAttribute('aria-pressed', String(button.dataset.filter === settings.filter));
     for (const button of element.querySelectorAll('[data-palette]')) button.setAttribute('aria-pressed', String(button.dataset.palette === settings.palette));
     for (const button of element.querySelectorAll('[data-tone]')) button.setAttribute('aria-pressed', String(button.dataset.tone === settings.inkTone));
-    element.querySelector('[data-motion-label]').textContent = settings.filter === 'ascii' ? '字符动态' : '光感动态';
-    element.querySelector('[data-motion-group]').setAttribute('aria-label', settings.filter === 'ascii' ? '字符动态' : '光感动态');
-    element.querySelector('[data-motion="true"]').textContent = settings.filter === 'ascii' ? '流动' : '呼吸';
+    element.querySelector('[data-motion-label]').textContent = settings.filter === 'ascii' ? '字符动态' : '颗粒动态';
+    element.querySelector('[data-motion-group]').setAttribute('aria-label', settings.filter === 'ascii' ? '字符动态' : '颗粒动态');
+    element.querySelector('[data-motion="true"]').textContent = '流动';
     for (const button of element.querySelectorAll('[data-motion]')) { button.setAttribute('aria-pressed', String(button.dataset.motion === String(settings.motion))); }
     element.querySelector('[data-tone-row]').hidden = settings.filter !== 'ascii';
   }

@@ -53,10 +53,10 @@ export function createEffectLayer({ box, mounts = [box], store, light = false, f
   const frame = make(), previous = make(), sampling = make(), blocks = make(), composed = make(), asciiBase = make(), glyphs = make();
   const ctx = frame.getContext('2d'), sampleCtx = sampling.getContext('2d', { willReadFrequently: true });
   let source, sourceURL, requestedURL, generation = 0, timer, animation, signature, disposed = false, visible = true;
-  let w = 1, h = 1, scale = 1, valid = false, flowChunks = [];
+  let w = 1, h = 1, scale = 1, valid = false, flowChunks = [], ditherPhases = [], ditherPixel = 2;
   const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
   let presentation = store.current, visualTime = 0, lastPaint = 0, fadeStart = 0, composedAlpha = -1;
-  const moving = () => flowChunks.length > 0 && presentation.motion && !motionPreference.matches;
+  const moving = () => (flowChunks.length > 0 || ditherPhases.length > 0) && presentation.motion && !motionPreference.matches;
   function buildFlowChunks(line, step, sampleOriginal, sprite) {
     flowChunks = [];
     const baseCtx = asciiBase.getContext('2d'), span = Math.max(step * 6, 36);
@@ -78,25 +78,31 @@ export function createEffectLayer({ box, mounts = [box], store, light = false, f
     }
   }
   function flowTexture(time) {
-    const t = time / 1000, ascii = presentation.filter === 'ascii';
+    const t = time / 1000;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, frame.width, frame.height); ctx.drawImage(asciiBase, 0, 0);
+    ctx.clearRect(0, 0, frame.width, frame.height);
+    if (presentation.filter === 'dither') {
+      ctx.setTransform(scale, 0, 0, scale, 0, 0);
+      // Move the Bayer threshold through the fixed source, never the photograph.
+      // Four cached block frames keep this path free of per-frame sampling/readback.
+      const phase = t * 2.4 % 4, index = Math.floor(phase), fraction = phase - index;
+      const current = ditherPhases[index], next = ditherPhases[(index + 1) % 4];
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(current, 0, 0, current.width * ditherPixel, current.height * ditherPixel);
+      ctx.globalAlpha = fraction * fraction * (3 - 2 * fraction);
+      ctx.drawImage(next, 0, 0, next.width * ditherPixel, next.height * ditherPixel);
+      ctx.globalAlpha = 1; mask(presentation.mask); composedAlpha = -1;
+      return;
+    }
+    ctx.drawImage(asciiBase, 0, 0);
     ctx.setTransform(scale, 0, 0, scale, 0, 0);
     for (const area of flowChunks) {
-      if (ascii) {
-        const phase = area.row * .34 + area.x / w * 1.6;
-        const dx = (Math.sin(t * .48) * 13 + Math.sin(t * 2.4 + phase) * 9) * area.weight;
-        const dy = Math.sin(t * 1.9 + phase) * 2.6 * area.weight;
-        ctx.globalAlpha = 1 - (.15 - Math.sin(t * 2.6 - phase) * .15) * area.weight;
-        ctx.drawImage(glyphs, area.sx, area.sy, area.sw, area.sh,
-          area.x + dx, area.y + dy, area.width, area.height);
-      } else {
-        // Quantized energy/cloud detail breathes in place; the photograph never shifts.
-        ctx.globalCompositeOperation = 'screen';
-        ctx.globalAlpha = (.025 + Math.sin(t * 1.8 + area.row * .25) * .025) * area.weight;
-        ctx.drawImage(asciiBase, area.sx, area.sy, area.sw, area.sh,
-          area.x, area.y, area.width, area.height);
-      }
+      const phase = area.row * .34 + area.x / w * 1.6;
+      const dx = (Math.sin(t * .48) * 13 + Math.sin(t * 2.4 + phase) * 9) * area.weight;
+      const dy = Math.sin(t * 1.9 + phase) * 2.6 * area.weight;
+      ctx.globalAlpha = 1 - (.15 - Math.sin(t * 2.6 - phase) * .15) * area.weight;
+      ctx.drawImage(glyphs, area.sx, area.sy, area.sw, area.sh,
+        area.x + dx, area.y + dy, area.width, area.height);
     }
     ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1; composedAlpha = -1;
   }
@@ -144,6 +150,7 @@ export function createEffectLayer({ box, mounts = [box], store, light = false, f
     if (!store.enabled) { canvases.forEach(c => { c.hidden = true; }); return; }
     const settings = store.current, { filter, palette, strength, size, spacing, inkTone } = settings;
     presentation = settings;
+    flowChunks = []; ditherPhases = [];
     const nextSignature = `${filter}:${palette}:${sourceURL}`;
     const crossfade = valid && signature !== nextSignature && !matchMedia('(prefers-reduced-motion: reduce)').matches;
     previous.width = frame.width; previous.height = frame.height;
@@ -210,25 +217,36 @@ export function createEffectLayer({ box, mounts = [box], store, light = false, f
       const pattern = Math.max(1, Math.round(range(spacing, 1, 4)));
       const levels = Math.max(2, Math.round(range(strength, 8, 2))), blend = range(strength, .32, 1);
       blocks.width = Math.ceil(w / pixel); blocks.height = Math.ceil(h / pixel);
-      const blockCtx = blocks.getContext('2d'), output = blockCtx.createImageData(blocks.width, blocks.height);
+      const blockCtx = blocks.getContext('2d');
+      const outputs = Array.from({ length: 4 }, () => blockCtx.createImageData(blocks.width, blocks.height));
+      let hasFlow = false;
       for (let y = 0; y < blocks.height; y++) for (let x = 0; x < blocks.width; x++) {
-        const rgb = sample(Math.min(w - .01, (x + .5) * pixel), Math.min(h - .01, (y + .5) * pixel));
+        const sx = Math.min(w - .01, (x + .5) * pixel), sy = Math.min(h - .01, (y + .5) * pixel);
+        const rgb = sample(sx, sy);
         const luma = luminance(...rgb) * 255;
-        const threshold = (BAYER[Math.floor(y / pattern) % 4][Math.floor(x / pattern) % 4] + .5) / 16;
+        const weight = sceneFlowWeight(sx / w, sy / h, ...sample(sx, sy, original));
+        if (weight > .08) hasFlow = true;
+        const thresholds = outputs.map((_, phase) => (BAYER[Math.floor(y / pattern) % 4][(Math.floor(x / pattern) + phase) % 4] + .5) / 16);
         const p = (y * blocks.width + x) * 4;
         rgb.forEach((channel, c) => {
           const value = clamp(luma + (channel - luma) * (1.06 + .18 * s), 0, 255);
           const scaled = value / 255 * (levels - 1), integer = Math.floor(scaled);
-          const q = integer + (scaled - integer > threshold ? 1 : 0);
-          output.data[p + c] = value + (q / (levels - 1) * 255 - value) * blend;
+          const quantized = threshold => value + ((integer + (scaled - integer > threshold ? 1 : 0)) / (levels - 1) * 255 - value) * blend;
+          const still = quantized(thresholds[0]);
+          outputs.forEach((output, phase) => {
+            output.data[p + c] = still + (quantized(thresholds[phase]) - still) * weight;
+          });
         });
-        output.data[p + 3] = 255;
+        outputs.forEach(output => { output.data[p + 3] = 255; });
       }
-      blockCtx.putImageData(output, 0, 0); ctx.imageSmoothingEnabled = false;
+      const phases = outputs.map((output, index) => {
+        const canvas = index === 0 ? blocks : make();
+        canvas.width = blocks.width; canvas.height = blocks.height;
+        canvas.getContext('2d').putImageData(output, 0, 0); return canvas;
+      });
+      ditherPixel = pixel; ditherPhases = hasFlow ? phases : [];
+      ctx.imageSmoothingEnabled = false;
       ctx.drawImage(blocks, 0, 0, blocks.width * pixel, blocks.height * pixel); mask(settings.mask);
-      asciiBase.width = frame.width; asciiBase.height = frame.height;
-      asciiBase.getContext('2d').drawImage(frame, 0, 0);
-      buildFlowChunks(Math.max(12, pixel * 4), Math.max(8, pixel * 2), (x, y) => sample(x, y, original), asciiBase);
     }
     valid = true; signature = nextSignature; composedAlpha = -1;
     fadeStart = crossfade ? performance.now() : 0;
