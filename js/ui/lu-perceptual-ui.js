@@ -258,63 +258,6 @@ function installLumnoDockMagnification(cleanups) {
   });
 }
 
-const BAYER_4X4 = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
-const INTRO_DITHER_PALETTES = {
-  'one-piece': [[8, 40, 56], [28, 96, 118], [107, 197, 209], [238, 212, 148]],
-  'dragon-ball': [[7, 29, 53], [32, 92, 82], [127, 216, 174], [239, 196, 98]],
-  naruto: [[48, 38, 51], [116, 96, 152], [182, 158, 212], [248, 232, 206]]
-};
-
-function installLumnoIntroDither(cleanups) {
-  const overlay = document.querySelector('#luIntroOverlay');
-  if (!overlay) return;
-  const canvas = document.createElement('canvas');
-  canvas.className = 'lu-intro-dither-canvas';
-  canvas.setAttribute('aria-hidden', 'true');
-  overlay.prepend(canvas);
-
-  const render = () => {
-    const w = 480, h = 300;
-    canvas.width = w;
-    canvas.height = h;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const theme = overlay.dataset.theme || document.body.dataset.luTheme || 'one-piece';
-    const pal = INTRO_DITHER_PALETTES[theme] || INTRO_DITHER_PALETTES['one-piece'];
-    const img = ctx.createImageData(w, h);
-    const data = img.data;
-
-    for (let y = 0; y < h; y++) {
-      const ny = (y / h) * 2 - 1;
-      const row = (y & 3) * 4;
-      for (let x = 0; x < w; x++) {
-        const nx = (x / w) * 2 - 1;
-        const radial = Math.min(1, Math.hypot(nx * 0.92, ny * 0.98));
-        const wave = 0.5 + 0.5 * Math.sin(nx * 3.4 + ny * 2.2);
-        const bayer = (BAYER_4X4[row + (x & 3)] / 16 - 0.5) * 0.28;
-        const tone = Math.max(0, Math.min(0.999, radial * 0.72 + wave * 0.28 + bayer));
-        const idx = Math.min(pal.length - 1, Math.floor(tone * pal.length));
-        const [r, g, b] = pal[idx];
-        const edgeMask = Math.max(0, Math.min(1, (radial - 0.28) / 0.64));
-        const p = (y * w + x) * 4;
-        data[p] = r;
-        data[p + 1] = g;
-        data[p + 2] = b;
-        data[p + 3] = Math.round(edgeMask * 42);
-      }
-    }
-    ctx.putImageData(img, 0, 0);
-  };
-
-  render();
-  const mo = new MutationObserver(render);
-  mo.observe(overlay, {attributes: true, attributeFilter: ['data-theme']});
-  cleanups.push(() => {
-    mo.disconnect();
-    canvas.remove();
-  });
-}
-
 const STAGE_SIGNATURES = {
   'band:cream': ['CREAM PRISM', '奶油棱镜'],
   'band:island': ['SUNSET ISLAND', '日落海岛'],
@@ -499,7 +442,6 @@ export function installPerceptualUI({isPlaying = () => false} = {}) {
 
   installLumnoIndicators(cleanups);
   installLumnoDockMagnification(cleanups);
-  installLumnoIntroDither(cleanups);
   installLumnoMastheadAndOpticsHUD(cleanups);
   installLumnoPointerSpotlight(cleanups);
 

@@ -1,4 +1,5 @@
 import { renderLiveAvatar } from '../avatar/live.js';
+import { installIntroEffect } from './lu-intro-effect.js';
 import { LU_THEME_PALETTES } from './lu-intro-atmosphere.js';
 
 const MOODS = ['calm', 'happy', 'wink', 'curious', 'surprised', 'sleepy'];
@@ -188,6 +189,7 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
   const wordmark = document.querySelector('#luIntroWordmark');
   const mark = document.querySelector('#performanceCapsule .performance-capsule-mark');
   const themeButtons = [...document.querySelectorAll('#luIntroThemeSelect [data-theme]')];
+  const backdropEffect = installIntroEffect(overlay);
   const sound = createSound();
   let selectedTheme = LU_THEME_PALETTES[stageState.theme] ? stageState.theme : 'one-piece';
   const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -556,6 +558,7 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
     get shellTransmission() { return cubeMaterial.transmission; },
     get theme() { return selectedTheme; },
     get backdropMode() { return 'static-image'; },
+    get backdropEffect() { return backdropEffect.store.current; },
     get shellOpacity() { return cubeMaterial.opacity; },
     get solved() { return cubies.every(mesh =>
       Object.keys(mesh.userData.home).every(axis => mesh.userData.coord[axis] === mesh.userData.home[axis])
@@ -602,7 +605,7 @@ export function createLuCubeIntro({ THREE, manifest, stageState, cubeGeometry, c
   overlay.addEventListener('keydown', event => {
     if (event.key === 'Escape') { event.stopPropagation(); event.preventDefault(); complete(); }
     else if (event.key === 'Tab') {
-      const focusables = [activate, ...themeButtons, introMute, skipButton];
+      const focusables = [...overlay.querySelectorAll('button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled)')].filter(element => element.getClientRects().length && getComputedStyle(element).visibility !== 'hidden');
       const current = focusables.indexOf(document.activeElement);
       const next = current < 0 ? (event.shiftKey ? focusables.length - 1 : 0)
         : (current + (event.shiftKey ? focusables.length - 1 : 1)) % focusables.length;
