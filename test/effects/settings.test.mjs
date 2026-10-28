@@ -55,13 +55,14 @@ test('prototype property names are rejected as palettes and filters', () => {
   }
 });
 
-test('local windows and restrained motion are defaults with independent per-filter preferences', () => {
-  const storage = memory(), store = createEffectSettings(storage);
-  assert.equal(store.current.region, 'window'); assert.equal(store.current.motion, true);
-  store.update('region', 'full'); store.update('motion', false);
-  store.select('dither'); assert.equal(store.current.region, 'window'); assert.equal(store.current.motion, true);
-  store.select('ascii'); assert.equal(store.current.region, 'full'); assert.equal(store.current.motion, false);
-  const restored = createEffectSettings(storage);
-  assert.equal(restored.current.region, 'full'); assert.equal(restored.current.motion, false);
-  restored.reset(); assert.equal(restored.current.region, 'window'); assert.equal(restored.current.motion, true);
+test('legacy windows are discarded while filter preferences and static choice survive', () => {
+  const storage = memory();
+  storage.setItem(STORAGE_KEY, JSON.stringify({ values: { ascii: { region: 'window', motion: false, size: 42, palette: 'blue' } } }));
+  const store = createEffectSettings(storage);
+  assert.equal(Object.hasOwn(store.current, 'region'), false);
+  assert.equal(store.current.size, 42); assert.equal(store.current.palette, 'blue'); assert.equal(store.current.motion, false);
+  store.update('region', 'window'); assert.equal(Object.hasOwn(store.current, 'region'), false);
+  store.select('dither'); assert.equal(store.current.motion, true);
+  store.select('ascii'); assert.equal(store.current.motion, false);
+  store.reset(); assert.equal(store.current.motion, true); assert.equal(Object.hasOwn(store.current, 'region'), false);
 });

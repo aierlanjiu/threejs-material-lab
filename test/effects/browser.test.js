@@ -50,9 +50,11 @@ try {
     await page.waitForFunction(() => document.querySelector('#effectPreview canvas').hidden);
     await page.locator('#effectEnabled').check();
     await page.waitForFunction(() => !document.querySelector('#effectPreview canvas').hidden);
+    await page.locator('[data-palette=original]').click();
     for (const theme of ['dragon-ball', 'naruto', 'one-piece']) {
       await page.selectOption('#effectTheme', theme);
       await page.waitForFunction(theme => document.querySelector('#effectImage').complete && document.querySelector('#effectImage').naturalWidth > 0 && document.querySelector('#effectImage').src.includes(theme), theme);
+      if (width === 1440) { await page.waitForTimeout(220); await page.screenshot({ path: `${artifacts}/preview-${theme}-${width}.png`, fullPage: true }); }
     }
     await page.locator('[data-palette=original]').click();
     await page.locator('.lu-effect-reset').click();
@@ -64,9 +66,10 @@ try {
       for (let p = 3; p < pixels.length; p += 4) { if (pixels[p] < 5) empty++; if (pixels[p] > 50) visible++; }
       return { empty: empty / (pixels.length / 4), visible };
     });
-    assert(alpha.empty > .5 && alpha.visible > 100, 'windows should leave most of the source unchanged');
+    assert(alpha.empty < .001 && alpha.visible > 100, 'the effect must cover the full frame without window clipping');
+    assert.equal(await page.locator('[data-region]').count(), 0, 'local window controls must be removed');
     const movingFrame = await hash(page); await page.waitForTimeout(400);
-    assert.notEqual(await hash(page), movingFrame, 'the local reveal should move gently');
+    assert.notEqual(await hash(page), movingFrame, 'scene-selected details should animate');
     await page.screenshot({ path: `${artifacts}/preview-${width}.png`, fullPage: true });
     const geometry = await page.evaluate(() => {
       const a = document.querySelector('#effectPreview').getBoundingClientRect(), b = document.querySelector('.lu-effect-controls').getBoundingClientRect();
@@ -80,37 +83,45 @@ try {
     console.log(`PASS preview ${width}px: live pixels, filters, recall/reset, palettes, original comparison, themes, reload, layout`);
   }
 
-  // Remove only the display mask in this isolated page, so mask drift cannot pass
-  // as character motion. The original glyph renderer failed this pixel check.
+  // Track actual content-directed glyph positions while the center remains still.
   const flow = await browser.newPage({ viewport: { width: 900, height: 720 } });
   flow.on('pageerror', error => errors.push(error.message));
   await flow.goto(`${base}/intro-effects.html`);
   await flow.waitForFunction(() => document.querySelector('#effectPreview canvas').width > 20);
   await flow.evaluate(() => {
     const draw = CanvasRenderingContext2D.prototype.drawImage;
-    window.glyphRowPositions = [];
+    window.glyphMotionRanges = new Map();
     CanvasRenderingContext2D.prototype.drawImage = function(...args) {
-      if (args.length === 9 && args[2] === 0 && Math.abs(args[5]) < 100) window.glyphRowPositions.push([args[5], args[6]]);
-      if (this.globalCompositeOperation === 'destination-in') return;
+      if (args.length === 9) {
+        const key = args.slice(1, 5).join(',');
+        const span = window.glyphMotionRanges.get(key) || [args[5], args[5]];
+        span[0] = Math.min(span[0], args[5]); span[1] = Math.max(span[1], args[5]);
+        window.glyphMotionRanges.set(key, span);
+      }
       return draw.apply(this, args);
     };
   });
   await flow.waitForTimeout(250);
+  const centerHash = () => flow.locator('#effectPreview canvas').evaluate(canvas => {
+    const d = canvas.getContext('2d').getImageData(canvas.width * .46, canvas.height * .43, canvas.width * .08, canvas.height * .10).data;
+    let value = 0; for (const byte of d) value = (value * 31 + byte) >>> 0; return value;
+  });
+  const quietCenter = await centerHash();
   const glyphFrame = await hash(flow);
   await flow.waitForTimeout(480);
-  assert.notEqual(await hash(flow), glyphFrame, 'ASCII glyphs themselves must move even when the display mask is fixed');
+  assert.notEqual(await hash(flow), glyphFrame, 'selected ASCII glyphs must move in the full-frame effect');
   const drift = await flow.evaluate(() => {
-    const xs = window.glyphRowPositions.map(p => p[0]);
-    return xs.length ? Math.max(...xs) - Math.min(...xs) : 0;
+    return Math.max(0, ...[...window.glyphMotionRanges.values()].map(span => span[1] - span[0]));
   });
-  assert(drift > 2, 'glyph rows must change position, not just pulse opacity');
+  assert(drift > 2, 'selected glyphs must change position, not just pulse opacity');
+  assert.equal(await centerHash(), quietCenter, 'the composition center should stay still');
   await flow.locator('[data-motion=false]').click();
   await flow.waitForTimeout(250);
   const stillGlyphs = await hash(flow);
   await flow.waitForTimeout(300);
   assert.equal(await hash(flow), stillGlyphs, 'static mode must freeze the glyph layer too');
   await flow.close();
-  console.log(`PASS independent ASCII glyph motion: ${drift.toFixed(2)}px row drift with mask removed, and static glyph freeze`);
+  console.log(`PASS scene-directed ASCII: ${drift.toFixed(2)}px glyph drift, full-frame coverage, quiet center and static freeze`);
 
   const reduced = await browser.newPage({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
   await reduced.goto(`${base}/intro-effects.html`);

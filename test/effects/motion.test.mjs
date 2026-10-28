@@ -3,14 +3,14 @@ import assert from 'node:assert/strict';
 import { createEffectSettings } from '../../js/effects/effect-settings.js';
 import { createEffectLayer } from '../../js/effects/effect-layer.js';
 
-test('window motion reuses sampled frames and stops for static, reduced motion, hidden and destroyed layers', async () => {
+test('scene-directed motion reuses sampled frames and stops for static, reduced motion, hidden and destroyed layers', async () => {
   const saved = new Map(), raf = new Map(), listeners = new Map();
-  let nextRAF = 0, reads = 0, masks = 0, rectangles = [], clock = 1000, frameAlphas = [];
+  let nextRAF = 0, reads = 0, masks = 0, copies = [], clock = 1000, frameAlphas = [], warmOnly = false;
   const preference = { matches: false, addEventListener: (_, fn) => { preference.change = fn; }, removeEventListener: () => {} };
   const output = [];
   const context = () => ({
-    clearRect() {}, fillRect() {}, drawImage(source) { if (source?.getContext?.('2d').hasGlyphs) frameAlphas.push(this.globalAlpha ?? 1); }, putImageData() {}, fillText() { this.hasGlyphs = true; }, beginPath() {}, fill() {},
-    roundRect(...args) { rectangles.push(args); },
+    clearRect() {}, fillRect() {}, drawImage(source, ...args) { if (args.length === 8) copies.push(args.slice(4, 6)); if (source?.getContext?.('2d').hasGlyphs) frameAlphas.push(this.globalAlpha ?? 1); }, putImageData() {}, fillText() { this.hasGlyphs = true; }, beginPath() {}, fill() {},
+    roundRect() { throw new Error('local windows must not be painted'); },
     createLinearGradient() { return { addColorStop() {} }; },
     measureText() { return { width: 7, actualBoundingBoxAscent: 9, actualBoundingBoxDescent: 2 }; },
     setTransform() {},
@@ -18,7 +18,11 @@ test('window motion reuses sampled frames and stops for static, reduced motion, 
     getImageData(x, y, w, h) {
       reads++;
       const data = new Uint8ClampedArray(w * h * 4);
-      for (let p = 0; p < data.length; p += 4) { data[p] = data[p + 1] = data[p + 2] = 40 + (p % 180); data[p + 3] = 255; }
+      for (let p = 0; p < data.length; p += 4) {
+        if (warmOnly) { data[p] = 210; data[p + 1] = 150; data[p + 2] = 60; }
+        else data[p] = data[p + 1] = data[p + 2] = 40 + (p % 180);
+        data[p + 3] = 255;
+      }
       return { data };
     },
     createImageData(w, h) { return { data: new Uint8ClampedArray(w * h * 4) }; }
@@ -42,11 +46,13 @@ test('window motion reuses sampled frames and stops for static, reduced motion, 
     const store = createEffectSettings({ getItem() { return null; }, setItem() {} });
     layer = createEffectLayer({ box: { append: canvas => output.push(canvas) }, store });
     await layer.setSource('test.png');
-    const initialReads = reads, initialX = rectangles[0][0];
-    assert.equal(initialReads, 1); assert(masks > 0); assert.equal(raf.size, 1);
-    rectangles = []; tick(performance.now() + 100);
-    assert(rectangles.length > 0); assert.notEqual(rectangles[0][0], initialX);
-    assert.equal(reads, initialReads, 'moving windows must not resample the image or regenerate glyphs');
+    const initialReads = reads;
+    assert.equal(initialReads, 1); assert.equal(masks, 0); assert.equal(raf.size, 1);
+    copies = []; tick(performance.now() + 100); const first = [...copies];
+    assert(first.length > 0); copies = []; tick(performance.now() + 100);
+    assert.notDeepEqual(copies, first, 'content-selected glyph chunks should move');
+    assert.equal(masks, 0, 'full-frame rendering must not apply a window mask');
+    assert.equal(reads, initialReads, 'animation must reuse image samples');
     store.update('motion', false); await settle();
     assert.equal(raf.size, 0, 'static mode must stop scheduling frames');
     store.update('palette', 'blue'); layer.render();
@@ -59,10 +65,16 @@ test('window motion reuses sampled frames and stops for static, reduced motion, 
     preference.matches = false; preference.change(); await settle(); assert.equal(raf.size, 1);
     document.hidden = true; tick(performance.now() + 1000); assert.equal(raf.size, 0);
     document.hidden = false; listeners.get('visibilitychange')(); await settle(); assert.equal(raf.size, 1);
-    store.update('region', 'full'); await settle(); assert.equal(raf.size, 0);
-    store.update('region', 'window'); await settle(); assert.equal(raf.size, 1);
+    store.select('dither'); await settle(); assert.equal(raf.size, 1);
+    store.update('motion', false); await settle(); assert.equal(raf.size, 0);
+    store.select('ascii'); await settle(); assert.equal(raf.size, 1);
     store.toggle(false); await settle(); assert.equal(raf.size, 0); assert.equal(output[0].hidden, true);
     store.toggle(true); await settle(); assert.equal(raf.size, 1);
+    warmOnly = true; layer.render();
+    assert.equal(raf.size, 0, 'no eligible motion content must not schedule empty animation');
+    store.update('palette', 'amber'); layer.render(); assert.equal(raf.size, 1, 'crossfade must still run without motion content');
+    const fadeStart = clock; for (let i = 1; i <= 10; i++) tick(fadeStart + i * 16);
+    assert.equal(raf.size, 0, 'empty-content crossfade must finish without restarting animation');
     layer.destroy(); layer = null; assert.equal(raf.size, 0); assert.equal(listeners.size, 0);
   } finally {
     layer?.destroy();

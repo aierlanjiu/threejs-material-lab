@@ -29,6 +29,20 @@ function drawSource(ctx, source, w, h, fit) {
   ctx.drawImage(source, (w - sw) / 2, (h - sh) / 2, sw, sh);
 }
 
+// A continuous motion field, not a visibility mask: cool water/energy and pale
+// clouds move, warm props stay still, and the composition center stays quiet.
+export function sceneFlowWeight(u, v, r, g, b) {
+  r /= 255; g /= 255; b /= 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  const saturation = max ? (max - min) / max : 0;
+  const cool = clamp((b - r - .035) / .20) * clamp((b - g * .72) / .18);
+  const cloud = b >= r * .9
+    ? clamp(((.299 * r + .587 * g + .114 * b) - .35) / .35) * clamp((.4 - saturation) / .25) : 0;
+  const radius = Math.hypot((u - .5) / .5, (v - .48) / .6);
+  const edge = clamp((radius - .25) / .65);
+  return Math.max(cool, cloud * .7) * edge * edge * (3 - 2 * edge);
+}
+
 // One image sampling pipeline, optionally mirrored into clipped curtain halves.
 export function createEffectLayer({ box, mounts = [box], store, light = false, fit = 'cover' }) {
   const make = () => document.createElement('canvas');
@@ -36,61 +50,58 @@ export function createEffectLayer({ box, mounts = [box], store, light = false, f
     const canvas = make(); canvas.className = 'lu-effect-canvas';
     canvas.setAttribute('aria-hidden', 'true'); mount.append(canvas); return canvas;
   });
-  const frame = make(), previous = make(), sampling = make(), blocks = make(), windowMask = make(), composed = make(), asciiBase = make(), glyphs = make();
+  const frame = make(), previous = make(), sampling = make(), blocks = make(), composed = make(), asciiBase = make(), glyphs = make();
   const ctx = frame.getContext('2d'), sampleCtx = sampling.getContext('2d', { willReadFrequently: true });
   let source, sourceURL, requestedURL, generation = 0, timer, animation, signature, disposed = false, visible = true;
-  let w = 1, h = 1, scale = 1, valid = false, asciiLine = 0;
+  let w = 1, h = 1, scale = 1, valid = false, flowChunks = [];
   const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
   let presentation = store.current, visualTime = 0, lastPaint = 0, fadeStart = 0, composedAlpha = -1;
-  const moving = () => presentation.region === 'window' && presentation.motion && !motionPreference.matches;
-  function paintWindow(time) {
-    const mw = windowMask.width, mh = windowMask.height, mobile = w < 720;
-    const mc = windowMask.getContext('2d');
-    mc.clearRect(0, 0, mw, mh);
-    const t = time / 1000;
-    const isAscii = presentation.filter === 'ascii';
-    const breath = (isAscii ? .90 : .78) + Math.sin(t * .65) * .055;
-    const windows = [
-      { x: (mobile ? .14 : .19) + Math.sin(t * .27) * .04,
-        y: (mobile ? .35 : .53) + Math.sin(t * .21) * .065,
-        w: isAscii ? (mobile ? .50 : .42) : (mobile ? .44 : .34),
-        h: isAscii ? (mobile ? .45 : .54) : (mobile ? .40 : .48), alpha: breath },
-      { x: .85 + Math.sin(t * .23 + 1.2) * .025,
-        y: (mobile ? .67 : .43) + Math.sin(t * .18 + 2) * .055,
-        w: isAscii ? (mobile ? .34 : .28) : (mobile ? .30 : .22),
-        h: isAscii ? .34 : .29, alpha: breath * (isAscii ? .70 : .58) }
-    ];
-    // The background stays anchored; this soft mask limits the effect to the sides.
-    mc.filter = `blur(${Math.max(3, mw * .018)}px)`;
-    for (const area of windows) {
-      mc.globalAlpha = area.alpha; mc.fillStyle = '#fff'; mc.beginPath();
-      mc.roundRect((area.x - area.w / 2) * mw, (area.y - area.h / 2) * mh,
-        area.w * mw, area.h * mh, Math.min(mw, mh) * .035);
-      mc.fill();
+  const moving = () => flowChunks.length > 0 && presentation.motion && !motionPreference.matches;
+  function buildFlowChunks(line, step, sampleOriginal, sprite) {
+    flowChunks = [];
+    const baseCtx = asciiBase.getContext('2d'), span = Math.max(step * 6, 36);
+    for (let y = 0, row = 0; y < h; y += line, row++) for (let x = 0; x < w; x += span) {
+      const width = Math.min(span, w - x), height = Math.min(line, h - y);
+      let weight = 0;
+      for (const position of [.2, .5, .8]) {
+        const sx = x + width * position, sy = y + height / 2;
+        weight += sceneFlowWeight(sx / w, sy / h, ...sampleOriginal(sx, sy)) / 3;
+      }
+      const chunk = { x, y, width, height, sx: Math.floor(x * scale), sy: Math.floor(y * scale),
+        sw: Math.min(sprite.width - Math.floor(x * scale), Math.ceil(width * scale)),
+        sh: Math.min(sprite.height - Math.floor(y * scale), Math.ceil(height * scale)), weight, row };
+      if (weight > .08) flowChunks.push(chunk);
+      else if (presentation.filter === 'ascii') {
+        baseCtx.drawImage(sprite, chunk.sx, chunk.sy, chunk.sw, chunk.sh,
+          chunk.x * scale, chunk.y * scale, chunk.width * scale, chunk.height * scale);
+      }
     }
-    mc.filter = 'none'; mc.globalAlpha = 1;
   }
-  function flowGlyphs(time) {
-    const t = time / 1000;
-    // Reuse the sampled glyph bitmap; move rows, never the underlying photograph.
+  function flowTexture(time) {
+    const t = time / 1000, ascii = presentation.filter === 'ascii';
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, frame.width, frame.height); ctx.drawImage(asciiBase, 0, 0);
     ctx.setTransform(scale, 0, 0, scale, 0, 0);
-    for (let y = 0, row = 0; y < h; y += asciiLine, row++) {
-      const sy = Math.floor(y * scale), sh = Math.min(Math.ceil(asciiLine * scale), glyphs.height - sy);
-      if (sh <= 0) continue;
-      const x = Math.sin(t * .48) * 13 + Math.sin(t * 2.4 + row * .34) * 9;
-      const dy = Math.sin(t * 1.9 + row * .38) * 2.6;
-      ctx.globalAlpha = .85 + Math.sin(t * 2.6 - row * .28) * .15;
-      ctx.drawImage(glyphs, 0, sy, glyphs.width, sh, x, y + dy, w, sh / scale);
-      // Wrap only the edge strip, retaining coverage as the characters flow sideways.
-      if (x > 0) ctx.drawImage(glyphs, 0, sy, glyphs.width, sh, x - w, y + dy, w, sh / scale);
-      else if (x < 0) ctx.drawImage(glyphs, 0, sy, glyphs.width, sh, x + w, y + dy, w, sh / scale);
+    for (const area of flowChunks) {
+      if (ascii) {
+        const phase = area.row * .34 + area.x / w * 1.6;
+        const dx = (Math.sin(t * .48) * 13 + Math.sin(t * 2.4 + phase) * 9) * area.weight;
+        const dy = Math.sin(t * 1.9 + phase) * 2.6 * area.weight;
+        ctx.globalAlpha = 1 - (.15 - Math.sin(t * 2.6 - phase) * .15) * area.weight;
+        ctx.drawImage(glyphs, area.sx, area.sy, area.sw, area.sh,
+          area.x + dx, area.y + dy, area.width, area.height);
+      } else {
+        // Quantized energy/cloud detail breathes in place; the photograph never shifts.
+        ctx.globalCompositeOperation = 'screen';
+        ctx.globalAlpha = (.025 + Math.sin(t * 1.8 + area.row * .25) * .025) * area.weight;
+        ctx.drawImage(asciiBase, area.sx, area.sy, area.sw, area.sh,
+          area.x, area.y, area.width, area.height);
+      }
     }
-    ctx.globalAlpha = 1; composedAlpha = -1;
+    ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1; composedAlpha = -1;
   }
   function present(alpha = 1) {
-    if (presentation.filter === 'ascii' && moving() && asciiLine > 0) flowGlyphs(visualTime);
+    if (moving()) flowTexture(visualTime);
     // Keep an unmasked copy of the displayed blend so an interrupted fade resumes smoothly.
     if (composedAlpha !== alpha || composed.width !== frame.width || composed.height !== frame.height) {
       composed.width = frame.width; composed.height = frame.height;
@@ -99,18 +110,12 @@ export function createEffectLayer({ box, mounts = [box], store, light = false, f
       cc.globalAlpha = alpha; cc.drawImage(frame, 0, 0); cc.globalAlpha = 1;
       composedAlpha = alpha;
     }
-    if (presentation.region === 'window') paintWindow(visualTime);
     for (const canvas of canvases) {
       if (canvas.width !== frame.width) canvas.width = frame.width;
       if (canvas.height !== frame.height) canvas.height = frame.height;
       const out = canvas.getContext('2d');
       out.clearRect(0, 0, canvas.width, canvas.height);
       out.drawImage(composed, 0, 0);
-      if (presentation.region === 'window') {
-        out.globalCompositeOperation = 'destination-in';
-        out.drawImage(windowMask, 0, 0, canvas.width, canvas.height);
-        out.globalCompositeOperation = 'source-over';
-      }
       canvas.hidden = !store.enabled || !valid;
     }
   }
@@ -152,8 +157,7 @@ export function createEffectLayer({ box, mounts = [box], store, light = false, f
     let pixels;
     try { pixels = sampleCtx.getImageData(0, 0, sampling.width, sampling.height); }
     catch { valid = false; canvases.forEach(c => { c.hidden = true; }); return; }
-    windowMask.width = sampling.width; windowMask.height = sampling.height;
-    const data = pixels.data, lookup = paletteLookup(palette);
+    const data = pixels.data, original = data.slice(), lookup = paletteLookup(palette);
     if (lookup) {
       for (let p = 0; p < data.length; p += 4) {
         const color = lookup[Math.round(luminance(data[p], data[p + 1], data[p + 2]) * 255)];
@@ -161,10 +165,10 @@ export function createEffectLayer({ box, mounts = [box], store, light = false, f
       }
       sampleCtx.putImageData(pixels, 0, 0);
     }
-    const sample = (x, y) => {
+    const sample = (x, y, input = data) => {
       const p = (Math.min(sampling.height - 1, Math.floor(y / h * sampling.height)) * sampling.width
         + Math.min(sampling.width - 1, Math.floor(x / w * sampling.width))) * 4;
-      return [data[p], data[p + 1], data[p + 2]];
+      return [input[p], input[p + 1], input[p + 2]];
     };
     const s = strength / 100;
     if (filter === 'ascii') {
@@ -186,7 +190,6 @@ export function createEffectLayer({ box, mounts = [box], store, light = false, f
       const step = Math.max(range(spacing, 8, 24), ...glyphMetrics.map(m => m.width * 1.08));
       const at = ctx.measureText('@');
       const line = Math.max(range(spacing, 9, 26), ((at.actualBoundingBoxAscent || font * .8) + (at.actualBoundingBoxDescent || font * .2)) * 1.12, font * 1.04);
-      asciiLine = line;
       for (let y = line / 2; y < h; y += line) for (let x = step / 2; x < w; x += step) {
         const rgb = sample(x, y), l = luminance(...rgb), dark = inkTone === 'shadows';
         const raw = dark ? 1 - l : l;
@@ -201,6 +204,7 @@ export function createEffectLayer({ box, mounts = [box], store, light = false, f
         glyphCtx.fillStyle = ctx.fillStyle;
         ctx.fillText(char, x, y); glyphCtx.fillText(char, x, y);
       }
+      buildFlowChunks(line, step, (x, y) => sample(x, y, original), glyphs);
     } else {
       const pixel = Math.max(2, Math.round(range(size, 2, w < 720 ? 7 : 9)));
       const pattern = Math.max(1, Math.round(range(spacing, 1, 4)));
@@ -222,6 +226,9 @@ export function createEffectLayer({ box, mounts = [box], store, light = false, f
       }
       blockCtx.putImageData(output, 0, 0); ctx.imageSmoothingEnabled = false;
       ctx.drawImage(blocks, 0, 0, blocks.width * pixel, blocks.height * pixel); mask(settings.mask);
+      asciiBase.width = frame.width; asciiBase.height = frame.height;
+      asciiBase.getContext('2d').drawImage(frame, 0, 0);
+      buildFlowChunks(Math.max(12, pixel * 4), Math.max(8, pixel * 2), (x, y) => sample(x, y, original), asciiBase);
     }
     valid = true; signature = nextSignature; composedAlpha = -1;
     fadeStart = crossfade ? performance.now() : 0;
