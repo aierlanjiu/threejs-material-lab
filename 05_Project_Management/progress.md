@@ -1,5 +1,11 @@
 # Project Progress
 
+## 入场背景 ASCII / Dither · 2026-10-28
+
+- Action: 入场背景真实采样滤镜、独立参数、五套色板和原图对比；独立预览面板不覆盖素材，保留魔方、构图和开幕层级。
+- Validation: 设置单测 4/4、现有项目检查与乐队 6/6 通过；浏览器验收结果见报告。
+- Report: [实现、适配取舍与验收](Reports/2026-10-28-lu-intro-ascii-dither.md)。Agent: Codex。
+
 ## Current State
 
 - Action: 修复左上角状态胶囊/品牌徽标展开工作台抽屉失效问题（覆盖 CSS 负坐标偏移与层级遮挡、防止进度拖拽误吞点击、支持抽屉外点击自动收起）；底部 Apple Dock 增加演出模式切换按钮（#appleModeBtn），设计并内置 4 套高精 Apple SF 风格 SVG 图标与文案标签（纯享、机械魔方、反重力、乐队），支持单按钮循环轮换；默认模式设为乐队（band）；实现工作台抽屉、顶部单行快捷胶囊与底部 Apple Dock 间模式状态双向实时同步。

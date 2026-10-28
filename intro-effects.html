@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>律 LÜ · 入场背景质感</title>
+  <link rel="stylesheet" href="./css/lu-cube-intro.css">
+</head>
+<body class="lu-effect-study" data-theme="one-piece">
+<main>
+  <header>
+    <div><a href="./index.html">『 律 』LÜ · 返回入场</a><h1>让背景带一点颗粒。</h1><p>ASCII 字符与有序抖色，找到舞台的第一种质感。</p></div>
+    <label><span class="lu-intro-sr-only">预览主题</span><select id="effectTheme" aria-label="预览主题"><option value="one-piece">海贼王</option><option value="dragon-ball">龙珠</option><option value="naruto">火影忍者</option></select></label>
+  </header>
+  <section class="lu-effect-workspace" aria-label="入场背景效果预览">
+    <figure>
+      <div class="lu-effect-preview" id="effectPreview"><img id="effectImage" alt="海贼王入场背景"></div>
+      <figcaption><span id="effectCaption">海贼王 · 入场背景</span><span>背景限定 / BACKDROP ONLY</span></figcaption>
+    </figure>
+    <aside class="lu-effect-controls" aria-label="背景效果设置">
+      <div class="lu-effect-panel-title"><h2>背景质感</h2><label><input id="effectEnabled" type="checkbox" checked>启用效果</label></div>
+      <div class="lu-effect-panel" id="effectPanel"></div>
+      <p class="lu-effect-note">取消勾选可对比原图。设置自动用于入场背景；魔方、标题和主题按钮保持清晰。</p>
+      <p class="lu-effect-note" id="effectStatus" role="status"></p>
+    </aside>
+  </section>
+</main>
+<script type="module">
+import { createEffectSettings, STORAGE_KEY } from './js/effects/effect-settings.js';
+import { createEffectLayer } from './js/effects/effect-layer.js';
+import { createEffectPanel } from './js/effects/effect-panel.js';
+const store = createEffectSettings();
+const box = document.querySelector('#effectPreview');
+const layer = createEffectLayer({box, store, fit: 'fill'});
+createEffectPanel({element: document.querySelector('#effectPanel'), store});
+const theme = document.querySelector('#effectTheme'), image = document.querySelector('#effectImage');
+const initialTheme = new URLSearchParams(location.search).get('theme');
+if (['one-piece', 'dragon-ball', 'naruto'].includes(initialTheme)) theme.value = initialTheme;
+const enabled = document.querySelector('#effectEnabled');
+const portrait = matchMedia('(max-width:760px)');
+function refresh() {
+  const name = theme.selectedOptions[0].textContent;
+  const url = new URL(`./assets/backgrounds/lu-intro-d-${theme.value}-${portrait.matches ? 'portrait' : 'wide'}.png`, location.href).href;
+  document.body.dataset.theme = theme.value;
+  image.src = url; image.alt = `${name}入场背景`;
+  box.style.setProperty('--effect-original', `url("${url}")`);
+  document.querySelector('#effectPanel').style.setProperty('--effect-original', `url("${url}")`);
+  document.querySelector('#effectCaption').textContent = `${name} · 入场背景`;
+  layer.setLight(theme.value === 'naruto'); layer.setSource(url);
+}
+function sync() { enabled.checked = store.enabled; }
+enabled.addEventListener('change', () => store.toggle(enabled.checked));
+store.subscribe(sync); sync();
+theme.addEventListener('change', refresh); portrait.addEventListener('change', refresh);
+window.addEventListener('storage', event => { if (event.key === STORAGE_KEY || event.key === null) try { store.restore(JSON.parse(event.newValue || 'null')); } catch {} });
+image.addEventListener('error', () => { document.querySelector('#effectStatus').textContent = '背景暂时无法加载，请刷新重试。'; });
+image.addEventListener('load', () => { document.querySelector('#effectStatus').textContent = ''; });
+refresh();
+</script>
+</body>
+</html>
