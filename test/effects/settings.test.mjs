@@ -54,3 +54,14 @@ test('prototype property names are rejected as palettes and filters', () => {
     store.select(key); assert.deepEqual(store.current, RECOMMENDED.ascii);
   }
 });
+
+test('local windows and restrained motion are defaults with independent per-filter preferences', () => {
+  const storage = memory(), store = createEffectSettings(storage);
+  assert.equal(store.current.region, 'window'); assert.equal(store.current.motion, true);
+  store.update('region', 'full'); store.update('motion', false);
+  store.select('dither'); assert.equal(store.current.region, 'window'); assert.equal(store.current.motion, true);
+  store.select('ascii'); assert.equal(store.current.region, 'full'); assert.equal(store.current.motion, false);
+  const restored = createEffectSettings(storage);
+  assert.equal(restored.current.region, 'full'); assert.equal(restored.current.motion, false);
+  restored.reset(); assert.equal(restored.current.region, 'window'); assert.equal(restored.current.motion, true);
+});

@@ -36,18 +36,71 @@ export function createEffectLayer({ box, mounts = [box], store, light = false, f
     const canvas = make(); canvas.className = 'lu-effect-canvas';
     canvas.setAttribute('aria-hidden', 'true'); mount.append(canvas); return canvas;
   });
-  const frame = make(), previous = make(), sampling = make(), blocks = make();
+  const frame = make(), previous = make(), sampling = make(), blocks = make(), windowMask = make(), composed = make();
   const ctx = frame.getContext('2d'), sampleCtx = sampling.getContext('2d', { willReadFrequently: true });
   let source, sourceURL, requestedURL, generation = 0, timer, animation, signature, disposed = false, visible = true;
   let w = 1, h = 1, scale = 1, valid = false;
+  const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+  let presentation = store.current, visualTime = 0, lastPaint = 0, fadeStart = 0, composedAlpha = -1;
+  const moving = () => presentation.region === 'window' && presentation.motion && !motionPreference.matches;
+  function paintWindow(time) {
+    const mw = windowMask.width, mh = windowMask.height, mobile = w < 720;
+    const mc = windowMask.getContext('2d');
+    mc.clearRect(0, 0, mw, mh);
+    const t = time / 1000;
+    const breath = .78 + Math.sin(t * .65) * .055;
+    const windows = [
+      { x: (mobile ? .14 : .19) + Math.sin(t * .27) * .04,
+        y: (mobile ? .35 : .53) + Math.sin(t * .21) * .065,
+        w: mobile ? .44 : .34, h: mobile ? .40 : .48, alpha: breath },
+      { x: .85 + Math.sin(t * .23 + 1.2) * .025,
+        y: (mobile ? .67 : .43) + Math.sin(t * .18 + 2) * .055,
+        w: mobile ? .30 : .22, h: .29, alpha: breath * .58 }
+    ];
+    // Only the reveal mask moves. The sampled image and glyph grid stay anchored.
+    mc.filter = `blur(${Math.max(3, mw * .018)}px)`;
+    for (const area of windows) {
+      mc.globalAlpha = area.alpha; mc.fillStyle = '#fff'; mc.beginPath();
+      mc.roundRect((area.x - area.w / 2) * mw, (area.y - area.h / 2) * mh,
+        area.w * mw, area.h * mh, Math.min(mw, mh) * .035);
+      mc.fill();
+    }
+    mc.filter = 'none'; mc.globalAlpha = 1;
+  }
   function present(alpha = 1) {
+    // Keep an unmasked copy of the displayed blend so an interrupted fade resumes smoothly.
+    if (composedAlpha !== alpha || composed.width !== frame.width || composed.height !== frame.height) {
+      composed.width = frame.width; composed.height = frame.height;
+      const cc = composed.getContext('2d');
+      if (alpha < 1) cc.drawImage(previous, 0, 0, composed.width, composed.height);
+      cc.globalAlpha = alpha; cc.drawImage(frame, 0, 0); cc.globalAlpha = 1;
+      composedAlpha = alpha;
+    }
+    if (presentation.region === 'window') paintWindow(visualTime);
     for (const canvas of canvases) {
-      canvas.width = frame.width; canvas.height = frame.height;
+      if (canvas.width !== frame.width) canvas.width = frame.width;
+      if (canvas.height !== frame.height) canvas.height = frame.height;
       const out = canvas.getContext('2d');
-      if (alpha < 1) out.drawImage(previous, 0, 0, canvas.width, canvas.height);
-      out.globalAlpha = alpha; out.drawImage(frame, 0, 0); out.globalAlpha = 1;
+      out.clearRect(0, 0, canvas.width, canvas.height);
+      out.drawImage(composed, 0, 0);
+      if (presentation.region === 'window') {
+        out.globalCompositeOperation = 'destination-in';
+        out.drawImage(windowMask, 0, 0, canvas.width, canvas.height);
+        out.globalCompositeOperation = 'source-over';
+      }
       canvas.hidden = !store.enabled || !valid;
     }
+  }
+  function animate(now) {
+    animation = 0;
+    if (disposed || !valid || !visible || document.hidden || !store.enabled) return;
+    const alpha = fadeStart ? clamp((now - fadeStart) / 150) : 1;
+    if (now - lastPaint >= 1000 / 24 || fadeStart) {
+      if (moving()) visualTime += Math.min(100, Math.max(0, now - lastPaint));
+      lastPaint = now; present(alpha);
+    }
+    if (alpha >= 1) fadeStart = 0;
+    if (moving() || fadeStart) animation = requestAnimationFrame(animate);
   }
   function mask(value) {
     const gradient = ctx.createLinearGradient(0, 0, 0, h);
@@ -62,10 +115,11 @@ export function createEffectLayer({ box, mounts = [box], store, light = false, f
     if (disposed || !visible || document.hidden || !source || !w || !h) return;
     if (!store.enabled) { canvases.forEach(c => { c.hidden = true; }); return; }
     const settings = store.current, { filter, palette, strength, size, spacing, inkTone } = settings;
+    presentation = settings;
     const nextSignature = `${filter}:${palette}:${sourceURL}`;
     const crossfade = valid && signature !== nextSignature && !matchMedia('(prefers-reduced-motion: reduce)').matches;
     previous.width = frame.width; previous.height = frame.height;
-    previous.getContext('2d').drawImage(canvases[0], 0, 0, previous.width, previous.height);
+    previous.getContext('2d').drawImage(composed, 0, 0, previous.width, previous.height);
     scale = Math.min(devicePixelRatio || 1, 1.6, 2048 / w, 2048 / h);
     frame.width = Math.max(1, Math.round(w * scale)); frame.height = Math.max(1, Math.round(h * scale));
     ctx.setTransform(scale, 0, 0, scale, 0, 0);
@@ -75,6 +129,7 @@ export function createEffectLayer({ box, mounts = [box], store, light = false, f
     let pixels;
     try { pixels = sampleCtx.getImageData(0, 0, sampling.width, sampling.height); }
     catch { valid = false; canvases.forEach(c => { c.hidden = true; }); return; }
+    windowMask.width = sampling.width; windowMask.height = sampling.height;
     const data = pixels.data, lookup = paletteLookup(palette);
     if (lookup) {
       for (let p = 0; p < data.length; p += 4) {
@@ -139,12 +194,10 @@ export function createEffectLayer({ box, mounts = [box], store, light = false, f
       blockCtx.putImageData(output, 0, 0); ctx.imageSmoothingEnabled = false;
       ctx.drawImage(blocks, 0, 0, blocks.width * pixel, blocks.height * pixel); mask(settings.mask);
     }
-    valid = true; signature = nextSignature; present(crossfade ? 0 : 1);
-    if (crossfade) {
-      const start = performance.now();
-      const fade = now => { const alpha = clamp((now - start) / 150); present(alpha); if (alpha < 1) animation = requestAnimationFrame(fade); };
-      animation = requestAnimationFrame(fade);
-    }
+    valid = true; signature = nextSignature; composedAlpha = -1;
+    fadeStart = crossfade ? performance.now() : 0;
+    lastPaint = performance.now(); present(crossfade ? 0 : 1);
+    if (moving() || fadeStart) animation = requestAnimationFrame(animate);
   }
   // Coalesce bursts without starving redraws during a continuous slider drag.
   function schedule() { if (!timer) timer = setTimeout(render, 72); }
@@ -154,6 +207,7 @@ export function createEffectLayer({ box, mounts = [box], store, light = false, f
   const intersection = new IntersectionObserver(entries => { visible = entries[0].isIntersecting; if (visible) schedule(); else cancelAnimationFrame(animation); });
   intersection.observe(box);
   document.addEventListener('visibilitychange', schedule);
+  motionPreference.addEventListener('change', schedule);
   return {
     canvases,
     render,
@@ -166,6 +220,6 @@ export function createEffectLayer({ box, mounts = [box], store, light = false, f
       if (disposed || token !== generation) return;
       source = image; sourceURL = url; render();
     },
-    destroy() { disposed = true; generation++; clearTimeout(timer); cancelAnimationFrame(animation); unsubscribe(); resize.disconnect(); intersection.disconnect(); document.removeEventListener('visibilitychange', schedule); canvases.forEach(c => c.remove()); }
+    destroy() { disposed = true; generation++; clearTimeout(timer); cancelAnimationFrame(animation); unsubscribe(); resize.disconnect(); intersection.disconnect(); document.removeEventListener('visibilitychange', schedule); motionPreference.removeEventListener('change', schedule); canvases.forEach(c => c.remove()); }
   };
 }

@@ -22,6 +22,7 @@
 .lu-effect-number > span { opacity:.6; }
 .lu-effect-segments { display:flex; gap:3px; padding:3px; border:1px solid var(--lu-intro-control-line); border-radius:8px; }
 .lu-effect-segments button { flex:1; height:30px; padding:0 8px; border:0; border-radius:5px; background:transparent; color:inherit; font:inherit; cursor:pointer; }
+.lu-effect-segments button:disabled { opacity:.4; cursor:default; }
 .lu-effect-segments button[aria-pressed=true] { color:var(--effect-selected-ink,#082838); background:var(--lu-theme-edge); }
 .lu-effect-swatches { display:flex; justify-content:space-between; gap:4px; }
 .lu-effect-swatch { position:relative; flex:0 0 22px; height:22px; padding:0; border:0; border-radius:50%; background:var(--swatch); cursor:pointer; }

@@ -6,10 +6,10 @@ export const PALETTES = {
   mono: ['#151515', '#575757', '#A6A6A6', '#ECECEC']
 };
 export const RECOMMENDED = {
-  ascii: { filter: 'ascii', mask: 90, palette: 'original', inkTone: 'shadows', strength: 100, size: 37, spacing: 0 },
-  dither: { filter: 'dither', mask: 88, palette: 'original', inkTone: 'shadows', strength: 100, size: 15, spacing: 0 }
+  ascii: { filter: 'ascii', mask: 52, palette: 'original', inkTone: 'shadows', strength: 78, size: 28, spacing: 10, region: 'window', motion: true },
+  dither: { filter: 'dither', mask: 24, palette: 'original', inkTone: 'shadows', strength: 72, size: 12, spacing: 0, region: 'window', motion: true }
 };
-export const STORAGE_KEY = 'luIntroEffect.v1';
+export const STORAGE_KEY = 'luIntroEffect.v2';
 export const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
 export const range = (v, a, b) => a + (b - a) * v / 100;
 export const luminance = (r, g, b) => (0.299 * r + 0.587 * g + 0.114 * b) / 255;
@@ -29,6 +29,8 @@ export function createEffectSettings(storage) {
       }
       values[name].palette = input?.palette === 'original' || Object.hasOwn(PALETTES, input?.palette) ? input.palette : 'original';
       values[name].inkTone = input?.inkTone === 'highlights' ? 'highlights' : 'shadows';
+      values[name].region = input?.region === 'full' ? 'full' : 'window';
+      values[name].motion = input?.motion !== false;
     }
   }
   try { restore(JSON.parse(storage?.getItem(STORAGE_KEY) || 'null')); } catch {}
@@ -43,6 +45,8 @@ export function createEffectSettings(storage) {
       if (['mask', 'strength', 'size', 'spacing'].includes(key) && Number.isFinite(value)) values[filter][key] = clamp(value, 0, 100);
       else if (key === 'palette' && (value === 'original' || Object.hasOwn(PALETTES, value))) values[filter][key] = value;
       else if (key === 'inkTone' && ['shadows', 'highlights'].includes(value)) values[filter][key] = value;
+      else if (key === 'region' && ['window', 'full'].includes(value)) values[filter].region = value;
+      else if (key === 'motion' && typeof value === 'boolean') values[filter].motion = value;
       else return;
       notify();
     },
