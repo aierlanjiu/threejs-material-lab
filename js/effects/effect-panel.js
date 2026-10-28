@@ -9,7 +9,7 @@ export function createEffectPanel({ element, store }) {
     <div class="lu-effect-row" data-tone-row><span>采样 / Tones</span><div class="lu-effect-segments" role="group" aria-label="采样色调"><button type="button" data-tone="shadows">暗部</button><button type="button" data-tone="highlights">亮部</button></div></div>
     ${slider('strength', '采样强度')}${slider('size', '尺寸 / Size')}${slider('spacing', '间距 / Spacing')}
     <div class="lu-effect-row"><span>效果区域</span><div class="lu-effect-segments" role="group" aria-label="效果区域"><button type="button" data-region="window">局部视窗</button><button type="button" data-region="full">全幅对比</button></div></div>
-    <div class="lu-effect-row"><span>视窗动态</span><div class="lu-effect-segments" role="group" aria-label="视窗动态"><button type="button" data-motion="true">缓动</button><button type="button" data-motion="false">静止</button></div></div>
+    <div class="lu-effect-row"><span data-motion-label>字符动态</span><div class="lu-effect-segments" role="group" data-motion-group aria-label="字符动态"><button type="button" data-motion="true">流动</button><button type="button" data-motion="false">静止</button></div></div>
     <button type="button" class="lu-effect-reset">恢复当前滤镜推荐值</button>`;
   function sync() {
     const settings = store.current;
@@ -21,6 +21,9 @@ export function createEffectPanel({ element, store }) {
     for (const button of element.querySelectorAll('[data-palette]')) button.setAttribute('aria-pressed', String(button.dataset.palette === settings.palette));
     for (const button of element.querySelectorAll('[data-tone]')) button.setAttribute('aria-pressed', String(button.dataset.tone === settings.inkTone));
     for (const button of element.querySelectorAll('[data-region]')) button.setAttribute('aria-pressed', String(button.dataset.region === settings.region));
+    element.querySelector('[data-motion-label]').textContent = settings.filter === 'ascii' ? '字符动态' : '视窗动态';
+    element.querySelector('[data-motion-group]').setAttribute('aria-label', settings.filter === 'ascii' ? '字符动态' : '视窗动态');
+    element.querySelector('[data-motion="true"]').textContent = settings.filter === 'ascii' ? '流动' : '缓动';
     for (const button of element.querySelectorAll('[data-motion]')) { button.setAttribute('aria-pressed', String(button.dataset.motion === String(settings.motion))); button.disabled = settings.region === 'full'; }
     element.querySelector('[data-tone-row]').hidden = settings.filter !== 'ascii';
   }

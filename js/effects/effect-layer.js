@@ -36,10 +36,10 @@ export function createEffectLayer({ box, mounts = [box], store, light = false, f
     const canvas = make(); canvas.className = 'lu-effect-canvas';
     canvas.setAttribute('aria-hidden', 'true'); mount.append(canvas); return canvas;
   });
-  const frame = make(), previous = make(), sampling = make(), blocks = make(), windowMask = make(), composed = make();
+  const frame = make(), previous = make(), sampling = make(), blocks = make(), windowMask = make(), composed = make(), asciiBase = make(), glyphs = make();
   const ctx = frame.getContext('2d'), sampleCtx = sampling.getContext('2d', { willReadFrequently: true });
   let source, sourceURL, requestedURL, generation = 0, timer, animation, signature, disposed = false, visible = true;
-  let w = 1, h = 1, scale = 1, valid = false;
+  let w = 1, h = 1, scale = 1, valid = false, asciiLine = 0;
   const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
   let presentation = store.current, visualTime = 0, lastPaint = 0, fadeStart = 0, composedAlpha = -1;
   const moving = () => presentation.region === 'window' && presentation.motion && !motionPreference.matches;
@@ -48,16 +48,19 @@ export function createEffectLayer({ box, mounts = [box], store, light = false, f
     const mc = windowMask.getContext('2d');
     mc.clearRect(0, 0, mw, mh);
     const t = time / 1000;
-    const breath = .78 + Math.sin(t * .65) * .055;
+    const isAscii = presentation.filter === 'ascii';
+    const breath = (isAscii ? .90 : .78) + Math.sin(t * .65) * .055;
     const windows = [
       { x: (mobile ? .14 : .19) + Math.sin(t * .27) * .04,
         y: (mobile ? .35 : .53) + Math.sin(t * .21) * .065,
-        w: mobile ? .44 : .34, h: mobile ? .40 : .48, alpha: breath },
+        w: isAscii ? (mobile ? .50 : .42) : (mobile ? .44 : .34),
+        h: isAscii ? (mobile ? .45 : .54) : (mobile ? .40 : .48), alpha: breath },
       { x: .85 + Math.sin(t * .23 + 1.2) * .025,
         y: (mobile ? .67 : .43) + Math.sin(t * .18 + 2) * .055,
-        w: mobile ? .30 : .22, h: .29, alpha: breath * .58 }
+        w: isAscii ? (mobile ? .34 : .28) : (mobile ? .30 : .22),
+        h: isAscii ? .34 : .29, alpha: breath * (isAscii ? .70 : .58) }
     ];
-    // Only the reveal mask moves. The sampled image and glyph grid stay anchored.
+    // The background stays anchored; this soft mask limits the effect to the sides.
     mc.filter = `blur(${Math.max(3, mw * .018)}px)`;
     for (const area of windows) {
       mc.globalAlpha = area.alpha; mc.fillStyle = '#fff'; mc.beginPath();
@@ -67,7 +70,27 @@ export function createEffectLayer({ box, mounts = [box], store, light = false, f
     }
     mc.filter = 'none'; mc.globalAlpha = 1;
   }
+  function flowGlyphs(time) {
+    const t = time / 1000;
+    // Reuse the sampled glyph bitmap; move rows, never the underlying photograph.
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, frame.width, frame.height); ctx.drawImage(asciiBase, 0, 0);
+    ctx.setTransform(scale, 0, 0, scale, 0, 0);
+    for (let y = 0, row = 0; y < h; y += asciiLine, row++) {
+      const sy = Math.floor(y * scale), sh = Math.min(Math.ceil(asciiLine * scale), glyphs.height - sy);
+      if (sh <= 0) continue;
+      const x = Math.sin(t * .48) * 13 + Math.sin(t * 2.4 + row * .34) * 9;
+      const dy = Math.sin(t * 1.9 + row * .38) * 2.6;
+      ctx.globalAlpha = .85 + Math.sin(t * 2.6 - row * .28) * .15;
+      ctx.drawImage(glyphs, 0, sy, glyphs.width, sh, x, y + dy, w, sh / scale);
+      // Wrap only the edge strip, retaining coverage as the characters flow sideways.
+      if (x > 0) ctx.drawImage(glyphs, 0, sy, glyphs.width, sh, x - w, y + dy, w, sh / scale);
+      else if (x < 0) ctx.drawImage(glyphs, 0, sy, glyphs.width, sh, x + w, y + dy, w, sh / scale);
+    }
+    ctx.globalAlpha = 1; composedAlpha = -1;
+  }
   function present(alpha = 1) {
+    if (presentation.filter === 'ascii' && moving() && asciiLine > 0) flowGlyphs(visualTime);
     // Keep an unmasked copy of the displayed blend so an interrupted fade resumes smoothly.
     if (composedAlpha !== alpha || composed.width !== frame.width || composed.height !== frame.height) {
       composed.width = frame.width; composed.height = frame.height;
@@ -153,12 +176,17 @@ export function createEffectLayer({ box, mounts = [box], store, light = false, f
       tones.sort((a, b) => a - b);
       const low = tones[Math.floor(count * .08)], high = tones[Math.floor(count * .92)];
       ctx.drawImage(sampling, 0, 0, w, h); mask(settings.mask);
+      asciiBase.width = glyphs.width = frame.width; asciiBase.height = glyphs.height = frame.height;
+      asciiBase.getContext('2d').drawImage(frame, 0, 0);
+      const glyphCtx = glyphs.getContext('2d'); glyphCtx.setTransform(scale, 0, 0, scale, 0, 0);
       const font = Math.round(range(size, 7, w < 720 ? 22 : 24));
-      ctx.font = `${font}px monospace`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      const glyphs = [...CHARS].map(c => ctx.measureText(c));
-      const step = Math.max(range(spacing, 8, 24), ...glyphs.map(m => m.width * 1.08));
+      ctx.font = glyphCtx.font = `${font}px monospace`;
+      ctx.textAlign = glyphCtx.textAlign = 'center'; ctx.textBaseline = glyphCtx.textBaseline = 'middle';
+      const glyphMetrics = [...CHARS].map(c => ctx.measureText(c));
+      const step = Math.max(range(spacing, 8, 24), ...glyphMetrics.map(m => m.width * 1.08));
       const at = ctx.measureText('@');
       const line = Math.max(range(spacing, 9, 26), ((at.actualBoundingBoxAscent || font * .8) + (at.actualBoundingBoxDescent || font * .2)) * 1.12, font * 1.04);
+      asciiLine = line;
       for (let y = line / 2; y < h; y += line) for (let x = step / 2; x < w; x += step) {
         const rgb = sample(x, y), l = luminance(...rgb), dark = inkTone === 'shadows';
         const raw = dark ? 1 - l : l;
@@ -170,7 +198,8 @@ export function createEffectLayer({ box, mounts = [box], store, light = false, f
         if (tone <= .02 || char === ' ') continue;
         const ink = liftedInk(rgb, s, tone);
         ctx.fillStyle = `rgba(${ink.join(',')},${clamp((.12 + .7 * tone) * (.72 + .28 * s), .06, .94)})`;
-        ctx.fillText(char, x, y);
+        glyphCtx.fillStyle = ctx.fillStyle;
+        ctx.fillText(char, x, y); glyphCtx.fillText(char, x, y);
       }
     } else {
       const pixel = Math.max(2, Math.round(range(size, 2, w < 720 ? 7 : 9)));

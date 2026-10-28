@@ -80,6 +80,38 @@ try {
     console.log(`PASS preview ${width}px: live pixels, filters, recall/reset, palettes, original comparison, themes, reload, layout`);
   }
 
+  // Remove only the display mask in this isolated page, so mask drift cannot pass
+  // as character motion. The original glyph renderer failed this pixel check.
+  const flow = await browser.newPage({ viewport: { width: 900, height: 720 } });
+  flow.on('pageerror', error => errors.push(error.message));
+  await flow.goto(`${base}/intro-effects.html`);
+  await flow.waitForFunction(() => document.querySelector('#effectPreview canvas').width > 20);
+  await flow.evaluate(() => {
+    const draw = CanvasRenderingContext2D.prototype.drawImage;
+    window.glyphRowPositions = [];
+    CanvasRenderingContext2D.prototype.drawImage = function(...args) {
+      if (args.length === 9 && args[2] === 0 && Math.abs(args[5]) < 100) window.glyphRowPositions.push([args[5], args[6]]);
+      if (this.globalCompositeOperation === 'destination-in') return;
+      return draw.apply(this, args);
+    };
+  });
+  await flow.waitForTimeout(250);
+  const glyphFrame = await hash(flow);
+  await flow.waitForTimeout(480);
+  assert.notEqual(await hash(flow), glyphFrame, 'ASCII glyphs themselves must move even when the display mask is fixed');
+  const drift = await flow.evaluate(() => {
+    const xs = window.glyphRowPositions.map(p => p[0]);
+    return xs.length ? Math.max(...xs) - Math.min(...xs) : 0;
+  });
+  assert(drift > 2, 'glyph rows must change position, not just pulse opacity');
+  await flow.locator('[data-motion=false]').click();
+  await flow.waitForTimeout(250);
+  const stillGlyphs = await hash(flow);
+  await flow.waitForTimeout(300);
+  assert.equal(await hash(flow), stillGlyphs, 'static mode must freeze the glyph layer too');
+  await flow.close();
+  console.log(`PASS independent ASCII glyph motion: ${drift.toFixed(2)}px row drift with mask removed, and static glyph freeze`);
+
   const reduced = await browser.newPage({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
   await reduced.goto(`${base}/intro-effects.html`);
   await reduced.waitForFunction(() => document.querySelector('canvas').width > 20);
