@@ -152,7 +152,7 @@ export async function createBandScene(container,{safeTop=0,safeBottom=15,cubeDes
  }
  const leadLight=new THREE.SpotLight(0xffedcd,0,90,.35,.85,1.5);scene.add(leadLight,leadLight.target);
  function disposeGroup(group){group.traverse(o=>{o.geometry?.dispose();o.material?.dispose();o.customDepthMaterial?.dispose();});}
- function releaseMembers(){for(const m of members){m.wings?.dispose();scene.remove(m.group);disposeGroup(m.group);m.originalTexture.dispose();m.layerTexture?.dispose();m.labelTexture.dispose();}members=[];dragPhysics.clear();projectionVersion++;}
+ function releaseMembers(){for(const m of members){m.wings?.dispose();scene.remove(m.group);disposeGroup(m.group);m.originalTexture.dispose();m.labelTexture.dispose();}members=[];dragPhysics.clear();projectionVersion++;}
  function labelFor(role){const canvas=document.createElement('canvas');canvas.width=768;canvas.height=144;const ctx=canvas.getContext('2d'),accent=role.accent||'#d8ad72';
   ctx.beginPath();ctx.roundRect(2,2,764,140,70);ctx.fillStyle='rgba(14,16,22,.82)';ctx.fill();ctx.strokeStyle=accent;ctx.globalAlpha=.45;ctx.lineWidth=1.5;ctx.stroke();ctx.globalAlpha=1;
   ctx.beginPath();ctx.arc(48,72,8,0,Math.PI*2);ctx.fillStyle=accent;ctx.fill();

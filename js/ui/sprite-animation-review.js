@@ -18,7 +18,7 @@ async function selectActor(id){
  const pet=actors.get('one-piece/'+id);if(!pet)throw Error('Unknown character');const token=++revision;$('play').disabled=true;
  if(!images.has(id))images.set(id,Promise.all([loadImage(`./assets/band-pets/one-piece/${id}.webp`),loadImage(pet.asset)]));
  try{const loaded=await images.get(id);if(token!==revision)return;[original,expanded]=loaded;manifest=pet;selected=id;position=0;
-  $('actorName').textContent=pet.name;$('video').href=`./output/sprite-animation-20261030/${id}-comparison.mp4`;
+  $('actorName').textContent=pet.name;
   $('original').width=$('expanded').width=Math.max(640,pet.frameWidth*2);
   document.querySelectorAll('[data-actor]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.actor===id)));
   Object.assign(window.spriteAnimationReview,{ready:true,selected,frameCount:pet.frameCount,uniqueNewCels:pet.newCelCount});$('play').disabled=false;render();

@@ -59,7 +59,7 @@ function render(){
 async function choose(){
  const token=++revision;++playerRevision;$('reviewPlayer').pause();$('reviewParts').replaceChildren();score=null;updateStatus();$('reviewResult').textContent='';$('reviewStatus').textContent='正在校验音源…';
  try{
-  const loaded=await loadBandAnalysis($('reviewTrack').value);if(token!==revision)return;
+  const loaded=await loadBandAnalysis($('reviewTrack').value,{preferHybrid:false});if(token!==revision)return;
   if(!loaded?.songBindings)throw new Error('本曲逐乐器候选尚未生成。已有四类数据不会自动变成逐乐器声部。');
   if(!await verifyBandSource(loaded,loaded.originalAudio))throw new Error('原曲与分析音源摘要不一致');
   if(token!==revision)return;score=structuredClone(loaded);render();

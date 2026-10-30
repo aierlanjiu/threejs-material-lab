@@ -60,13 +60,16 @@ try {
     assert.equal(await page.locator('#luIntroSkip').innerText(), '跳过');
     assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('#luIntroOverlay')).backgroundColor), 'rgb(8, 40, 56)',
       'the opening scene should use the ocean palette before the canvas unfolds');
-    const plate = await page.evaluate(() => getComputedStyle(document.querySelector('.lu-intro-curtain i'), '::before').backgroundImage);
+    const plate = await page.evaluate(() => getComputedStyle(document.querySelector('.lu-intro-curtain i')).backgroundImage);
     assert.match(plate, width <= 760 ? /lu-intro-d-one-piece-portrait\.png/ : /lu-intro-d-one-piece-wide\.png/,
       'the static D backdrop should match the viewport');
     assert.equal(await page.evaluate(() => window.luCubeIntro.backdropMode), 'static-image');
-    assert.equal(await page.locator('#luIntroOverlay canvas:not(.lu-intro-dither-canvas)').count(), 1,
+    const introContexts = await page.locator('#luIntroOverlay canvas').evaluateAll(canvases =>
+      canvases.map(canvas => ({ cube: Boolean(canvas.closest('#luIntroActivate')), is2D: Boolean(canvas.getContext('2d')) })));
+    assert.equal(introContexts.filter(canvas => !canvas.is2D).length, 1,
       'the static backdrop must not create a second WebGL renderer');
-    assert.equal(await page.locator('.lu-intro-dither-canvas').evaluate(canvas => Boolean(canvas.getContext('2d'))), true, 'film grain must remain a 2D canvas');
+    assert(introContexts.some(canvas => canvas.cube && !canvas.is2D), 'the entrance cube must retain its WebGL context');
+    assert.equal(await page.locator('.lu-effect-canvas').evaluateAll(canvases => canvases.length > 0 && canvases.every(canvas => Boolean(canvas.getContext('2d')))), true, 'intro effects must remain 2D canvases');
     assert.deepEqual(await page.locator('#luIntroThemeSelect img').evaluateAll(images =>
       images.map(image => image.complete && image.naturalWidth > 0)), [true, true, true],
       'all three theme buttons need their theme-specific artwork');
@@ -89,7 +92,7 @@ try {
     for (const theme of ['dragon-ball', 'naruto']) {
       const themePlate = await page.evaluate(theme => {
         window.luCubeIntro.setTheme(theme);
-        return getComputedStyle(document.querySelector('.lu-intro-curtain i'), '::before').backgroundImage;
+        return getComputedStyle(document.querySelector('.lu-intro-curtain i')).backgroundImage;
       }, theme);
       assert.match(themePlate, new RegExp(`lu-intro-d-${theme}-${width <= 760 ? 'portrait' : 'wide'}\\.png`));
       assert.equal(await page.locator('#luIntroWordmark').innerText(), theme === 'dragon-ball' ? 'DRAGON BALL' : 'NARUTO');

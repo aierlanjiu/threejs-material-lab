@@ -6,7 +6,7 @@ export function createBandMixer({getContext,getOutput,getTrack,getTime=()=>0}){
  let trackId='',buffers=new Map(),sources=[],originalGain=null,revision=0,abort=null,ready=false,enabled=false,policy={muted:[],soloGroup:null},independent=false,restoreSongTime=null;
  const buses=new Map(),spatialChains=new Map();
  let hybrid=null,theme='one-piece',spatial={};
- let procedural=false,rendered=null;
+ let procedural=false,rendered=null,activeSource=null;
  function setAudioParam(param,value){
   if(!param||!Number.isFinite(value))return;
   const ctx=getContext?.(),now=ctx?.currentTime||0;
@@ -56,17 +56,21 @@ export function createBandMixer({getContext,getOutput,getTrack,getTime=()=>0}){
   for(const item of sources){const coef=coefficient(item.id);ramp(item.gain,coef,at,independent&&enabled?.25:1-autoBed,restoreAt);if(item.chain){item.chain.allowSpatial=coef>=0;applyChainSpatial(item.id,item.chain);}}
   for(const [id,bus] of buses)ramp(bus,gainValue(id),at,1,restoreAt);
  }
- function stop(){rendered?.stop();hybrid?.stop();for(const item of sources){try{item.source.stop();}catch{}item.source.disconnect();item.gain.disconnect();item.chain?.depth?.disconnect();item.chain?.shelf?.disconnect();item.chain?.panner?.disconnect();spatialChains.delete(item.id);}sources=[];originalGain?.disconnect();originalGain=null;}
+ function stopStems(){for(const item of sources){try{item.source.stop();}catch{}item.source.disconnect();item.gain.disconnect();item.chain?.depth?.disconnect();item.chain?.shelf?.disconnect();item.chain?.panner?.disconnect();spatialChains.delete(item.id);}sources=[];}
+ function connectOriginal(source,value=1){originalGain?.disconnect();originalGain=getContext().createGain();originalGain.gain.value=value;source.connect(originalGain);originalGain.connect(getOutput());}
+ function stop(){rendered?.stop();hybrid?.stop();stopStems();originalGain?.disconnect();originalGain=null;activeSource=null;}
  return {
   setTheme(value){theme=value;},
   async configure(score){
+   const restoreOriginal=Boolean(rendered||hybrid)&&activeSource;
    rendered?.dispose();rendered=null;
    hybrid?.dispose();hybrid=null;
+   stopStems();if(restoreOriginal)connectOriginal(restoreOriginal);
    const token=++revision;abort?.abort();abort=new AbortController();ready=false;trackId=score?.trackId||'';buffers=new Map();policy={muted:[],soloGroup:null};restoreSongTime=null;independent=score?.arrangement?.mixMode==='independent-stems';procedural=score?.source==='procedural';
    if(originalGain||buses.size)schedule();
    if(!score)return;
-   if(score.rendered){stop();const next=createRenderedStemAudio({getContext,getOutput,getTime});rendered=next;next.setEnabled(enabled);next.setSpatial(spatial);await next.configure(score);if(token===revision)ready=true;return;}
-   if(score.hybrid){stop();const next=createBandHybridAudio({getContext,getOutput,getTime});hybrid=next;next.setEnabled(enabled);next.setSpatial?.(spatial);await next.configure(score,theme);if(token===revision)ready=true;return;}
+   if(score.rendered){const next=createRenderedStemAudio({getContext,getOutput,getTime});rendered=next;next.setEnabled(enabled);next.setSpatial(spatial);await next.configure(score);if(token===revision)ready=true;return;}
+   if(score.hybrid){const next=createBandHybridAudio({getContext,getOutput,getTime});hybrid=next;next.setEnabled(enabled);next.setSpatial?.(spatial);await next.configure(score,theme);if(token===revision)ready=true;return;}
    if(score.source==='procedural'){ready=true;return;}
    const ctx=getContext(),loaded=await Promise.all(score.stems.filter(s=>s.audio).map(async stem=>{
     const response=await fetch(stem.audio,{signal:abort.signal});if(!response.ok)throw new Error('指挥声轨无法读取');const bytes=await response.arrayBuffer();
@@ -76,11 +80,15 @@ export function createBandMixer({getContext,getOutput,getTrack,getTime=()=>0}){
    if(token!==revision)return;buffers=new Map(loaded);ready=true;
   },
   start(source,offset,duration,loop=false,advanceOffset=false){
+   stop();activeSource=source;
+   if(trackId!==getTrack()?.type){
+    ++revision;abort?.abort();rendered?.dispose();rendered=null;hybrid?.dispose();hybrid=null;
+    ready=false;independent=false;procedural=false;trackId='';buffers=new Map();policy={muted:[],soloGroup:null};restoreSongTime=null;
+   }
    if(rendered)return rendered.start(source,offset,duration,loop,advanceOffset);
    if(hybrid)return hybrid.start(source,offset,duration,loop,advanceOffset);
-   stop();const ctx=getContext(),preparedAt=ctx.currentTime;
-   if(trackId!==getTrack()?.type)policy={muted:[],soloGroup:null};
-   originalGain=ctx.createGain();originalGain.gain.value=bedValue();source.connect(originalGain);originalGain.connect(getOutput());
+   const ctx=getContext(),preparedAt=ctx.currentTime;
+   connectOriginal(source,bedValue());
    if(enabled&&ready&&trackId===getTrack()?.type){for(const [id,raw] of buffers){
     let buffer=raw;
     if(raw.length!==source.buffer.length){buffer=ctx.createBuffer(raw.numberOfChannels,source.buffer.length,raw.sampleRate);for(let c=0;c<raw.numberOfChannels;c++)buffer.copyToChannel(raw.getChannelData(c).subarray(0,buffer.length),c);buffers.set(id,buffer);}
