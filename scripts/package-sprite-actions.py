@@ -11,14 +11,41 @@ from scipy.ndimage import label, find_objects, binary_dilation
 ROOT = Path(__file__).resolve().parent.parent
 
 
+def nearby_pose_walk(frames, indices):
+    # Traverse nearby complete poses out-and-back. A branch returns through its
+    # intermediate pose rather than snapping directly to the opposite gesture.
+    views=[]
+    for index in indices:
+        cel=frames[index].resize((80,80),Image.Resampling.LANCZOS)
+        backdrop=Image.new('RGBA',cel.size,'#edf0e6');backdrop.alpha_composite(cel)
+        views.append(np.array(backdrop)[:,:,:3].astype(np.float32))
+    distance=np.array([[np.mean((a-b)**2) for b in views] for a in views])
+    visited={0};edges={i:[] for i in range(len(indices))}
+    while len(visited)<len(indices):
+        _,left,right=min((distance[a,b],a,b) for a in visited for b in range(len(indices)) if b not in visited)
+        visited.add(right);edges[left].append(right);edges[right].append(left)
+    walk=[0]
+    def visit(node,parent=None):
+        for child in sorted(edges[node],key=lambda other:distance[node,other]):
+            if child==parent:continue
+            walk.append(child);visit(child,node);walk.append(node)
+    visit(0)
+    return [indices[index] for index in walk[:-1]]
+
+
 def source_cels(source, count):
     image = Image.open(source).convert('RGBA')
     pixels = np.array(image)
-    components, _ = label(pixels[:, :, 3] >= 80)
-    objects = []
-    for identity, slices in enumerate(find_objects(components), 1):
-        if np.count_nonzero(components[slices] == identity) > 800:
-            objects.append((identity, slices))
+    objects=[]
+    # Adjacent cels can touch through a faint antialias fringe. Use opaque
+    # seeds to separate them, retaining the original fringe around each seed.
+    for threshold in [80,160,224]:
+        components, _ = label(pixels[:, :, 3] >= threshold)
+        objects = []
+        for identity, slices in enumerate(find_objects(components), 1):
+            if np.count_nonzero(components[slices] == identity) > 800:
+                objects.append((identity, slices))
+        if len(objects)==count:break
     if len(objects) != count:
         raise ValueError(f'Expected exactly {count} complete cels; found {len(objects)}')
     # Order by rows first; native sheets need not have exact equal gutters.
@@ -29,11 +56,11 @@ def source_cels(source, count):
     return [(pixels, components, identity, str(source)) for identity, _ in ordered]
 
 
-def package(source, actor, accent_source=None):
+def package(source, actor, accent_source=None, source_count=16):
     destination = ROOT / 'assets/band-pet-actions/one-piece' / actor
     destination.mkdir(parents=True, exist_ok=True)
     original = Image.open(ROOT / f'assets/band-pets/one-piece/{actor}.webp').convert('RGBA')
-    ordered = source_cels(source,16)
+    ordered = source_cels(source,source_count)
     if accent_source:
         ordered = ordered[:8]+source_cels(accent_source,8)
     idle = original.crop((0, 0, 256, 320))
@@ -43,9 +70,11 @@ def package(source, actor, accent_source=None):
     foot_y = int(ys.max()+1)
     foot_xs = np.nonzero(idle_mask[max(0, foot_y-15):foot_y])[1]
     reference_center = (int(foot_xs.min())+int(foot_xs.max()))/2
-    first = Image.new('RGBA', (320, 320))
-    first.alpha_composite(idle, (32, 0))
-    reference_center += 32
+    frame_width = 384 if actor == 'shanks' else 320
+    registration = (frame_width-256)//2
+    first = Image.new('RGBA', (frame_width, 320))
+    first.alpha_composite(idle, (registration, 0))
+    reference_center += registration
     frames = [first]
     records = []
     for index, (pixels, components, identity, native_source) in enumerate(ordered):
@@ -63,9 +92,9 @@ def package(source, actor, accent_source=None):
         source_center = (int(foot_xs.min())+int(foot_xs.max()))/2-left
         x = round(reference_center-source_center*scale)
         y = foot_y-reference_height
-        if x < 4 or x+scaled.width > 316:
+        if x < 4 or x+scaled.width > frame_width-4:
             raise ValueError(f'Frame {index}: full cel would leave safe horizontal bounds')
-        frame = Image.new('RGBA', (320, 320))
+        frame = Image.new('RGBA', (frame_width, 320))
         frame.alpha_composite(scaled, (x, y))
         frames.append(frame)
         records.append({'frame':index+1, 'source':Path(native_source).name, 'sourceBounds':[left,top,right,bottom],
@@ -73,9 +102,13 @@ def package(source, actor, accent_source=None):
                         'sha256':hashlib.sha256(frame.tobytes()).hexdigest()})
     if len({record['sha256'] for record in records}) != 16:
         raise ValueError('Repeated cels')
-    atlas = Image.new('RGBA', (320*len(frames), 320))
+    # Use clean static poses for Ace's old floor fragment and Shanks' old
+    # missing fretting hand. Do not paint or erase original character pixels.
+    if actor in ('ace','shanks'):
+        frames[0] = frames[1].copy()
+    atlas = Image.new('RGBA', (frame_width*len(frames), 320))
     for index, frame in enumerate(frames):
-        atlas.alpha_composite(frame, (index*320, 0))
+        atlas.alpha_composite(frame, (index*frame_width, 0))
     atlas.save(destination/f'{actor}-actions.webp', 'WEBP', lossless=True, method=6)
     shutil.copy2(source, destination/'generated-sheet.png')
     if accent_source:
@@ -87,9 +120,17 @@ def package(source, actor, accent_source=None):
     clips = {'rest':[0], **{key:values+values[-2:0:-1] for key,values in order.items()}}
     if accent_source:
         clips['accent']=list(range(9,17))
+    if actor in ('luffy','sanji'):
+        clips['play']=nearby_pose_walk(frames,list(range(1,9)))
+        # Keep the limb progression monotonic: low -> middle -> high -> back.
+        # Appearance similarity alone can insert a resting hand between lifts.
+        accent_order={'luffy':[16,14,13,9,15,12,10,11],
+                      'sanji':[16,13,10,14,9,12,11,15]}[actor]
+        clips['accent']=accent_order+accent_order[-2:0:-1]
     data = {'id':f'one-piece/{actor}', 'status':'sample-awaiting-style-review',
-            'asset':f'{actor}-actions.webp', 'frameWidth':320, 'frameHeight':320,
+            'asset':f'{actor}-actions.webp', 'frameWidth':frame_width, 'frameHeight':320,
             'frameCount':17, 'baseline':.94, 'fps':12,
+            'restSource':'generated-clean-still' if actor in ('ace','shanks') else 'original-rest',
             'clips':clips,
             'sourceSha256':hashlib.sha256(Path(source).read_bytes()).hexdigest(),
             'accentSourceSha256':hashlib.sha256(Path(accent_source).read_bytes()).hexdigest() if accent_source else None,
@@ -104,5 +145,6 @@ if __name__ == '__main__':
     parser.add_argument('source',type=Path)
     parser.add_argument('--actor',default='zoro')
     parser.add_argument('--accent-source',type=Path)
+    parser.add_argument('--source-count',type=int,default=16,choices=[8,16])
     args = parser.parse_args()
-    package(args.source,args.actor,args.accent_source)
+    package(args.source,args.actor,args.accent_source,args.source_count)

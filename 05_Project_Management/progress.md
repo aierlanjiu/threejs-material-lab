@@ -1,10 +1,10 @@
 # Project Progress
 
-## 完整角色动画恢复 · 2026-10-30
+## 十人完整角色动作扩展 · 2026-10-30
 
-- Action: 用户否定骨骼视觉，主站／制作间恢复十人原完整四帧；保留贝壳GLB。Agent: codex。
-- Validation: 浏览器播放／暂停、390／320布局及Node21/21通过；索隆新增16整帧为待确认样片，其余九人未扩帧，音乐仍是待重做模板稿。Agent: codex。
-- Report: [样片与未完成项](Reports/2026-10-30-lu-intact-sprite-animation.md)；预览`sprite-animation-review.html`，备份／证据`output/sprite-animation-20261030/`。Agent: codex。
+- Action: 按用户确认的原完整人物形式，十人各新增16整帧，演奏／重拍／休止接入主站与制作间；保留贝壳GLB。Agent: codex。
+- Validation: 十人17格、原资源未改、播放／暂停／静音休止、390／320及Node22/22通过；路飞／山治仍缺部分过渡姿态，连续流畅度待观看；音乐未改。Agent: codex。
+- Report: [十人动作与验收边界](Reports/2026-10-30-lu-intact-sprite-animation.md)；预览`sprite-animation-review.html`，备份／证据`output/sprite-animation-20261030/`。Agent: codex。
 
 ## Entire 智能体版本控制集成 · 2026-10-30
 
@@ -99,6 +99,8 @@
 - 前排粒子翼、宣传片、感知 UI、羽翼对齐与两版《偏爱》试听的完整记录及原报告入口见 [无损归档](Reports/progress_full_archive_20261024_before_scenography.md)。近期简表与历史索引继续保留。
 
 ## Active Assets
+
+- 海贼十人整帧：`assets/band-pet-actions/`；逐人预览`sprite-animation-review.html`，总览`output/sprite-animation-20261030/all-cast-actions.mp4`。Agent: codex。
 
 - 三主题最终陈设入口：`http://127.0.0.1:8765/index.html?intro=skip&band=pianai&concertLook=obsidian`；新增模型与授权：`assets/models/band-scenography/manifest.json`，署名入口沿用 `assets/models/band-concert/credits.html`。普通入口继续使用原方向。
 - 单曲舞台：`http://127.0.0.1:8000/index.html?intro=skip&band=bolero`，进入后点击原播放键开始；直接角色交互，无新增指挥面板。Web 十轨与事件在 `output/lu-band-arrangement/bolero-trial/web/`，本轮证据在 `output/playwright/band-direct-pets/`。

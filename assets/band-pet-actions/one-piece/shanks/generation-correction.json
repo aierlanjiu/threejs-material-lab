@@ -1,0 +1,10 @@
+{
+  "tool": "native-imagegen",
+  "source": "/Users/papazed/.codex/generated_images/01a186a9-e06a-7893-99d3-573742dc7168/exec-0a4c3c1c-639d-4e62-958d-1fea0f5561ac.png",
+  "prompt": "EDIT the first attached 16-cel Shanks cello sprite sheet; second attached image is the original strict character art reference. Preserve the original complete soft polished 3D chibi toy character, red hair, eye scar, cape, white shirt, sash, trousers and sandals, identical proportions and camera. Fix the SAME TWO specific issues in ALL16 intact full-character cels: (1) ADD the missing LEFT fretting arm/hand. The character's own LEFT SHOULDER is at IMAGE RIGHT, behind the cello; a natural white shirt sleeve and bent forearm must visibly connect that shoulder to a clearly visible LEFT HAND at the UPPER CELLO NECK just below the tuning pegs beside his face. Fingers wrap across fingerboard strings, thumb behind neck. Do not hide or omit this hand; do not put it on the cello body. Keep his own RIGHT bowing hand at IMAGE LEFT as in reference, two anatomically natural connected arms only. (2) In every playing cel the bow HAIR must contact the cello strings near the bridge, approximately horizontal; no hanging-down bow. First8 make a short smooth bow stroke one direction then back. Last8 make a longer expressive bow stroke with visible elbow extension and recovery, still touching strings. Left fingers make subtle natural fret changes. Keep head, torso, feet, cello shape/endpin stationary and upright in all16. The ONLY animation is complete naturally drawn bowing/fingering arms. Keep same FOUR columns FOUR rows 16 full cels; all hair, boots, cello and long bow completely visible; generous TRANSPARENT gaps between rows and columns. True transparent alpha without haze/shadows/background/text/grid. Do not crop bows or feet. No exploded parts or geometric deformation. Strictly preserve original appealing solid character silhouette and rendering.",
+  "changes": [
+    "Visible left fretting hand",
+    "Bow on strings in all playing poses"
+  ],
+  "transparent_background": true
+}

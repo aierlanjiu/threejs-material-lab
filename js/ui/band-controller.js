@@ -1,4 +1,4 @@
-import {createBandScene} from './band-scene.js?v=20261030-sprites';
+import {createBandScene} from './band-scene.js?v=20261030-sprites-all';
 import {createBandDemoScore} from '../audio/band-timeline.js';
 import {compileBandParts,sampleBandEnsemble,bandPartScore,bandRoster} from '../audio/band-parts.js?v=20261029-shell-live';
 import {loadBandAnalysis,verifyBandSource} from '../audio/band-library.js?v=20261029-shell-live';

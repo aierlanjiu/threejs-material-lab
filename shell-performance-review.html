@@ -7,9 +7,9 @@
 </style>
 <main>
 <header><div><span class="tag">LÜ / PEARL SHELL · PRODUCTION 01</span><h1>珍珠贝壳 · 制作间</h1><p>十位完整角色 · 九件独立乐器 · 《One day》单曲制作稿</p></div><a href="shell-concert.html">查看舞台 ↗</a></header>
-<div class="notice">角色已恢复原版完整人物四帧，<a href="./sprite-animation-review.html">查看索隆补帧样片</a>。本页音乐仍是旧模板器乐制作稿；原曲主唱与伴奏解析重组留待角色验收之后。</div>
+<div class="notice">角色已按原版完整人物扩展，每人新增16个演奏姿态，<a href="./sprite-animation-review.html">逐人查看动作</a>。本页音乐仍是旧模板器乐制作稿；原曲主唱与伴奏解析重组留待角色验收之后。</div>
 <div class="workspace">
-<section class="stage"><canvas id="actorCanvas" width="512" height="640" aria-label="所选角色整帧预览"></canvas><div class="caption"><strong id="actorName">载入角色…</strong><span>原版整帧</span></div></section>
+<section class="stage"><canvas id="actorCanvas" width="768" height="640" aria-label="所选角色整帧预览"></canvas><div class="caption"><strong id="actorName">载入角色…</strong><span>完整人物整帧</span></div></section>
 <section class="panel">
 <div class="tag">65—95s / 30秒同步试听</div><p>九轨使用同一音频时钟。点击角色放大检查；声部可独奏或静音。</p>
 <div class="transport"><button id="play" disabled>载入中…</button><button id="stop">回到起点</button><button id="clear">恢复合奏</button></div>
@@ -21,7 +21,7 @@
 <section class="panel"><h2>全曲试听与制作文件</h2><p>全曲为 266.29 秒。以下播放器用于独立试听，不与上方的30秒分轨控制联动。</p>
 <label for="fullMode">试听版本</label> <select id="fullMode"><option value="one-day-accompaniment.mp3">九件乐器合奏</option><option value="one-day-original-vocal-guide.mp3">原唱参考导唱 · 非新合唱</option></select>
 <audio id="fullAudio" controls preload="metadata"></audio>
-<div class="downloads"><a href="output/lu-band-arrangement/one-day-shell-v1/one-day-accompaniment.wav" download>合奏 WAV</a><a href="output/lu-band-arrangement/one-day-shell-v1/one-day-nine-instruments.mid" download>九轨 MIDI</a><a href="output/lu-band-arrangement/one-day-shell-v1/arrangement.json">声部与音符事件</a><a href="assets/band-pet-actions/one-piece/zoro/manifest.json">索隆补帧样片清单</a></div>
+<div class="downloads"><a href="output/lu-band-arrangement/one-day-shell-v1/one-day-accompaniment.wav" download>合奏 WAV</a><a href="output/lu-band-arrangement/one-day-shell-v1/one-day-nine-instruments.mid" download>九轨 MIDI</a><a href="output/lu-band-arrangement/one-day-shell-v1/arrangement.json">声部与音符事件</a><a href="assets/band-pet-actions/manifest.json">十人动作清单</a></div>
 </section></main>
-<script type="module" src="js/ui/shell-performance-review.js?v=20261030-sprites"></script>
+<script type="module" src="js/ui/shell-performance-review.js?v=20261030-sprites-all"></script>
 </html>

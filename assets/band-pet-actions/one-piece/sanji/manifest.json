@@ -1,0 +1,309 @@
+{
+  "id": "one-piece/sanji",
+  "status": "local-integrated",
+  "asset": "sanji-actions.webp",
+  "frameWidth": 320,
+  "frameHeight": 320,
+  "frameCount": 17,
+  "baseline": 0.94,
+  "fps": 12,
+  "restSource": "original-rest",
+  "clips": {
+    "rest": [
+      0
+    ],
+    "play": [
+      1,
+      8,
+      3,
+      7,
+      2,
+      6,
+      2,
+      7,
+      3,
+      4,
+      5,
+      4,
+      3,
+      8
+    ],
+    "accent": [
+      16,
+      13,
+      10,
+      14,
+      9,
+      12,
+      11,
+      15,
+      11,
+      12,
+      9,
+      14,
+      10,
+      13
+    ]
+  },
+  "sourceSha256": "29c23b847c67be493a8c6291f2eac46ab1c05813d5ec19f2d573210899684a30",
+  "accentSourceSha256": null,
+  "originalAssetSha256": "83cdb8287f5be3ab5457150e9f6caef85bbfb353d2c2659ce49dc49e7348b3f1",
+  "frames": [
+    {
+      "frame": 1,
+      "source": "exec-e14cb086-abc2-4327-91d9-5d0264dcde47.png",
+      "sourceBounds": [
+        36,
+        25,
+        270,
+        298
+      ],
+      "uniformScale": 0.7985347985347986,
+      "translation": [
+        65,
+        83
+      ],
+      "sha256": "680de6fe87ed7ddc6e48c65bedd2017440e633b29ba6edc09eb89a58ac5b8ebf"
+    },
+    {
+      "frame": 2,
+      "source": "exec-e14cb086-abc2-4327-91d9-5d0264dcde47.png",
+      "sourceBounds": [
+        331,
+        25,
+        608,
+        298
+      ],
+      "uniformScale": 0.7985347985347986,
+      "translation": [
+        46,
+        83
+      ],
+      "sha256": "1519429ea0d56dd48c0bb07078bd19bd902a81c92e8bba5160b9797e3d2e11b2"
+    },
+    {
+      "frame": 3,
+      "source": "exec-e14cb086-abc2-4327-91d9-5d0264dcde47.png",
+      "sourceBounds": [
+        653,
+        26,
+        928,
+        298
+      ],
+      "uniformScale": 0.8014705882352942,
+      "translation": [
+        47,
+        83
+      ],
+      "sha256": "72c3a8ff024a2a87a9f7c6064526dd7663189ba5fad73bc31a550c0103efd397"
+    },
+    {
+      "frame": 4,
+      "source": "exec-e14cb086-abc2-4327-91d9-5d0264dcde47.png",
+      "sourceBounds": [
+        977,
+        25,
+        1247,
+        298
+      ],
+      "uniformScale": 0.7985347985347986,
+      "translation": [
+        46,
+        83
+      ],
+      "sha256": "7d6ba63fddd8146b70eb1ff8882cb6ed6f3171607f1215c394dc324eef714619"
+    },
+    {
+      "frame": 5,
+      "source": "exec-e14cb086-abc2-4327-91d9-5d0264dcde47.png",
+      "sourceBounds": [
+        14,
+        334,
+        281,
+        610
+      ],
+      "uniformScale": 0.7898550724637681,
+      "translation": [
+        48,
+        83
+      ],
+      "sha256": "67bad06957db647aba23fa768d61854a0af14a770a5be10a95381cca4fad2bfa"
+    },
+    {
+      "frame": 6,
+      "source": "exec-e14cb086-abc2-4327-91d9-5d0264dcde47.png",
+      "sourceBounds": [
+        332,
+        333,
+        611,
+        611
+      ],
+      "uniformScale": 0.7841726618705036,
+      "translation": [
+        47,
+        83
+      ],
+      "sha256": "7412591ac63ad56d8cb216a347d30eb697d2e10e86da5ddf1aab80a6e3725e5b"
+    },
+    {
+      "frame": 7,
+      "source": "exec-e14cb086-abc2-4327-91d9-5d0264dcde47.png",
+      "sourceBounds": [
+        653,
+        336,
+        936,
+        611
+      ],
+      "uniformScale": 0.7927272727272727,
+      "translation": [
+        46,
+        83
+      ],
+      "sha256": "bd35801e8780c06ee601cc4ac4d3b43e10bc4441d053d295f72291427731a9e2"
+    },
+    {
+      "frame": 8,
+      "source": "exec-e14cb086-abc2-4327-91d9-5d0264dcde47.png",
+      "sourceBounds": [
+        984,
+        335,
+        1249,
+        611
+      ],
+      "uniformScale": 0.7898550724637681,
+      "translation": [
+        54,
+        83
+      ],
+      "sha256": "4787501bc97e73033ca5e850514caacf06a6c3c5ace34a38dfa2fcfb4a279804"
+    },
+    {
+      "frame": 9,
+      "source": "exec-e14cb086-abc2-4327-91d9-5d0264dcde47.png",
+      "sourceBounds": [
+        15,
+        647,
+        289,
+        923
+      ],
+      "uniformScale": 0.7898550724637681,
+      "translation": [
+        48,
+        83
+      ],
+      "sha256": "2a14f26cf35f9d5297434a975e4e8d9aee68336208025f612f5d75f4d6141fc9"
+    },
+    {
+      "frame": 10,
+      "source": "exec-e14cb086-abc2-4327-91d9-5d0264dcde47.png",
+      "sourceBounds": [
+        331,
+        647,
+        612,
+        924
+      ],
+      "uniformScale": 0.7870036101083032,
+      "translation": [
+        44,
+        83
+      ],
+      "sha256": "5ddc39911c4c51da24505dac6943d3fed867339a13026b3f747975615c2fd364"
+    },
+    {
+      "frame": 11,
+      "source": "exec-e14cb086-abc2-4327-91d9-5d0264dcde47.png",
+      "sourceBounds": [
+        653,
+        648,
+        932,
+        924
+      ],
+      "uniformScale": 0.7898550724637681,
+      "translation": [
+        47,
+        83
+      ],
+      "sha256": "bd52328e8eeb9f548084e2dd29200b91bb66d73fd0bc87b9d45f7bc66a7d9399"
+    },
+    {
+      "frame": 12,
+      "source": "exec-e14cb086-abc2-4327-91d9-5d0264dcde47.png",
+      "sourceBounds": [
+        978,
+        646,
+        1251,
+        923
+      ],
+      "uniformScale": 0.7870036101083032,
+      "translation": [
+        49,
+        83
+      ],
+      "sha256": "6a1f5034f05ed1c0b6490c5793a5712718f768a31cdb60fb40f798a39f4f8c2b"
+    },
+    {
+      "frame": 13,
+      "source": "exec-e14cb086-abc2-4327-91d9-5d0264dcde47.png",
+      "sourceBounds": [
+        12,
+        955,
+        288,
+        1228
+      ],
+      "uniformScale": 0.7985347985347986,
+      "translation": [
+        45,
+        83
+      ],
+      "sha256": "1c312a919bf5e3d86d27a63a8625d1f2ecef2e75550d75e3c8495990c24e45c7"
+    },
+    {
+      "frame": 14,
+      "source": "exec-e14cb086-abc2-4327-91d9-5d0264dcde47.png",
+      "sourceBounds": [
+        335,
+        953,
+        617,
+        1230
+      ],
+      "uniformScale": 0.7870036101083032,
+      "translation": [
+        46,
+        83
+      ],
+      "sha256": "b1364f0336da635a8f245f5f72bb0ea9a017bf0f2e12745f54ba7dd75a7a0799"
+    },
+    {
+      "frame": 15,
+      "source": "exec-e14cb086-abc2-4327-91d9-5d0264dcde47.png",
+      "sourceBounds": [
+        650,
+        953,
+        935,
+        1229
+      ],
+      "uniformScale": 0.7898550724637681,
+      "translation": [
+        44,
+        83
+      ],
+      "sha256": "d0fc635ac0bccb164f481e33243e89067cf19c9da66b69690960675c16dd89bd"
+    },
+    {
+      "frame": 16,
+      "source": "exec-e14cb086-abc2-4327-91d9-5d0264dcde47.png",
+      "sourceBounds": [
+        984,
+        953,
+        1247,
+        1228
+      ],
+      "uniformScale": 0.7927272727272727,
+      "translation": [
+        53,
+        83
+      ],
+      "sha256": "eda84bcb81e338563f6e9bb797ef7165f3d2e363a121f7d2508b3331d94e7935"
+    }
+  ]
+}

@@ -6,6 +6,7 @@ import {formationAt,sampleBandMotion,bandEase} from '../audio/band-layout.js';
 import {stageSpec,stageBandLayout,stageHeightAt,stageLightingAt,stageLimits,spatialStageAt,spatialStemMap} from '../audio/band-stage-layout.js';
 import {bandBeatAt} from '../audio/band-beat.js';
 import {bandPet,petFrameAt} from '../avatar/band-pets.js';
+import {loadBandActionPets,spritePerformanceFrame} from '../avatar/sprite-actions.js?v=20261030-sprites-all';
 import {defaultBandSettings,settingsForMember} from './band-settings.js';
 import {loadConcertModels} from './band-concert-props.js';
 import {createEnergyWings,energyWingAttachment} from './band-energy-wings.js';
@@ -50,6 +51,8 @@ export async function createBandScene(container,{safeTop=0,safeBottom=15,cubeDes
  const rimLight=new THREE.DirectionalLight(0x78d4ea,1.8);rimLight.position.set(10,9,-8);scene.add(rimLight);
  Object.assign(fill.shadow.camera,{left:-24,right:24,top:24,bottom:-24,far:75});fill.shadow.mapSize.set(1024,1024);fill.shadow.bias=-.0004;scene.add(fill);
  const loader=new THREE.TextureLoader(),textures=new Map(),maxAniso=Math.min(8,renderer.capabilities.getMaxAnisotropy?.()||4);
+ const actionPets=await loadBandActionPets().catch(error=>{console.warn('完整角色动作暂不可用:',error);return new Map();});
+ const petFor=id=>actionPets.get(id)||bandPet(id);
  const textureFor=url=>{if(!textures.has(url))textures.set(url,loader.loadAsync(url).then(t=>{t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=maxAniso;return t;}).catch(error=>{textures.delete(url);throw error;}));return textures.get(url);};
  let prewarmHandle=null,prewarmReady=false,prewarmStarted=false,prewarmBusy=false,prewarmLoaded=0;
  const prewarmQueue=[],prewarmFailures=[];
@@ -158,10 +161,10 @@ export async function createBandScene(container,{safeTop=0,safeBottom=15,cubeDes
   const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=maxAniso;texture.minFilter=THREE.LinearFilter;return texture;}
  async function configure(nextTheme=theme){
   if(members.length&&theme===nextTheme)return;theme=nextTheme;const token=++revision,roles=bandRoster(theme);
-  const loaded=await Promise.all(roles.map(r=>textureFor(bandPet(r.id).asset)));
+  const loaded=await Promise.all(roles.map(r=>textureFor(petFor(r.id).asset)));
   if(disposed||token!==revision)return;releaseMembers();lastUpdateKey='';
   members=roles.map((role,i)=>{
-   const pet=bandPet(role.id),group=new THREE.Group(),body=new THREE.Group();group.add(body);scene.add(group);
+   const pet=petFor(role.id),group=new THREE.Group(),body=new THREE.Group();group.add(body);scene.add(group);
    const texture=loaded[i].clone();texture.generateMipmaps=false;texture.minFilter=THREE.LinearFilter;texture.magFilter=THREE.LinearFilter;texture.anisotropy=maxAniso;texture.repeat.set(1/pet.frameCount,1);texture.offset.set(0,0);texture.needsUpdate=true;
    const art=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({map:texture,transparent:true,alphaTest:.035,depthWrite:true,toneMapped:false}));art.castShadow=true;body.add(art);
    art.customDepthMaterial=new THREE.MeshDepthMaterial({depthPacking:THREE.RGBADepthPacking,map:texture,alphaTest:.22});
@@ -291,10 +294,13 @@ export async function createBandScene(container,{safeTop=0,safeBottom=15,cubeDes
    if(member.texture!==texture){member.texture=texture;member.hitCanvas=null;member.art.material.map=member.reflection.material.map=member.art.customDepthMaterial.map=texture;member.art.material.needsUpdate=member.reflection.material.needsUpdate=member.art.customDepthMaterial.needsUpdate=true;}
    member.pet=member.originalPet;
    const h=(isShell?shellStage.anchorFor(member.role.id,i).height*.82:3.05)*v.actorSize*(isFocused?1.06:1);
-   member.art.position.set(0,h*(member.pet.baseline-.5),0);member.art.scale.set(h*.8,h,1);
+   const aspect=member.pet.frameWidth/member.pet.frameHeight;
+   member.art.position.set(0,h*(member.pet.baseline-.5),0);member.art.scale.set(h*aspect,h,1);
    member.art.rotation.y=Math.atan2(camera.position.x-member.group.position.x,camera.position.z-member.group.position.z)+THREE.MathUtils.degToRad(v.actorRotation)*.32;
-   member.reflection.position.set(0,-h*(member.pet.baseline-.5)*.30,.012);member.reflection.scale.set(h*.8,-h*.30,1);member.reflection.rotation.y=member.art.rotation.y;
-   member.frame=petFrameAt(frame.time,score?.bpmEstimate||120,isMuted?0:sample.activity,{reduced,speed:v.instrumentMotion*(.6+v.instrumentSize*.5),index:i,attack:Math.max(sample.attack||0,downbeat*sample.activity*.65)});member.texture.offset.x=member.frame/member.pet.frameCount;
+   member.reflection.position.set(0,-h*(member.pet.baseline-.5)*.30,.012);member.reflection.scale.set(h*aspect,-h*.30,1);member.reflection.rotation.y=member.art.rotation.y;
+   const actionOptions={reduced,speed:v.instrumentMotion*(.6+v.instrumentSize*.5),index:i,attack:Math.max(sample.attack||0,downbeat*sample.activity*.65)};
+   const action=member.pet.clips?spritePerformanceFrame(member.pet,frame.time,score?.bpmEstimate||120,isMuted?0:sample.activity,actionOptions):{action:'legacy',frame:petFrameAt(frame.time,score?.bpmEstimate||120,isMuted?0:sample.activity,actionOptions)};
+   member.spriteAction=action.action;member.frame=action.frame;member.texture.offset.x=member.frame/member.pet.frameCount;
    if(isMuted){
     member.art.material.opacity=.46;
     member.art.material.color.setRGB(.44,.48,.56);
@@ -390,6 +396,6 @@ export async function createBandScene(container,{safeTop=0,safeBottom=15,cubeDes
   {narrow,draggingId:drag?.id||null,placedIds:[...placements.keys()]}
  );
  return {configure,update,resize,setActive,drawTo,setCaptureSize,endCapture,dispose,pickMember,startDrag,moveDrag,endDrag,resetPositions,canvas:renderer.domElement,get narrow(){return narrow;},get captureActive(){return !!captureSize;},get formation(){return currentFormation();},get spatial(){return currentSpatial();},get dragging(){return drag?.id||null;},get memberProjections(){return projectMembers();},get diagnostics(){const spatial=currentSpatial(),projected=projectMembers();return {active,theme,narrow,captureSize,formation:currentFormation(),stage:{...theatre.diagnostics,shell:shellStage?.diagnostics||{ready:false,error:shellError}},glow:{strength:glow.strength},petCount:members.length,prewarm:{started:prewarmStarted,busy:prewarmBusy,pending:prewarmQueue.length,loaded:prewarmLoaded,failed:[...prewarmFailures]},wings:{...particleWingState(last?.options.score,last?.frame.time||0,{mode:last?.options.settings.effects,reduced:last?.options.reduced}),members:members.filter(m=>m.wings).map(m=>({id:m.role.id,...m.wings.diagnostics}))},placements:Object.fromEntries(placements),dragging:drag?.id||null,spatial,
-  cueSource:last?.options.score?.stageCues?.source||'demo',chorusCandidates:last?.options.score?.stageCues?.choruses||[],camera:{position:camera.position.toArray(),fov:camera.fov,aspect:camera.aspect,...lastCameraFit},propsBounds:theatre.projectProps(camera),fullFrame:frameStats,beams:spots.map(s=>s.beam.visible?s.beam.material.uniforms.uOpacity.value:0),members:members.map((m,i)=>({...projected[i],renderMode:'sprite-sequence',spriteFrameCount:m.pet.frameCount,layered:false,layerCount:1,actorRotation:m.art.rotation.toArray().slice(0,3),instrumentRotation:m.body.rotation.toArray().slice(0,3),actorScale:m.art.scale.toArray(),instrumentScale:m.body.scale.toArray(),actorFade:m.art.material.opacity,ringOpacity:m.ring.material.opacity,ringShader:{activity:m.ring.material.uniforms.uActivity.value,solo:m.ring.material.uniforms.uSolo.value,muted:m.ring.material.uniforms.uMuted.value},labelSize:[m.labelTexture.image.width,m.labelTexture.image.height],dragPhysics:{...physicsFor(m.role.id)}
+  cueSource:last?.options.score?.stageCues?.source||'demo',chorusCandidates:last?.options.score?.stageCues?.choruses||[],camera:{position:camera.position.toArray(),fov:camera.fov,aspect:camera.aspect,...lastCameraFit},propsBounds:theatre.projectProps(camera),fullFrame:frameStats,beams:spots.map(s=>s.beam.visible?s.beam.material.uniforms.uOpacity.value:0),members:members.map((m,i)=>({...projected[i],renderMode:'sprite-sequence',spriteFrameCount:m.pet.frameCount,spriteAction:m.spriteAction,spriteFrame:m.frame,layered:false,layerCount:1,actorRotation:m.art.rotation.toArray().slice(0,3),instrumentRotation:m.body.rotation.toArray().slice(0,3),actorScale:m.art.scale.toArray(),instrumentScale:m.body.scale.toArray(),actorFade:m.art.material.opacity,ringOpacity:m.ring.material.opacity,ringShader:{activity:m.ring.material.uniforms.uActivity.value,solo:m.ring.material.uniforms.uSolo.value,muted:m.ring.material.uniforms.uMuted.value},labelSize:[m.labelTexture.image.width,m.labelTexture.image.height],dragPhysics:{...physicsFor(m.role.id)}
   })),lights:spots.map(s=>s.light.intensity),drawCalls:renderer.info.render.calls};}};
 }
