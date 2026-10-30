@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { chromium } from 'playwright';
 
-const browser = await chromium.launch({ headless: true });
+const browser = await chromium.launch({ headless: true, channel: process.env.LU_TEST_BROWSER || undefined });
 try {
   const widths = process.env.LU_INTRO_WIDTHS === 'none' ? []
     : (process.env.LU_INTRO_WIDTHS || '390,1440').split(',').map(Number);
@@ -35,6 +35,26 @@ try {
     });
     await page.goto('http://localhost:8000/index.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => window.luCubeIntro?.phase === 'waiting');
+    if (process.env.LU_TEST_ARTIFACTS) {
+      await page.screenshot({ path: `${process.env.LU_TEST_ARTIFACTS}/intro-${width}px.png` });
+    }
+    // The cube is an interactive scene, not an ordinary 40px action key.
+    const introGeometry = await page.locator('#luIntroActivate').evaluate(button => {
+      const rect = button.getBoundingClientRect();
+      const canvas = button.querySelector('canvas').getBoundingClientRect();
+      const themes = document.querySelector('#luIntroThemeSelect').getBoundingClientRect();
+      return {
+        width: rect.width, height: rect.height, face: getComputedStyle(button).backgroundImage,
+        canvasContained: canvas.top >= rect.top - 1 && canvas.bottom <= rect.bottom + 1,
+        themesBelowCube: themes.top >= canvas.bottom - 1,
+        centerUnblocked: button.contains(document.elementFromPoint(canvas.x + canvas.width / 2, canvas.y + canvas.height / 2))
+      };
+    });
+    assert(Math.abs(introGeometry.width - introGeometry.height) < 1 && introGeometry.height >= 260,
+      `the entrance cube must retain its square scene container: ${JSON.stringify(introGeometry)}`);
+    assert.equal(introGeometry.face, 'none', 'the entrance canvas must not receive a filled button face');
+    assert(introGeometry.canvasContained && introGeometry.themesBelowCube && introGeometry.centerUnblocked,
+      `the entrance cube must not overlap its theme buttons: ${JSON.stringify(introGeometry)}`);
     assert.equal(await page.locator('#luIntroOverlay').isVisible(), true);
     assert.equal(await page.locator('.lu-intro-hint').innerText(), '轻触魔方');
     assert.equal(await page.locator('#luIntroSkip').innerText(), '跳过');
@@ -115,12 +135,42 @@ try {
     assert((await page.evaluate(() => window.introBufferSourceCount)) >= 9,
       'each layer turn and the final lock should play recorded material');
 
+    await page.waitForFunction(() => window.luBand && document.body.hasAttribute('data-festival-look'));
+    const stageButtons = page.locator('.lu-festival-switch > button');
+    assert.equal(await stageButtons.locator('svg[aria-hidden="true"]').count(), 3,
+      'all three stage choices must retain their decorative SVG and accessible button names');
+    for (const look of ['island', 'shell', 'cream']) {
+      const option = page.locator(`.lu-festival-switch > button[data-look="${look}"]`);
+      await option.click();
+      assert.equal(await page.locator('body').getAttribute('data-festival-look'), look);
+      assert.equal(await option.getAttribute('aria-pressed'), 'true');
+      assert.equal(await option.locator('svg').evaluate(svg => getComputedStyle(svg).filter), 'none');
+    }
+    const pyro = page.locator('.lu-band-pyro-toggle');
+    const pyroBox = await pyro.boundingBox();
+    assert(pyroBox.x >= width - 80 && pyroBox.y >= 0 && pyroBox.y < 60,
+      `the fireworks sound icon must stay in the top-right corner: ${JSON.stringify(pyroBox)}`);
+    assert(pyroBox.width >= 44 && pyroBox.height >= 44);
+    for (const pressed of ['false', 'true']) {
+      await pyro.click();
+      assert.equal(await pyro.getAttribute('aria-pressed'), pressed);
+      assert.equal(await pyro.locator('svg').count(), 1, 'toggling sound must not erase its SVG');
+    }
+    assert.equal(await page.locator('#appleModeBtn .lu-apple-mode-icon').first()
+      .evaluate(svg => getComputedStyle(svg).filter), 'none', 'mode SVG must retain its original colors');
+    if (process.env.LU_TEST_ARTIFACTS) {
+      await page.screenshot({ path: `${process.env.LU_TEST_ARTIFACTS}/stage-${width}px.png` });
+      await page.locator('#luAppleDock').screenshot({ path: `${process.env.LU_TEST_ARTIFACTS}/buttons-${width}px.png` });
+    }
+
     await page.locator('#performanceCapsule').click();
     await page.locator('#lueTabCreate').click();
     await page.locator('#luCoreMute').click();
     assert.equal(await page.locator('#luCoreMute').getAttribute('aria-pressed'), 'false');
     await page.locator('#luCoreReplay').click();
     await page.waitForFunction(() => window.luCubeIntro?.phase === 'waiting');
+    const replayBox = await page.locator('#luIntroActivate').boundingBox();
+    assert(Math.abs(replayBox.width - replayBox.height) < 1, 'replay must retain the square cube scene');
     assert.equal(await page.evaluate(() => window.luCubeIntro.solved), false);
     assert.equal(await page.locator('#luIntroMute').getAttribute('aria-pressed'), 'false');
     await page.locator('#luIntroSkip').click();

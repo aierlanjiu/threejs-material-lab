@@ -2,7 +2,7 @@ import { validateBandScore } from './band-timeline.js';
 import {parseBandLrc,buildBandCues,computeVocalLineSpans} from './band-cues.js';
 import {validateSongBindings,applyStoredSongReview} from './band-song-parts.js';
 import {validateFamilyBindings} from './band-family-bindings.js';
-import {BOLERO_TRACK,validateArrangement} from './band-arrangement.js';
+import {BOLERO_TRACK,validateArrangement} from './band-arrangement.js?v=20261029-shell-live';
 export const BAND_TRACKS=Object.freeze([
  ['anime_op_we_are','We Are!','one-piece'],['anime_op_over_the_top','OVER THE TOP','one-piece'],['anime_op_overtaken','Overtaken','one-piece'],['anime_op_one_day','One day','one-piece'],
  ['anime_db_chala','CHA-LA HEAD-CHA-LA','dragon-ball'],['anime_db_makafushigi','Makafushigi Adventure!','dragon-ball'],['anime_db_dandan','DAN DAN 心魅かれてく','dragon-ball'],
@@ -21,8 +21,14 @@ export const GENERAL_BAND_TRACKS=Object.freeze([
 ].map(([id,title,theme,src])=>Object.freeze({id,title,theme,src})));
 export const ALL_BAND_TRACKS=Object.freeze([...BAND_TRACKS,...GENERAL_BAND_TRACKS,BOLERO_TRACK]);
 
-export async function loadBandAnalysis(id,{signal,preferHybrid=true}={}){
+export async function loadBandAnalysis(id,{signal,preferHybrid=true,preferShell=false}={}){
  if(!ALL_BAND_TRACKS.some(t=>t.id===id))return null;
+ if(preferShell&&id==='anime_op_one_day'){
+  const response=await fetch('./assets/band-shell-performance/score.json',{signal});if(!response.ok)throw Error('珍珠贝壳独立声部尚未就绪');
+  const score=await response.json(),checked=validateArrangement(score),timeline=validateBandScore(score);
+  if(!checked.ok||!timeline.ok||score.trackId!==id)throw Error([...checked.errors,...timeline.errors].join('；'));
+  return attachLyrics(score,id,signal);
+ }
  if(id===BOLERO_TRACK.id){
   const response=await fetch(BOLERO_TRACK.score,{signal});if(!response.ok)throw new Error('改编声轨尚未就绪');
   const score=await response.json(),checked=validateArrangement(score),timeline=validateBandScore(score);

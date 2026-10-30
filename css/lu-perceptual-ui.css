@@ -9,6 +9,17 @@
   initial-value: superellipse(1.25);
 }
 
+@property --lu-button-face-top {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: transparent;
+}
+@property --lu-button-face-bottom {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: transparent;
+}
+
 @supports (corner-shape: superellipse(1.25)) {
   .lu-perceptual-ui :where(
     #luAppleDock,
@@ -225,6 +236,13 @@
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / .30),
     0 2px 8px rgb(168 82 36 / .28);
+}
+
+.lu-perceptual-ui body.lu-band-mode[data-festival-look="shell"] .lu-festival-switch > .lu-lumno-indicator {
+  background: linear-gradient(180deg, #2b6058 0%, #1b443e 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / .30),
+    0 2px 8px rgb(27 68 62 / .28);
 }
 
 .lu-perceptual-ui body.lu-band-mode[data-festival-look] :is(.lue-facet-tabs, #kineticModeSwitcher, .inspector-tabs, .material-families, #avatarGroupTabs, .lu-apple-aspect-group, #contentModeGroup, #layerModeGroup, #adhesionCraftGroup, #morphFreqGroup, #fovModeGroup, #camMotionGroup, #orbitModeGroup) > .lu-lumno-indicator {
@@ -1220,5 +1238,345 @@ body.lu-mode-transitioning #canvas-container {
   .lu-perceptual-ui .lu-lumno-indicator,
   .lu-lumno-dock-tip {
     transition: none !important;
+  }
+}
+
+/* Tactile action buttons. Extend the existing class/token system, no new component.
+ * The named important layer intentionally wins the legacy theme !important rules.
+ * Variant selectors only set material values; one shadow recipe owns every state.
+ * Three inset slots + two drop slots remain in the same order during transitions.
+ */
+@layer lu-button-material {
+  .lu-perceptual-ui :where(
+    .btn, .lu-apple-icon-btn, .lu-apple-play-btn, .lu-apple-record-start,
+    .lu-apple-import-trigger, .lue-quick-pill, .lue-facet-close,
+    .lu-festival-switch > button, .lu-apple-aspect-group > button,
+    .lu-band-controls > button, .lu-band-members > button,
+    .pill-btn, .preset-cam-btn, .inspector-tab-btn, .lue-facet-tab, .kinetic-mode-btn,
+    .material-families > button, .studio-lighting button,
+    .lu-intro-tools button, .lu-intro-skip, .lu-band-pyro-toggle,
+    #inspectorCloseBtn, #workbenchHandle, #inspectorDockButton
+  ) {
+    --lu-button-material: tactile;
+    --lu-button-label-size: 14px;
+    --lu-button-u: calc(var(--lu-button-label-size) / 14);
+    --lu-button-rest-top: #ffffff;
+    --lu-button-rest-bottom: #f4f5f7;
+    --lu-button-hover-top: #ffffff;
+    --lu-button-hover-bottom: #fafbfc;
+    --lu-button-edge: rgb(15 23 42 / .14);
+    --lu-button-label: #374151;
+    --lu-button-highlight: rgb(255 255 255 / 1);
+    --lu-button-bottom-shade: rgb(0 0 0 / .06);
+    --lu-button-contact: rgb(0 0 0 / .06);
+    --lu-button-lift: rgb(0 0 0 / .09);
+    --lu-button-well: rgb(0 0 0 / .14);
+    --lu-button-paper-line: rgb(255 255 255 / .9);
+    --lu-button-text-shadow: transparent;
+    --lu-button-face-top: var(--lu-button-rest-top);
+    --lu-button-face-bottom: var(--lu-button-rest-bottom);
+    --lu-button-inset-top: inset 0 var(--lu-button-u) 0 var(--lu-button-highlight);
+    --lu-button-inset-bottom: inset 0 calc(-1 * var(--lu-button-u)) 0 var(--lu-button-bottom-shade);
+    --lu-button-inset-pad: inset 0 0 0 transparent;
+    --lu-button-drop-contact: 0 var(--lu-button-u) calc(2 * var(--lu-button-u)) var(--lu-button-contact);
+    --lu-button-drop-lift: 0 calc(4 * var(--lu-button-u)) calc(10 * var(--lu-button-u)) calc(-3 * var(--lu-button-u)) var(--lu-button-lift);
+    box-sizing: border-box !important;
+    height: calc(40 * var(--lu-button-u)) !important;
+    min-height: calc(40 * var(--lu-button-u)) !important;
+    padding: 0 calc(18 * var(--lu-button-u)) !important;
+    gap: calc(8 * var(--lu-button-u)) !important;
+    border: var(--lu-button-u) solid var(--lu-button-edge) !important;
+    border-radius: calc(10 * var(--lu-button-u)) !important;
+    corner-shape: round !important;
+    font-size: var(--lu-button-label-size) !important;
+    font-weight: 600 !important;
+    line-height: 1.25 !important;
+    letter-spacing: normal !important;
+    color: var(--lu-button-label) !important;
+    background: linear-gradient(180deg, var(--lu-button-face-top), var(--lu-button-face-bottom)) !important;
+    box-shadow: var(--lu-button-inset-top), var(--lu-button-inset-bottom), var(--lu-button-inset-pad), var(--lu-button-drop-contact), var(--lu-button-drop-lift) !important;
+    text-shadow: 0 calc(-1 * var(--lu-button-u)) 0 var(--lu-button-text-shadow) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    transform: translateY(var(--lu-button-press-y, 0px)) !important;
+    transition: transform 120ms ease, box-shadow 140ms ease,
+      --lu-button-face-top 160ms ease, --lu-button-face-bottom 160ms ease,
+      color 160ms ease, border-color 160ms ease !important;
+
+    @media (hover: hover) {
+      &:not(:disabled):not([aria-disabled="true"]):hover {
+        --lu-button-face-top: var(--lu-button-hover-top);
+        --lu-button-face-bottom: var(--lu-button-hover-bottom);
+        --lu-button-drop-lift: 0 calc(8 * var(--lu-button-u)) calc(16 * var(--lu-button-u)) calc(-5 * var(--lu-button-u)) var(--lu-button-lift);
+      }
+    }
+    &:not(:disabled):not([aria-disabled="true"]):active {
+      --lu-button-face-top: var(--lu-button-rest-bottom);
+      --lu-button-face-bottom: var(--lu-button-rest-top);
+      --lu-button-inset-top: inset 0 var(--lu-button-u) calc(2 * var(--lu-button-u)) var(--lu-button-well);
+      --lu-button-inset-bottom: inset 0 0 0 transparent;
+      --lu-button-drop-contact: 0 var(--lu-button-u) 0 var(--lu-button-paper-line);
+      --lu-button-drop-lift: 0 var(--lu-button-u) var(--lu-button-u) var(--lu-button-contact);
+      --lu-button-press-y: var(--lu-button-u);
+    }
+    &:is(:disabled, [aria-disabled="true"]) {
+      --lu-button-drop-contact: 0 0 0 transparent;
+      --lu-button-drop-lift: 0 0 0 transparent;
+      --lu-button-press-y: 0px;
+      cursor: default !important;
+      opacity: .45 !important;
+    }
+  }
+
+  /* Primary, including persistent selected states. Selection is not :active. */
+  .lu-perceptual-ui :is(
+    .btn-primary, .lu-apple-play-btn, .lu-apple-record-start,
+    #playPauseBtn, #recordToggle, .lu-band-pyro-toggle[aria-pressed="true"],
+    .btn.active, .pill-btn.active, .preset-cam-btn.active,
+    #appleOrderModeBtn[aria-pressed="true"],
+    .lue-facet-tab.active, .inspector-tab-btn.active, .kinetic-mode-btn.active,
+    .lu-festival-switch > button[aria-pressed="true"],
+    .lu-apple-aspect-group > button[aria-pressed="true"],
+    .lu-band-members > button[aria-pressed="true"],
+    .material-families > button[aria-pressed="true"],
+    .studio-lighting button[aria-pressed="true"]
+  ) {
+    --lu-button-rest-top: #404859;
+    --lu-button-rest-bottom: #273042;
+    --lu-button-hover-top: #4a5365;
+    --lu-button-hover-bottom: #313b50;
+    --lu-button-edge: #12161f;
+    --lu-button-label: #ffffff;
+    --lu-button-highlight: rgb(255 255 255 / .18);
+    --lu-button-bottom-shade: rgb(0 0 0 / .22);
+    --lu-button-contact: rgb(0 0 0 / .18);
+    --lu-button-lift: rgb(0 0 0 / .28);
+    --lu-button-well: rgb(0 0 0 / .4);
+    --lu-button-paper-line: transparent;
+    --lu-button-text-shadow: rgb(0 0 0 / .28);
+  }
+
+  .lu-perceptual-ui :is(.btn-tertiary, #appleStopBtn, #resetCam, #bandDemoExit) {
+    --lu-button-rest-top: #f3f4f6;
+    --lu-button-rest-bottom: #e7e9ec;
+    --lu-button-hover-top: #fafbfc;
+    --lu-button-hover-bottom: #eff1f4;
+    --lu-button-edge: rgb(15 23 42 / .1);
+    --lu-button-highlight: rgb(255 255 255 / .85);
+    --lu-button-well: rgb(0 0 0 / .12);
+  }
+
+  .lu-perceptual-ui :is(
+    .btn-ghost, .lue-facet-close, .lu-intro-tools button,
+    #appleOrderModeBtn:not([aria-pressed="true"]), #appleRecordCloseBtn, #inspectorCloseBtn,
+    #applePlaylistBtn, #appleSettingsBtn, #appleCollapseOrbBtn
+  ) {
+    --lu-button-rest-top: transparent;
+    --lu-button-rest-bottom: transparent;
+    --lu-button-hover-top: rgb(128 135 145 / .08);
+    --lu-button-hover-bottom: rgb(128 135 145 / .12);
+    --lu-button-edge: transparent;
+    --lu-button-highlight: transparent;
+    --lu-button-bottom-shade: transparent;
+    --lu-button-contact: transparent;
+    --lu-button-lift: transparent;
+    --lu-button-well: rgb(0 0 0 / .14);
+    --lu-button-paper-line: rgb(255 255 255 / .9);
+  }
+
+  .lu-perceptual-ui :is(.btn-text, .lue-related-link, .lu-intro-skip) {
+    --lu-button-rest-top: transparent;
+    --lu-button-rest-bottom: transparent;
+    --lu-button-hover-top: transparent;
+    --lu-button-hover-bottom: transparent;
+    --lu-button-edge: transparent;
+    --lu-button-label: #4b5563;
+    --lu-button-highlight: transparent;
+    --lu-button-bottom-shade: transparent;
+    --lu-button-contact: transparent;
+    --lu-button-lift: transparent;
+    --lu-button-well: transparent;
+    --lu-button-paper-line: transparent;
+    text-decoration-line: underline !important;
+    text-decoration-thickness: var(--lu-button-u) !important;
+    text-underline-offset: calc(3 * var(--lu-button-u)) !important;
+  }
+
+  /* Auxiliary labels retain readable neutral contrast on the existing dark UI. */
+  .lu-perceptual-ui body:not(.lu-band-mode[data-festival-look]) :is(
+    .btn-ghost, .btn-text, .lue-related-link, .lue-facet-close, .lu-intro-skip,
+    .lu-intro-tools button, #appleOrderModeBtn:not([aria-pressed="true"]), #appleRecordCloseBtn,
+    #inspectorCloseBtn, #applePlaylistBtn, #appleSettingsBtn, #appleCollapseOrbBtn
+  ) { --lu-button-label: #d1d5db; }
+
+  /* The unit changes once; height, edge, radius, icons and all shadows follow. */
+  .lu-perceptual-ui :is(.btn-lg, .lu-apple-play-btn) {
+    --lu-button-label-size: 16px;
+  }
+  .lu-perceptual-ui .btn-md { --lu-button-label-size: 14px; }
+
+  .lu-perceptual-ui :where(
+    .lu-apple-icon-btn, .lu-apple-play-btn, .lu-intro-tools button
+  ) {
+    width: calc(40 * var(--lu-button-u)) !important;
+    min-width: calc(40 * var(--lu-button-u)) !important;
+    padding-inline: 0 !important;
+    flex-shrink: 0 !important;
+  }
+  .lu-perceptual-ui :is(#appleModeBtn, #appleRecordMenuBtn) {
+    width: auto !important;
+    min-width: calc(60 * var(--lu-button-u)) !important;
+    padding-inline: calc(8 * var(--lu-button-u)) !important;
+    gap: calc(5 * var(--lu-button-u)) !important;
+  }
+  .lu-perceptual-ui :where(
+    .btn, .lu-apple-icon-btn, .lu-apple-play-btn, .lue-quick-pill,
+    .lu-apple-record-start, .lue-facet-tab, .inspector-tab-btn, .kinetic-mode-btn
+  ) :is(svg, .lu-apple-mode-icon) {
+    width: calc(16 * var(--lu-button-u)) !important;
+    height: calc(16 * var(--lu-button-u)) !important;
+    flex-shrink: 0 !important;
+    filter: grayscale(1) !important;
+    scale: 1 !important;
+    translate: none !important;
+  }
+  .lu-perceptual-ui :where(.lu-apple-mode-label, #appleRecordMenuBtn > span) {
+    font-size: inherit !important;
+    color: inherit !important;
+  }
+
+  /* These controls identify scenes/modes by color; keep the neutral key faces. */
+  .lu-perceptual-ui :is(#appleModeBtn, .kinetic-mode-btn) svg {
+    filter: none !important;
+  }
+  .lu-perceptual-ui #appleModeBtn > .lu-apple-mode-icon {
+    width: calc(24 * var(--lu-button-u)) !important;
+    height: calc(24 * var(--lu-button-u)) !important;
+  }
+  .lu-perceptual-ui #appleModeBtn {
+    width: calc(40 * var(--lu-button-u)) !important;
+    min-width: calc(40 * var(--lu-button-u)) !important;
+    padding-inline: 0 !important;
+  }
+  .lu-perceptual-ui #appleModeLabel { display: none !important; }
+
+  .lu-perceptual-ui .lu-festival-switch {
+    width: auto !important;
+    justify-self: end !important;
+  }
+  .lu-perceptual-ui .lu-festival-switch > button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: calc(40 * var(--lu-button-u)) !important;
+    min-width: calc(40 * var(--lu-button-u)) !important;
+    padding-inline: 0 !important;
+    flex: 0 0 auto !important;
+  }
+  .lu-perceptual-ui :is(.lu-stage-look-icon, .lu-pyro-sound-icon) {
+    width: calc(24 * var(--lu-button-u)) !important;
+    height: calc(24 * var(--lu-button-u)) !important;
+    flex-shrink: 0 !important;
+    filter: none !important;
+  }
+  .lu-perceptual-ui body .lu-band-pyro-toggle {
+    position: fixed !important;
+    top: max(calc(14 * var(--lu-button-u)), env(safe-area-inset-top)) !important;
+    right: max(calc(14 * var(--lu-button-u)), env(safe-area-inset-right)) !important;
+    z-index: 130 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: calc(44 * var(--lu-button-u)) !important;
+    min-width: calc(44 * var(--lu-button-u)) !important;
+    height: calc(44 * var(--lu-button-u)) !important;
+    min-height: calc(44 * var(--lu-button-u)) !important;
+    padding: 0 !important;
+  }
+  .lu-perceptual-ui .lu-band-pyro-toggle[hidden] { display: none !important; }
+  .lu-perceptual-ui .lu-band-pyro-toggle[aria-pressed="true"] .lu-pyro-sound-off,
+  .lu-perceptual-ui .lu-band-pyro-toggle[aria-pressed="false"] .lu-pyro-sound-on {
+    display: none !important;
+  }
+
+  /* Existing compact groups keep their fitted cells and 44px touch targets. */
+  .lu-perceptual-ui :is(.lue-facet-tab, .inspector-tab-btn, .kinetic-mode-btn) {
+    padding-inline: calc(8 * var(--lu-button-u)) !important;
+    min-width: 0 !important;
+    gap: calc(5 * var(--lu-button-u)) !important;
+  }
+  @media (pointer: coarse) {
+    .lu-perceptual-ui :is(.lu-apple-icon-btn, .lue-facet-tab, .inspector-tab-btn, .lu-festival-switch > button) {
+      min-height: calc(44 * var(--lu-button-u)) !important;
+    }
+    .lu-perceptual-ui body :is(.lu-apple-icon-btn, #appleModeBtn, #appleRecordMenuBtn, .lu-festival-switch > button) {
+      width: calc(44 * var(--lu-button-u)) !important;
+      min-width: calc(44 * var(--lu-button-u)) !important;
+    }
+  }
+
+  /* Put the material on the real key, rather than the moving indicator overlay. */
+  .lu-perceptual-ui [data-lumno-indicator]:not(#luIntroThemeSelect) > .lu-lumno-indicator {
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .lu-perceptual-ui :is(
+    .btn-ghost, .lue-facet-close, .lu-intro-tools button,
+    #appleOrderModeBtn:not([aria-pressed="true"]), #appleRecordCloseBtn, #inspectorCloseBtn,
+    #applePlaylistBtn, #appleSettingsBtn, #appleCollapseOrbBtn
+  ):not(:disabled):active {
+    --lu-button-face-top: #e2e5e9;
+    --lu-button-face-bottom: #eff1f4;
+  }
+  /* A masked arrow adds no generated text to the accessible name. */
+  .lu-perceptual-ui :is(.btn-text, .lue-related-link, .lu-intro-skip)::after {
+    content: "";
+    display: inline-block;
+    width: calc(14 * var(--lu-button-u));
+    height: calc(14 * var(--lu-button-u));
+    margin-inline-start: calc(5 * var(--lu-button-u));
+    vertical-align: middle;
+    background: currentColor;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8h10M9 4l4 4-4 4' fill='none' stroke='black' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+    transition: transform 120ms ease;
+  }
+  @media (hover: hover) {
+    .lu-perceptual-ui :is(.btn-text, .lue-related-link, .lu-intro-skip):not(:disabled):hover::after {
+      transform: translateX(calc(2 * var(--lu-button-u)));
+    }
+  }
+
+  @media (max-width: 760px) {
+    .lu-perceptual-ui .kinetic-mode-btn {
+      padding-inline: calc(4 * var(--lu-button-u)) !important;
+      gap: calc(4 * var(--lu-button-u)) !important;
+    }
+    .lu-perceptual-ui :is(#appleModeBtn, #appleRecordMenuBtn) {
+      min-width: calc(40 * var(--lu-button-u)) !important;
+      width: calc(40 * var(--lu-button-u)) !important;
+      padding-inline: 0 !important;
+    }
+    .lu-perceptual-ui .lu-festival-switch > button {
+      min-width: 0 !important;
+      padding-inline: 0 !important;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lu-perceptual-ui :where(button, a)[class],
+    .lu-perceptual-ui :is(.btn-text, .lue-related-link, .lu-intro-skip)::after {
+      transition: none !important;
+      transform: none !important;
+    }
+  }
+  @media (forced-colors: active) {
+    .lu-perceptual-ui :where(button, a)[class] {
+      --lu-button-edge: ButtonText;
+      --lu-button-label: ButtonText;
+      --lu-button-face-top: ButtonFace;
+      --lu-button-face-bottom: ButtonFace;
+      text-shadow: none !important;
+      box-shadow: none !important;
+    }
   }
 }

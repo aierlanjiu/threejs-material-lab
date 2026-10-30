@@ -3,6 +3,7 @@ import {instrumentById,instrumentsForTheme} from '../avatar/instrument-manifest.
 export const BOLERO_TRACK=Object.freeze({id:'arrangement_bolero',title:'波莱罗 · 十人改编',theme:'one-piece',
  src:'./output/lu-band-arrangement/bolero-trial/bolero-pet-ensemble.mp3',score:'./output/lu-band-arrangement/bolero-trial/web/score.json'});
 export function validateArrangement(score){
+ if(score?.arrangement?.version===3)return validateRenderedArrangement(score);
  if(score?.arrangement?.version===2)return validateHybridArrangement(score);
  const a=score?.arrangement,errors=[],actors=new Set(),stems=new Set();
  if(score?.source!=='arrangement'||a?.version!==1||a?.provenance!=='rendered-midi-events-v1'||a?.mixMode!=='independent-stems')errors.push('改编来源无效');
@@ -16,6 +17,19 @@ export function validateArrangement(score){
   actors.add(part.actorId);stems.add(part.stemId);
  }
  return {ok:!errors.length,errors};
+}
+export function validateRenderedArrangement(score){
+ const errors=[],a=score?.arrangement,r=score?.rendered,actors=new Set(),audios=new Set();
+ if(score?.source!=='arrangement'||a?.mixMode!=='rendered-stems'||a?.provenance!=='rendered-independent-midi-v1'||a?.theme!=='one-piece'||a?.takeoverBars!==4||r?.version!==1||r?.chunkSeconds!==12)errors.push('独立渲染编配来源无效');
+ if(!/^[a-f0-9]{64}$/.test(score?.sourceSha256||'')||a?.parts?.length!==10||score?.stems?.length!==10)errors.push('独立编配编制或源摘要无效');
+ for(const p of a?.parts||[]){const actor=instrumentById(p.actorId);if(!actor||actor.theme!=='one-piece'||actor.instrumentKind!==p.instrumentId||actors.has(p.actorId))errors.push('独立编配角色不匹配');actors.add(p.actorId);
+  const s=score.stems?.find(s=>s.id===p.stemId);
+  if(p.instrumentId==='vocals'){if(p.stemId!==null||score.choir?.generated!==false)errors.push('待制作合唱须保持休止');continue;}
+  if(!s||s.instrumentId!==p.instrumentId||!s.events?.length||audios.has(s.audio)||!s.audio||!/^[a-f0-9]{64}$/.test(s.audioSha256||''))errors.push('缺少唯一独立音轨');audios.add(s?.audio);
+  let end=0;for(const c of s?.chunks||[]){if(Math.abs(c.start-end)>.001||!(c.duration>0&&c.duration<=12)||!c.audio||!/^[a-f0-9]{64}$/.test(c.audioSha256||''))errors.push('声部分段不连续或摘要无效');end=c.start+c.duration;}
+  if(Math.abs(end-score.duration)>.001)errors.push('声部分段未覆盖全曲');
+ }
+ if(audios.size!==9)errors.push('须有九件独立乐器');return {ok:!errors.length,errors};
 }
 export function validateHybridArrangement(score){
  const a=score?.arrangement,h=score?.hybrid,errors=[],ids=new Set();
@@ -40,6 +54,7 @@ export function validateHybridArrangement(score){
  return {ok:!errors.length,errors};
 }
 export function arrangementPartsForTheme(score,theme,roles){
+ if(score?.arrangement?.version===3){const valid=validateArrangement(score).ok&&theme==='one-piece';return roles.map(role=>{const p=valid&&score.arrangement.parts.find(p=>p.actorId===role.id),s=p?.stemId&&score.stems.find(s=>s.id===p.stemId);return {...role,partId:s?`rendered-${s.id}`:null,stemId:s?.id||null,instrumentId:p?.instrumentId||null,technique:p?.technique||role.technique,label:role.instrument,sourceLabel:s?'独立渲染声部 · 编配待听审':'新合唱待制作 · 休止',bindingStatus:s?'composed':'unbound',events:s?.events||[],percussion:!!s?.percussion,shared:false,source:'arrangement'};});}
  if(score?.arrangement?.version===2){const valid=validateArrangement(score).ok;
   return roles.map(role=>{const p=valid&&score.arrangement.themes[theme]?.find(p=>p.actorId===role.id),s=p&&score.stems.find(s=>s.id===p.stemId);
    return {...role,partId:p?`hybrid-${s.id}`:null,stemId:s?.id||null,instrumentId:p?.instrumentId||null,

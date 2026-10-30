@@ -1,11 +1,12 @@
 // All-on is the original mix. Muting subtracts the attributable model source;
 // solo uses the actual source. Unseparated accompaniment is never duplicated.
 import {createBandHybridAudio} from './band-hybrid-audio.js';
+import {createRenderedStemAudio} from './band-rendered-audio.js';
 export function createBandMixer({getContext,getOutput,getTrack,getTime=()=>0}){
  let trackId='',buffers=new Map(),sources=[],originalGain=null,revision=0,abort=null,ready=false,enabled=false,policy={muted:[],soloGroup:null},independent=false,restoreSongTime=null;
  const buses=new Map(),spatialChains=new Map();
  let hybrid=null,theme='one-piece',spatial={};
- let procedural=false;
+ let procedural=false,rendered=null;
  function setAudioParam(param,value){
   if(!param||!Number.isFinite(value))return;
   const ctx=getContext?.(),now=ctx?.currentTime||0;
@@ -55,14 +56,16 @@ export function createBandMixer({getContext,getOutput,getTrack,getTime=()=>0}){
   for(const item of sources){const coef=coefficient(item.id);ramp(item.gain,coef,at,independent&&enabled?.25:1-autoBed,restoreAt);if(item.chain){item.chain.allowSpatial=coef>=0;applyChainSpatial(item.id,item.chain);}}
   for(const [id,bus] of buses)ramp(bus,gainValue(id),at,1,restoreAt);
  }
- function stop(){hybrid?.stop();for(const item of sources){try{item.source.stop();}catch{}item.source.disconnect();item.gain.disconnect();item.chain?.depth?.disconnect();item.chain?.shelf?.disconnect();item.chain?.panner?.disconnect();spatialChains.delete(item.id);}sources=[];originalGain?.disconnect();originalGain=null;}
+ function stop(){rendered?.stop();hybrid?.stop();for(const item of sources){try{item.source.stop();}catch{}item.source.disconnect();item.gain.disconnect();item.chain?.depth?.disconnect();item.chain?.shelf?.disconnect();item.chain?.panner?.disconnect();spatialChains.delete(item.id);}sources=[];originalGain?.disconnect();originalGain=null;}
  return {
   setTheme(value){theme=value;},
   async configure(score){
+   rendered?.dispose();rendered=null;
    hybrid?.dispose();hybrid=null;
    const token=++revision;abort?.abort();abort=new AbortController();ready=false;trackId=score?.trackId||'';buffers=new Map();policy={muted:[],soloGroup:null};restoreSongTime=null;independent=score?.arrangement?.mixMode==='independent-stems';procedural=score?.source==='procedural';
    if(originalGain||buses.size)schedule();
    if(!score)return;
+   if(score.rendered){stop();const next=createRenderedStemAudio({getContext,getOutput,getTime});rendered=next;next.setEnabled(enabled);next.setSpatial(spatial);await next.configure(score);if(token===revision)ready=true;return;}
    if(score.hybrid){stop();const next=createBandHybridAudio({getContext,getOutput,getTime});hybrid=next;next.setEnabled(enabled);next.setSpatial?.(spatial);await next.configure(score,theme);if(token===revision)ready=true;return;}
    if(score.source==='procedural'){ready=true;return;}
    const ctx=getContext(),loaded=await Promise.all(score.stems.filter(s=>s.audio).map(async stem=>{
@@ -73,6 +76,7 @@ export function createBandMixer({getContext,getOutput,getTrack,getTime=()=>0}){
    if(token!==revision)return;buffers=new Map(loaded);ready=true;
   },
   start(source,offset,duration,loop=false,advanceOffset=false){
+   if(rendered)return rendered.start(source,offset,duration,loop,advanceOffset);
    if(hybrid)return hybrid.start(source,offset,duration,loop,advanceOffset);
    stop();const ctx=getContext(),preparedAt=ctx.currentTime;
    if(trackId!==getTrack()?.type)policy={muted:[],soloGroup:null};
@@ -90,10 +94,10 @@ export function createBandMixer({getContext,getOutput,getTrack,getTime=()=>0}){
   },
   proceduralBus(id){const ctx=getContext();if(!buses.has(id)){const bus=ctx.createGain();bus.gain.value=gainValue(id);attachSpatialChain(ctx,id,bus,true);buses.set(id,bus);}return buses.get(id);},
   prepareProcedural(id){if(trackId!==id){trackId=id;policy={muted:[],soloGroup:null};for(const bus of buses.values())bus.disconnect();for(const c of spatialChains.values()){c.depth?.disconnect();c.shelf?.disconnect();c.panner?.disconnect();}buses.clear();spatialChains.clear();}procedural=true;ready=true;buffers=new Map();},
-  setPolicy(next,audioTime,{restoreTime=null}={}){policy={muted:[...next.muted],soloGroup:next.soloGroup};restoreSongTime=restoreTime;if(hybrid)hybrid.setPolicy(next,audioTime,{restoreTime});else schedule(audioTime);},
-  setSpatial(next={}){if(!next||typeof next!=='object')return;spatial={...spatial,...next};hybrid?.setSpatial?.(spatial);for(const [id,chain] of spatialChains)applyChainSpatial(id,chain);},
-  setEnabled(value){enabled=Boolean(value);hybrid?.setEnabled(enabled);if(originalGain||buses.size)schedule();},stop,
-  get diagnostics(){if(hybrid)return hybrid.diagnostics;return {ready,enabled,trackId,independent,restoreSongTime,loaded:[...buffers.keys()],policy:{...policy},coefficients:Object.fromEntries(sources.map(s=>[s.id,s.gain.gain.value])),bed:originalGain?.gain.value??1,spatial:{...spatial}};},
-  dispose(){++revision;abort?.abort();hybrid?.dispose();stop();for(const bus of buses.values())bus.disconnect();for(const c of spatialChains.values()){c.depth?.disconnect();c.shelf?.disconnect();c.panner?.disconnect();}buses.clear();spatialChains.clear();}
+  setPolicy(next,audioTime,{restoreTime=null}={}){policy={muted:[...next.muted],soloGroup:next.soloGroup};restoreSongTime=restoreTime;if(rendered)rendered.setPolicy(next,audioTime,{restoreTime});else if(hybrid)hybrid.setPolicy(next,audioTime,{restoreTime});else schedule(audioTime);},
+  setSpatial(next={}){if(!next||typeof next!=='object')return;spatial={...spatial,...next};rendered?.setSpatial(spatial);hybrid?.setSpatial?.(spatial);for(const [id,chain] of spatialChains)applyChainSpatial(id,chain);},
+  setEnabled(value){enabled=Boolean(value);rendered?.setEnabled(enabled);hybrid?.setEnabled(enabled);if(originalGain||buses.size)schedule();},stop,
+  get diagnostics(){if(rendered)return rendered.diagnostics;if(hybrid)return hybrid.diagnostics;return {ready,enabled,trackId,independent,restoreSongTime,loaded:[...buffers.keys()],policy:{...policy},coefficients:Object.fromEntries(sources.map(s=>[s.id,s.gain.gain.value])),bed:originalGain?.gain.value??1,spatial:{...spatial}};},
+  dispose(){++revision;abort?.abort();rendered?.dispose();hybrid?.dispose();stop();for(const bus of buses.values())bus.disconnect();for(const c of spatialChains.values()){c.depth?.disconnect();c.shelf?.disconnect();c.panner?.disconnect();}buses.clear();spatialChains.clear();}
  };
 }

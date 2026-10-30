@@ -1,5 +1,17 @@
 # Project Progress
 
+## 完整角色动画恢复 · 2026-10-30
+
+- Action: 用户否定骨骼视觉，主站／制作间恢复十人原完整四帧；保留贝壳GLB。Agent: codex。
+- Validation: 浏览器播放／暂停、390／320布局及Node21/21通过；索隆新增16整帧为待确认样片，其余九人未扩帧，音乐仍是待重做模板稿。Agent: codex。
+- Report: [样片与未完成项](Reports/2026-10-30-lu-intact-sprite-animation.md)；预览`sprite-animation-review.html`，备份／证据`output/sprite-animation-20261030/`。Agent: codex。
+
+## Entire 智能体版本控制集成 · 2026-10-30
+
+- Action: 卸载家目录误初始化的 Entire 钩子并安全归档临时空 Git 仓库；在『律』主项目（`threejs-material-lab`）中正式启用 Entire 检查点跟踪，挂载 Antigravity, Claude Code, Codex, Cursor, Pi 等智能体集成。Agent: 大江南。
+- Validation: `entire status` 与 `entire doctor` 检查全部通过；Codex、Claude Code、Pi 等 8 个智能体钩子均已生成对应配置（`.entire/`、`.codex/`、`.claude/` 等），家目录恢复非 Git 净态。
+- Status: 项目级检查点跟踪已激活；代码提交时将自动关联智能体上下文会话并同步至 origin。
+
 ## 象棋独立与最新 Pages 发布 · 2026-10-26
 
 - Action: 提交 AGY 最新舞台／音频改动，将象棋 62 份页面、源码、素材、测试及专属文档迁入 [lu-xiangqi](https://github.com/aierlanjiu/lu-xiangqi)，调整律的 package／服务器与可独立运行的乐队测试。

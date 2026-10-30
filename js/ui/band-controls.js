@@ -5,12 +5,47 @@ import {songBindingSummary} from '../audio/band-song-parts.js';
 
 export function createPyroSoundToggle(host,{settings,onChange,storageKey='lu_band_v2'}) {
  const button=document.createElement('button');button.type='button';button.className='lu-band-pyro-toggle';
- button.setAttribute('aria-label','焰火音效');host.append(button);
+ button.setAttribute('aria-label','焰火音效');
+ button.innerHTML=`<svg class="lu-pyro-sound-icon" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+  <g fill="none" stroke-linecap="round" stroke-width="2.2">
+   <path d="M13 3v4m0 14v4M2 14h4m14 0h4" stroke="#e8a545"/>
+   <path d="m5 6 3 3m10 10 3 3M5 22l3-3M18 9l3-3" stroke="#b695eb"/>
+   <path d="m8 3 1 3m8-3-1 3M2 9l3 1m-3 8 3-1" stroke="#64cbd0"/>
+  </g>
+  <circle cx="13" cy="14" r="3.2" fill="#ffbf5e"/>
+  <path d="M20 21h3l4-3v12l-4-3h-3z" fill="#78b7e9" stroke="#527da9" stroke-width="1" stroke-linejoin="round"/>
+  <path class="lu-pyro-sound-on" d="M29 21q3 3 0 6" fill="none" stroke="#64cbd0" stroke-width="1.6" stroke-linecap="round"/>
+  <path class="lu-pyro-sound-off" d="m20 19 10 11" fill="none" stroke="#df7f86" stroke-width="2" stroke-linecap="round"/>
+ </svg>`;host.append(button);
  const styles=document.createElement('div');styles.className='lu-festival-switch';styles.setAttribute('role','group');styles.setAttribute('aria-label','舞台风格');
- styles.innerHTML='<button type="button" data-look="cream">奶油棱镜</button><button type="button" data-look="island">日落海岛</button>';(document.getElementById('luAppleCapsuleBody')||host).append(styles);
+ styles.innerHTML=`<button type="button" data-look="cream" aria-label="奶油棱镜" title="奶油棱镜">
+  <svg class="lu-stage-look-icon" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+   <path d="m4 20 12-6 12 6v5l-12 6-12-6z" fill="#b9dedb" stroke="#548f94" stroke-width="1.2" stroke-linejoin="round"/>
+   <path d="m4 20 12 6 12-6-12-6z" fill="#eef7ed"/>
+   <path d="M16 3 6 20l10 5 10-5z" fill="#f5dfb5" stroke="#bb9b69" stroke-width="1.3" stroke-linejoin="round"/>
+   <path d="M16 3v22l10-5z" fill="#c4c2ed"/>
+   <path d="m16 3-5 18 5 4" fill="#fff7e5"/>
+   <path d="M23 4v5m-2.5-2.5h5" fill="none" stroke="#7fc6cf" stroke-width="1.4" stroke-linecap="round"/>
+  </svg><span class="lu-sr-only">奶油棱镜</span>
+ </button><button type="button" data-look="island" aria-label="日落海岛" title="日落海岛">
+  <svg class="lu-stage-look-icon" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+   <circle cx="22" cy="10" r="6" fill="#ffb56b"/>
+   <path d="M3 25q6-6 13-4t13 4v4H3z" fill="#efd29d"/>
+   <path d="M3 28q4-2 8 0t8 0 10 0" fill="none" stroke="#58bfcf" stroke-width="2.6" stroke-linecap="round"/>
+   <path d="M12 23q3-7 2-15" fill="none" stroke="#b98057" stroke-width="2.7" stroke-linecap="round"/>
+   <path d="M14 9Q6 2 3 11q5-3 11-2Zm0 0q4-9 11-3-6 0-11 3Zm0 0q-6 2-7 8 5-2 7-8Zm0 0q7 0 9 7-7-2-9-7Z" fill="#4fae8b" stroke="#357e69" stroke-width=".8" stroke-linejoin="round"/>
+  </svg><span class="lu-sr-only">日落海岛</span>
+ </button><button type="button" data-look="shell" aria-label="珍珠贝壳" title="珍珠贝壳">
+  <svg class="lu-stage-look-icon" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+   <path d="M16 5C10 5 5 11 5 18c0 6 5 10 11 10s11-4 11-10c0-7-5-13-11-13z" fill="#f8f4ed" stroke="#d8a46c" stroke-width="1.2"/>
+   <path d="M16 5v23M16 5c-3.8 4.5-6.5 11-6.5 18.5M16 5c3.8 4.5 6.5 11 6.5 18.5M16 5C8 9 6 16 6 22M16 5c8 4 10 11 10 17" fill="none" stroke="#5daaa0" stroke-width="1.1" stroke-linecap="round"/>
+   <ellipse cx="16" cy="20.5" rx="3.6" ry="3.6" fill="#ffffff" stroke="#e29e58" stroke-width="1.2"/>
+   <circle cx="16" cy="20.5" r="1.6" fill="#fedeba"/>
+  </svg><span class="lu-sr-only">珍珠贝壳</span>
+ </button>`;(document.getElementById('luAppleCapsuleBody')||host).append(styles);
  for(const option of styles.querySelectorAll('button'))option.addEventListener('click',()=>{settings.stageLook=option.dataset.look;saveBandSettings(settings,storageKey);render();onChange?.();});
 
- function render(){const look=settings.stageLook||'cream';document.body.dataset.festivalLook=look;for(const option of styles.querySelectorAll('button'))option.setAttribute('aria-pressed',String(option.dataset.look===look));const value=String(settings.pyroSound!==false);if(button.getAttribute('aria-pressed')!==value){button.setAttribute('aria-pressed',value);button.textContent=`焰火音效 ${value==='true'?'开':'关'}`;}}
+ function render(){const look=settings.stageLook||'cream';document.body.dataset.festivalLook=look;for(const option of styles.querySelectorAll('button'))option.setAttribute('aria-pressed',String(option.dataset.look===look));const value=String(settings.pyroSound!==false);if(button.getAttribute('aria-pressed')!==value){button.setAttribute('aria-pressed',value);button.title=`焰火音效：${value==='true'?'开，点击关闭':'关，点击开启'}`;}}
  button.addEventListener('click',()=>{settings.pyroSound=settings.pyroSound===false;saveBandSettings(settings,storageKey);render();onChange?.();});render();
  return {button,render,dispose(){button.remove();styles.remove();delete document.body.dataset.festivalLook;}};
 }

@@ -1,7 +1,7 @@
-import {createBandScene} from './band-scene.js';
+import {createBandScene} from './band-scene.js?v=20261030-sprites';
 import {createBandDemoScore} from '../audio/band-timeline.js';
-import {compileBandParts,sampleBandEnsemble,bandPartScore,bandRoster} from '../audio/band-parts.js';
-import {loadBandAnalysis,verifyBandSource} from '../audio/band-library.js';
+import {compileBandParts,sampleBandEnsemble,bandPartScore,bandRoster} from '../audio/band-parts.js?v=20261029-shell-live';
+import {loadBandAnalysis,verifyBandSource} from '../audio/band-library.js?v=20261029-shell-live';
 import {songBindingSummary} from '../audio/band-song-parts.js';
 import {sampleBandLyric} from '../audio/band-cues.js';
 import {loadBandSettings} from './band-settings.js';
@@ -36,7 +36,7 @@ export async function createBandController({stage,state,getTime,getLyric=()=>'',
  let conductor=null,conductScore=null,conductTheme='',conductReady=false,conductRevision=0,conductError='',listening='mix',soloActor=null;
  const demoScore=createBandDemoScore(),currentScore=()=>{if(demo)return demoScore;const track=state.playlist[state.currentTrackIndex];if(!track?.isPreset)return score;const generated=getProceduralScore();return generated?.trackId===track.type?generated:null;};
  const clock=()=>demo?(demoPlaying?Math.min(32,demoOffset+(performance.now()-demoOrigin)/1000):demoOffset):getTime();
- const canConduct=()=>Boolean(enabled&&!demo&&mixer&&conductReady&&listening==='mix');
+ const canConduct=()=>Boolean(enabled&&!demo&&mixer&&conductReady&&listening==='mix'&&(!currentScore()?.rendered||mixer.diagnostics.ready));
  const conductorPart=id=>parts.find(p=>p.id===id&&p.stemId);
  const memberInteractions=createBandMemberInteractions(interactionHost,{
   onToggle:id=>{const part=conductorPart(id);if(canConduct()&&part)conductor.toggle(part.stemId);},
@@ -65,11 +65,11 @@ export async function createBandController({stage,state,getTime,getLyric=()=>'',
   }:null});
  function rebuildParts(){parts=compileBandParts(currentScore(),state.theme,settings.overrides);partScore=bandPartScore(currentScore(),parts);controls.setParts(parts);memberInteractions.setParts(parts);conductor?.setGroups(parts.filter(p=>p.stemId).map(p=>p.stemId));prepareConduct(currentScore()).catch(console.warn);if(demo){monitorStem?.({id:'mix'}).catch(console.warn);controls.setListening('mix');}}
  async function syncTrack(){
-  const track=state.playlist[state.currentTrackIndex],key=`${track?.type}|${track?.title||''}|${track?.src||''}`;if(key===sourceKey)return;
+  const track=state.playlist[state.currentTrackIndex],preferShell=settings.stageLook==='shell'&&state.theme==='one-piece',key=`${track?.type}|${track?.title||''}|${track?.src||''}|${preferShell}`;if(key===sourceKey)return;
   releaseCanvas();scene.resetPositions();sourceKey=key;controller?.abort();controller=new AbortController();const signal=controller.signal;score=null;loadError='本曲音轨与分谱尚未接入';rebuildParts();
   if(track?.isPreset){loadError=getProceduralScore()?'':'播放预设后读取生成器实际事件';if(enabled)frame();return;}
   try{
-   const loaded=await loadBandAnalysis(track?.type,{signal});if(signal.aborted)return;
+   const loaded=await loadBandAnalysis(track?.type,{signal,preferShell});if(signal.aborted)return;
    if(loaded&&await verifyBandSource(loaded,track.src,signal)){score=loaded;loadError='';}
    else if(loaded)loadError='音频与谱面源文件不匹配，请重新分析';
   }catch(error){
@@ -86,7 +86,7 @@ export async function createBandController({stage,state,getTime,getLyric=()=>'',
   const time=clock();conductor?.tick();const conducting=conductor?.snapshot;
   const solo=conducting?.soloGroup?(parts.find(p=>p.id===soloActor&&p.stemId===conducting.soloGroup)||parts.find(p=>p.stemId===conducting.soloGroup))?.id:null;
   const sampled=sampleBandEnsemble(data,parts,time,solo||focus);
-  if(data?.hybrid&&!conductReady)for(const sample of sampled.parts){if(parts.find(p=>p.id===sample.id)?.technique==='voice')continue;for(const key of ['activity','energy','attack','notePulse'])sample[key]=0;sample.notes=[];}
+  if((data?.hybrid&&!conductReady)||(data?.rendered&&(!conductReady||!mixer?.diagnostics.ready)))for(const sample of sampled.parts){if(parts.find(p=>p.id===sample.id)?.technique==='voice')continue;for(const key of ['activity','energy','attack','notePulse'])sample[key]=0;sample.notes=[];}
   if(canConduct())for(const sample of sampled.parts){const gain=conductor.gain(sample.stemId);sample.userMuted=!gain;for(const key of ['activity','energy','attack','notePulse'])sample[key]*=gain;if(!gain)sample.notes=[];}
   for(const sample of sampled.parts)sample.idle=state.isPlayingMusic&&time<(data?.duration||0);
   const effectsFrame=stageEffectsAt(data,time,settings.effects||'auto',reduced.matches?null:conducting?.effect);
@@ -106,8 +106,9 @@ export async function createBandController({stage,state,getTime,getLyric=()=>'',
   const title=`${part.name} · ${demo?part.instrument:part.label}`,source=demo?'编排演示':data?part.sourceLabel:'待接入';
   if(title!==lastScoreTitle){scoreHeading.textContent=title;lastScoreTitle=title;}if(source!==lastScoreSource){scoreSource.textContent=source;lastScoreSource=source;}
   const binding=songBindingSummary(data);
-  const nextStatus=data?.hybrid&&!conductReady?(conductError||'正在准备乐队 · 原曲继续播放'):demo?`编排演示 · 未绑定当前歌曲 · ${playing}/${parts.length} 演奏`:
-   data?.source==='arrangement'?`${data.title} · ${section} · ${playing}/${parts.length} 演奏${conducting?.remainingBeats?` · 手动接管 ${Math.ceil(conducting.remainingBeats/conducting.beatsPerBar)} 小节`:solo?' · 临时独奏':' · 自动演出'}`:
+  const shellPending=settings.stageLook==='shell'&&!scene.diagnostics.stage.shell?.ready;
+  const nextStatus=shellPending?(scene.diagnostics.stage.shell?.error||'正在载入珍珠贝壳舞台与分层角色'):(data?.hybrid&&!conductReady)||(data?.rendered&&(!conductReady||!mixer?.diagnostics.ready))?(conductError||mixer?.diagnostics.error||'正在准备乐队 · 原曲继续播放'):demo?`编排演示 · 未绑定当前歌曲 · ${playing}/${parts.length} 演奏`:
+   data?.source==='arrangement'?`${data.title} · ${section} · ${playing}/${parts.length} 演奏${data.rendered?' · 新合唱待制作':''}${conducting?.remainingBeats?` · 手动接管 ${Math.ceil(conducting.remainingBeats/conducting.beatsPerBar)} 小节`:solo?' · 临时独奏':' · 自动演出'}`:
    data?`${data.title} · ${binding.estimated?`${binding.estimated} 组家族模型估计`:`${binding.verified} 声部已核验 · ${binding.pending} 待校验`}${binding.unresolved.length?' · 其余保留原曲':''} · ${playing} 演奏`:
    loadError||'正在读取本曲分谱';
   if(nextStatus!==lastStatus){status.textContent=nextStatus;lastStatus=nextStatus;}
@@ -202,6 +203,6 @@ export async function createBandController({stage,state,getTime,getLyric=()=>'',
   return scene.diagnostics;
  }
  requestAnimationFrame(tick);
- return {setEnabled,drawRecording,renderPromoFrame,setCaptureSize:(w,h,lw,lh)=>scene.setCaptureSize(w,h,lw,lh),endCapture:()=>{promoStepping=false;scene.endCapture();},resetTransport(options){releaseCanvas();pyroAudio.stop();conductor?.resetTransport(options);},resetPerformance(){releaseCanvas();pyroAudio.stop();conductor?.restartPerformance();},get enabled(){return enabled;},get canvas(){return scene.canvas;},get diagnostics(){return {...scene.diagnostics,cadence:{...cadence},pyroAudio:pyroAudio.diagnostics,enabled,source:currentScore()?.source||'pending',trackId:currentScore()?.trackId,time:clock(),focus,settings,binding:songBindingSummary(currentScore()),conductor:conductor?{...conductor.snapshot,ready:conductReady,error:conductError,audio:mixer?.diagnostics}:null,parts:parts.map(p=>({id:p.id,stem:p.stemId,events:p.events.length,bindingStatus:p.bindingStatus,partId:p.partId,instrumentId:p.instrumentId,shared:p.shared,technique:p.technique})),snapshot:lastSnapshot,loadError};},
+ return {setEnabled,drawRecording,renderPromoFrame,setCaptureSize:(w,h,lw,lh)=>scene.setCaptureSize(w,h,lw,lh),endCapture:()=>{promoStepping=false;scene.endCapture();},resetTransport(options){releaseCanvas();pyroAudio.stop();conductor?.resetTransport(options);},resetPerformance(){releaseCanvas();pyroAudio.stop();conductor?.restartPerformance();},get enabled(){return enabled;},get canvas(){return scene.canvas;},get diagnostics(){return {...scene.diagnostics,cadence:{...cadence},pyroAudio:pyroAudio.diagnostics,enabled,source:currentScore()?.source||'pending',trackId:currentScore()?.trackId,selectionKey:sourceKey,arrangementVersion:currentScore()?.arrangement?.version,time:clock(),focus,settings,binding:songBindingSummary(currentScore()),conductor:conductor?{...conductor.snapshot,ready:conductReady,error:conductError,audio:mixer?.diagnostics}:null,parts:parts.map(p=>({id:p.id,stem:p.stemId,events:p.events.length,bindingStatus:p.bindingStatus,partId:p.partId,instrumentId:p.instrumentId,shared:p.shared,technique:p.technique})),snapshot:lastSnapshot,loadError};},
   dispose(){disposed=true;releaseCanvas();pyroAudio.dispose();pyroToggle.dispose();++conductRevision;controller?.abort();cancelAnimationFrame(frameId);memberInteractions.dispose();mixer?.dispose();scoreDisclosure.dispose();scene.dispose();host.remove();panel.remove();status.remove();lyric.remove();interactionHost.remove();}};
 }

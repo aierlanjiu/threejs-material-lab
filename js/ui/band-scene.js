@@ -1,4 +1,5 @@
-import {createFestivalStage} from './band-festival-stage.js';
+import {createFestivalStage} from './band-festival-stage.js?v=20261029-shell-live';
+import {createShellConcertStage} from './band-shell-stage.js';
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.166.1/+esm';
 import {bandRoster} from '../audio/band-parts.js';
 import {formationAt,sampleBandMotion,bandEase} from '../audio/band-layout.js';
@@ -44,7 +45,7 @@ export async function createBandScene(container,{safeTop=0,safeBottom=15,cubeDes
  }
  const pmrem=new THREE.PMREMGenerator(renderer),environment=pmrem.fromScene(room,.04);scene.environment=environment.texture;
  room.traverse(o=>{o.geometry?.dispose();o.material?.dispose();});pmrem.dispose();
- scene.add(new THREE.HemisphereLight(0xfff4e2,0x48606c,0.95));
+ const ambientLight=new THREE.HemisphereLight(0xfff4e2,0x48606c,0.95);scene.add(ambientLight);
  const fill=new THREE.DirectionalLight(0xffe8ce,1.85);fill.position.set(-8,18,12);fill.castShadow=true;
  const rimLight=new THREE.DirectionalLight(0x78d4ea,1.8);rimLight.position.set(10,9,-8);scene.add(rimLight);
  Object.assign(fill.shadow.camera,{left:-24,right:24,top:24,bottom:-24,far:75});fill.shadow.mapSize.set(1024,1024);fill.shadow.bias=-.0004;scene.add(fill);
@@ -68,9 +69,11 @@ export async function createBandScene(container,{safeTop=0,safeBottom=15,cubeDes
  }
  const onVisibility=()=>{if(document.hidden)cancelPrewarm();else schedulePrewarm();};
  const modelBundle=await loadConcertModels({concertLook});
- const festivalTextures={};await Promise.all(['cream','island'].map(async id=>{try{festivalTextures[id]=await textureFor(new URL(`../../assets/band-festival/${id}.jpg`,import.meta.url).href);}catch(error){console.warn('Festival background unavailable',id,error);}}));
+ const festivalTextures={};await Promise.all(['cream','island','shell'].map(async id=>{try{festivalTextures[id]=await textureFor(new URL(`../../assets/band-festival/${id}.jpg`,import.meta.url).href);}catch(error){console.warn('Festival background unavailable',id,error);}}));
  const theatre=createFestivalStage(scene,{modelBundle,festivalTextures});
  let frameStats=null;
+ let shellStage=null,shellLoad=null,shellError='';
+ function ensureShell(){if(!shellLoad)shellLoad=createShellConcertStage(scene,renderer).then(stage=>{if(disposed){stage.dispose();return;}shellStage=stage;lastUpdateKey='';if(last)update(last.frame,last.options);}).catch(error=>{shellError=error.message;console.error('珍珠贝壳舞台:',error);});return shellLoad;}
  let members=[],theme='one-piece',narrow=false,active=false,revision=0,disposed=false,last=null,designKey=cubeDesign?.getKey?.()||'prism',captureSize=null;
  document.addEventListener('visibilitychange',onVisibility);
  let lastUpdateKey='',lastCameraFit=null,placementRevision=0,drag=null;
@@ -93,7 +96,7 @@ export async function createBandScene(container,{safeTop=0,safeBottom=15,cubeDes
   });
   projectedVersion=projectionVersion;return lastProjectedMembers;
  }
- const placements=new Map();
+ const placements=new Map(),shellPlacements=new Map();
  const limits=()=>stageLimits(narrow);
  function placed(point){const l=limits(),s=stageSpec(narrow),x=point.x*l.x;
   let z=l.back+point.z*(l.front-l.back);
@@ -103,17 +106,20 @@ export async function createBandScene(container,{safeTop=0,safeBottom=15,cubeDes
   ray.setFromCamera(new THREE.Vector2((x-rect.left)/rect.width*2-1,1-(y-rect.top)/rect.height*2),camera);
   return ray.ray.intersectPlane(plane,new THREE.Vector3());}
  function startDrag(id,x,y){const member=members.find(m=>m.role.id===id);if(!member)return;
+  if(last?.options.settings.stageLook==='shell'&&shellStage){const rect=renderer.domElement.getBoundingClientRect(),ray=new THREE.Raycaster();ray.setFromCamera(new THREE.Vector2((x-rect.left)/rect.width*2-1,1-(y-rect.top)/rect.height*2),camera);const hit=shellStage.pickFloor(ray);if(!hit)return;const physics=physicsFor(id);physics.lastX=member.group.position.x;physics.lastZ=member.group.position.z;physics.landingAge=1;drag={id,shell:true,origin:member.group.position.clone(),hit};lastUpdateKey='';return;}
   const plane=new THREE.Plane(new THREE.Vector3(0,1,0),-member.group.position.y),hit=rayPoint(x,y,plane);if(!hit)return;
   const physics=physicsFor(id);physics.lastX=member.group.position.x;physics.lastZ=member.group.position.z;physics.landingAge=1;
   drag={id,plane,hit,origin:member.group.position.clone(),previous:placements.get(id)};lastUpdateKey='';}
- function moveDrag(id,x,y){if(drag?.id!==id)return;const hit=rayPoint(x,y,drag.plane);if(!hit)return;const l=limits(),p=drag.origin.clone().add(hit.sub(drag.hit));
+ function moveDrag(id,x,y){if(drag?.id!==id)return;
+  if(drag.shell){const rect=renderer.domElement.getBoundingClientRect(),ray=new THREE.Raycaster();ray.setFromCamera(new THREE.Vector2((x-rect.left)/rect.width*2-1,1-(y-rect.top)/rect.height*2),camera);const hit=shellStage.pickFloor(ray);if(hit){const point=shellStage.supportAt(drag.origin.x+hit.x-drag.hit.x,drag.origin.z+hit.z-drag.hit.z);if(point){shellPlacements.set(id,point.toArray());placementRevision++;lastUpdateKey='';}}return;}
+  const hit=rayPoint(x,y,drag.plane);if(!hit)return;const l=limits(),p=drag.origin.clone().add(hit.sub(drag.hit));
   const pt={x:THREE.MathUtils.clamp(p.x/l.x,-1,1),z:THREE.MathUtils.clamp((p.z-l.back)/(l.front-l.back),0,1)};
   placements.delete(id);placements.set(id,pt);
   const member=members.find(m=>m.role.id===id);
   if(member){const pos=placed(pt);member.group.position.fromArray(pos);member.spatial=spatialStageAt(pos[0],pos[2],narrow);}
   placementRevision++;lastUpdateKey='';}
- function endDrag(id,{cancelled=false}={}){if(drag?.id!==id)return;if(cancelled){if(drag.previous){placements.delete(id);placements.set(id,drag.previous);}else placements.delete(id);}const physics=physicsFor(id);physics.landingAge=cancelled?1:0;physics.landingPulse=cancelled?0:1;drag=null;placementRevision++;lastUpdateKey='';}
- function resetPositions(){placements.clear();dragPhysics.clear();drag=null;placementRevision++;lastUpdateKey='';}
+ function endDrag(id,{cancelled=false}={}){if(drag?.id!==id)return;if(cancelled){if(drag.shell)shellPlacements.set(id,drag.origin.toArray());else if(drag.previous){placements.delete(id);placements.set(id,drag.previous);}else placements.delete(id);}const physics=physicsFor(id);physics.landingAge=cancelled?1:0;physics.landingPulse=cancelled?0:1;drag=null;placementRevision++;lastUpdateKey='';}
+ function resetPositions(){placements.clear();shellPlacements.clear();dragPhysics.clear();drag=null;placementRevision++;lastUpdateKey='';}
  const dimensions=()=>captureSize?{w:captureSize.logicalWidth,h:captureSize.logicalHeight}:{w:container.clientWidth,h:container.clientHeight};
  const haloCanvas=document.createElement('canvas');haloCanvas.width=haloCanvas.height=128;
  const hc=haloCanvas.getContext('2d'),gradient=hc.createRadialGradient(64,64,4,64,64,64);
@@ -143,7 +149,7 @@ export async function createBandScene(container,{safeTop=0,safeBottom=15,cubeDes
  }
  const leadLight=new THREE.SpotLight(0xffedcd,0,90,.35,.85,1.5);scene.add(leadLight,leadLight.target);
  function disposeGroup(group){group.traverse(o=>{o.geometry?.dispose();o.material?.dispose();o.customDepthMaterial?.dispose();});}
- function releaseMembers(){for(const m of members){m.wings?.dispose();scene.remove(m.group);disposeGroup(m.group);m.texture.dispose();m.labelTexture.dispose();}members=[];dragPhysics.clear();projectionVersion++;}
+ function releaseMembers(){for(const m of members){m.wings?.dispose();scene.remove(m.group);disposeGroup(m.group);m.originalTexture.dispose();m.layerTexture?.dispose();m.labelTexture.dispose();}members=[];dragPhysics.clear();projectionVersion++;}
  function labelFor(role){const canvas=document.createElement('canvas');canvas.width=768;canvas.height=144;const ctx=canvas.getContext('2d'),accent=role.accent||'#d8ad72';
   ctx.beginPath();ctx.roundRect(2,2,764,140,70);ctx.fillStyle='rgba(14,16,22,.82)';ctx.fill();ctx.strokeStyle=accent;ctx.globalAlpha=.45;ctx.lineWidth=1.5;ctx.stroke();ctx.globalAlpha=1;
   ctx.beginPath();ctx.arc(48,72,8,0,Math.PI*2);ctx.fillStyle=accent;ctx.fill();
@@ -167,7 +173,7 @@ export async function createBandScene(container,{safeTop=0,safeBottom=15,cubeDes
    const labelTexture=labelFor(role),label=new THREE.Sprite(new THREE.SpriteMaterial({map:labelTexture,transparent:true,depthWrite:false,toneMapped:false}));label.scale.set(2.45,.46,1);group.add(label);
    // The roster starts with the singer and the two front-line partners in every theme.
    const wings=i<3?createEnergyWings(group,{samples:144,compactSamples:96}):null;
-   return {role,pet,group,body,art,reflection,shadow,ring,label,labelTexture,texture,wings,frame:0,sample:null,pose:null};
+   return {role,pet,originalPet:pet,group,body,art,reflection,shadow,ring,label,labelTexture,texture,originalTexture:texture,wings,frame:0,sample:null,pose:null};
   });
   resize();await theatre.setTheme(theme);prewarmReady=true;if(active)render();
  }
@@ -227,8 +233,13 @@ export async function createBandScene(container,{safeTop=0,safeBottom=15,cubeDes
   const nextLook=settings.stageLook||'cream';
   if(nextLook!==theatre.look&&active&&renderCount>0&&!reduced)captureLookSnapshot();
   if(reduced)cancelLookSnapshot();
-  theatre.setLook(nextLook,{immediate:reduced||!active||renderCount===0});
+  if(nextLook!=='shell')shellStage?.setActive(false);
+  theatre.setLook(nextLook,{immediate:reduced||!active||renderCount===0});theatre.setVisible(nextLook!=='shell');
   lastUpdateKey=updateKey;last={frame,options:{settings,focus,reduced,score,parts,easterEgg,cameraPose}};
+  const isShell=nextLook==='shell';
+  ambientLight.visible=fill.visible=rimLight.visible=!isShell;
+  if(isShell&&!shellStage){ensureShell();members.forEach(m=>m.group.visible=false);leadLight.intensity=0;spots.forEach(s=>{s.halo.visible=s.beam.visible=false;});if(active)render();return;}
+  shellStage?.setActive(isShell);members.forEach(m=>m.group.visible=true);
   const fx=effectsFrame||stageEffectsAt(score,frame.time,settings.effects||'auto',reduced?null:easterEgg);
   const wingState=particleWingState(score,frame.time,{mode:settings.effects,reduced});
   const lighting=stageLightingAt(score,frame.time,fx,reduced);
@@ -238,27 +249,27 @@ export async function createBandScene(container,{safeTop=0,safeBottom=15,cubeDes
   lighting.flash=(lighting.flash||0)*(1-wingFocus*.6);
   glowStrength=reduced?0:Math.min(.65,.07+(lighting.climax||0)*.16+wingFocus*.18+downbeat*.08+beatPulse*.03+(lighting.flash||0)*.15);
   const isIsland=settings.stageLook==='island';
-  fill.intensity=(isIsland?1.95:1.80)+(lighting.flash||0)*.9+downbeat*.24;
-  fill.color.set(isIsland?'#ffe0ba':'#fff0da').lerp(new THREE.Color(isIsland?'#ffb86c':'#ffd494'),((lighting.flash||0)+downbeat*.28)*.48);
-  rimLight.color.set(isIsland?(theme==='naruto'?'#ffb48a':'#5fd4de'):(theme==='dragon-ball'?'#9ce0c2':theme==='naruto'?'#b8c4ee':'#88dce0'));
-  rimLight.intensity=(isIsland?1.75:1.60)+(lighting.climax||0)*.28+beatPulse*.12;
-  renderer.toneMappingExposure=1.02+(lighting.flash||0)*.16+downbeat*.04;
+  fill.intensity=(isIsland?1.95:isShell?1.85:1.80)+(lighting.flash||0)*.9+downbeat*.24;
+  fill.color.set(isIsland?'#ffe0ba':isShell?'#fff2e2':'#fff0da').lerp(new THREE.Color(isIsland?'#ffb86c':isShell?'#ffd9a8':'#ffd494'),((lighting.flash||0)+downbeat*.28)*.48);
+  rimLight.color.set(isIsland?(theme==='naruto'?'#ffb48a':'#5fd4de'):isShell?(theme==='naruto'?'#ffc4a2':theme==='dragon-ball'?'#a4e8d0':'#72d8dc'):(theme==='dragon-ball'?'#9ce0c2':theme==='naruto'?'#b8c4ee':'#88dce0'));
+  rimLight.intensity=(isIsland?1.75:isShell?1.68:1.60)+(lighting.climax||0)*.28+beatPulse*.12;
+  renderer.toneMappingExposure=isShell?.85:1.02+(lighting.flash||0)*.16+downbeat*.04;
   const nextKey=cubeDesign?.getKey?.()||designKey;if(nextKey!==designKey){designKey=nextKey;theatre.refreshMaterial();}
   // A theme resize can still carry the preceding, longer roster's frame.
   const moving=settings.lightMode==='move',leader=Math.min(members.length-1,Math.max(0,frame.leadIndex)),previousLeader=Math.min(members.length-1,Math.max(0,frame.previousLeadIndex));
   const formation=formationAt(frame.time,score,focus||moving?'solo':settings.formation);
-  const spread=settings.spread*(narrow?.90:1),from=stageBandLayout(members.length,formation.previousId,narrow,moving?previousLeader:leader,spread),to=stageBandLayout(members.length,formation.id,narrow,leader,spread);
-  const next=stageBandLayout(members.length,formation.nextId,narrow,Math.max(0,frame.nextLeadIndex),spread);
-  const manual=to.map((p,i)=>placements.has(members[i].role.id)?placed(placements.get(members[i].role.id)):p);
-  fitCamera([from,to,next,manual],settings,lighting,wingState,cameraPose);
+  const spread=settings.spread*(narrow?.90:1),layout=(id,lead)=>{const original=stageBandLayout(members.length,id,narrow,lead,spread);return isShell?shellStage.layout(members.map(m=>m.role),settings.formation==='auto'?'terrace':id,lead,original):original;};
+  const from=layout(formation.previousId,moving?previousLeader:leader),to=layout(formation.id,leader),next=layout(formation.nextId,Math.max(0,frame.nextLeadIndex));
+  const manual=to.map((p,i)=>isShell?(shellPlacements.get(members[i].role.id)||p):placements.has(members[i].role.id)?placed(placements.get(members[i].role.id)):p);
+  if(isShell){const {w,h}=dimensions(),focused=focus?members.findIndex(m=>m.role.id===focus):-1;const point=focused>=0?new THREE.Vector3(...manual[focused]).add(new THREE.Vector3(0,1,0)):null;shellStage.fitCamera(camera,{w,h,top:narrow?85:75,bottom:narrow?160:125,focus:point,pose:cameraPose});lastCameraFit={...shellStage.diagnostics.camera,actorFraming:narrow,asset:'shell-concert.glb'};}
+  else{camera.far=220;camera.fov=narrow?34:30;fitCamera([from,to,next,manual],settings,lighting,wingState,cameraPose);}
   members.forEach((member,i)=>{
    const sample=frame.parts[i]||{activity:0,energy:0,attack:0,notePulse:0,lead:false},part=parts[i]||member.role,v=settingsForMember(settings,member.role.id);
    const progress=moving&&frame.previousLeadIndex>=0?bandEase((frame.time-(frame.section?.start||0))/1.6):formation.mix;
    const mix=reduced?(progress>.5?1:0):progress;
    member.group.position.fromArray(from[i]).lerp(new THREE.Vector3(...to[i]),mix);
-   member.group.position.x+=Math.sign(member.group.position.x)*v.gap*.6;
-   member.group.position.y=stageHeightAt(member.group.position.x,member.group.position.z,narrow)+.045;
-   if(placements.has(member.role.id))member.group.position.fromArray(placed(placements.get(member.role.id)));
+   if(isShell){member.group.position.fromArray(shellPlacements.get(member.role.id)||to[i]);member.group.position.y+=.012;}
+   else{member.group.position.x+=Math.sign(member.group.position.x)*v.gap*.6;member.group.position.y=stageHeightAt(member.group.position.x,member.group.position.z,narrow)+.045;if(placements.has(member.role.id))member.group.position.fromArray(placed(placements.get(member.role.id)));}
    member.spatial=spatialStageAt(member.group.position.x,member.group.position.z,narrow);
    const pose=sampleBandMotion(sample,frame.time,score?.bpmEstimate||120,{technique:part.technique,index:i,actorMotion:v.actorMotion,instrumentMotion:v.instrumentMotion,reduced,beatPulse,downbeat});
    member.body.position.set(pose.actor.position[0],pose.actor.position[1]*.7,0);
@@ -276,11 +287,14 @@ export async function createBandScene(container,{safeTop=0,safeBottom=15,cubeDes
    }
    member.body.position.y+=physics.lift+physics.landingPulse*.055;member.body.rotation.z+=physics.tiltZ;member.body.rotation.x=physics.tiltX;
    const isMuted=Boolean(sample.userMuted),isFocused=Boolean(focus&&focus===member.role.id),isOtherFocused=Boolean(focus&&focus!==member.role.id);
-   const h=3.05*v.actorSize*(isFocused?1.06:1);
+   const texture=member.originalTexture;
+   if(member.texture!==texture){member.texture=texture;member.hitCanvas=null;member.art.material.map=member.reflection.material.map=member.art.customDepthMaterial.map=texture;member.art.material.needsUpdate=member.reflection.material.needsUpdate=member.art.customDepthMaterial.needsUpdate=true;}
+   member.pet=member.originalPet;
+   const h=(isShell?shellStage.anchorFor(member.role.id,i).height*.82:3.05)*v.actorSize*(isFocused?1.06:1);
    member.art.position.set(0,h*(member.pet.baseline-.5),0);member.art.scale.set(h*.8,h,1);
    member.art.rotation.y=Math.atan2(camera.position.x-member.group.position.x,camera.position.z-member.group.position.z)+THREE.MathUtils.degToRad(v.actorRotation)*.32;
    member.reflection.position.set(0,-h*(member.pet.baseline-.5)*.30,.012);member.reflection.scale.set(h*.8,-h*.30,1);member.reflection.rotation.y=member.art.rotation.y;
-   member.frame=petFrameAt(frame.time,score?.bpmEstimate||120,sample.activity,{reduced,speed:v.instrumentMotion*(.6+v.instrumentSize*.5),index:i,attack:Math.max(sample.attack||0,downbeat*sample.activity*.65)});member.texture.offset.x=member.frame/4;
+   member.frame=petFrameAt(frame.time,score?.bpmEstimate||120,isMuted?0:sample.activity,{reduced,speed:v.instrumentMotion*(.6+v.instrumentSize*.5),index:i,attack:Math.max(sample.attack||0,downbeat*sample.activity*.65)});member.texture.offset.x=member.frame/member.pet.frameCount;
    if(isMuted){
     member.art.material.opacity=.46;
     member.art.material.color.setRGB(.44,.48,.56);
@@ -333,6 +347,8 @@ export async function createBandScene(container,{safeTop=0,safeBottom=15,cubeDes
    const m=members[leader];setSpot(spots[0],m,(m.sample.userMuted?0:m.sample.activity*1.28+downbeat*.18),new THREE.Color('#ffe4bd'),leader);
   }
   const lead=members[focusedIndex>=0?focusedIndex:leader];leadLight.position.copy(spots[0].light.position);leadLight.target.position.copy(lead.group.position).add(new THREE.Vector3(0,1,0));leadLight.intensity=focusedIndex>=0?95+beatPulse*22:(frame.leadIndex>=0&&!lead.sample.userMuted?lead.sample.activity*68+downbeat*15:0);
+  if(isShell){leadLight.intensity=0;spots.forEach(s=>{s.halo.visible=s.beam.visible=false;});shellStage.update(frame.time,beatPulse,reduced);}
+  else spots.forEach(s=>s.halo.visible=true);
   const s=stageSpec(narrow),rows=Array.from({length:s.levels},(_,level)=>{const row=members.filter(m=>Math.round((m.group.position.y-.395)/s.step)===level);return row.length?row.reduce((total,m)=>total+m.sample.activity,0)/row.length:0;});
   theatre.update(frame.time,fx,reduced,lighting,renderer.domElement.height,rows,settings.effects||'auto');
   if(active)render();
@@ -366,14 +382,14 @@ export async function createBandScene(container,{safeTop=0,safeBottom=15,cubeDes
  function setActive(value){active=value;container.hidden=!value;if(value){resize();render();schedulePrewarm();}else{cancelLookSnapshot();cancelPrewarm();}}
  function setCaptureSize(width,height,logicalWidth,logicalHeight){if(captureSize?.width===width&&captureSize?.height===height)return;captureSize={width,height,logicalWidth,logicalHeight};renderer.setPixelRatio(1);resize();}
  function endCapture(){if(!captureSize)return;captureSize=null;renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));resize();}
- function dispose(){disposed=true;cancelPrewarm();document.removeEventListener('visibilitychange',onVisibility);cancelLookSnapshot();lookSnapshot?.canvas.remove();lookSnapshot=null;observer.disconnect();releaseMembers();theatre.dispose();glow.dispose();environment.dispose();haloTexture.dispose();scene.traverse(o=>{o.geometry?.dispose();o.material?.dispose();});for(const t of textures.values())t.then(texture=>texture.dispose()).catch(()=>{});renderer.dispose();renderer.domElement.remove();}
+ function dispose(){disposed=true;cancelPrewarm();document.removeEventListener('visibilitychange',onVisibility);cancelLookSnapshot();lookSnapshot?.canvas.remove();lookSnapshot=null;observer.disconnect();releaseMembers();shellStage?.dispose();theatre.dispose();glow.dispose();environment.dispose();haloTexture.dispose();scene.traverse(o=>{o.geometry?.dispose();o.material?.dispose();});for(const t of textures.values())t.then(texture=>texture.dispose()).catch(()=>{});renderer.dispose();renderer.domElement.remove();}
  const currentFormation=()=>last?formationAt(last.frame.time,last.options.score,last.options.focus||last.options.settings.lightMode==='move'?'solo':last.options.settings.formation).id:null;
  const currentSpatial=()=>spatialStemMap(
   members.map(m=>({id:m.role.id,position:m.group.position.toArray(),activity:m.sample?.activity||0,userMuted:Boolean(m.sample?.userMuted),spatial:m.spatial||spatialStageAt(m.group.position.x,m.group.position.z,narrow)})),
   last?.options?.parts||[],
   {narrow,draggingId:drag?.id||null,placedIds:[...placements.keys()]}
  );
- return {configure,update,resize,setActive,drawTo,setCaptureSize,endCapture,dispose,pickMember,startDrag,moveDrag,endDrag,resetPositions,canvas:renderer.domElement,get narrow(){return narrow;},get captureActive(){return !!captureSize;},get formation(){return currentFormation();},get spatial(){return currentSpatial();},get dragging(){return drag?.id||null;},get memberProjections(){return projectMembers();},get diagnostics(){const spatial=currentSpatial(),projected=projectMembers();return {active,theme,narrow,captureSize,formation:currentFormation(),stage:theatre.diagnostics,glow:{strength:glow.strength},petCount:members.length,prewarm:{started:prewarmStarted,busy:prewarmBusy,pending:prewarmQueue.length,loaded:prewarmLoaded,failed:[...prewarmFailures]},wings:{...particleWingState(last?.options.score,last?.frame.time||0,{mode:last?.options.settings.effects,reduced:last?.options.reduced}),members:members.filter(m=>m.wings).map(m=>({id:m.role.id,...m.wings.diagnostics}))},placements:Object.fromEntries(placements),dragging:drag?.id||null,spatial,
-  cueSource:last?.options.score?.stageCues?.source||'demo',chorusCandidates:last?.options.score?.stageCues?.choruses||[],camera:{position:camera.position.toArray(),fov:camera.fov,aspect:camera.aspect,...lastCameraFit},propsBounds:theatre.projectProps(camera),fullFrame:frameStats,beams:spots.map(s=>s.beam.visible?s.beam.material.uniforms.uOpacity.value:0),members:members.map((m,i)=>({...projected[i],actorRotation:m.art.rotation.toArray().slice(0,3),instrumentRotation:m.body.rotation.toArray().slice(0,3),actorScale:m.art.scale.toArray(),instrumentScale:m.body.scale.toArray(),actorFade:m.art.material.opacity,ringOpacity:m.ring.material.opacity,ringShader:{activity:m.ring.material.uniforms.uActivity.value,solo:m.ring.material.uniforms.uSolo.value,muted:m.ring.material.uniforms.uMuted.value},labelSize:[m.labelTexture.image.width,m.labelTexture.image.height],dragPhysics:{...physicsFor(m.role.id)}
+ return {configure,update,resize,setActive,drawTo,setCaptureSize,endCapture,dispose,pickMember,startDrag,moveDrag,endDrag,resetPositions,canvas:renderer.domElement,get narrow(){return narrow;},get captureActive(){return !!captureSize;},get formation(){return currentFormation();},get spatial(){return currentSpatial();},get dragging(){return drag?.id||null;},get memberProjections(){return projectMembers();},get diagnostics(){const spatial=currentSpatial(),projected=projectMembers();return {active,theme,narrow,captureSize,formation:currentFormation(),stage:{...theatre.diagnostics,shell:shellStage?.diagnostics||{ready:false,error:shellError}},glow:{strength:glow.strength},petCount:members.length,prewarm:{started:prewarmStarted,busy:prewarmBusy,pending:prewarmQueue.length,loaded:prewarmLoaded,failed:[...prewarmFailures]},wings:{...particleWingState(last?.options.score,last?.frame.time||0,{mode:last?.options.settings.effects,reduced:last?.options.reduced}),members:members.filter(m=>m.wings).map(m=>({id:m.role.id,...m.wings.diagnostics}))},placements:Object.fromEntries(placements),dragging:drag?.id||null,spatial,
+  cueSource:last?.options.score?.stageCues?.source||'demo',chorusCandidates:last?.options.score?.stageCues?.choruses||[],camera:{position:camera.position.toArray(),fov:camera.fov,aspect:camera.aspect,...lastCameraFit},propsBounds:theatre.projectProps(camera),fullFrame:frameStats,beams:spots.map(s=>s.beam.visible?s.beam.material.uniforms.uOpacity.value:0),members:members.map((m,i)=>({...projected[i],renderMode:'sprite-sequence',spriteFrameCount:m.pet.frameCount,layered:false,layerCount:1,actorRotation:m.art.rotation.toArray().slice(0,3),instrumentRotation:m.body.rotation.toArray().slice(0,3),actorScale:m.art.scale.toArray(),instrumentScale:m.body.scale.toArray(),actorFade:m.art.material.opacity,ringOpacity:m.ring.material.opacity,ringShader:{activity:m.ring.material.uniforms.uActivity.value,solo:m.ring.material.uniforms.uSolo.value,muted:m.ring.material.uniforms.uMuted.value},labelSize:[m.labelTexture.image.width,m.labelTexture.image.height],dragPhysics:{...physicsFor(m.role.id)}
   })),lights:spots.map(s=>s.light.intensity),drawCalls:renderer.info.render.calls};}};
 }

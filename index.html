@@ -3609,9 +3609,9 @@ import { motionRise, motionLeave, motionTabSwitch, motionToast, motionTextMorph,
 import { KineticLyricsManager } from './js/ui/kinetic-lyrics.js?v=20261006-motion';
 import { VIDEO_PRESETS, drawPerformanceFrame } from './js/ui/recording-compositor.js';
 import { validateRecordedVideo } from './js/ui/recording-validation.js';
-import { createBandController } from './js/ui/band-controller.js';
+import { createBandController } from './js/ui/band-controller.js?v=20261030-sprites';
 import { createProceduralBandLog } from './js/audio/band-procedural.js';
-import { createBandMixer } from './js/audio/band-mixer.js';
+import { createBandMixer } from './js/audio/band-mixer.js?v=20261029-shell-live';
 import {perceptualLevel} from './js/ui/perceptual-math.js';
 import {installPerceptualUI,runStageViewTransition} from './js/ui/lu-perceptual-ui.js';
 queueMicrotask(()=>{const cleanup=installPerceptualUI({isPlaying:()=>state.isPlayingMusic});window.addEventListener('pagehide',cleanup,{once:true});});

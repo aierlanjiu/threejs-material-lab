@@ -318,6 +318,7 @@ function installLumnoIntroDither(cleanups) {
 const STAGE_SIGNATURES = {
   'band:cream': ['CREAM PRISM', '奶油棱镜'],
   'band:island': ['SUNSET ISLAND', '日落海岛'],
+  'band:shell': ['PEARL SHELL', '珍珠贝壳'],
   slot: ['KINETIC CUBE', '机械魔方'],
   gravity: ['ZERO GRAVITY', '反重力场'],
   off: ['PURE STAGE', '纯享舞台']
@@ -483,6 +484,9 @@ export function installPerceptualUI({isPlaying = () => false} = {}) {
   const selector = '.lu-apple-icon-btn,.lu-apple-play-btn,#luAppleOrbBtn,.kinetic-mode-btn,.lue-facet-tab,.lu-festival-switch button,.lu-intro-theme,#luQuickOpticsBtn';
   function press(button, value) {
     if (!button || button.disabled) return;
+    // Tactile keys use their own 120ms vertical press, including native keyboard
+    // :active. Do not also spring-scale their face or label out of its keycap.
+    if (getComputedStyle(button).getPropertyValue('--lu-button-material').trim() === 'tactile') return;
     const face = button.querySelector('svg,.face,.lu-theme-art') || button;
     if (!face) return;
     if (!presses.has(face)) presses.set(face, spring(1, v => { face.style.scale = String(v); }, SPRINGS.button));

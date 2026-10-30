@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>律 · 珍珠贝壳制作间</title>
+<style>
+:root{color-scheme:light;font-family:ui-sans-serif,system-ui,"PingFang SC",sans-serif;color:#243f38;background:#f2f0e8}*{box-sizing:border-box}body{margin:0}main{max-width:1280px;margin:auto;padding:32px 24px 64px}header{display:flex;justify-content:space-between;gap:24px;align-items:center}h1{font-size:28px;letter-spacing:.06em;margin:8px 0}p{line-height:1.7;color:#5a7067;font-size:14px}.tag{font-size:11px;letter-spacing:.18em;color:#648d7c}.notice{border-left:3px solid #bb8a51;padding:10px 16px;background:#faf6ec;margin:20px 0;font-size:13px;line-height:1.7}.workspace{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(300px,1fr);gap:24px}.stage{border:1px solid #d1dbd0;border-radius:24px;background:radial-gradient(ellipse at 50% 55%,#fffefa,#e0e9de);overflow:hidden;position:relative}.stage canvas{display:block;width:100%;height:auto;max-height:650px;object-fit:contain}.caption{display:flex;justify-content:space-between;align-items:center;padding:0 24px 20px}.caption strong{font-size:20px}.panel{background:#faf9f4;border:1px solid #d8ded4;border-radius:24px;padding:22px}button,select{font:inherit;min-height:42px;border:1px solid #bccdbf;border-radius:12px;background:#fffdf8;color:#2c4c3c;padding:8px 14px;cursor:pointer}button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #9b6d31;outline-offset:3px}button[aria-pressed=true]{background:#264d3c;color:white;border-color:#264d3c}button:disabled{opacity:.5;cursor:wait}.transport{display:flex;flex-wrap:wrap;gap:8px;align-items:center}#play{background:#264d3c;color:white;min-width:100px}.seek{display:flex;align-items:center;gap:10px;margin:18px 0}.seek input{min-width:0;flex:1;accent-color:#406a4e}#time{font-variant-numeric:tabular-nums;font-size:13px;white-space:nowrap}#lyric{min-height:55px;line-height:1.7;margin:20px 0;font-size:16px}.track{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:8px;border-top:1px solid #e0e6dc;padding:8px 0}.track button{padding:4px 11px;font-size:12px;min-height:36px}.track small{color:#718071;margin-left:7px}.roster{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:22px 0}.actor{padding:0 4px 10px;overflow:hidden;background:#f9faf3}.actor canvas{width:100%;display:block}.actor span{font-size:13px}.downloads{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}a{color:#426444;font-size:13px;text-underline-offset:4px}audio{width:100%;margin:10px 0}label{font-size:13px}.status{font-size:12px;line-height:1.7;color:#647362}#error{color:#9b3c24;white-space:pre-wrap}#layerInfo{font-size:12px;color:#647362}h2{font-size:16px;margin-top:24px}@media(max-width:760px){main{padding:20px 12px 40px}.workspace{grid-template-columns:1fr;gap:16px}header{align-items:flex-start}.roster{grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}.actor{border-radius:10px}.actor span{font-size:11px}.panel{padding:16px}.stage canvas{max-height:480px}h1{font-size:23px}.tag{font-size:10px}.caption{padding:0 18px 15px}.caption strong{font-size:18px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+<main>
+<header><div><span class="tag">LÜ / PEARL SHELL · PRODUCTION 01</span><h1>珍珠贝壳 · 制作间</h1><p>十位完整角色 · 九件独立乐器 · 《One day》单曲制作稿</p></div><a href="shell-concert.html">查看舞台 ↗</a></header>
+<div class="notice">角色已恢复原版完整人物四帧，<a href="./sprite-animation-review.html">查看索隆补帧样片</a>。本页音乐仍是旧模板器乐制作稿；原曲主唱与伴奏解析重组留待角色验收之后。</div>
+<div class="workspace">
+<section class="stage"><canvas id="actorCanvas" width="512" height="640" aria-label="所选角色整帧预览"></canvas><div class="caption"><strong id="actorName">载入角色…</strong><span>原版整帧</span></div></section>
+<section class="panel">
+<div class="tag">65—95s / 30秒同步试听</div><p>九轨使用同一音频时钟。点击角色放大检查；声部可独奏或静音。</p>
+<div class="transport"><button id="play" disabled>载入中…</button><button id="stop">回到起点</button><button id="clear">恢复合奏</button></div>
+<div class="seek"><input id="seek" type="range" min="0" max="30" value="0" step=".01" aria-label="试听进度"><span id="time">01:05 / 01:35</span></div>
+<div id="lyric" aria-live="off"></div><div id="tracks"></div>
+<p id="status" role="status" class="status">正在载入素材索引…</p><p id="error" role="alert"></p>
+</section></div>
+<div id="roster" class="roster" aria-label="选择角色"></div><p id="layerInfo"></p>
+<section class="panel"><h2>全曲试听与制作文件</h2><p>全曲为 266.29 秒。以下播放器用于独立试听，不与上方的30秒分轨控制联动。</p>
+<label for="fullMode">试听版本</label> <select id="fullMode"><option value="one-day-accompaniment.mp3">九件乐器合奏</option><option value="one-day-original-vocal-guide.mp3">原唱参考导唱 · 非新合唱</option></select>
+<audio id="fullAudio" controls preload="metadata"></audio>
+<div class="downloads"><a href="output/lu-band-arrangement/one-day-shell-v1/one-day-accompaniment.wav" download>合奏 WAV</a><a href="output/lu-band-arrangement/one-day-shell-v1/one-day-nine-instruments.mid" download>九轨 MIDI</a><a href="output/lu-band-arrangement/one-day-shell-v1/arrangement.json">声部与音符事件</a><a href="assets/band-pet-actions/one-piece/zoro/manifest.json">索隆补帧样片清单</a></div>
+</section></main>
+<script type="module" src="js/ui/shell-performance-review.js?v=20261030-sprites"></script>
+</html>

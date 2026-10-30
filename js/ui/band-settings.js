@@ -13,7 +13,7 @@ const formations=new Set(['auto','arc','terrace','ring','wings','solo']);
 export function normalizeBandSettings(input={}){
  const result=defaultBandSettings();
  if(input&&typeof input==='object'){
-  if(['cream','island'].includes(input.stageLook))result.stageLook=input.stageLook;
+  if(['cream','island','shell'].includes(input.stageLook))result.stageLook=input.stageLook;
   if(BAND_PRESETS[input.preset])result.preset=input.preset;
   if(formations.has(input.formation))result.formation=input.formation;
   if(['follow','move','multi'].includes(input.lightMode))result.lightMode=input.lightMode;

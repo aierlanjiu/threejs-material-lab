@@ -1,0 +1,165 @@
+{
+  "id": "lu-shell-concert-v2",
+  "created": "2026-10-29",
+  "agent": "codex",
+  "reference": "selected-image-2",
+  "model": "shell-concert.glb",
+  "environmentModel": "shell-concert-environment.glb",
+  "sourceScript": "../../../scripts/build-shell-concert.py",
+  "geometrySource": "../../../scripts/shell_concert_geometry.py",
+  "buildBackend": "portable-python",
+  "nativeBlend": {
+    "status": "ready",
+    "scene": "Scene",
+    "backend": "blender",
+    "sourceFingerprint": "c306ccc34eeebe9e07c052742c1eb5780db442f8c9db891a6e18086154f346fb",
+    "generatedWithoutRendering": true,
+    "renderVerification": {
+      "status": "completed",
+      "engine": "CYCLES",
+      "device": "METAL",
+      "samples": 96,
+      "resolution": [
+        1920,
+        1080
+      ],
+      "views": [
+        "front",
+        "three-quarter"
+      ]
+    }
+  },
+  "units": "meters",
+  "upAxis": "Y",
+  "actorAnchors": [
+    {
+      "id": "one-piece/luffy",
+      "node": "Actor_luffy",
+      "position": [
+        0,
+        0.5,
+        4.15
+      ],
+      "height": 2.18,
+      "frame": 2
+    },
+    {
+      "id": "one-piece/zoro",
+      "node": "Actor_zoro",
+      "position": [
+        -4.9,
+        0.85,
+        1.1
+      ],
+      "height": 2.0,
+      "frame": 1
+    },
+    {
+      "id": "one-piece/nami",
+      "node": "Actor_nami",
+      "position": [
+        3.35,
+        0.85,
+        1.45
+      ],
+      "height": 1.92,
+      "frame": 2
+    },
+    {
+      "id": "one-piece/chopper",
+      "node": "Actor_chopper",
+      "position": [
+        5.25,
+        0.85,
+        0.75
+      ],
+      "height": 1.62,
+      "frame": 1
+    },
+    {
+      "id": "one-piece/sanji",
+      "node": "Actor_sanji",
+      "position": [
+        -2.8,
+        1.24,
+        -0.45
+      ],
+      "height": 1.9,
+      "frame": 2
+    },
+    {
+      "id": "one-piece/robin",
+      "node": "Actor_robin",
+      "position": [
+        -4.6,
+        1.24,
+        -0.5
+      ],
+      "height": 2.0,
+      "frame": 2
+    },
+    {
+      "id": "one-piece/usopp",
+      "node": "Actor_usopp",
+      "position": [
+        -1.15,
+        1.62,
+        -2.15
+      ],
+      "height": 1.9,
+      "frame": 2
+    },
+    {
+      "id": "one-piece/ace",
+      "node": "Actor_ace",
+      "position": [
+        0.85,
+        1.62,
+        -2.15
+      ],
+      "height": 1.92,
+      "frame": 1
+    },
+    {
+      "id": "one-piece/law",
+      "node": "Actor_law",
+      "position": [
+        3.7,
+        1.24,
+        -0.5
+      ],
+      "height": 1.95,
+      "frame": 1
+    },
+    {
+      "id": "one-piece/shanks",
+      "node": "Actor_shanks",
+      "position": [
+        5.2,
+        1.24,
+        -1.35
+      ],
+      "height": 2.05,
+      "frame": 1
+    }
+  ],
+  "features": [
+    "six broad cupped 7cm-thick acoustic shells",
+    "114 solid glass flutes",
+    "gold cradle and luminous 0.55m mother pearl",
+    "polished pearl terraces",
+    "2700K LED edges and eight pendant lights"
+  ],
+  "previewCast": "Existing ten 2.5D sprites, unchanged identity; no full 3D characters",
+  "environment": "Separate real foreground shells, floating pearls, islands and harbour lights; water/sky are renderer-specific",
+  "skyTexture": "sunset-sky.png",
+  "sourceFingerprint": "c306ccc34eeebe9e07c052742c1eb5780db442f8c9db891a6e18086154f346fb",
+  "sha256": {
+    "shell-concert.glb": "5dae4500aaa6cc86d05c4b3c79113e53f742711996826da30cad2245b48ed7db",
+    "shell-concert-environment.glb": "24c6faeadce6b50f06ad38c1e32917ca5bcd183511a8db16581114ca6dda151e",
+    "sunset-sky.png": "749c46390e07403adcb13a2d521a5ea6e155237b33f7e0934be251c162623aac",
+    "shell-concert.blend": "3646272ce42b6056aacfc4eb45e483576e31c173fc837348b8c183c71a674a3c"
+  },
+  "source": "shell-concert.blend",
+  "blenderVersion": "5.1.2"
+}

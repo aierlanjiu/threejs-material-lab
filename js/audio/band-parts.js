@@ -3,7 +3,7 @@ import {sampleBandFrame} from './band-timeline.js';
 import {songPartsForTheme,SONG_INSTRUMENTS} from './band-song-parts.js';
 import {generatedPartsForTheme} from './band-procedural.js';
 import {familyPartsForTheme} from './band-family-bindings.js';
-import {arrangementPartsForTheme} from './band-arrangement.js';
+import {arrangementPartsForTheme} from './band-arrangement.js?v=20261029-shell-live';
 
 // These are stage arrangements of measured notes, not additional separated instruments.
 const definitions={

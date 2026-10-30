@@ -4,7 +4,7 @@ import {Reflector} from 'https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm
 import {stageSpec} from '../audio/band-stage-layout.js';
 import {createStageFountains} from './band-fountains.js';
 
-export const FESTIVAL_LOOKS=['cream','island'];
+export const FESTIVAL_LOOKS=['cream','island','shell'];
 
 const PALETTES={
  cream:{
@@ -16,6 +16,11 @@ const PALETTES={
   'one-piece':{cool:'#1c7c88',warm:'#e47e30',glass:'#5ac8d2',water:'#0e4650',shallow:'#2ea4a0',sand:'#c29a68',horizon:'#b85230',sun:'#ffc468',skyTint:'#f09c68',coral:'#2896a2'},
   'dragon-ball':{cool:'#1e7a6e',warm:'#e6781c',glass:'#60ccb6',water:'#10484a',shallow:'#32a68e',sand:'#c49c66',horizon:'#bc542c',sun:'#ffca60',skyTint:'#f09e64',coral:'#cc7a1a'},
   naruto:{cool:'#22687c',warm:'#dc663e',glass:'#66b4c6',water:'#12404e',shallow:'#3696a4',sand:'#c09668',horizon:'#b44c2e',sun:'#ffbe6e',skyTint:'#e89668',coral:'#509670'}
+ },
+ shell:{
+  'one-piece':{cool:'#3ea498',warm:'#e69a58',glass:'#c2ece5',water:'#1c4e56',shallow:'#489e94',sand:'#ded4c8',horizon:'#b47a82',sun:'#ffe2ba',skyTint:'#e8b4a8',coral:'#df6e7a'},
+  'dragon-ball':{cool:'#3aa87e',warm:'#e89848',glass:'#c2eccf',water:'#1a4e46',shallow:'#46a086',sand:'#ded6ca',horizon:'#b87c7e',sun:'#ffe6b8',skyTint:'#e8b6a4',coral:'#e07e3e'},
+  naruto:{cool:'#4e8aa4',warm:'#e07c5a',glass:'#cad8ee',water:'#1c4458',shallow:'#488ca6',sand:'#dad2ce',horizon:'#b07284',sun:'#ffdec2',skyTint:'#e2b0ac',coral:'#64a282'}
  }
 };
 
@@ -34,12 +39,12 @@ export function createFestivalStage(scene,{modelBundle=null,festivalTextures={}}
   scene.background.copy(color('horizon'));
   const sky=root.getObjectByName('festival-distant-backdrop')?.material.uniforms;
   if(sky){
-   sky.uLookMix.value=t;sky.uIsland.value=THREE.MathUtils.lerp(lookTransition.fromLook==='island'?1:0,look==='island'?1:0,t);
+   sky.uLookMix.value=t;sky.uIsland.value=THREE.MathUtils.lerp(lookTransition.fromLook==='island'?1:lookTransition.fromLook==='shell'?.5:0,look==='island'?1:look==='shell'?.5:0,t);
    for(const [uniform,key] of [['uHorizon','horizon'],['uSkyTint','skyTint'],['uSun','sun'],['uAccent','cool']])sky[uniform].value.copy(color(key));
   }
   if(water){const u=water.material.uniforms;
    for(const [uniform,key] of [['color','water'],['uShallow','shallow'],['uSand','sand'],['uHorizon','horizon'],['uSun','sun']])u[uniform].value.copy(color(key));
-   u.uSea.value=THREE.MathUtils.lerp(lookTransition.fromLook==='island'?1:0,look==='island'?1:0,t);
+   u.uSea.value=THREE.MathUtils.lerp(lookTransition.fromLook==='island'?1:lookTransition.fromLook==='shell'?.7:0,look==='island'?1:look==='shell'?.7:0,t);
   }
   for(const [name,material] of Object.entries(lookSurfaces)){
    const target=lookTransition.surfaces[name];if(!target)continue;
@@ -96,7 +101,7 @@ export function createFestivalStage(scene,{modelBundle=null,festivalTextures={}}
    sh.lineTo(w,back);
    sh.lineTo(w,front-.55);
    sh.quadraticCurveTo(w,front+.38,w-.8,front+.48);
-   sh.quadraticCurveTo(0,front+(look==='cream'?1.08:.72),-w+.8,front+.48);
+   sh.quadraticCurveTo(0,front+(look==='cream'?1.08:look==='shell'?0.95:.72),-w+.8,front+.48);
    sh.quadraticCurveTo(-w,front+.38,-w,front-.55);
    sh.closePath();
   }else{
@@ -104,7 +109,7 @@ export function createFestivalStage(scene,{modelBundle=null,festivalTextures={}}
    sh.moveTo(-r,s.back);
    for(let i=0;i<=96;i++){
     const a=Math.PI-i/96*Math.PI;
-    const extra=look==='cream'?.62*Math.sin(a*3)**2:.32*Math.sin(a);
+    const extra=look==='cream'?.62*Math.sin(a*3)**2:look==='shell'?.48*Math.sin(a*2)**2:.32*Math.sin(a);
     const rr=r+extra;
     sh.lineTo(Math.cos(a)*rr,s.back+Math.sin(a)*rr);
    }
@@ -188,7 +193,7 @@ export function createFestivalStage(scene,{modelBundle=null,festivalTextures={}}
  }
 
  function backdrop(pal,zHorizon){
-  const island=look==='island';
+  const island=look==='island',shell=look==='shell';
   const tex=festivalTextures[look]||null;
   const m=new THREE.ShaderMaterial({
    depthWrite:false,
@@ -196,11 +201,11 @@ export function createFestivalStage(scene,{modelBundle=null,festivalTextures={}}
    uniforms:{
     uTex:{value:tex},
     uFromTex:{value:festivalTextures[lookTransition?.fromLook||look]||tex},
-    uFromIsland:{value:(lookTransition?.fromLook||look)==='island'?1:0},
-    uTargetIsland:{value:island?1:0},
+    uFromIsland:{value:(lookTransition?.fromLook||look)==='island'?1:(lookTransition?.fromLook||look)==='shell'?.5:0},
+    uTargetIsland:{value:island?1:shell?.5:0},
     uLookMix:{value:lookMix},
     uHasTex:{value:tex?1:0},
-    uIsland:{value:island?1:0},
+    uIsland:{value:island?1:shell?.5:0},
     uTime:{value:0},
     uBeat:{value:0},
     uNarrow:{value:narrow?1:0},
@@ -258,7 +263,7 @@ export function createFestivalStage(scene,{modelBundle=null,festivalTextures={}}
  }
 
  function createWater(pal,zHorizon){
-  const island=look==='island';
+  const island=look==='island',shell=look==='shell';
   // Keep one mirror camera: Three.js caches transmission targets per camera.
   if(water){
    const u=water.material.uniforms;
@@ -267,11 +272,11 @@ export function createFestivalStage(scene,{modelBundle=null,festivalTextures={}}
    u.uSand.value.set(pal.sand);
    u.uHorizon.value.set(pal.horizon);
    u.uSun.value.set(pal.sun);
-   u.uSea.value=island?1:0;
+   u.uSea.value=island?1:shell?.7:0;
    u.uNarrow.value=narrow?1:0;
    u.uZHorizon.value=zHorizon;
    water.getRenderTarget().setSize(narrow?256:512,narrow?256:512);
-   water.name=island?'open-sea':'quiet-lake';
+   water.name=island?'open-sea':shell?'pearl-lagoon':'quiet-lake';
    water.position.set(0,-.66,zHorizon+50);
    root.add(water);
    return;
@@ -294,7 +299,7 @@ export function createFestivalStage(scene,{modelBundle=null,festivalTextures={}}
      uSun:{value:new THREE.Color(pal.sun)},
      uTime:{value:0},
      uBeat:{value:0},
-     uSea:{value:island?1:0},
+     uSea:{value:island?1:shell?.7:0},
      uNarrow:{value:narrow?1:0},
      uZHorizon:{value:zHorizon}
     },
@@ -385,7 +390,7 @@ export function createFestivalStage(scene,{modelBundle=null,festivalTextures={}}
   };
   water.material.transparent=false;
   water.material.depthWrite=true;
-  water.name=island?'open-sea':'quiet-lake';
+  water.name=island?'open-sea':shell?'pearl-lagoon':'quiet-lake';
   water.rotation.x=-Math.PI/2;
   water.position.set(0,-.66,zHorizon+50);
   water.receiveShadow=false;
@@ -533,6 +538,92 @@ export function createFestivalStage(scene,{modelBundle=null,festivalTextures={}}
   }
  }
 
+ function buildShellAcousticCanopy(span,trim,pal){
+  const orbMat=getSharedOrbMaterial();
+  const coreGlow=cachedMat('coreGlow',()=>new THREE.MeshStandardMaterial({color:'#fff8e2',emissive:'#ffd480',emissiveIntensity:.85,roughness:.18}));
+  luminous.push({m:coreGlow,base:.85});
+
+  const shellNacre=cachedMat(`shellNacre:${pal.cool}`,()=>new THREE.MeshPhysicalMaterial({
+   color:'#faf6f0',
+   emissive:new THREE.Color(pal.warm).lerp(new THREE.Color('#fff2e0'),.65),
+   emissiveIntensity:.14,
+   roughness:.22,
+   metalness:.12,
+   clearcoat:1,
+   clearcoatRoughness:.06,
+   iridescence:.88
+  }));
+
+  const cz=narrow?-2.2:-1.8;
+  const finCount=6;
+  for(let k=0;k<finCount;k++){
+   const t=k/(finCount-1);
+   const r=narrow?7.8+k*1.1:11.2+k*1.5;
+   const h=narrow?7.2+k*1.2:9.6+k*1.6;
+   const arcStart=Math.PI*.48-t*.12;
+   const arcLen=Math.PI*(narrow?.46:.52)+t*.24;
+   const finGeo=new THREE.CylinderGeometry(r,r*.88,h,48,1,true,arcStart,arcLen);
+   const fin=mesh(finGeo,shellNacre,0,h*.5-.2,cz-k*.6);
+   fin.castShadow=false;
+
+   for(const y of [.15,h+.02]){
+    const pts=Array.from({length:33},(_,i)=>{
+     const a=arcStart+i/32*arcLen;
+     const rad=y===.15?r*.88:r;
+     return [Math.sin(a)*rad,y,cz-k*.6+Math.cos(a)*rad];
+    });
+    tube(pts,.038,trim,24,6);
+   }
+  }
+
+  for(let i=0;i<8;i++){
+   const t=(i+.5)/8;
+   const spread=narrow?7.6:13.2;
+   const ox=(t-.5)*spread;
+   const oz=cz-(narrow?1.8:2.4)-Math.abs(t-.5)*2.2;
+   const oy=(narrow?5.6:6.4)+(i%2)*.8+Math.sin(t*Math.PI)*.9;
+   const roofY=oy+2.4;
+   tube([[ox,roofY,oz],[ox,oy+.26,oz]],.016,trim,8,6);
+   const orbGroup=new THREE.Group();
+   orbGroup.position.set(ox,oy,oz);
+   const inner=new THREE.Mesh(new THREE.SphereGeometry(.20,16,12),coreGlow);
+   const outer=new THREE.Mesh(new THREE.SphereGeometry(.34,22,16),orbMat);
+   orbGroup.add(inner,outer);
+   root.add(orbGroup);
+   animated.push({kind:'orb',o:orbGroup,y:oy,seed:i*1.2});
+  }
+
+  const pz=narrow?-4.2:-4.8;
+  ellipse(narrow?1.9:2.6,narrow?1.2:1.6,trim,0,.92,pz,.22);
+  const giantPearlGroup=new THREE.Group();
+  giantPearlGroup.position.set(0,1.95,pz);
+  const giantInner=new THREE.Mesh(new THREE.SphereGeometry(.48,24,18),coreGlow);
+  const giantOuter=new THREE.Mesh(new THREE.SphereGeometry(.78,32,24),orbMat);
+  giantPearlGroup.add(giantInner,giantOuter);
+  root.add(giantPearlGroup);
+  animated.push({kind:'orb',o:giantPearlGroup,y:1.95,seed:3.14});
+
+  for(let j=0;j<12;j++){
+   const angle=Math.PI*.12+(j/11)*Math.PI*.76;
+   const side=j%2===0?1:-1;
+   const dist=narrow?12.8+(j%3)*2.2:17.5+(j%3)*3.2;
+   const px=side*Math.sin(angle)*dist;
+   const pz=cz+Math.cos(angle)*(dist*.65);
+   const py=-.52+(j%3)*.05;
+   const pearlMesh=mesh(new THREE.SphereGeometry(narrow?.42:.58,22,16),orbMat,px,py,pz);
+   animated.push({kind:'orb',o:pearlMesh,y:py,seed:j*1.4});
+  }
+
+  for(const side of [-1,1]){
+   const hx=side*(narrow?8.8:15.6),hz=-2.2;
+   const haloPts=Array.from({length:41},(_,i)=>{
+    const a=-Math.PI*.12+i/40*Math.PI*1.24;
+    return [hx+Math.cos(a)*(narrow?1.25:1.75),1.4+Math.sin(a)*(narrow?1.55:2.15),hz+Math.sin(a)*.2];
+   });
+   tube(haloPts,.052,trim);
+  }
+ }
+
  function buildCoastalLantern(x,y,z,trim,glowMat){
   const wood=mat('#a87952',.62,.1);
   mesh(new THREE.CylinderGeometry(.32,.36,.22,22),wood,x,y+.11,z);
@@ -541,7 +632,7 @@ export function createFestivalStage(scene,{modelBundle=null,festivalTextures={}}
  }
 
  function themeArchitecture(span,trim,pal){
-  const island=look==='island',z=-7.2;
+  const island=look==='island',shell=look==='shell',z=-7.2;
   const glowMat=cachedMat(`glow:${pal.warm}`,()=>new THREE.MeshStandardMaterial({
    color:'#fff3d6',
    emissive:pal.warm,
@@ -561,17 +652,17 @@ export function createFestivalStage(scene,{modelBundle=null,festivalTextures={}}
     z:wingZ-.8,
     width:narrow?2.8:4.4,
     rotation:side*.35,
-    tint:island?'#c8af8c':'#dcd8c8',
+    tint:island?'#c8af8c':shell?'#dedad4':'#dcd8c8',
     roughness:.56,
     top:true
    });
 
    // Concert audio & stage equipment
-   placeGlb('speaker',{x:side*(narrow?7.6:13.4),y:-.18,z:-2.6,height:narrow?1.85:2.35,rotation:-side*.24,tint:island?'#5a4a3c':'#586864',roughness:.42,metalness:.28});
-   placeGlb('amp',{x:side*(narrow?6.8:12.0),y:-.18,z:-1.0,height:narrow?.82:1.08,rotation:-side*.32,tint:island?'#6b5340':'#526460',roughness:.46,metalness:.24});
-   placeGlb('monitor',{x:side*(narrow?5.6:10.4),y:.36,z:narrow?5.6:3.8,width:narrow?.85:1.18,rotation:Math.PI-side*.25,tint:island?'#544538':'#495a58',roughness:.42,metalness:.3});
+   placeGlb('speaker',{x:side*(narrow?7.6:13.4),y:-.18,z:-2.6,height:narrow?1.85:2.35,rotation:-side*.24,tint:island?'#5a4a3c':shell?'#7a6e64':'#586864',roughness:.42,metalness:.28});
+   placeGlb('amp',{x:side*(narrow?6.8:12.0),y:-.18,z:-1.0,height:narrow?.82:1.08,rotation:-side*.32,tint:island?'#6b5340':shell?'#827468':'#526460',roughness:.46,metalness:.24});
+   placeGlb('monitor',{x:side*(narrow?5.6:10.4),y:.36,z:narrow?5.6:3.8,width:narrow?.85:1.18,rotation:Math.PI-side*.25,tint:island?'#544538':shell?'#72665c':'#495a58',roughness:.42,metalness:.3});
 
-   if(island){
+   if(island||shell){
     buildCoastalLantern(side*(narrow?7.2:12.4),-.20,1.4,trim,glowMat);
     buildCoastalLantern(side*(narrow?8.6:15.4),-.20,-.2,trim,glowMat);
    }
@@ -580,17 +671,17 @@ export function createFestivalStage(scene,{modelBundle=null,festivalTextures={}}
     if(island){
      buildSail(side,span,trim,pal);
     }else{
-     // Nautical astrolabe & golden sail-rib arches for Cream One Piece
+     // Nautical astrolabe & golden sail-rib arches for Cream One Piece / Shell
      const pts=Array.from({length:49},(_,i)=>{
       const a=i/48*Math.PI;
-      return [x+side*Math.sin(a)*3.4,.6+i/48*9.2,z+Math.sin(a)*1.2];
+      return [x+side*Math.sin(a)*(shell?3.8:3.4),.6+i/48*(shell?9.8:9.2),z+Math.sin(a)*(shell?1.4:1.2)];
      });
-     tube(pts,.07,trim);
+     tube(pts,shell?.078:.07,trim);
      const innerPts=Array.from({length:49},(_,i)=>{
       const a=i/48*Math.PI;
-      return [x+side*Math.sin(a)*2.3,.6+i/48*7.2,z-.3+Math.cos(a)*.7];
+      return [x+side*Math.sin(a)*(shell?2.6:2.3),.6+i/48*(shell?7.8:7.2),z-.3+Math.cos(a)*.7];
      });
-     tube(innerPts,.04,trim);
+     tube(innerPts,shell?.045:.04,trim);
     }
     // High-precision 3D Coral, Scenario Nautical Lantern & sculpted botanical foliage on both wings
     placeGlb('coral',{
@@ -765,14 +856,19 @@ export function createFestivalStage(scene,{modelBundle=null,festivalTextures={}}
   if(narrow===null||disposed)return;
   clear();
   revision++;
-  const s=stageSpec(narrow),island=look==='island';
+  const s=stageSpec(narrow),island=look==='island',shell=look==='shell';
+  if(shell){lookSurfaces={};return;} // The delivered GLB is owned by band-shell-stage.
   const pal=(PALETTES[look]||PALETTES.cream)[theme]||PALETTES.cream['one-piece'];
   const zHorizon=narrow?-16.5:-25.5;
 
   scene.background=new THREE.Color(pal.horizon);
-  const ivory=mat(island?'#9c6e48':'#d8e5e2',island?.62:.48,island?.05:.08);
-  const trim=cachedMat(`trim:${island?'#c89662':pal.warm}`,()=>new THREE.MeshStandardMaterial({color:island?'#c89662':pal.warm,metalness:.62,roughness:.26}));
-  ivory.color.set(island?'#9c6e48':'#d8e5e2');ivory.roughness=island?.62:.48;trim.color.set(island?'#db8234':pal.warm);
+  const ivoryColor=island?'#9c6e48':shell?'#eae6de':'#d8e5e2';
+  const ivoryRoughness=island?.62:shell?.36:.48;
+  const ivoryMetalness=island?.05:shell?.12:.08;
+  const ivory=mat(ivoryColor,ivoryRoughness,ivoryMetalness);
+  const trimColor=island?'#c89662':shell?'#dfa86a':pal.warm;
+  const trim=cachedMat(`trim:${trimColor}`,()=>new THREE.MeshStandardMaterial({color:trimColor,metalness:shell?.72:.62,roughness:shell?.22:.26}));
+  ivory.color.set(ivoryColor);ivory.roughness=ivoryRoughness;trim.color.set(trimColor);
   lookSurfaces={floor:ivory,trim};
 
   backdrop(pal,zHorizon);
@@ -785,8 +881,8 @@ export function createFestivalStage(scene,{modelBundle=null,festivalTextures={}}
   }
   ellipse(narrow?14.2:22.2,12.1,ivory,0,-.52,-2,.20);
   const baseRimMat=cachedMat(`baseRim:${look}:${pal.cool}`,()=>new THREE.MeshStandardMaterial({
-   color:island?'#ffb458':pal.cool,
-   emissive:island?'#ff9436':pal.cool,
+   color:island?'#ffb458':shell?'#f5c28a':pal.cool,
+   emissive:island?'#ff9436':shell?'#e8a25c':pal.cool,
    emissiveIntensity:.45,
    roughness:.28
   }));
@@ -802,26 +898,26 @@ export function createFestivalStage(scene,{modelBundle=null,festivalTextures={}}
   }
 
   // 3-Level Central Amphitheatre Stage (actor support coordinates stay exact)
-  const stepBeaconMat=island?cachedMat('stepBeacon',()=>new THREE.MeshStandardMaterial({color:'#fff4d8',emissive:'#ff9c32',emissiveIntensity:1.25,roughness:.2})):null;
+  const stepBeaconMat=island||shell?cachedMat(`stepBeacon:${look}`,()=>new THREE.MeshStandardMaterial({color:'#fff4d8',emissive:shell?'#ffa844':'#ff9c32',emissiveIntensity:shell?1.4:1.25,roughness:.2})):null;
   if(stepBeaconMat)luminous.push({m:stepBeaconMat,base:.78});
 
   const edgeMat=cachedMat(`edge:${look}:${pal.cool}`,()=>new THREE.MeshStandardMaterial({
-   color:island?'#ffc872':pal.cool,
-   emissive:island?'#ff9c32':pal.cool,
-   emissiveIntensity:.45,
+   color:island?'#ffc872':shell?'#ffe0ad':pal.cool,
+   emissive:island?'#ff9c32':shell?'#ffa844':pal.cool,
+   emissiveIntensity:shell?.55:.45,
    roughness:.25
   }));
   edges.push(edgeMat);
 
-  const creamWallMat=!island?cachedMat(`creamWall:${pal.cool}`,()=>new THREE.MeshPhysicalMaterial({
-   color:new THREE.Color(pal.cool).lerp(new THREE.Color('#385a54'),.35),
-   emissive:new THREE.Color(pal.cool),
-   emissiveIntensity:.14,
+  const creamWallMat=!island?cachedMat(`${look}Wall:${pal.cool}`,()=>new THREE.MeshPhysicalMaterial({
+   color:new THREE.Color(shell?'#faf4ec':pal.cool).lerp(new THREE.Color(shell?pal.cool:'#385a54'),shell?.30:.35),
+   emissive:new THREE.Color(shell?pal.warm:pal.cool),
+   emissiveIntensity:shell?.18:.14,
    roughness:.20,
    metalness:.18,
    clearcoat:1,
    clearcoatRoughness:.08,
-   iridescence:.42
+   iridescence:shell?.68:.42
   })):null;
 
   for(let level=0;level<s.levels;level++){
@@ -842,26 +938,29 @@ export function createFestivalStage(scene,{modelBundle=null,festivalTextures={}}
    }
    tube(points,.028,edgeMat);
 
-   if(island){
-    // Inlaid timber deck joints
-    const width=narrow?s.widths[level]:s.radii[level]*2;
-    for(let x=-width/2+.65;x<width/2;x+=1.35){
-     const front=narrow?s.fronts[level]:s.back+Math.sqrt(Math.max(0,s.radii[level]**2-x*x));
-     tube([[x,top+.046,s.back+.12],[x,top+.046,front-.16]],.011,mat('#cbb696',.68));
+   if(island||shell){
+    if(island){
+     // Inlaid timber deck joints
+     const width=narrow?s.widths[level]:s.radii[level]*2;
+     for(let x=-width/2+.65;x<width/2;x+=1.35){
+      const front=narrow?s.fronts[level]:s.back+Math.sqrt(Math.max(0,s.radii[level]**2-x*x));
+      tube([[x,top+.046,s.back+.12],[x,top+.046,front-.16]],.011,mat('#cbb696',.68));
+     }
     }
-    // Recessed warm step-light beacons along the curved risers (Concept D signature)
+    // Recessed warm step-light beacons along the curved risers
     if(!narrow){
      const r=s.radii[level]+.18,beaconCount=level===0?9:level===1?7:5;
      for(let b=1;b<beaconCount;b++){
       const a=Math.PI-b/beaconCount*Math.PI;
-      mesh(new THREE.SphereGeometry(.08,12,10),stepBeaconMat,Math.cos(a)*r,top-s.step+.14,s.back+Math.sin(a)*r);
+      mesh(new THREE.SphereGeometry(shell?.09:.08,12,10),stepBeaconMat,Math.cos(a)*r,top-s.step+.14,s.back+Math.sin(a)*r);
      }
     }
    }
   }
 
   const span=narrow?11.2:14.2;
-  if(!island)buildCreamPrismScreens(span,trim,pal);
+  if(shell)buildShellAcousticCanopy(span,trim,pal);
+  else if(!island)buildCreamPrismScreens(span,trim,pal);
   themeArchitecture(span,trim,pal);
   batchStatic();
   fountains.setLayout(narrow);
@@ -871,6 +970,7 @@ export function createFestivalStage(scene,{modelBundle=null,festivalTextures={}}
   setLook(next,{immediate=false}={}){
    next=FESTIVAL_LOOKS.includes(next)?next:'cream';
    if(next===look)return;
+   if(next==='shell'||look==='shell')immediate=true;
    const from=palette(),fromLook=look,previous=Object.fromEntries(Object.entries(lookSurfaces).map(([name,m])=>[name,{color:m.color.clone(),roughness:m.roughness}]));
    lookMix=immediate?1:0;lookTransition=immediate?null:{from,fromLook,started:performance.now(),surfaces:{}};
    look=next;
@@ -892,9 +992,11 @@ export function createFestivalStage(scene,{modelBundle=null,festivalTextures={}}
    rebuild();
   },
   refreshMaterial(){},
+  setVisible(value){root.visible=value;effects.visible=value;},
   projectProps(){return [];},
   update(time,fx,reduced,lighting={},height=650,rows=[],mode='auto'){
    lastLighting=lighting;
+   if(look==='shell')return;
    if(lookTransition){lookMix=reduced?1:Math.min(1,(performance.now()-lookTransition.started)/550);applyLookMix();}
    const motion=!reduced&&mode!=='off';
    const beat=motion?(lighting.beat||0):0;
@@ -924,7 +1026,7 @@ export function createFestivalStage(scene,{modelBundle=null,festivalTextures={}}
     narrow,
     revision,
     water:water?{kind:water.name,time:water.material.uniforms.uTime.value,reflectionSize:water.getRenderTarget().width}:null,
-    shape:look==='cream'?'petal-amphitheatre':'coastal-terraces',
+    shape:look==='cream'?'petal-amphitheatre':look==='shell'?'pearl-acoustic-amphitheatre':'coastal-terraces',
     levels:stageSpec(narrow).levels,
     lighting:lastLighting,
     fountains:fountains.diagnostics,

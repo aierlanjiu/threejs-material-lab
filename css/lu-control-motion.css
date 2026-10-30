@@ -2039,6 +2039,9 @@ body.lu-band-mode .lu-festival-switch {
 body.lu-band-mode[data-festival-look="island"] .lu-festival-switch button[aria-pressed="true"] {
  background:#234c52;
 }
+body.lu-band-mode[data-festival-look="shell"] .lu-festival-switch button[aria-pressed="true"] {
+ background:#1e4844;
+}
 .lu-festival-switch button:focus-visible {outline:2px solid var(--band-accent);outline-offset:3px;}
 body.recording-preview .lu-festival-switch {display:none;}
 @media(max-width:760px){

@@ -6,6 +6,15 @@
 
 ---
 
+## 🎬 乐队模式短片 (Band Mode Film)
+
+[![律 · 乐队模式短片](assets/film/band-mode-preview.gif)](https://aierlanjiu.github.io/threejs-material-lab/band-film.html)
+
+> **“把世界，奏成你的乐队。29 位乐手 · 3 个阵容 · 2 种舞台 · 1080p 60fps 原片”**
+
+- ▷ **[在浏览器全屏在线观看（1080p / 60 fps）](https://aierlanjiu.github.io/threejs-material-lab/band-film.html)**（原生播放器，秒开无需下载）
+- 📥 **[直接下载 40MB 母带 MP4 原片](https://raw.githubusercontent.com/aierlanjiu/threejs-material-lab/master/assets/film/band-mode-20261027.mp4)**
+
 ## 🌟 项目双旗舰架构
 
 本项目为纯前端轻量 WebGL / Three.js 架构，包含两大旗舰体验：
@@ -105,6 +114,7 @@
 
 ## 🌐 在线体验 (GitHub Pages)
 
+- 🎬 **『 律 』· 乐队模式 30 秒短片**：[https://aierlanjiu.github.io/threejs-material-lab/band-film.html](https://aierlanjiu.github.io/threejs-material-lab/band-film.html)
 - 🌰 **『 荔 』(LI) · 暖光藏品伴侣室**：[https://aierlanjiu.github.io/threejs-material-lab/mascot_studio.html](https://aierlanjiu.github.io/threejs-material-lab/mascot_studio.html)
   - 极简短链入口：[https://aierlanjiu.github.io/threejs-material-lab/li.html](https://aierlanjiu.github.io/threejs-material-lab/li.html)
 - 💎 **『 律 』(LÜ) · 3D 物理材质与声波共振工作台**：[https://aierlanjiu.github.io/threejs-material-lab/](https://aierlanjiu.github.io/threejs-material-lab/)
