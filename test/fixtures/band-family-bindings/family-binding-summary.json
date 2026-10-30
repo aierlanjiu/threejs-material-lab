@@ -1,0 +1,146 @@
+[
+  {
+    "trackId": "anime_db_chala",
+    "parts": 3,
+    "actors": {
+      "one-piece": 3,
+      "dragon-ball": 2,
+      "naruto": 3
+    }
+  },
+  {
+    "trackId": "anime_db_dandan",
+    "parts": 6,
+    "actors": {
+      "one-piece": 6,
+      "dragon-ball": 4,
+      "naruto": 5
+    }
+  },
+  {
+    "trackId": "anime_db_makafushigi",
+    "parts": 4,
+    "actors": {
+      "one-piece": 4,
+      "dragon-ball": 2,
+      "naruto": 3
+    }
+  },
+  {
+    "trackId": "anime_nr_blue_bird",
+    "parts": 6,
+    "actors": {
+      "one-piece": 6,
+      "dragon-ball": 4,
+      "naruto": 5
+    }
+  },
+  {
+    "trackId": "anime_nr_sign",
+    "parts": 5,
+    "actors": {
+      "one-piece": 5,
+      "dragon-ball": 3,
+      "naruto": 4
+    }
+  },
+  {
+    "trackId": "anime_nr_silhouette",
+    "parts": 4,
+    "actors": {
+      "one-piece": 4,
+      "dragon-ball": 3,
+      "naruto": 4
+    }
+  },
+  {
+    "trackId": "anime_op_one_day",
+    "parts": 4,
+    "actors": {
+      "one-piece": 4,
+      "dragon-ball": 3,
+      "naruto": 4
+    }
+  },
+  {
+    "trackId": "anime_op_over_the_top",
+    "parts": 7,
+    "actors": {
+      "one-piece": 7,
+      "dragon-ball": 5,
+      "naruto": 6
+    }
+  },
+  {
+    "trackId": "anime_op_overtaken",
+    "parts": 2,
+    "actors": {
+      "one-piece": 2,
+      "dragon-ball": 2,
+      "naruto": 2
+    }
+  },
+  {
+    "trackId": "anime_op_we_are",
+    "parts": 7,
+    "actors": {
+      "one-piece": 7,
+      "dragon-ball": 5,
+      "naruto": 6
+    }
+  },
+  {
+    "trackId": "track_0",
+    "parts": 3,
+    "actors": {
+      "one-piece": 3,
+      "dragon-ball": 2,
+      "naruto": 3
+    }
+  },
+  {
+    "trackId": "track_1",
+    "parts": 3,
+    "actors": {
+      "one-piece": 3,
+      "dragon-ball": 1,
+      "naruto": 2
+    }
+  },
+  {
+    "trackId": "track_2",
+    "parts": 5,
+    "actors": {
+      "one-piece": 5,
+      "dragon-ball": 3,
+      "naruto": 4
+    }
+  },
+  {
+    "trackId": "track_3",
+    "parts": 4,
+    "actors": {
+      "one-piece": 4,
+      "dragon-ball": 3,
+      "naruto": 4
+    }
+  },
+  {
+    "trackId": "track_4",
+    "parts": 6,
+    "actors": {
+      "one-piece": 6,
+      "dragon-ball": 4,
+      "naruto": 5
+    }
+  },
+  {
+    "trackId": "track_5",
+    "parts": 2,
+    "actors": {
+      "one-piece": 2,
+      "dragon-ball": 1,
+      "naruto": 1
+    }
+  }
+]

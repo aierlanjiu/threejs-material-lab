@@ -30,8 +30,8 @@ export function validateBandScore(score) {
   if (score.version !== 1) {
     errors.push('score.version must be 1');
   }
-  if (score.source !== 'demo' && score.source !== 'analysis') {
-    errors.push("score.source must be 'demo' or 'analysis'");
+  if (!['demo', 'analysis', 'arrangement'].includes(score.source)) {
+    errors.push("score.source must be 'demo', 'analysis' or 'arrangement'");
   }
   if (typeof score.title !== 'string' || score.title.trim() === '') {
     errors.push('score.title must be a non-empty string');

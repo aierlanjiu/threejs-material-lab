@@ -1,0 +1,42 @@
+<!doctype html><meta charset="utf-8"><title>Festival regression</title>
+<style>body{margin:0;background:#f5efdf;color:#234;font:14px system-ui}button{padding:12px}#stage{width:1280px;height:720px}pre{white-space:pre-wrap}</style>
+<button id="run">运行双风格回归</button><pre id="result" role="status">就绪</pre><div id="stage"></div>
+<script type="module">
+import {stageHeightAt} from '../js/audio/band-stage-layout.js';
+import {createBandScene} from '../js/ui/band-scene.js';
+import {defaultBandSettings,normalizeBandSettings} from '../js/ui/band-settings.js';
+import {createBandDemoScore} from '../js/audio/band-timeline.js';
+import {compileBandParts,sampleBandEnsemble} from '../js/audio/band-parts.js';
+const host=document.querySelector('#stage'),result=document.querySelector('#result'),run=document.querySelector('#run');
+const pause=()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+run.onclick=async()=>{
+ run.disabled=true;result.textContent='运行中';let scene;
+ try{
+  scene=await createBandScene(host);scene.setActive(true);const score=createBandDemoScore(),settings=defaultBandSettings(),observed=[];
+  if(normalizeBandSettings({stageLook:'island'}).stageLook!=='island'||normalizeBandSettings({stageLook:'invalid'}).stageLook!=='cream')throw Error('Invalid persisted look');
+  for(const size of [[1280,720],[390,700]]){
+   host.style.width=size[0]+'px';host.style.height=size[1]+'px';scene.resize();await pause();
+   for(const look of ['cream','island'])for(const theme of ['one-piece','dragon-ball','naruto']){
+    settings.stageLook=look;await scene.configure(theme);const parts=compileBandParts(score,theme);
+    for(const formation of ['arc','terrace','ring','wings','solo']){
+     settings.formation=formation;const frame=sampleBandEnsemble(score,parts,6);scene.update(frame,{settings,score,parts});await pause();const d=scene.diagnostics;
+     if(!d.stage.water||d.stage.water.kind!==(look==='island'?'open-sea':'quiet-lake')||d.stage.water.time!==6)throw Error('Water state');
+     if(d.stage.look!==look||d.stage.theme!==theme||d.petCount!==(theme==='naruto'?9:10))throw Error('Appearance/roster drift');
+     if(d.members.some(m=>Object.values(m.bounds).some(v=>!Number.isFinite(v))||m.bounds.left< -1||m.bounds.right>1||m.bounds.top>1||m.bounds.bottom< -1))throw Error('Actor clipping '+JSON.stringify({look,theme,formation,size}));
+     if(d.members.some(m=>Math.abs(m.position[1]-stageHeightAt(m.position[0],m.position[2],d.narrow)-.045)>1e-6))throw Error('Actor grounding');
+     observed.push({look,theme,formation,size,calls:d.fullFrame.calls,geometries:d.fullFrame.geometries,textures:d.fullFrame.textures});
+    }
+    scene.update(sampleBandEnsemble(score,parts,12),{settings,score,parts,reduced:true});if(scene.diagnostics.stage.water.time!==0)throw Error('Water motion suppression');if(scene.diagnostics.stage.fountains.visible!==0)throw Error('Reduced motion fireworks');
+    settings.effects='off';scene.update(sampleBandEnsemble(score,parts,2),{settings,score,parts});if(scene.diagnostics.stage.water.time!==0)throw Error('Water motion suppression');if(scene.diagnostics.stage.fountains.visible!==0)throw Error('Disabled effects');settings.effects='auto';
+   }
+  }
+  const parts=compileBandParts(score,'naruto'),resources=[];
+  for(let i=0;i<20;i++){settings.stageLook=i%2?'cream':'island';scene.update(sampleBandEnsemble(score,parts,6),{settings,score,parts});await pause();resources.push({...scene.diagnostics.fullFrame});}
+  if(resources.at(-1).geometries>resources[1].geometries+2||resources.at(-1).textures>resources[1].textures+1)throw Error('Resource growth '+JSON.stringify(resources));
+  const captures=[];
+  for(const look of ['cream','island'])for(const [w,h] of [[1280,720],[720,1280],[1680,720]]){settings.stageLook=look;scene.setCaptureSize(w,h,w,h);scene.update(sampleBandEnsemble(score,parts,8),{settings,score,parts});await pause();if(scene.canvas.width!==w||scene.canvas.height!==h)throw Error('Capture size');captures.push({width:w,height:h,look:scene.diagnostics.stage.look});scene.endCapture();}
+  scene.dispose();scene=null;if(host.querySelector('canvas'))throw Error('Canvas disposal');
+  result.textContent='PASS '+JSON.stringify({states:observed.length,observed,resources,captures,dispose:true},null,2);
+ }catch(e){result.textContent='FAIL '+e.stack;}finally{scene?.dispose();run.disabled=false;}
+};
+</script>

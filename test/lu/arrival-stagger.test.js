@@ -1,14 +1,14 @@
 // 入场错时回归：确认方阵不是"一次性融化"，而是按时间片一站站长出来，
 // 且承载内容的单元（角色所在的那个）排在第一拍；入场完成后不允许出现穿模。
 // 用法: node test/lu/arrival-stagger.test.js
-// 依赖: 已在 127.0.0.1:8099 提供 index.html 的静态服务 (可用 LU_URL 覆盖)
+// 依赖: 已在 localhost:8000 提供 index.html 的静态服务 (可用 LU_URL 覆盖)
 //
 // 设计说明：虚拟时钟会大步跳帧（实测一帧可跨 0.8s），逐帧采样观察不到入场中间态。
 // 因此主判据放在"入场时间表"这个确定性事实上，而不是"某一帧看到了什么"。
 import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
 
-const BASE = process.env.LU_URL || 'http://127.0.0.1:8099/';
+const BASE = process.env.LU_URL || 'http://localhost:8000/';
 
 const probe = async ({ settleFrames }) => {
   const diag = window.luDiagnostics;
@@ -71,6 +71,8 @@ const run = async () => {
   page.on('pageerror', e => errors.push(String(e)));
   page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
   await page.goto(BASE + 'index.html?intro=skip', { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => window.luBand && window.luApplePlayer);
+  await page.evaluate(() => kineticLyricsManager.setMode('slot'));
   await page.waitForFunction(() => window.luDiagnostics && window.state
     && window.luDiagnostics.matrixGroup && window.luDiagnostics.matrixGroup.children.length > 0, { timeout: 30000 });
   const cdp = await page.context().newCDPSession(page);

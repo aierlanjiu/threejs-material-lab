@@ -1,0 +1,162 @@
+{
+  "version": 1,
+  "trackId": "anime_op_overtaken",
+  "sourceSha256": "2696df92ea57484d4daa39e60f4f601bfb6696b7980aa2371bdfa396792ca7a9",
+  "audioDigests": {
+    "drums": "941dc03e58f1e7454f4b4a6df7bf41680f6e3ca9cf491dbf6e654659d5bb639e",
+    "bass": "e8a1a51f8e1fa029a42a54b027d171a866b638f4360ac286bf8892fa6b989903",
+    "other": "bf84331636f0a6513e177460eec47a7c49114726eacef9c2666b92f545ac3227",
+    "vocals": "142d7534c91a5197656e4a49a3ac07cb8e59d1e793c0d0ed6552f6318163fa2b",
+    "guitar": "1631e56c5e4b9edd5959f6d8ac5a3dd9143558bc859f32711ea8721e910641b4",
+    "piano": "160ecef9b606171dedf5578082aa694c4aee4f651f91e15883dbaf0af90aa7c9"
+  },
+  "method": "AST-family-classification-and-measured-stem-events-v1",
+  "nativeAudioListeningVerified": false,
+  "notice": "模型估计；音色类别按10秒音频窗口分析，实际动作由分轨事件和能量驱动。共享伴奏的多个家族联动控制，未声称各乐器独立分离。",
+  "sections": [
+    {
+      "start": 0.0,
+      "end": 15.5,
+      "label": "前奏",
+      "activeFamilies": [
+        "percussion",
+        "bass",
+        "winds"
+      ]
+    },
+    {
+      "start": 15.5,
+      "end": 30.8,
+      "label": "主歌",
+      "activeFamilies": [
+        "percussion",
+        "bass",
+        "winds"
+      ]
+    },
+    {
+      "start": 30.8,
+      "end": 46.2,
+      "label": "主歌",
+      "activeFamilies": [
+        "percussion",
+        "bass",
+        "winds"
+      ]
+    },
+    {
+      "start": 46.2,
+      "end": 61.5,
+      "label": "间奏",
+      "activeFamilies": [
+        "percussion",
+        "bass",
+        "winds",
+        "bowed_strings"
+      ]
+    },
+    {
+      "start": 61.5,
+      "end": 73.0,
+      "label": "副歌",
+      "activeFamilies": [
+        "percussion",
+        "bass",
+        "winds",
+        "bowed_strings"
+      ]
+    },
+    {
+      "start": 73.0,
+      "end": 119.03,
+      "label": "尾奏",
+      "activeFamilies": [
+        "percussion",
+        "bass",
+        "winds"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "id": "drums-percussion",
+      "stemId": "drums",
+      "instrumentId": "drums",
+      "familyId": "percussion",
+      "actors": {
+        "one-piece": "sanji",
+        "dragon-ball": "krillin",
+        "naruto": "sakura"
+      },
+      "status": "estimated",
+      "activeIntervals": [
+        [
+          2.9,
+          119.0
+        ]
+      ],
+      "activitySource": "events",
+      "sharedAudio": false,
+      "review": {
+        "reviewer": "AST AudioSet model + measured stem activity",
+        "method": "local-PCM-family-cross-check",
+        "at": "2026-10-15T06:20:34.659592+00:00"
+      },
+      "evidence": {
+        "model": "MIT/ast-finetuned-audioset-10-10-0.4593",
+        "revision": "f826b80d28226b62986cc218e5cec390b1096902",
+        "classificationSha256": "5145a6f831e5c842c7803fca8107846f657d704e8b1fc66b84c28b6b56526b1e",
+        "audioSha256": "941dc03e58f1e7454f4b4a6df7bf41680f6e3ca9cf491dbf6e654659d5bb639e",
+        "score": 0.36684
+      }
+    },
+    {
+      "id": "other-winds",
+      "stemId": "other",
+      "instrumentId": null,
+      "familyId": "winds",
+      "actors": {
+        "one-piece": "ace",
+        "dragon-ball": "piccolo",
+        "naruto": "itachi"
+      },
+      "status": "estimated",
+      "activeIntervals": [
+        [
+          8.0,
+          8.8
+        ],
+        [
+          9.4,
+          10.8
+        ],
+        [
+          11.7,
+          13.3
+        ],
+        [
+          14.5,
+          15.5
+        ],
+        [
+          16.1,
+          26.0
+        ]
+      ],
+      "activitySource": "envelope",
+      "sharedAudio": true,
+      "review": {
+        "reviewer": "AST AudioSet model + measured stem activity",
+        "method": "local-PCM-family-cross-check",
+        "at": "2026-10-15T06:20:34.660005+00:00"
+      },
+      "evidence": {
+        "model": "MIT/ast-finetuned-audioset-10-10-0.4593",
+        "revision": "f826b80d28226b62986cc218e5cec390b1096902",
+        "classificationSha256": "5145a6f831e5c842c7803fca8107846f657d704e8b1fc66b84c28b6b56526b1e",
+        "audioSha256": "bf84331636f0a6513e177460eec47a7c49114726eacef9c2666b92f545ac3227",
+        "score": 0.23561
+      }
+    }
+  ]
+}

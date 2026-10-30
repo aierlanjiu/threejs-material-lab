@@ -19,7 +19,7 @@ const physicsShader=`
   return vec3(direction.x*spread,direction.y*spread-willow*a*a,direction.z*spread);
  }
  vec3 coolingColor(float life){
-  vec3 hot=vec3(.94,.98,1.),gold=vec3(1.,.8235,.4784),copper=vec3(.8784,.3255,.1098),ember=vec3(.16,.022,.006);
+  vec3 hot=vec3(1.,1.,1.),gold=vec3(1.15,.88,.42),copper=vec3(.94,.38,.12),ember=vec3(.16,.022,.006);
   if(life<.18)return hot;
   if(life<.60)return mix(hot,gold,(life-.18)/.42);
   if(life<.85)return mix(gold,copper,(life-.60)/.25);
@@ -43,6 +43,7 @@ const physicsShader=`
 `;
 const vertexShader=physicsShader+`
  uniform float uTime,uAge,uPreviousAge,uDuration,uPreviousDuration,uRank,uPower,uViewportHeight,uKind,uRise,uHeight;
+ uniform float uWingFocus;uniform vec4 uWingZones[2];uniform int uWingZoneCount;
  attribute vec4 dynamics,accents;attribute vec2 extras;
  varying vec2 vUv;varying float vFade,vLife,vSeed,vKind,vHot,vGrain,vAspect;
  float bornPower(float particleAge){return max(streamPower(uAge-particleAge,uRank,uDuration),streamPower(uPreviousAge-particleAge,uRank,uPreviousDuration));}
@@ -93,7 +94,14 @@ const vertexShader=physicsShader+`
    offset=position.xy*size;
    if(uKind>3.5&&uKind<4.5)offset=vec2(position.x*size*.48,flameLift(position.y,size));
   }
-  clip.xy+=offset/resolution*2.*clip.w;gl_Position=clip;
+  clip.xy+=offset/resolution*2.*clip.w;
+  float guarded=0.;vec2 ndc=clip.xy/clip.w;
+  for(int i=0;i<2;i++){if(i>=uWingZoneCount)break;vec4 zone=uWingZones[i];
+   guarded=max(guarded,1.-smoothstep(.65,1.15,length((ndc-zone.xy)/max(zone.zw,vec2(.02)))));
+  }
+  float density=fract(sin(vSeed*12.9898+uKind*17.)*43758.5453);
+  vFade*=(1.-uWingFocus*.30)*(1.-guarded*uWingFocus*.65)*step(guarded*uWingFocus*.35,density);
+  gl_Position=clip;
  }`;
 const fragmentShader=physicsShader+`
  varying vec2 vUv;varying float vFade,vLife,vSeed,vKind,vHot,vGrain,vAspect;
@@ -105,11 +113,11 @@ const fragmentShader=physicsShader+`
    float tail=exp(-p.x*p.x*22./(taper*taper))*smoothstep(0.,.20,vUv.y)*(1.-smoothstep(.75,.99,vUv.y));
    float head=starCore(p.x,vUv.y-.775,vAspect);
    float pop=step(.14,vGrain)*step(.72,fract(vSeed*.137))*smoothstep(.82,.84,vLife)*(1.-smoothstep(.94,.96,vLife))*pow(max(0.,sin(vLife*90.+vSeed)),16.);
-   color=mix(color,vec3(1.,.96,.84),pop*.85+vHot*.22);
-   color=mix(color,color*vec3(1.,.68,.40),clamp((.78-vUv.y)*.5,0.,.35));
-   alpha=(tail*.37+head*.92+head*pop*1.3)*vFade;
-  }else if(vKind<3.5){alpha=exp(-dot(p,p)*16.)*vFade;color=vec3(1.,.97,.87);}
-  else if(vKind<4.5){float taper=.12+.65*(1.-vUv.y);alpha=exp(-p.x*p.x*7./(taper*taper))*sin(vUv.y*3.14159265)*vFade*.55;}
+   color=mix(color,vec3(1.35,1.25,1.0),pop*.9+vHot*.35);
+   color=mix(color,color*vec3(1.1,.62,.30),clamp((.78-vUv.y)*.5,0.,.35));
+   alpha=(tail*.48+head*1.35+head*pop*2.0)*vFade*1.3;
+  }else if(vKind<3.5){alpha=exp(-dot(p,p)*16.)*vFade*1.35;color=vec3(1.4,1.3,1.1);}
+  else if(vKind<4.5){float taper=.12+.65*(1.-vUv.y);alpha=exp(-p.x*p.x*7./(taper*taper))*sin(vUv.y*3.14159265)*vFade*.75;}
   else{float fog=exp(-dot(p,p)*7.)*(.8+.2*sin(vUv.x*19.+vUv.y*13.+vSeed));alpha=fog*vFade;color=vec3(.94,.75,.47);}
   gl_FragColor=vec4(color,alpha);
  }`;
@@ -122,8 +130,9 @@ function quads(dynamics,accents,extras,uniforms,kind){
 const uniformsFor=()=>({uTime:{value:0},uAge:{value:100},uPreviousAge:{value:100},uDuration:{value:0},uPreviousDuration:{value:0},uRank:{value:0},uPower:{value:0},uViewportHeight:{value:650},uRise:{value:6},uHeight:{value:10}});
 export function createStageFountains(parent){
  const jets=[],airbursts=[],capacity=400,airCapacity=768;let narrow=false,lastTime=0,lastPyro=null,previous=-100,lastFlow=0;
+ const focusUniforms={uWingFocus:{value:0},uWingZoneCount:{value:0},uWingZones:{value:new Float32Array(8)}};
  for(let i=0;i<8;i++){
-  const group=new THREE.Group(),ds=[],as=[],es=[],u=uniformsFor();
+  const group=new THREE.Group(),ds=[],as=[],es=[],u={...uniformsFor(),...focusUniforms};
   for(let k=0;k<capacity;k++){const seed=k+i*capacity,speed=27.5+random(seed+3)*5.7,life=(speed+12.4/2.8)/12.4,core=k%5<3;
    ds.push(random(seed+1)*life,life,speed,0);as.push(random(seed+7)*Math.PI*2,core?.045+random(seed+9)*.10:.45+random(seed+9)*.75,seed*3.2,core?.105:.14+random(seed+2)*.10);es.push(random(seed+11),0);}
   const sparks=quads(ds,as,es,u,0);group.add(sparks);
@@ -132,7 +141,7 @@ export function createStageFountains(parent){
   const nozzle=new THREE.Mesh(new THREE.CylinderGeometry(.10,.14,.19,10),new THREE.MeshStandardMaterial({color:'#303743',metalness:.8,roughness:.3}));nozzle.position.y=.1;group.add(nozzle);parent.add(group);group.visible=false;jets.push({group,sparks,flame,smoke,uniforms:u});
  }
  for(let i=0;i<2;i++){
-  const group=new THREE.Group(),ds=[],as=[],es=[],u=uniformsFor();
+  const group=new THREE.Group(),ds=[],as=[],es=[],u={...uniformsFor(),...focusUniforms};
   for(let k=0;k<airCapacity;k++){const seed=k+i*airCapacity,index=k%384,n=384,y=1-2*(index+.5)/n,phi=index*Math.PI*(3-Math.sqrt(5))+Math.floor(k/384)*.37,ring=Math.sqrt(1-y*y),inner=index%5===0,radius=(inner?1.6:4.3)+random(seed+21)*(inner?.6:2.4);
    ds.push(Math.cos(phi)*ring*radius,y*radius,Math.sin(phi)*ring*radius,random(seed+12)*.035);as.push(inner?2.3:4.25,.10+random(seed+22)*.11,seed*2.8,inner?1:0);es.push(0,0);}
   const sparks=quads(ds,as,es,u,1);group.add(sparks);
@@ -146,7 +155,10 @@ export function createStageFountains(parent){
   jets.forEach((jet,i)=>{jet.enabled=i<slots.length;jet.group.visible=false;if(!jet.enabled)return;jet.group.position.fromArray(slots[i]);jet.uniforms.uRank.value=Math.floor(Math.abs(i-(slots.length-1)/2));jet.sparks.geometry.instanceCount=narrow?240:capacity;});
   airbursts.forEach((burst,i)=>{const scale=narrow?.68:1;burst.group.position.set((i?1:-1)*(narrow?2.7:5.8),narrow?8.1:10.3,s.back+1.25);burst.group.scale.setScalar(scale);burst.uniforms.uHeight.value=burst.group.position.y/scale;burst.uniforms.uRise.value=(burst.group.position.y-2.7)/scale;burst.sparks.geometry.instanceCount=narrow?384:airCapacity;});
  }
- function update(time,fx,reduced,viewportHeight){lastTime=time;lastPyro=stagePyroAt(time,fx,narrow,reduced);previous=Math.max(-100,...fx.bursts.filter(t=>t<lastPyro.start));
+ function update(time,fx,reduced,viewportHeight,focus={}){lastTime=time;lastPyro=stagePyroAt(time,fx,narrow,reduced);previous=Math.max(-100,...fx.bursts.filter(t=>t<lastPyro.start));
+  focusUniforms.uWingFocus.value=reduced?0:Math.max(0,Math.min(1,focus.power||0));
+  focusUniforms.uWingZoneCount.value=Math.min(2,focus.zones?.length||0);
+  focus.zones?.slice(0,2).forEach((z,i)=>focusUniforms.uWingZones.value.set([z.x,z.y,z.width,z.height],i*4));
   const explicitWindow='fountainWindow' in fx,window=explicitWindow?fx.fountainWindow||{start:-100,end:-100}:{start:lastPyro.start,end:lastPyro.start+5.1},age=time-window.start,duration=window.start>=0?window.end-window.start:0,past=time-previous,pastDuration=!explicitWindow&&previous>=0?5.1:0;
   lastFlow=0;
   jets.forEach(jet=>{const rank=jet.uniforms.uRank.value,active=jet.enabled&&!reduced&&((duration>0&&age>=rank*.11&&age<duration+3.1)||(pastDuration>0&&past>=rank*.11&&past<pastDuration+3.1));jet.group.visible=active;
@@ -157,6 +169,6 @@ export function createStageFountains(parent){
    burst.sparks.visible=now;burst.comet.visible=now;burst.core.visible=now;burst.history.visible=old;
    burst.uniforms.uTime.value=time;burst.uniforms.uAge.value=age;burst.pastUniforms.uAge.value=past;burst.uniforms.uPower.value=now||old?1:0;burst.uniforms.uViewportHeight.value=viewportHeight;});
  }
- return {setLayout,update,get flow(){return lastFlow;},get diagnostics(){const ages=airbursts.flatMap(b=>[...(b.sparks.visible?[b.uniforms.uAge.value]:[]),...(b.history.visible?[b.pastUniforms.uAge.value]:[])]);return {motion:'vertex-shader',streaks:'instanced-quads',angularDistribution:'360-degree',cooling:'white-gold-copper-ember',groundCutoff:true,poolUse:'full-primary-shared-history',continuous:true,roundCore:true,flameAnchor:'nozzle',smokeOpacity:.075,emitters:narrow?6:8,visible:jets.filter(j=>j.group.visible).length,particleCount:narrow?6*240+2*384:8*capacity+2*airCapacity,flow:lastFlow,window:fxWindow(),smokeClouds:(narrow?6:8)*3,time:lastTime,mode:lastFlow>.05?'stream':lastPyro?.mode,flash:lastPyro?.flash||0,powers:lastPyro?.powers||[],attributeUpdates:[...jets,...airbursts].reduce((sum,j)=>sum+Object.values(j.sparks.geometry.attributes).reduce((n,a)=>n+a.version,0),0),positions:jets.filter(j=>j.enabled).map(j=>j.group.position.toArray()),airbursts:{emitters:2,visible:airbursts.filter(b=>b.group.visible).length,historyVisible:airbursts.filter(b=>b.history.visible).length,particlesPerBurst:narrow?384:airCapacity,spherical:true,comets:ages.filter(a=>a>=-.35&&a<.07).length,cores:ages.filter(a=>a>=0&&a<.12).length,starts:lastPyro?.airStarts||[]}};}};
+ return {setLayout,update,get flow(){return lastFlow;},get diagnostics(){const ages=airbursts.flatMap(b=>[...(b.sparks.visible?[b.uniforms.uAge.value]:[]),...(b.history.visible?[b.pastUniforms.uAge.value]:[])]);return {motion:'vertex-shader',streaks:'instanced-quads',angularDistribution:'360-degree',cooling:'white-gold-copper-ember',groundCutoff:true,poolUse:'full-primary-shared-history',continuous:true,roundCore:true,flameAnchor:'nozzle',smokeOpacity:.075,wingFocus:focusUniforms.uWingFocus.value,wingZones:focusUniforms.uWingZoneCount.value,emitters:narrow?6:8,visible:jets.filter(j=>j.group.visible).length,particleCount:narrow?6*240+2*384:8*capacity+2*airCapacity,flow:lastFlow,window:fxWindow(),smokeClouds:(narrow?6:8)*3,time:lastTime,mode:lastFlow>.05?'stream':lastPyro?.mode,flash:lastPyro?.flash||0,powers:lastPyro?.powers||[],attributeUpdates:[...jets,...airbursts].reduce((sum,j)=>sum+Object.values(j.sparks.geometry.attributes).reduce((n,a)=>n+a.version,0),0),positions:jets.filter(j=>j.enabled).map(j=>j.group.position.toArray()),airbursts:{emitters:2,visible:airbursts.filter(b=>b.group.visible).length,historyVisible:airbursts.filter(b=>b.history.visible).length,particlesPerBurst:narrow?384:airCapacity,spherical:true,comets:ages.filter(a=>a>=-.35&&a<.07).length,cores:ages.filter(a=>a>=0&&a<.12).length,starts:lastPyro?.airStarts||[]}};}};
  function fxWindow(){const u=jets[0].uniforms;return {start:lastTime-u.uAge.value,end:lastTime-u.uAge.value+u.uDuration.value};}
 }

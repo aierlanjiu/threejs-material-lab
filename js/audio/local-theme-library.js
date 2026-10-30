@@ -101,6 +101,8 @@ export async function discoverLocalThemeTrack(type) {
 
 export async function loadLocalThemeTranslation(type, sourceText) {
   if (!sourceText || !/^anime_[a-z_]+$/.test(type)) return '';
+  // Overtaken is instrumental and has no translated lyric asset.
+  if (type === 'anime_op_overtaken') return '';
   if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('localAudio') === '0') return '';
   try {
     const response = await fetch(`output/audio/${type}.zh.lrc`);

@@ -1,0 +1,256 @@
+{
+  "date": "2026-10-23",
+  "agent": "codex",
+  "task": "Read-only development-plan review by Gemini 4 in the existing Gemini App conversation",
+  "root": "/Users/papazed/dev/threejs-material-lab",
+  "head": "a9c42b8c4ce0ee7a6de1d0bf82e96e82d11eadcb",
+  "working_tree": "dirty; copied current files rather than HEAD",
+  "business_tracked_diff_sha256": "7c587270ff63c268c45444da9da3aaa2e9e3212ec3d0836a9ee7d9c3a52ff22b",
+  "files": [
+    {
+      "path": "development.md",
+      "source": "05_Project_Management/Reports/2026-10-23-lu-dream-concert-development.md",
+      "bytes": 28860,
+      "sha256": "270070425090b4ab87a40b54d5bbdd418a34271b63056023524d42b96962c424"
+    },
+    {
+      "path": "source/js/ui/band-stage.js",
+      "source": "js/ui/band-stage.js",
+      "bytes": 22452,
+      "sha256": "628d239a69c24244f1ec8917be81666bb624b9138eee8029d466180649f8410f"
+    },
+    {
+      "path": "source/js/ui/band-scene.js",
+      "source": "js/ui/band-scene.js",
+      "bytes": 29700,
+      "sha256": "bd053d30c298e9be2c6c4af867d4ec89a9b9a9534cfad79a8431e413c404fba4"
+    },
+    {
+      "path": "source/js/audio/band-stage-layout.js",
+      "source": "js/audio/band-stage-layout.js",
+      "bytes": 9064,
+      "sha256": "ba07137e612cd4dea85023c8c68527c52d63620f6168dcd314dc2bc821b10691"
+    },
+    {
+      "path": "source/js/audio/band-beat.js",
+      "source": "js/audio/band-beat.js",
+      "bytes": 927,
+      "sha256": "05098ad56e1e146445962f8a682f447423eeb8ad588630e090d9d720ebd0157e"
+    },
+    {
+      "path": "source/js/ui/band-controller.js",
+      "source": "js/ui/band-controller.js",
+      "bytes": 21116,
+      "sha256": "03d29a68a7e102e773574e0f747c20e0958f73652766d6d3f5749cbbcde0d471"
+    },
+    {
+      "path": "source/js/ui/band-settings.js",
+      "source": "js/ui/band-settings.js",
+      "bytes": 3073,
+      "sha256": "be204758de7e5ef19847841762ae02c4f3688ff24866ebf890114fff21574348"
+    },
+    {
+      "path": "source/js/ui/band-fountains.js",
+      "source": "js/ui/band-fountains.js",
+      "bytes": 15275,
+      "sha256": "2bffcd539c418f62b6b957abeedeebd5ef8de79428cb24cb29bd2bd81b7decaa"
+    },
+    {
+      "path": "source/js/ui/band-study.js",
+      "source": "js/ui/band-study.js",
+      "bytes": 11016,
+      "sha256": "a6d1930a5b893aa028c4ddd738ac0c88795b690051fe639faf8fec7f26a3e76b"
+    },
+    {
+      "path": "source/js/avatar/band-pets.js",
+      "source": "js/avatar/band-pets.js",
+      "bytes": 544,
+      "sha256": "7bc3dad27ecc4be63d5236836543f0280546c1c70e98c9f31f5e9850be973712"
+    },
+    {
+      "path": "source/assets/band-pets/README.md",
+      "source": "assets/band-pets/README.md",
+      "bytes": 1037,
+      "sha256": "0f3607b37a1b7a3a100cd4ea1c40d570da59c7e4a6f3358f14a952c80fe86c08"
+    },
+    {
+      "path": "source/test/band-stage.test.mjs",
+      "source": "test/band-stage.test.mjs",
+      "bytes": 4827,
+      "sha256": "1fea2e2d54a48ba3139aac8f9e75b955b156cca9d89051b6d5b8e97c4de33acd"
+    },
+    {
+      "path": "source/test/band-front-wings.browser.js",
+      "source": "test/band-front-wings.browser.js",
+      "bytes": 4468,
+      "sha256": "5f04f267401cdfef76d27a264d8346adc13bf01559820f6443e05331a7c14821"
+    },
+    {
+      "path": "source/test/band-pyro-realism.test.mjs",
+      "source": "test/band-pyro-realism.test.mjs",
+      "bytes": 8477,
+      "sha256": "05462568ed48bd8368ae605353de094dcdff7f3ff93e10b175e03261a871f705"
+    },
+    {
+      "path": "source/band-study.html",
+      "source": "band-study.html",
+      "bytes": 2898,
+      "sha256": "71f357749efcbf01fdf82316ca260494736979c5917d933d756488e701b913fb"
+    },
+    {
+      "path": "reference-screenshots/one-piece-1440.png",
+      "source": "output/front-three-wings-release/screenshots/one-piece-1440.png",
+      "bytes": 1166936,
+      "sha256": "41e2fdd489801296e1eb0fcab32cc6294c5c1cfb05187cd9a5a84651e8ded37e"
+    },
+    {
+      "path": "reference-screenshots/one-piece-390.png",
+      "source": "output/front-three-wings-release/screenshots/one-piece-390.png",
+      "bytes": 382563,
+      "sha256": "a756965f6129a8abe2ae4d74c7523f638135aa0f48b21db65fdd9e52fc9e6402"
+    },
+    {
+      "path": "reference-screenshots/dragon-ball-1440.png",
+      "source": "output/front-three-wings-release/screenshots/dragon-ball-1440.png",
+      "bytes": 1178872,
+      "sha256": "3ce63d67391bd6ccda11458ca86e008b32597370792fc7c928fd4dbb51522e6b"
+    },
+    {
+      "path": "reference-screenshots/dragon-ball-390.png",
+      "source": "output/front-three-wings-release/screenshots/dragon-ball-390.png",
+      "bytes": 400880,
+      "sha256": "5709633e7ebbb2bfcd128071618f9ceef996cd17149a55c4855c133a8650bd89"
+    },
+    {
+      "path": "reference-screenshots/naruto-1440.png",
+      "source": "output/front-three-wings-release/screenshots/naruto-1440.png",
+      "bytes": 1171767,
+      "sha256": "2b5567ccca316c6afded14954a9cb29ef751c2e209b3188f8d9556917af89987"
+    },
+    {
+      "path": "reference-screenshots/naruto-390.png",
+      "source": "output/front-three-wings-release/screenshots/naruto-390.png",
+      "bytes": 381687,
+      "sha256": "d05728510e4d1b8b9a3acf97cf8e81413e1196e49f2a759f312ddc60f8de4da8"
+    }
+  ],
+  "protected_pet_assets": [
+    {
+      "path": "assets/band-pets/dragon-ball/bulma.webp",
+      "sha256": "0aca2b5e42aaa3ca09e7307f95c9defd234d7037d08d6f98ac4e9ea4278734df"
+    },
+    {
+      "path": "assets/band-pets/dragon-ball/buu.webp",
+      "sha256": "3864489900d0d80c53fb91d1b5a0416ff76c36d6231912aa0494785a7a8372be"
+    },
+    {
+      "path": "assets/band-pets/dragon-ball/cell.webp",
+      "sha256": "934a6c6ffb33b61cbf7dec6c91efbf450042d4163b075fdaaa7f22bc86e8428e"
+    },
+    {
+      "path": "assets/band-pets/dragon-ball/frieza.webp",
+      "sha256": "00e508e5251f9d797810983b26c79f4494514ecfdefa5a7e790da36ea3472b91"
+    },
+    {
+      "path": "assets/band-pets/dragon-ball/gohan.webp",
+      "sha256": "0fae5bd3af26a339f53574693a1ba7a71d5b5f05a37edc6fe6fe4747013feb0f"
+    },
+    {
+      "path": "assets/band-pets/dragon-ball/goku.webp",
+      "sha256": "e884ea26fd79efd1b97ee194a4e4dc7946570fa047193b147df06ad382396b3e"
+    },
+    {
+      "path": "assets/band-pets/dragon-ball/krillin.webp",
+      "sha256": "3178b432fb560c5648d45bf0e3b987c058fe31eda69d432b5a7eae978196ed4f"
+    },
+    {
+      "path": "assets/band-pets/dragon-ball/piccolo.webp",
+      "sha256": "352f56afbdabb593d9f1a4f864d6342f01a2e80a67751bd403c3df175d0593d6"
+    },
+    {
+      "path": "assets/band-pets/dragon-ball/trunks.webp",
+      "sha256": "77e797c6f6a88a773ee86aeaea9593b2036d313b26138d1b94c75932d07e7430"
+    },
+    {
+      "path": "assets/band-pets/dragon-ball/vegeta.webp",
+      "sha256": "54eb9fe26ddd41abf84150092aade5cb3af13980e780eba167b07346b16b0614"
+    },
+    {
+      "path": "assets/band-pets/naruto/gaara.webp",
+      "sha256": "6b647723b011ecd32aa1b4e0797671a0c7dd40d202fd20b0d2d17a6d95cd4d04"
+    },
+    {
+      "path": "assets/band-pets/naruto/itachi.webp",
+      "sha256": "4af30368c544f9b72ce90c3063f9b29b1af4691727f4cff6cef2ee503910b854"
+    },
+    {
+      "path": "assets/band-pets/naruto/jiraiya.webp",
+      "sha256": "eddab18a61b8e023c2611eb2e4dc8e6ea8857e009d002e2638a7e97d46076100"
+    },
+    {
+      "path": "assets/band-pets/naruto/madara.webp",
+      "sha256": "8570aefcf9b024cb64b5981ffb2f9edcf6bb0d1689a0937cede237ab06baaa54"
+    },
+    {
+      "path": "assets/band-pets/naruto/naruto.webp",
+      "sha256": "5cc8f214827410997a2abdfcb6a249f66edcfad526dad7e264b326c77873c51e"
+    },
+    {
+      "path": "assets/band-pets/naruto/ninja-06.webp",
+      "sha256": "e910e83b4d2587b8e0184af2011a6734f53697cccb18c3d5e264de849a45a097"
+    },
+    {
+      "path": "assets/band-pets/naruto/pain.webp",
+      "sha256": "8565949838f12ad0de84b7ee75c3ca1eb070eb757fc2a008a8355f1d8be3c64e"
+    },
+    {
+      "path": "assets/band-pets/naruto/sakura.webp",
+      "sha256": "0f354af21dbfef20072d53ad7fa44d59b31543e81fa98383fda6a35cbd406e78"
+    },
+    {
+      "path": "assets/band-pets/naruto/sasuke.webp",
+      "sha256": "dc91b88a16cbb3cdf834ed2e2e0e53edfcc660f9f325f2f49efa58bd187375d2"
+    },
+    {
+      "path": "assets/band-pets/one-piece/ace.webp",
+      "sha256": "983ac41474fbf5c9ccf1ed65c4e296e9ff6e3f62101cad6f4ccf5e966f358798"
+    },
+    {
+      "path": "assets/band-pets/one-piece/chopper.webp",
+      "sha256": "369d534038105c4a1fbcc4c0d9f38a50d9a35a05478678a0082f328b7821266b"
+    },
+    {
+      "path": "assets/band-pets/one-piece/law.webp",
+      "sha256": "8d5775a6e915b3bf86b4bcac233e83fd02ecd5b9054bef3fbeda17f95b54aa1c"
+    },
+    {
+      "path": "assets/band-pets/one-piece/luffy.webp",
+      "sha256": "ad1c92579579b9ba1b582be5ea8fb543b98555deeaafd01a9ab578479c0a7b8b"
+    },
+    {
+      "path": "assets/band-pets/one-piece/nami.webp",
+      "sha256": "e14b50ea21e006953b74aa0e8df4e58b1d08aa6494e36ac0b092bdaee936dfac"
+    },
+    {
+      "path": "assets/band-pets/one-piece/robin.webp",
+      "sha256": "e74e8abd3ae3f3ef0d24aa893827bbfa3c63165d774175baaaa7413c3ff81e66"
+    },
+    {
+      "path": "assets/band-pets/one-piece/sanji.webp",
+      "sha256": "83cdb8287f5be3ab5457150e9f6caef85bbfb353d2c2659ce49dc49e7348b3f1"
+    },
+    {
+      "path": "assets/band-pets/one-piece/shanks.webp",
+      "sha256": "e8149ff12789462a2c39355466128a993ab0e2f42720e25d801ab75b604d860e"
+    },
+    {
+      "path": "assets/band-pets/one-piece/usopp.webp",
+      "sha256": "bbb16293a9f761a5390f4c9fc31ce3de76c3071cc42e5f4581820d652451447d"
+    },
+    {
+      "path": "assets/band-pets/one-piece/zoro.webp",
+      "sha256": "b0781f89b6d6eee8cbb1c5679d50ad4b8fe3c901e850940ed86246414708227f"
+    }
+  ],
+  "screenshot_notice": "Historical reference screenshots, not evidence of proposed assets or current rendering performance."
+}

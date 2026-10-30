@@ -1,0 +1,488 @@
+{
+  "version": 1,
+  "renderMode": "intact-sprite-sequence",
+  "actors": [
+    {
+      "id": "one-piece/luffy",
+      "name": "路飞",
+      "instrument": "草帽麦克风",
+      "asset": "one-piece/luffy/luffy-actions.webp",
+      "frameWidth": 320,
+      "frameHeight": 320,
+      "frameCount": 17,
+      "fps": 12,
+      "baseline": 0.94,
+      "clips": {
+        "rest": [
+          0
+        ],
+        "play": [
+          1,
+          5,
+          8,
+          4,
+          8,
+          5,
+          1,
+          2,
+          6,
+          7,
+          3,
+          7,
+          6,
+          2
+        ],
+        "accent": [
+          16,
+          14,
+          13,
+          9,
+          15,
+          12,
+          10,
+          11,
+          10,
+          12,
+          15,
+          9,
+          13,
+          14
+        ]
+      },
+      "newCelCount": 16,
+      "restSource": "original-rest"
+    },
+    {
+      "id": "one-piece/zoro",
+      "name": "索隆",
+      "instrument": "三弦脊贝斯",
+      "asset": "one-piece/zoro/zoro-actions.webp",
+      "frameWidth": 320,
+      "frameHeight": 320,
+      "frameCount": 17,
+      "fps": 12,
+      "baseline": 0.94,
+      "clips": {
+        "rest": [
+          0
+        ],
+        "play": [
+          1,
+          5,
+          8,
+          7,
+          2,
+          6,
+          4,
+          3,
+          4,
+          6,
+          2,
+          7,
+          8,
+          5
+        ],
+        "accent": [
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16
+        ]
+      },
+      "newCelCount": 16
+    },
+    {
+      "id": "one-piece/nami",
+      "name": "娜美",
+      "instrument": "航海手风琴",
+      "asset": "one-piece/nami/nami-actions.webp",
+      "frameWidth": 320,
+      "frameHeight": 320,
+      "frameCount": 17,
+      "fps": 12,
+      "baseline": 0.94,
+      "clips": {
+        "rest": [
+          0
+        ],
+        "play": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2
+        ],
+        "accent": [
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          15,
+          14,
+          13,
+          12,
+          11,
+          10
+        ]
+      },
+      "newCelCount": 16
+    },
+    {
+      "id": "one-piece/sanji",
+      "name": "山治",
+      "instrument": "海蓝爵士鼓",
+      "asset": "one-piece/sanji/sanji-actions.webp",
+      "frameWidth": 320,
+      "frameHeight": 320,
+      "frameCount": 17,
+      "fps": 12,
+      "baseline": 0.94,
+      "clips": {
+        "rest": [
+          0
+        ],
+        "play": [
+          1,
+          8,
+          3,
+          7,
+          2,
+          6,
+          2,
+          7,
+          3,
+          4,
+          5,
+          4,
+          3,
+          8
+        ],
+        "accent": [
+          16,
+          13,
+          10,
+          14,
+          9,
+          12,
+          11,
+          15,
+          11,
+          12,
+          9,
+          14,
+          10,
+          13
+        ]
+      },
+      "newCelCount": 16,
+      "restSource": "original-rest"
+    },
+    {
+      "id": "one-piece/chopper",
+      "name": "乔巴",
+      "instrument": "鹿角木琴",
+      "asset": "one-piece/chopper/chopper-actions.webp",
+      "frameWidth": 320,
+      "frameHeight": 320,
+      "frameCount": 17,
+      "fps": 12,
+      "baseline": 0.94,
+      "clips": {
+        "rest": [
+          0
+        ],
+        "play": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2
+        ],
+        "accent": [
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          15,
+          14,
+          13,
+          12,
+          11,
+          10
+        ]
+      },
+      "newCelCount": 16
+    },
+    {
+      "id": "one-piece/robin",
+      "name": "罗宾",
+      "instrument": "花瓣竖琴",
+      "asset": "one-piece/robin/robin-actions.webp",
+      "frameWidth": 320,
+      "frameHeight": 320,
+      "frameCount": 17,
+      "fps": 12,
+      "baseline": 0.94,
+      "clips": {
+        "rest": [
+          0
+        ],
+        "play": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2
+        ],
+        "accent": [
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          15,
+          14,
+          13,
+          12,
+          11,
+          10
+        ]
+      },
+      "newCelCount": 16
+    },
+    {
+      "id": "one-piece/usopp",
+      "name": "乌索普",
+      "instrument": "弹弓吉他",
+      "asset": "one-piece/usopp/usopp-actions.webp",
+      "frameWidth": 320,
+      "frameHeight": 320,
+      "frameCount": 17,
+      "fps": 12,
+      "baseline": 0.94,
+      "clips": {
+        "rest": [
+          0
+        ],
+        "play": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2
+        ],
+        "accent": [
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          15,
+          14,
+          13,
+          12,
+          11,
+          10
+        ]
+      },
+      "newCelCount": 16
+    },
+    {
+      "id": "one-piece/ace",
+      "name": "艾斯",
+      "instrument": "焰红萨克斯",
+      "asset": "one-piece/ace/ace-actions.webp",
+      "frameWidth": 320,
+      "frameHeight": 320,
+      "frameCount": 17,
+      "fps": 12,
+      "baseline": 0.94,
+      "clips": {
+        "rest": [
+          0
+        ],
+        "play": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2
+        ],
+        "accent": [
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16
+        ]
+      },
+      "newCelCount": 16,
+      "restSource": "generated-clean-still"
+    },
+    {
+      "id": "one-piece/law",
+      "name": "罗",
+      "instrument": "刻度电子键盘",
+      "asset": "one-piece/law/law-actions.webp",
+      "frameWidth": 320,
+      "frameHeight": 320,
+      "frameCount": 17,
+      "fps": 12,
+      "baseline": 0.94,
+      "clips": {
+        "rest": [
+          0
+        ],
+        "play": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2
+        ],
+        "accent": [
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          15,
+          14,
+          13,
+          12,
+          11,
+          10
+        ]
+      },
+      "newCelCount": 16
+    },
+    {
+      "id": "one-piece/shanks",
+      "name": "香克斯",
+      "instrument": "酒红大提琴",
+      "asset": "one-piece/shanks/shanks-actions.webp",
+      "frameWidth": 384,
+      "frameHeight": 320,
+      "frameCount": 17,
+      "fps": 12,
+      "baseline": 0.94,
+      "clips": {
+        "rest": [
+          0
+        ],
+        "play": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2
+        ],
+        "accent": [
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          15,
+          14,
+          13,
+          12,
+          11,
+          10
+        ]
+      },
+      "newCelCount": 16,
+      "restSource": "generated-clean-still"
+    }
+  ]
+}

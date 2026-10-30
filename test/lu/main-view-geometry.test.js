@@ -4,7 +4,7 @@
 import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
 
-const BASE = process.env.LU_URL || 'http://127.0.0.1:8091/';
+const BASE = process.env.LU_URL || 'http://localhost:8000/';
 const FORMATIONS = ['grid', 'helix', 'ring', 'fan', 'orbit', 'terrace', 'sphere'];
 const PATTERNS = ['ripple', 'diagonal', 'equalizer', 'spiral', 'heartbeat', 'glitch'];
 const TIERS = (process.env.LU_TIERS || '1,2,3').split(',').map(Number);
@@ -263,6 +263,8 @@ async function run() {
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
   await page.goto(BASE + (BASE.includes('?') ? '&' : '?') + 'intro=skip', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.luDiagnostics && window.state);
+  await page.waitForFunction(() => window.luBand && window.luApplePlayer);
+  await page.evaluate(() => kineticLyricsManager.setMode('slot'));
   if (process.env.LU_DUMP === '1') await page.evaluate(() => { window.__luDump = true; });
   const cdp = await page.context().newCDPSession(page);
   // 虚拟时间：headless 下 rAF 会被节流到 1~2fps，用虚拟时钟把整拍周期快速跑完

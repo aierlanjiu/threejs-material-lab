@@ -72,3 +72,15 @@ for(const group of root.children.slice(8)){
  assert.equal(above,192);assert.equal(below,192,'the mobile prefix must cover both sphere hemispheres');
 }
 console.log('PASS full primary pools, sustained births, shutoff drain, circular spark cores, nozzle anchoring, visible smoke and overlapping airbursts');
+const focusedCue={bursts:[5],intensity:1,fountainWindow:{start:5,end:25}};
+fountains.update(10,focusedCue,false,800,{power:1,zones:[{x:0,y:.1,width:.3,height:.2},{x:.5,y:0,width:.2,height:.3}]});
+assert.equal(fountains.diagnostics.wingFocus,1);assert.equal(fountains.diagnostics.wingZones,2);
+assert.ok(fountains.diagnostics.flow>.9,'visual focus must preserve the continuous birth envelope');
+const focusMaterial=root.children[0].children[0].material;
+assert.equal(focusMaterial.uniforms.uWingFocus.value,1);
+assert.ok(Math.abs(focusMaterial.uniforms.uWingZones.value[1]-.1)<1e-7,'projected wing regions reach the actual shader');
+fountains.update(10,focusedCue,false,800);
+assert.equal(fountains.diagnostics.wingFocus,0);assert.equal(fountains.diagnostics.wingZones,0,'focus clears outside the wing presentation');
+fountains.update(10,focusedCue,true,800,{power:1,zones:[]});
+assert.equal(fountains.diagnostics.wingFocus,0,'reduced motion also disables the focus layer');
+console.log('PASS projected wing focus, unchanged continuous births, focus reset and reduced motion');

@@ -1,0 +1,309 @@
+{
+  "id": "one-piece/luffy",
+  "status": "local-integrated",
+  "asset": "luffy-actions.webp",
+  "frameWidth": 320,
+  "frameHeight": 320,
+  "frameCount": 17,
+  "baseline": 0.94,
+  "fps": 12,
+  "restSource": "original-rest",
+  "clips": {
+    "rest": [
+      0
+    ],
+    "play": [
+      1,
+      5,
+      8,
+      4,
+      8,
+      5,
+      1,
+      2,
+      6,
+      7,
+      3,
+      7,
+      6,
+      2
+    ],
+    "accent": [
+      16,
+      14,
+      13,
+      9,
+      15,
+      12,
+      10,
+      11,
+      10,
+      12,
+      15,
+      9,
+      13,
+      14
+    ]
+  },
+  "sourceSha256": "2926c815e5fefe8a6f6511c72606cd6ab74bb53b3853b935c411ce70e68bd861",
+  "accentSourceSha256": null,
+  "originalAssetSha256": "ad1c92579579b9ba1b582be5ea8fb543b98555deeaafd01a9ab578479c0a7b8b",
+  "frames": [
+    {
+      "frame": 1,
+      "source": "exec-6e883c3e-c16d-454c-8bc8-a2d31a57017c.png",
+      "sourceBounds": [
+        55,
+        14,
+        289,
+        315
+      ],
+      "uniformScale": 0.8870431893687708,
+      "translation": [
+        73,
+        34
+      ],
+      "sha256": "5762f3f11188298739b8d68643e03182e0d91d4a8ba7da843f2d4cca8b8aed4a"
+    },
+    {
+      "frame": 2,
+      "source": "exec-6e883c3e-c16d-454c-8bc8-a2d31a57017c.png",
+      "sourceBounds": [
+        358,
+        14,
+        607,
+        315
+      ],
+      "uniformScale": 0.8870431893687708,
+      "translation": [
+        59,
+        34
+      ],
+      "sha256": "254d7d4e5c7573e05b6122ae8e430742bca1c21f9e2dddf31df7dd2f72740d9b"
+    },
+    {
+      "frame": 3,
+      "source": "exec-6e883c3e-c16d-454c-8bc8-a2d31a57017c.png",
+      "sourceBounds": [
+        663,
+        13,
+        925,
+        315
+      ],
+      "uniformScale": 0.8841059602649006,
+      "translation": [
+        54,
+        34
+      ],
+      "sha256": "26ededaae7463f5da518d761652c67e6ad927520fb2b2f27efd738c038c560e1"
+    },
+    {
+      "frame": 4,
+      "source": "exec-6e883c3e-c16d-454c-8bc8-a2d31a57017c.png",
+      "sourceBounds": [
+        1010,
+        14,
+        1242,
+        315
+      ],
+      "uniformScale": 0.8870431893687708,
+      "translation": [
+        70,
+        34
+      ],
+      "sha256": "fe401d839e16580a55f871786edb18dd4311656803051fc23cef9390a3334c21"
+    },
+    {
+      "frame": 5,
+      "source": "exec-6e883c3e-c16d-454c-8bc8-a2d31a57017c.png",
+      "sourceBounds": [
+        55,
+        324,
+        291,
+        625
+      ],
+      "uniformScale": 0.8870431893687708,
+      "translation": [
+        73,
+        34
+      ],
+      "sha256": "234edc164b9d1d834ff3cbe04550e9472cf6b31462c209dc567985432c34dae8"
+    },
+    {
+      "frame": 6,
+      "source": "exec-6e883c3e-c16d-454c-8bc8-a2d31a57017c.png",
+      "sourceBounds": [
+        349,
+        324,
+        610,
+        625
+      ],
+      "uniformScale": 0.8870431893687708,
+      "translation": [
+        51,
+        34
+      ],
+      "sha256": "0cb6b6f15c3dc2fb0f7efd5445e3c22da936996101c218437f642f809c72a074"
+    },
+    {
+      "frame": 7,
+      "source": "exec-6e883c3e-c16d-454c-8bc8-a2d31a57017c.png",
+      "sourceBounds": [
+        663,
+        323,
+        926,
+        625
+      ],
+      "uniformScale": 0.8841059602649006,
+      "translation": [
+        54,
+        34
+      ],
+      "sha256": "a94da42a52fc272d255d8ea1c97e718dfe7eef72f54da9e62323ec8e353e8d0b"
+    },
+    {
+      "frame": 8,
+      "source": "exec-6e883c3e-c16d-454c-8bc8-a2d31a57017c.png",
+      "sourceBounds": [
+        1010,
+        323,
+        1243,
+        625
+      ],
+      "uniformScale": 0.8841059602649006,
+      "translation": [
+        71,
+        34
+      ],
+      "sha256": "473919f1173b98229c79e735cebafec4d1771f7fb5dfff7b0fd28b4447f509a2"
+    },
+    {
+      "frame": 9,
+      "source": "exec-6e883c3e-c16d-454c-8bc8-a2d31a57017c.png",
+      "sourceBounds": [
+        19,
+        631,
+        293,
+        930
+      ],
+      "uniformScale": 0.8929765886287625,
+      "translation": [
+        40,
+        34
+      ],
+      "sha256": "3151e28a4841765d2c09cfe6e966b8047d615818db18b5e40529a684eb51c28d"
+    },
+    {
+      "frame": 10,
+      "source": "exec-6e883c3e-c16d-454c-8bc8-a2d31a57017c.png",
+      "sourceBounds": [
+        328,
+        630,
+        613,
+        930
+      ],
+      "uniformScale": 0.89,
+      "translation": [
+        31,
+        34
+      ],
+      "sha256": "4403da96ac698331fcf2e8691db930b2239fef45fe818f227afa08a6545fe87d"
+    },
+    {
+      "frame": 11,
+      "source": "exec-6e883c3e-c16d-454c-8bc8-a2d31a57017c.png",
+      "sourceBounds": [
+        643,
+        631,
+        928,
+        930
+      ],
+      "uniformScale": 0.8929765886287625,
+      "translation": [
+        34,
+        34
+      ],
+      "sha256": "dbc2a1695d0a243e2eec5695b3e6216bd7355be3c001aa4db77d798798ef1be7"
+    },
+    {
+      "frame": 12,
+      "source": "exec-6e883c3e-c16d-454c-8bc8-a2d31a57017c.png",
+      "sourceBounds": [
+        965,
+        631,
+        1248,
+        930
+      ],
+      "uniformScale": 0.8929765886287625,
+      "translation": [
+        30,
+        34
+      ],
+      "sha256": "13f446989013146dd91d1db7dd0df0aa621a5c404d254237fdc452ac8fbb8492"
+    },
+    {
+      "frame": 13,
+      "source": "exec-6e883c3e-c16d-454c-8bc8-a2d31a57017c.png",
+      "sourceBounds": [
+        18,
+        936,
+        292,
+        1230
+      ],
+      "uniformScale": 0.9081632653061225,
+      "translation": [
+        37,
+        34
+      ],
+      "sha256": "1fcbc2c6571403b11d5b6d8c5d63e156e112e29f26e15362bb286c2ce4f78853"
+    },
+    {
+      "frame": 14,
+      "source": "exec-6e883c3e-c16d-454c-8bc8-a2d31a57017c.png",
+      "sourceBounds": [
+        356,
+        936,
+        611,
+        1230
+      ],
+      "uniformScale": 0.9081632653061225,
+      "translation": [
+        54,
+        34
+      ],
+      "sha256": "b2e3e3a3cb825a58df06289e634267455be794d05248688beb032efbd5798658"
+    },
+    {
+      "frame": 15,
+      "source": "exec-6e883c3e-c16d-454c-8bc8-a2d31a57017c.png",
+      "sourceBounds": [
+        668,
+        936,
+        926,
+        1230
+      ],
+      "uniformScale": 0.9081632653061225,
+      "translation": [
+        55,
+        34
+      ],
+      "sha256": "e8a1c59985a8618320489c068cab2564a49b6ef7fa83d5c21f2a83704cfd8e79"
+    },
+    {
+      "frame": 16,
+      "source": "exec-6e883c3e-c16d-454c-8bc8-a2d31a57017c.png",
+      "sourceBounds": [
+        1009,
+        936,
+        1244,
+        1230
+      ],
+      "uniformScale": 0.9081632653061225,
+      "translation": [
+        69,
+        34
+      ],
+      "sha256": "09dfd414cdf75ca14e80950aeb299349918e49401a410375c1c13a3cdb52261e"
+    }
+  ]
+}

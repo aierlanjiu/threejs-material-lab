@@ -1,0 +1,308 @@
+{
+  "id": "one-piece/law",
+  "status": "local-integrated",
+  "asset": "law-actions.webp",
+  "frameWidth": 320,
+  "frameHeight": 320,
+  "frameCount": 17,
+  "baseline": 0.94,
+  "fps": 12,
+  "clips": {
+    "rest": [
+      0
+    ],
+    "play": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      7,
+      6,
+      5,
+      4,
+      3,
+      2
+    ],
+    "accent": [
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      15,
+      14,
+      13,
+      12,
+      11,
+      10
+    ]
+  },
+  "sourceSha256": "c4715a271c5c84edb34065c65a76c27acf1a447ed4427934582b86fa02e21156",
+  "accentSourceSha256": null,
+  "originalAssetSha256": "8d5775a6e915b3bf86b4bcac233e83fd02ecd5b9054bef3fbeda17f95b54aa1c",
+  "frames": [
+    {
+      "frame": 1,
+      "source": "exec-12aa7469-c17b-4ec5-8463-9363a1ae4a7f.png",
+      "sourceBounds": [
+        31,
+        16,
+        300,
+        314
+      ],
+      "uniformScale": 0.8825503355704698,
+      "translation": [
+        40,
+        38
+      ],
+      "sha256": "17be3033d02fedacce5642f7210d199d7a10a21e29c3407723f695c3016c2438"
+    },
+    {
+      "frame": 2,
+      "source": "exec-12aa7469-c17b-4ec5-8463-9363a1ae4a7f.png",
+      "sourceBounds": [
+        354,
+        16,
+        626,
+        314
+      ],
+      "uniformScale": 0.8825503355704698,
+      "translation": [
+        38,
+        38
+      ],
+      "sha256": "696d27a2fd14b2166e72cb8413fb0c37acd8531219ba91a62a40d682477871bf"
+    },
+    {
+      "frame": 3,
+      "source": "exec-12aa7469-c17b-4ec5-8463-9363a1ae4a7f.png",
+      "sourceBounds": [
+        668,
+        15,
+        937,
+        315
+      ],
+      "uniformScale": 0.8766666666666667,
+      "translation": [
+        40,
+        38
+      ],
+      "sha256": "b521a233aa4fb2896a3363d37a7dea49a97790c320a37ce336af898df7798f8b"
+    },
+    {
+      "frame": 4,
+      "source": "exec-12aa7469-c17b-4ec5-8463-9363a1ae4a7f.png",
+      "sourceBounds": [
+        986,
+        15,
+        1256,
+        315
+      ],
+      "uniformScale": 0.8766666666666667,
+      "translation": [
+        40,
+        38
+      ],
+      "sha256": "87c884381c55bb257c2c0e60b6894e214d9e0a37edc190ca98463963aa71134d"
+    },
+    {
+      "frame": 5,
+      "source": "exec-12aa7469-c17b-4ec5-8463-9363a1ae4a7f.png",
+      "sourceBounds": [
+        30,
+        321,
+        301,
+        623
+      ],
+      "uniformScale": 0.8708609271523179,
+      "translation": [
+        41,
+        38
+      ],
+      "sha256": "1ec5ca34dff7d0262b8550335f59564b35b60b6dcdba594d65459a6c29337a58"
+    },
+    {
+      "frame": 6,
+      "source": "exec-12aa7469-c17b-4ec5-8463-9363a1ae4a7f.png",
+      "sourceBounds": [
+        351,
+        321,
+        625,
+        624
+      ],
+      "uniformScale": 0.8679867986798679,
+      "translation": [
+        38,
+        38
+      ],
+      "sha256": "99698ad93f31e77a878c0a2f0d211a9a2ca268a0f9d03269884784a74c9a64ed"
+    },
+    {
+      "frame": 7,
+      "source": "exec-12aa7469-c17b-4ec5-8463-9363a1ae4a7f.png",
+      "sourceBounds": [
+        667,
+        321,
+        938,
+        624
+      ],
+      "uniformScale": 0.8679867986798679,
+      "translation": [
+        41,
+        38
+      ],
+      "sha256": "4b7085d6e76592dfdc70182a3f7d33b76ded1035d2f8dbc71108e6e633ecffa4"
+    },
+    {
+      "frame": 8,
+      "source": "exec-12aa7469-c17b-4ec5-8463-9363a1ae4a7f.png",
+      "sourceBounds": [
+        985,
+        323,
+        1256,
+        624
+      ],
+      "uniformScale": 0.8737541528239202,
+      "translation": [
+        39,
+        38
+      ],
+      "sha256": "95c719434406d7a6435b8033c4b34a7458a314688e544aeb3518bfb859d24ed8"
+    },
+    {
+      "frame": 9,
+      "source": "exec-12aa7469-c17b-4ec5-8463-9363a1ae4a7f.png",
+      "sourceBounds": [
+        33,
+        631,
+        301,
+        930
+      ],
+      "uniformScale": 0.8795986622073578,
+      "translation": [
+        41,
+        38
+      ],
+      "sha256": "769730e8f57af5bf59f721960f56b4e78ed58522d8ed769ad82c20bfacabc22a"
+    },
+    {
+      "frame": 10,
+      "source": "exec-12aa7469-c17b-4ec5-8463-9363a1ae4a7f.png",
+      "sourceBounds": [
+        354,
+        632,
+        627,
+        930
+      ],
+      "uniformScale": 0.8825503355704698,
+      "translation": [
+        38,
+        38
+      ],
+      "sha256": "f8ba198e1f4242bca6e8ba7ddd458fe5c51e323c769548115a59a1ef62cc9122"
+    },
+    {
+      "frame": 11,
+      "source": "exec-12aa7469-c17b-4ec5-8463-9363a1ae4a7f.png",
+      "sourceBounds": [
+        669,
+        633,
+        940,
+        930
+      ],
+      "uniformScale": 0.8855218855218855,
+      "translation": [
+        40,
+        38
+      ],
+      "sha256": "7a373206b9e166a81556683c159eabe26de49726a7a7c2003c75b30994148e3a"
+    },
+    {
+      "frame": 12,
+      "source": "exec-12aa7469-c17b-4ec5-8463-9363a1ae4a7f.png",
+      "sourceBounds": [
+        984,
+        632,
+        1258,
+        930
+      ],
+      "uniformScale": 0.8825503355704698,
+      "translation": [
+        37,
+        38
+      ],
+      "sha256": "2147e779838232479a441ce8372cff13bcbcdf638ed4985bf377d54d0dc3b852"
+    },
+    {
+      "frame": 13,
+      "source": "exec-12aa7469-c17b-4ec5-8463-9363a1ae4a7f.png",
+      "sourceBounds": [
+        30,
+        934,
+        300,
+        1226
+      ],
+      "uniformScale": 0.9006849315068494,
+      "translation": [
+        37,
+        38
+      ],
+      "sha256": "3d059f3a806b5a8ab5f1116594d840f841b9fb9630cfa8607f88df86e23d0b09"
+    },
+    {
+      "frame": 14,
+      "source": "exec-12aa7469-c17b-4ec5-8463-9363a1ae4a7f.png",
+      "sourceBounds": [
+        353,
+        934,
+        626,
+        1226
+      ],
+      "uniformScale": 0.9006849315068494,
+      "translation": [
+        36,
+        38
+      ],
+      "sha256": "43e2ca10d0253eb3258390ec7c9ef8596fc8d443c88ef1609f6383fc2a107c83"
+    },
+    {
+      "frame": 15,
+      "source": "exec-12aa7469-c17b-4ec5-8463-9363a1ae4a7f.png",
+      "sourceBounds": [
+        669,
+        934,
+        939,
+        1226
+      ],
+      "uniformScale": 0.9006849315068494,
+      "translation": [
+        37,
+        38
+      ],
+      "sha256": "a2b3f6c06c52b28721c902dd18c60175f691700f91934350b468e12537457618"
+    },
+    {
+      "frame": 16,
+      "source": "exec-12aa7469-c17b-4ec5-8463-9363a1ae4a7f.png",
+      "sourceBounds": [
+        986,
+        936,
+        1258,
+        1226
+      ],
+      "uniformScale": 0.906896551724138,
+      "translation": [
+        35,
+        38
+      ],
+      "sha256": "c876f99ee4d477b4c7244ee9180d523c4ed4b07052add7bc165fdfbfb4fd04f7"
+    }
+  ]
+}

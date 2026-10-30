@@ -1,0 +1,309 @@
+{
+  "id": "one-piece/shanks",
+  "status": "local-integrated",
+  "asset": "shanks-actions.webp",
+  "frameWidth": 384,
+  "frameHeight": 320,
+  "frameCount": 17,
+  "baseline": 0.94,
+  "fps": 12,
+  "restSource": "generated-clean-still",
+  "clips": {
+    "rest": [
+      0
+    ],
+    "play": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      7,
+      6,
+      5,
+      4,
+      3,
+      2
+    ],
+    "accent": [
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      15,
+      14,
+      13,
+      12,
+      11,
+      10
+    ]
+  },
+  "sourceSha256": "4021f29807143c972ffd30280baa9101309157e12544b03b4d923a025318538d",
+  "accentSourceSha256": null,
+  "originalAssetSha256": "e8149ff12789462a2c39355466128a993ab0e2f42720e25d801ab75b604d860e",
+  "frames": [
+    {
+      "frame": 1,
+      "source": "exec-0a4c3c1c-639d-4e62-958d-1fea0f5561ac.png",
+      "sourceBounds": [
+        35,
+        11,
+        291,
+        321
+      ],
+      "uniformScale": 0.932258064516129,
+      "translation": [
+        69,
+        12
+      ],
+      "sha256": "dff9f13d6fa0c9e7758a499cf51ba338a9aee242a18376fd51b2474a34f0ff2d"
+    },
+    {
+      "frame": 2,
+      "source": "exec-0a4c3c1c-639d-4e62-958d-1fea0f5561ac.png",
+      "sourceBounds": [
+        349,
+        11,
+        612,
+        321
+      ],
+      "uniformScale": 0.932258064516129,
+      "translation": [
+        63,
+        12
+      ],
+      "sha256": "de7aa617529f963b5848247e8a1b27d7e2bc39dea631597238f6c73adecaa9a0"
+    },
+    {
+      "frame": 3,
+      "source": "exec-0a4c3c1c-639d-4e62-958d-1fea0f5561ac.png",
+      "sourceBounds": [
+        669,
+        11,
+        931,
+        321
+      ],
+      "uniformScale": 0.932258064516129,
+      "translation": [
+        64,
+        12
+      ],
+      "sha256": "3c760553c8ccc3f023e28f0c92bfdf03613dae9e4077774afc046780a79ee0de"
+    },
+    {
+      "frame": 4,
+      "source": "exec-0a4c3c1c-639d-4e62-958d-1fea0f5561ac.png",
+      "sourceBounds": [
+        994,
+        12,
+        1251,
+        321
+      ],
+      "uniformScale": 0.9352750809061489,
+      "translation": [
+        68,
+        12
+      ],
+      "sha256": "7ec6d514bba2573144fd03d80d8b2a4125f9e8098f9127242127ba605695eaeb"
+    },
+    {
+      "frame": 5,
+      "source": "exec-0a4c3c1c-639d-4e62-958d-1fea0f5561ac.png",
+      "sourceBounds": [
+        39,
+        324,
+        297,
+        626
+      ],
+      "uniformScale": 0.956953642384106,
+      "translation": [
+        67,
+        12
+      ],
+      "sha256": "486e992905ada56fffe300283b521ba82a277fc376c30d2b221c13451c8970ad"
+    },
+    {
+      "frame": 6,
+      "source": "exec-0a4c3c1c-639d-4e62-958d-1fea0f5561ac.png",
+      "sourceBounds": [
+        353,
+        324,
+        613,
+        625
+      ],
+      "uniformScale": 0.9601328903654485,
+      "translation": [
+        63,
+        12
+      ],
+      "sha256": "f46c31fa84a0cedb509ef8bbd4b4d2271855f322b63c83d16eef2f03ed147091"
+    },
+    {
+      "frame": 7,
+      "source": "exec-0a4c3c1c-639d-4e62-958d-1fea0f5561ac.png",
+      "sourceBounds": [
+        672,
+        324,
+        933,
+        626
+      ],
+      "uniformScale": 0.956953642384106,
+      "translation": [
+        62,
+        12
+      ],
+      "sha256": "005883d7325e803e5a5ea315eb255c5e40cee0ea338b380909251e380fc3db2f"
+    },
+    {
+      "frame": 8,
+      "source": "exec-0a4c3c1c-639d-4e62-958d-1fea0f5561ac.png",
+      "sourceBounds": [
+        993,
+        325,
+        1251,
+        626
+      ],
+      "uniformScale": 0.9601328903654485,
+      "translation": [
+        64,
+        12
+      ],
+      "sha256": "f928efb581cbe52760b15a92a98c905e42b8428c595d465110daf37d77cf2373"
+    },
+    {
+      "frame": 9,
+      "source": "exec-0a4c3c1c-639d-4e62-958d-1fea0f5561ac.png",
+      "sourceBounds": [
+        37,
+        629,
+        301,
+        930
+      ],
+      "uniformScale": 0.9601328903654485,
+      "translation": [
+        66,
+        12
+      ],
+      "sha256": "6a6201552a9c7e6ff5e9dc2c52654124b00249d82f547857601d8ac7e409012d"
+    },
+    {
+      "frame": 10,
+      "source": "exec-0a4c3c1c-639d-4e62-958d-1fea0f5561ac.png",
+      "sourceBounds": [
+        353,
+        627,
+        626,
+        930
+      ],
+      "uniformScale": 0.9537953795379538,
+      "translation": [
+        64,
+        12
+      ],
+      "sha256": "fd5c38cb7eed11a6a971312f0b8dd113801c25ed02509648d92144da6f4bfd06"
+    },
+    {
+      "frame": 11,
+      "source": "exec-0a4c3c1c-639d-4e62-958d-1fea0f5561ac.png",
+      "sourceBounds": [
+        661,
+        627,
+        946,
+        929
+      ],
+      "uniformScale": 0.956953642384106,
+      "translation": [
+        53,
+        12
+      ],
+      "sha256": "b4e248494c59eb6748d60fcd6143993422a5b96603a17f71561eb7b54d0fb109"
+    },
+    {
+      "frame": 12,
+      "source": "exec-0a4c3c1c-639d-4e62-958d-1fea0f5561ac.png",
+      "sourceBounds": [
+        988,
+        629,
+        1262,
+        930
+      ],
+      "uniformScale": 0.9601328903654485,
+      "translation": [
+        57,
+        12
+      ],
+      "sha256": "92086385a639db17c397a724aeb2610a1af6d49f31047e8a454dd7e1f17c15b1"
+    },
+    {
+      "frame": 13,
+      "source": "exec-0a4c3c1c-639d-4e62-958d-1fea0f5561ac.png",
+      "sourceBounds": [
+        30,
+        931,
+        307,
+        1226
+      ],
+      "uniformScale": 0.9796610169491525,
+      "translation": [
+        56,
+        12
+      ],
+      "sha256": "3874b6934c1492d610a81a4de8007d1530cfa69bc67a25f7ea730ad3c101de2c"
+    },
+    {
+      "frame": 14,
+      "source": "exec-0a4c3c1c-639d-4e62-958d-1fea0f5561ac.png",
+      "sourceBounds": [
+        346,
+        931,
+        621,
+        1226
+      ],
+      "uniformScale": 0.9796610169491525,
+      "translation": [
+        53,
+        12
+      ],
+      "sha256": "358218983a566f91f6067ad8d570bcc5bec03da53534036eb1cdde771a6d527e"
+    },
+    {
+      "frame": 15,
+      "source": "exec-0a4c3c1c-639d-4e62-958d-1fea0f5561ac.png",
+      "sourceBounds": [
+        664,
+        930,
+        942,
+        1226
+      ],
+      "uniformScale": 0.9763513513513513,
+      "translation": [
+        52,
+        12
+      ],
+      "sha256": "865030186a717a69f09c58fe290ef3101e697190f27f9fad04428562923f0117"
+    },
+    {
+      "frame": 16,
+      "source": "exec-0a4c3c1c-639d-4e62-958d-1fea0f5561ac.png",
+      "sourceBounds": [
+        992,
+        931,
+        1261,
+        1226
+      ],
+      "uniformScale": 0.9796610169491525,
+      "translation": [
+        59,
+        12
+      ],
+      "sha256": "7cce450391980ff3a8afc445344742b9d839f7f0bbb4078cd2f66d353fc96c62"
+    }
+  ]
+}

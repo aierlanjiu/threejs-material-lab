@@ -1,0 +1,42 @@
+# 律 · 当前双风格舞台版本 GitHub Pages 发布
+
+日期：2026-10-26 · Agent：codex
+
+## 范围
+
+按用户“先提交 github 页面对于当前的内容”发布当前版本。包含奶油棱镜／日落海岛、水景、三主题舞台模型及署名、已有 UI 排印／交互改动与相应回归。没有实施 award_alignment_plan 的六阶段新开发。
+
+提交前发现原工作区正在并发写入空间音频等新计划代码，因此源码使用独立发布快照分支 release/lu-pages-20261026-154632，Pages 仍沿用 gh-pages 根目录 legacy 发布方式。已冻结的 Git 候选树与独立验证目录不包含这些并发改动，不移动、覆盖或清理它们。只提交所选页面、运行依赖、测试与关联项目记录；本地视频脚本、申请材料、评审原始素材等其他未提交内容保留。
+
+## 发布前修正
+
+真实 WebGL 检查发现新辉光模块强制使用 RGBFormat，触发纹理 storage／framebuffer copy 警告。js/ui/band-glow.js 保留 FramebufferTexture 默认 RGBA 格式后，重跑双风格 60 状态、20 轮资源往返与六种录制画幅通过，未再出现上述 WebGL 警告。原文件物理备份：output/pages-release-20261026-154632/band-glow.before.js。
+
+## 验证
+
+- 原工作区 14 项 band Node 回归全部通过。
+- 从 Git 候选树独立导出验证：13 项无需离线分析素材的 band 回归通过；另 1 项 family-bindings 需要被忽略的分析素材，提供 34 个既有分析 JSON 后单独通过，未引入原工作区运行时代码。
+- npm test 通过：18 项象棋规则与 Wukong AI 回归；21 个舞台／UI 模块和主页面内联模块语法通过。
+- 真浏览器双风格、三主题、两画幅、五队形共 60 状态，减少动态／关闭特效、20 轮资源往返、六种录制画幅与 dispose 回归通过。
+- 主页面实际播放通过：10 个角色声部与混音器就绪，播放时间持续前进。
+- 既有 menu-mode-regression 无头脚本两次在 20 秒初始化门槛超时，没有捕获页面脚本异常；独立初始化诊断随后确认 luApplePlayer、luBand 和 band 模式就绪。该脚本未通过，不计入成功测试。
+- 秘钥模式扫描通过。使用既有部署排除规则，仅从部署索引排除离线脚本、测试、项目记录与 Hunyuan OBJ 源副本，不删除本地文件。候选运行树约 995.3 MiB，低于现有脚本的 1 GiB 限额。
+
+实体手机温升／GPU、弱网与整首有声导出未在本轮复验，不宣称完整奖项级验收。
+
+## 发布状态
+
+已发布：[打开律](https://aierlanjiu.github.io/threejs-material-lab/)。
+
+- 源码快照：`bf30a61e4a229bcda80605f2dc0936481307ebca`，分支 `release/lu-pages-20261026-154632`。
+- Pages 提交：`1598eda7fd22ec5875c38374528e1fefb69e0146`；GitHub Pages API 回读为 `built`。
+- 构建、部署、构建状态回报三个 Actions job 全部成功：[构建记录](https://github.com/aierlanjiu/threejs-material-lab/actions/runs/40289107489)。
+- 从公开普通 URL 读回 46 个文件，全部 SHA-256 与发布源码一致，覆盖当前改动的 42 个运行文件及原有混音器、两份谱面和《偏爱》完整 MP3。
+- 运行树 `1043621354` 字节。部署仅更改 gh-pages 和独立源码快照分支，原工作区 HEAD 与并发开发内容保持。
+- 发布前 Pages 基线 `7e49dd4be84fe0cc85332a63c9ded8b7f5ae8805`，本地恢复引用 `backup/pages-before-20261026-154632`。未进行回滚。
+
+完整 API、文件摘要、测试日志与备份位于 `output/pages-release-20261026-154632/`。
+
+## 线上冷启动检查限制
+
+部署完成后，全新浏览器访问公开地址在 60 秒内未完成 DOMContentLoaded；后续诊断显示主脚本与多项资源仍在长时间加载，运行时尚未就绪。因此不把本轮线上冷启动或手机实际交互计为通过。此项与已确认的 Pages 构建成功、46 个 HTTP 资源摘要一致分别报告；未擅自调整代理，也没有扩大为新的性能改造。

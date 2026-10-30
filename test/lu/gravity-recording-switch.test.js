@@ -10,6 +10,8 @@ try {
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('http://localhost:8000/index.html?intro=skip', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.luDiagnostics);
+  await page.waitForFunction(() => Boolean(window.luBand && window.luApplePlayer));
+  await page.evaluate(() => kineticLyricsManager.setMode('slot'));
   await page.evaluate(() => kineticLyricsManager.prepareGravity());
   console.log('Gravity shaders prepared');
   assert.equal(await page.evaluate(() => kineticLyricsManager.mode), 'slot', 'preparation must preserve the visible mode');
@@ -26,11 +28,6 @@ try {
     slider.dispatchEvent(new Event('change', { bubbles: true }));
   });
   await page.waitForFunction(() => state.audioReady && getSynchronizedLyricContext().activeText.includes('梦想'));
-  await page.locator('#lueTabRecord').click();
-  await page.locator('#videoAspectSelect').selectOption('portrait');
-  await page.locator('#recordToggle').click();
-  await page.waitForFunction(() => state.isRecording);
-  console.log('Portrait recording started with local music');
   const switchInfo = await page.evaluate(() => {
     window.__gravityRenderCosts = [];
     const composer = luDiagnostics.composer;
@@ -46,6 +43,13 @@ try {
     return { switchMs: performance.now() - start, mode: kineticLyricsManager.mode };
   });
   assert.equal(switchInfo.mode, 'gravity');
+  await page.locator('#lueTabRecord').click();
+  await page.locator('#videoAspectSelect').selectOption('portrait');
+  await page.locator('#recordToggle').click();
+  await page.waitForFunction(() => state.isRecording);
+  console.log('Portrait recording started with local music');
+  assert.equal(await page.evaluate(() => { kineticLyricsManager.setMode('slot'); return kineticLyricsManager.mode; }), 'gravity', 'recording must retain the selected mode until export');
+
   await page.waitForFunction(() => window.__gravityRenderCosts.length >= 20).catch(async error => {
     console.error('Gravity recording diagnostic', JSON.stringify({ errors, runtime: await page.evaluate(() => ({
       renders: window.__gravityRenderCosts, mode: kineticLyricsManager.mode,
@@ -73,6 +77,7 @@ try {
   });
   assert.ok(framing.visible / framing.total > .98, `automatic lens cropped the mound: ${JSON.stringify(framing)}`);
   await page.screenshot({ path: 'output/playwright/lu-gravity-recording-switch.png' });
+  await page.waitForTimeout(1100);
   if (await page.locator('#lueCoreDrawer').evaluate(el => el.hidden)) await page.locator('#performanceCapsule').click();
   await page.locator('#lueTabRecord').click();
   const [download] = await Promise.all([

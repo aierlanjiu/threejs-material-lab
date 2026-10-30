@@ -1,0 +1,197 @@
+{
+  "date": "2026-10-24",
+  "agents": [
+    "Astra high",
+    "codex"
+  ],
+  "source_dataset": "https://huggingface.co/datasets/scenario-labs/3d-collection",
+  "total_bytes": 1527396,
+  "assets": [
+    {
+      "id": "lantern",
+      "file": "lantern.glb",
+      "title": "Warm nautical lantern",
+      "author": "Scenario",
+      "license": "CC-BY 4.0",
+      "source": "https://huggingface.co/datasets/scenario-labs/3d-collection/tree/main/assets/scenario_asset_KJvFD5ovvgBa3Yg8T8ACxMmV",
+      "source_download": "https://huggingface.co/datasets/scenario-labs/3d-collection/resolve/main/assets/scenario_asset_KJvFD5ovvgBa3Yg8T8ACxMmV/output.glb",
+      "dataset_index": 393,
+      "source_model": "model_yvo3d-image-to-3d",
+      "original": {
+        "bytes": 13873672,
+        "sha256": "b9d835029118033cc0c92234b50a3812a2288abc3db62196cf226f8da675f92b",
+        "triangles": 96561,
+        "meshes": 1,
+        "materials": 1,
+        "textures": [
+          [
+            2048,
+            2048
+          ],
+          [
+            2048,
+            2048
+          ],
+          [
+            1024,
+            1024
+          ]
+        ],
+        "extensions_used": [],
+        "extensions_required": []
+      },
+      "optimized": {
+        "bytes": 607252,
+        "sha256": "2ff68505c008aeefdcf049135bfe4cf3aa658353bc748bdd5563cd3a2c29ecba",
+        "triangles": 10284,
+        "meshes": 1,
+        "materials": 1,
+        "textures": [
+          [
+            512,
+            512
+          ],
+          [
+            512,
+            512
+          ],
+          [
+            512,
+            512
+          ]
+        ],
+        "extensions_used": [
+          "EXT_texture_webp"
+        ],
+        "extensions_required": [
+          "EXT_texture_webp"
+        ]
+      },
+      "adaptations": "glTF-Transform v4.5.1 geometry reduction and embedded 512px WebP textures; runtime scale, placement and theme palette with static warm emission."
+    },
+    {
+      "id": "quartz",
+      "file": "quartz.glb",
+      "title": "Amethyst crystal cluster",
+      "author": "Scenario",
+      "license": "CC-BY 4.0",
+      "source": "https://huggingface.co/datasets/scenario-labs/3d-collection/tree/main/assets/scenario_asset_6EZohL3kkr6gUJPeJYYj9AbY",
+      "source_download": "https://huggingface.co/datasets/scenario-labs/3d-collection/resolve/main/assets/scenario_asset_6EZohL3kkr6gUJPeJYYj9AbY/output.glb",
+      "dataset_index": 111,
+      "source_model": "model_meshy-7-1-img23d",
+      "original": {
+        "bytes": 10928524,
+        "sha256": "02cb7ceb1865987197da2a8ac17fd7361f31a622c4509a854a5c964038d51a7a",
+        "triangles": 262,
+        "meshes": 1,
+        "materials": 1,
+        "textures": [
+          [
+            2048,
+            2048
+          ],
+          [
+            2048,
+            2048
+          ],
+          [
+            2048,
+            2048
+          ]
+        ],
+        "extensions_used": [],
+        "extensions_required": []
+      },
+      "optimized": {
+        "bytes": 129600,
+        "sha256": "e0b50bd93b52253eb5d659ac0f2f25d92e3a32b7a1eb5428beb797842b2a17c9",
+        "triangles": 262,
+        "meshes": 1,
+        "materials": 1,
+        "textures": [
+          [
+            512,
+            512
+          ],
+          [
+            512,
+            512
+          ],
+          [
+            512,
+            512
+          ]
+        ],
+        "extensions_used": [
+          "EXT_texture_webp"
+        ],
+        "extensions_required": [
+          "EXT_texture_webp"
+        ]
+      },
+      "adaptations": "glTF-Transform v4.5.1 embedded 512px WebP textures; original geometry retained; runtime scale, placement, amber texture remapping and deterministic song-clock float."
+    },
+    {
+      "id": "bonsai",
+      "file": "bonsai.glb",
+      "title": "Rooted bonsai tree",
+      "author": "Scenario",
+      "license": "CC-BY 4.0",
+      "source": "https://huggingface.co/datasets/scenario-labs/3d-collection/tree/main/assets/scenario_asset_atX74xizVa3xxkxidTzJnKL8",
+      "source_download": "https://huggingface.co/datasets/scenario-labs/3d-collection/resolve/main/assets/scenario_asset_atX74xizVa3xxkxidTzJnKL8/output.glb",
+      "dataset_index": 721,
+      "source_model": "model_meshy-7-img23d",
+      "original": {
+        "bytes": 103860644,
+        "sha256": "beb075f8858aa0244289d288c507870bc968172a280abd09d4273bd4b275ca7f",
+        "triangles": 1939052,
+        "meshes": 1,
+        "materials": 1,
+        "textures": [
+          [
+            4096,
+            4096
+          ],
+          [
+            2048,
+            2048
+          ],
+          [
+            4096,
+            4096
+          ]
+        ],
+        "extensions_used": [],
+        "extensions_required": []
+      },
+      "optimized": {
+        "bytes": 790544,
+        "sha256": "82cdc1aa4d5046383e763e6c64cadf6d57ce6bcca2e24bdf6323a3de39f0a577",
+        "triangles": 11618,
+        "meshes": 1,
+        "materials": 1,
+        "textures": [
+          [
+            512,
+            512
+          ],
+          [
+            512,
+            512
+          ],
+          [
+            512,
+            512
+          ]
+        ],
+        "extensions_used": [
+          "EXT_texture_webp"
+        ],
+        "extensions_required": [
+          "EXT_texture_webp"
+        ]
+      },
+      "adaptations": "glTF-Transform v4.5.1 geometry reduction and embedded 512px WebP textures; runtime scale, placement and theme palette."
+    }
+  ]
+}

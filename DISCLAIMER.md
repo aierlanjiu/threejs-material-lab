@@ -29,3 +29,7 @@
 
 4. **Notice and Takedown Policy**
    If you are a copyright owner or an authorized representative thereof and believe that any material within this repository infringes upon your copyright, please contact the repository maintainer via GitHub Issue. Upon receipt of valid notice, we will immediately take down, delete, or replace the relevant materials.
+
+## 舞台第三方模型授权补充（2026-10-23）
+
+新增舞台模型的作者、来源、许可证与适配说明见 [模型署名页](assets/models/band-concert/credits.html)、[既有模型清单](assets/models/band-concert/manifest.json) 及 [Scenario 陈设清单](assets/models/band-scenography/manifest.json)。这些第三方模型独立适用各自 CC BY 3.0、CC BY 4.0 或 CC0 许可证，不受本文件关于项目非商业用途的额外限制；角色与音乐的权利说明保持适用。

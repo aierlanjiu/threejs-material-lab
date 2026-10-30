@@ -1,0 +1,1582 @@
+/* ========================================================================= */
+/* Lumno Design System × LÜ Perceptual UI                                    */
+/* Continuous Superellipse Corners · 0.5px Optical Rings · Spring Indicators */
+/* ========================================================================= */
+
+@property --lumno-corner-shape {
+  syntax: "*";
+  inherits: false;
+  initial-value: superellipse(1.25);
+}
+
+@property --lu-button-face-top {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: transparent;
+}
+@property --lu-button-face-bottom {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: transparent;
+}
+
+@supports (corner-shape: superellipse(1.25)) {
+  .lu-perceptual-ui :where(
+    #luAppleDock,
+    #lueCoreDrawer,
+    #inspectorPanel,
+    .lu-apple-playlist-popover,
+    .lu-apple-record-popover,
+    .modal-card,
+    .dock-section,
+    .lue-create-card,
+    .waveform-board,
+    .motion-card,
+    .card-block,
+    .avatar-card,
+    .lu-lumno-indicator,
+    .lu-lumno-dock-tip,
+    .lu-apple-artwork
+  ) {
+    corner-shape: var(--lumno-corner-shape) !important;
+  }
+
+  /* Capsules and circles explicitly keep round ends to prevent flat-ended pills */
+  .lu-perceptual-ui :where(
+    .performance-capsule,
+    .lu-festival-switch,
+    .lu-festival-switch button,
+    .lu-festival-switch > .lu-lumno-indicator,
+    .lu-apple-play-btn,
+    #luAppleOrbBtn,
+    .lu-apple-icon-btn,
+    .lu-band-pyro-toggle,
+    .lue-facet-tab,
+    .lue-facet-tabs > .lu-lumno-indicator,
+    .lue-facet-close,
+    .pill-btn,
+    .lu-intro-skip,
+    .lu-intro-tools button,
+    .lu-intro-hint,
+    .lu-intro-theme-select,
+    .lu-intro-theme-select > .lu-lumno-indicator
+  ) {
+    --lumno-corner-shape: round;
+    corner-shape: round !important;
+  }
+}
+
+.lu-perceptual-ui {
+  color-scheme: dark;
+  --in-oklab: ;
+  --in-oklch: ;
+  --lu-hairline: 1px;
+  --lu-spring-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --lu-expo-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --lu-overshoot: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --lu-font-editorial: "Songti SC", "Noto Serif SC", "STSong", "Didot", "Bodoni 72", Georgia, serif;
+  --lu-font-sans: "Geist", "SF Pro Display", -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+  --lu-font-mono: "JetBrains Mono", "SF Mono", ui-monospace, Menlo, monospace;
+  --lu-surface-1: rgb(255 255 255 / .055);
+  --lu-surface-2: rgb(255 255 255 / .085);
+  --lu-surface-3: rgb(255 255 255 / .13);
+  --lu-optical-ring-dark:
+    0 0 0 var(--lu-hairline) rgb(255 255 255 / .14),
+    inset 0 1px 0 rgb(255 255 255 / .24),
+    inset 0 0 0 1px rgb(255 255 255 / .06),
+    0 20px 50px rgb(0 0 0 / .44),
+    0 4px 14px rgb(0 0 0 / .22);
+  --lu-optical-ring-light:
+    0 0 0 var(--lu-hairline) rgb(20 34 38 / .11),
+    inset 0 1px 0 rgb(255 255 255 / .90),
+    inset 0 0 0 1px rgb(255 255 255 / .54),
+    0 18px 46px rgb(18 30 36 / .15),
+    0 4px 12px rgb(18 30 36 / .06);
+}
+
+@supports (background: linear-gradient(in oklab, white, black)) {
+  .lu-perceptual-ui {
+    --in-oklab: in oklab;
+    --in-oklch: in oklch;
+  }
+}
+
+@media (min-resolution: 2dppx) {
+  .lu-perceptual-ui {
+    --lu-hairline: 0.5px;
+  }
+}
+
+/* Primary floating surfaces with 0.5px dual-layer optical specular ring */
+.lu-perceptual-ui :is(#luAppleDock, #lueCoreDrawer, #inspectorPanel, .lu-apple-playlist-popover, .lu-apple-record-popover) {
+  border-color: transparent !important;
+  box-shadow: var(--lu-optical-ring-dark);
+  -webkit-font-smoothing: antialiased;
+}
+
+.lu-perceptual-ui body.lu-band-mode[data-festival-look] :is(#luAppleDock, #lueCoreDrawer, #inspectorPanel, .lu-apple-playlist-popover, .lu-apple-record-popover) {
+  box-shadow: var(--lu-optical-ring-light) !important;
+}
+
+/* Discrete entry & exit transitions with @starting-style */
+.lu-perceptual-ui :is(#lueCoreDrawer, #applePlaylistPopover, #appleRecordPopover) {
+  transform-origin: 50% 100%;
+  transition:
+    opacity 240ms var(--lu-spring-ease),
+    transform 280ms var(--lu-spring-ease),
+    scale 280ms var(--lu-spring-ease),
+    display 240ms allow-discrete,
+    overlay 240ms allow-discrete;
+  transition-behavior: allow-discrete;
+  @starting-style {
+    opacity: 0;
+    scale: 0.96;
+  }
+}
+
+.lu-perceptual-ui #lueCoreDrawer {
+  transform-origin: 18% 0%;
+}
+
+.lu-perceptual-ui #luAppleDock {
+  transition-property: opacity, transform;
+  transition-duration: 280ms;
+  transition-timing-function: var(--lu-spring-ease);
+}
+
+.lu-perceptual-ui #luAppleDock[data-dock-state="orb"] {
+  width: 72px;
+  height: 72px;
+  padding: 8px;
+  border-radius: 50%;
+}
+
+/* ========================================================================= */
+/* Lumno Sliding Pill Indicator (.lu-lumno-indicator)                        */
+/* ========================================================================= */
+.lu-perceptual-ui [data-lumno-indicator] {
+  position: relative;
+  isolation: isolate;
+}
+
+/* Hide legacy selection surface when Lumno indicator is active */
+.lu-perceptual-ui [data-lumno-indicator] > .lu-selection-surface {
+  display: none !important;
+}
+
+.lu-perceptual-ui [data-lumno-indicator] > button {
+  position: relative;
+  z-index: 1;
+}
+
+.lu-perceptual-ui .lu-lumno-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  pointer-events: none;
+  box-sizing: border-box;
+  border-radius: 999px;
+  opacity: 0;
+  background: linear-gradient(180deg, rgb(255 255 255 / .22), rgb(255 255 255 / .14));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / .34),
+    0 1px 4px rgb(0 0 0 / .24),
+    0 0 0 var(--lu-hairline) rgb(255 255 255 / .16);
+  @media (prefers-reduced-motion: no-preference) {
+    transition:
+      transform 360ms cubic-bezier(0.22, 1, 0.36, 1),
+      width 340ms cubic-bezier(0.22, 1, 0.36, 1),
+      height 340ms cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 180ms ease,
+      background-color 240ms ease,
+      box-shadow 240ms ease;
+  }
+}
+
+.lu-perceptual-ui :is(#kineticModeSwitcher, .inspector-tabs, .material-families, #avatarGroupTabs, .lu-apple-aspect-group, #contentModeGroup, #layerModeGroup, #adhesionCraftGroup, #morphFreqGroup, #fovModeGroup, #camMotionGroup, #orbitModeGroup) > .lu-lumno-indicator {
+  border-radius: 9px;
+}
+
+.lu-perceptual-ui .inspector-tabs > .lu-lumno-indicator {
+  border-radius: 8px;
+}
+
+/* Anchor positioning progressive enhancement with non-anchor fallback */
+@supports (anchor-name: --lu-active-anchor) and (position-anchor: --lu-active-anchor) {
+  .lu-perceptual-ui [data-lumno-indicator="ready"] > .lu-lumno-indicator {
+    position-anchor: var(--lu-group-anchor);
+  }
+}
+
+@supports not (position-anchor: auto) {
+  .lu-perceptual-ui [data-lumno-indicator]:not([data-lumno-indicator="ready"]) > button:is(.active, [aria-selected="true"], [aria-pressed="true"]) {
+    border-bottom: 2px solid var(--band-accent, #c94f64);
+  }
+}
+
+/* Strip static button fills inside indicator-driven groups so the pill glides cleanly */
+.lu-perceptual-ui [data-lumno-indicator="ready"] > button,
+.lu-perceptual-ui [data-lumno-indicator="ready"] > button:is(.active, [aria-selected="true"], [aria-pressed="true"]) {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+
+/* Festival look indicator palette (Cream Prism & Sunset Island) */
+.lu-perceptual-ui body.lu-band-mode[data-festival-look] .lu-festival-switch > .lu-lumno-indicator {
+  background: linear-gradient(180deg, #27534e 0%, #1d403c 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / .26),
+    0 2px 8px rgb(24 52 48 / .24);
+}
+
+.lu-perceptual-ui body.lu-band-mode[data-festival-look="island"] .lu-festival-switch > .lu-lumno-indicator {
+  background: linear-gradient(180deg, #c66a38 0%, #a85224 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / .30),
+    0 2px 8px rgb(168 82 36 / .28);
+}
+
+.lu-perceptual-ui body.lu-band-mode[data-festival-look="shell"] .lu-festival-switch > .lu-lumno-indicator {
+  background: linear-gradient(180deg, #2b6058 0%, #1b443e 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / .30),
+    0 2px 8px rgb(27 68 62 / .28);
+}
+
+.lu-perceptual-ui body.lu-band-mode[data-festival-look] :is(.lue-facet-tabs, #kineticModeSwitcher, .inspector-tabs, .material-families, #avatarGroupTabs, .lu-apple-aspect-group, #contentModeGroup, #layerModeGroup, #adhesionCraftGroup, #morphFreqGroup, #fovModeGroup, #camMotionGroup, #orbitModeGroup) > .lu-lumno-indicator {
+  background: linear-gradient(180deg, var(--band-accent, #244b46) 0%, color-mix(in srgb, var(--band-accent, #244b46) 86%, #0d1f1d) 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / .28),
+    0 2px 7px rgb(20 44 40 / .20);
+}
+
+.lu-perceptual-ui body.lu-band-mode[data-festival-look] [data-lumno-indicator="ready"] > button:is(.active, [aria-selected="true"], [aria-pressed="true"]) {
+  color: #ffffff !important;
+}
+
+.lu-perceptual-ui body.lu-band-mode[data-festival-look] [data-lumno-indicator="ready"] > button:is(.active, [aria-selected="true"], [aria-pressed="true"]) svg {
+  color: #ffffff !important;
+}
+
+/* ========================================================================= */
+/* Lumno Dock Proximity Magnification & Floating Micro-Tooltip               */
+/* ========================================================================= */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .lu-perceptual-ui #luAppleDock :is(.lu-apple-icon-btn, .lu-apple-play-btn) > svg,
+  .lu-perceptual-ui #luAppleDock #appleModeBtn > .lu-apple-mode-icon,
+  .lu-perceptual-ui #luAppleDock .lu-festival-switch > button {
+    translate: var(--dock-shift, 0px) var(--dock-rise, 0px);
+    scale: var(--dock-scale, 1);
+    transition:
+      translate 150ms cubic-bezier(0.22, 1, 0.36, 1),
+      scale 150ms cubic-bezier(0.22, 1, 0.36, 1),
+      color 160ms ease;
+    will-change: translate, scale;
+  }
+}
+
+.lu-lumno-dock-tip {
+  position: absolute;
+  left: var(--tip-x, 50%);
+  top: var(--tip-y, -10px);
+  transform: translate(-50%, -100%) scale(0.94);
+  transform-origin: 50% 100%;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font: 500 11px/1.2 -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 30;
+  opacity: 0;
+  color: #f5f5f7;
+  background: rgb(22 24 30 / .90);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  box-shadow:
+    0 0 0 var(--lu-hairline, 0.5px) rgb(255 255 255 / .18),
+    inset 0 1px 0 rgb(255 255 255 / .22),
+    0 6px 18px rgb(0 0 0 / .28);
+  @media (prefers-reduced-motion: no-preference) {
+    transition:
+      opacity 150ms var(--lu-spring-ease),
+      transform 180ms var(--lu-spring-ease);
+  }
+}
+
+.lu-lumno-dock-tip[data-visible="true"] {
+  opacity: 1;
+  transform: translate(-50%, -100%) scale(1);
+}
+
+.lu-perceptual-ui body.lu-band-mode[data-festival-look] .lu-lumno-dock-tip {
+  color: var(--band-paper, #1b312f);
+  background: rgb(252 249 242 / .94);
+  box-shadow:
+    0 0 0 var(--lu-hairline, 0.5px) rgb(26 48 45 / .14),
+    inset 0 1px 0 #ffffff,
+    0 8px 20px rgb(20 38 36 / .14);
+}
+
+/* ========================================================================= */
+/* Unified Surface & Contrast Harmonization (#lueCoreDrawer & #inspectorPanel) */
+/* ========================================================================= */
+.lu-perceptual-ui :is(#lueCoreDrawer, #inspectorPanel) :is(.dock-section, .lue-create-card, .waveform-board, .motion-card, .bottom-dynamic-dock) {
+  border: 0;
+  box-shadow: inset 0 0 0 var(--lu-hairline) rgb(255 255 255 / .08);
+  background: var(--lu-surface-1);
+}
+
+.lu-perceptual-ui :is(#lueCoreDrawer, #inspectorPanel) :is(.dock-section, .lue-create-card, .card-block) {
+  border-radius: 12px;
+}
+
+.lu-perceptual-ui :is(#lueCoreDrawer, #inspectorPanel) :is(.pill-btn, .motion-card, .waveform-board, .lue-facet-tab, .lue-facet-close) {
+  border-color: transparent;
+}
+
+.lu-perceptual-ui :is(#lueCoreDrawer, #inspectorPanel) :is(button:not([aria-selected="true"]):not([aria-pressed="true"]):not(.active), .lue-create-card):hover {
+  background-color: var(--lu-surface-3);
+}
+
+.lu-perceptual-ui #kineticModeSwitcher,
+.lu-perceptual-ui .lue-facet-tabs,
+.lu-perceptual-ui .inspector-tabs,
+.lu-perceptual-ui .material-families,
+.lu-perceptual-ui #avatarGroupTabs {
+  background: var(--lu-surface-2);
+  border: 0;
+  border-radius: 11px;
+  padding: 3px;
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / .16);
+}
+
+.lu-perceptual-ui .lue-facet-tabs {
+  border-radius: 0;
+  padding: 7px 10px;
+  background: rgb(255 255 255 / .04);
+  border-bottom: 1px solid rgb(255 255 255 / .09);
+  box-shadow: none;
+}
+
+/* Floating Inspector Panel geometry: never collides with bottom #luAppleDock */
+@media (min-width: 761px) {
+  .lu-perceptual-ui #inspectorPanel {
+    top: 72px !important;
+    right: 20px !important;
+    bottom: calc(var(--band-dock-height, 92px) + 34px) !important;
+    height: auto !important;
+    max-height: calc(100dvh - var(--band-dock-height, 92px) - 108px) !important;
+    border-radius: 22px !important;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition:
+      transform 320ms var(--lu-spring-ease),
+      opacity 240ms var(--lu-spring-ease);
+  }
+  .lu-perceptual-ui #inspectorPanel .inspector-body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    min-height: 0;
+  }
+}
+
+/* Festival Daylight Mode: Warm Ivory-Jade Glass for #lueCoreDrawer & #inspectorPanel */
+.lu-perceptual-ui body.lu-band-mode[data-festival-look] :is(#lueCoreDrawer, #inspectorPanel) {
+  color-scheme: light;
+  color: var(--band-paper, #1b312f) !important;
+  background: linear-gradient(165deg, rgb(251 248 241 / .90), rgb(242 238 228 / .88)) !important;
+  backdrop-filter: blur(30px) saturate(175%) !important;
+  -webkit-backdrop-filter: blur(30px) saturate(175%) !important;
+  --muted: var(--band-muted, #486460);
+  --text: var(--band-paper, #1b312f);
+  --text-graphite: var(--band-paper, #1b312f);
+}
+
+.lu-perceptual-ui body.lu-band-mode[data-festival-look] :is(#lueCoreDrawer, #inspectorPanel) :is(
+  .lue-facet-panels,
+  .lue-sublabel,
+  .lue-record-field label,
+  .lue-record-notes,
+  .deck-title,
+  .time-display,
+  .inspector-heading,
+  .section-title,
+  .material-heading,
+  .tone-heading,
+  .material-lock,
+  .studio-lighting,
+  .custom-tone,
+  .material-details summary,
+  #materialName,
+  .official-avatar-tools,
+  #officialAvatarStatus,
+  label,
+  .range > span,
+  output,
+  .band-v2-controls,
+  .band-adjustments summary,
+  .band-parameter,
+  .band-parameter output,
+  .lu-ui-sound-setting
+) {
+  color: var(--band-paper, #1b312f) !important;
+}
+
+.lu-perceptual-ui body.lu-band-mode[data-festival-look] :is(#lueCoreDrawer, #inspectorPanel) :is(
+  .lue-facet-tab:not(.active),
+  .inspector-tab-btn:not(.active),
+  .kinetic-mode-btn:not(.active),
+  .material-families button:not([aria-pressed="true"]),
+  .pill-btn:not(.active)
+) {
+  color: var(--band-muted, #435e5a) !important;
+}
+
+.lu-perceptual-ui body.lu-band-mode[data-festival-look] :is(#lueCoreDrawer, #inspectorPanel) :is(
+  .lue-facet-tabs,
+  .inspector-heading,
+  .inspector-tabs
+) {
+  background: rgb(36 72 67 / .055) !important;
+  border-color: rgb(36 72 67 / .10) !important;
+}
+
+.lu-perceptual-ui body.lu-band-mode[data-festival-look] :is(#lueCoreDrawer, #inspectorPanel) :is(
+  #kineticModeSwitcher,
+  .material-families,
+  #avatarGroupTabs,
+  .studio-lighting > div,
+  #contentModeGroup,
+  #layerModeGroup,
+  #adhesionCraftGroup,
+  #morphFreqGroup,
+  #fovModeGroup,
+  #camMotionGroup,
+  #orbitModeGroup
+) {
+  background: rgb(36 72 67 / .075) !important;
+  box-shadow: inset 0 1px 2px rgb(20 42 39 / .07) !important;
+}
+
+.lu-perceptual-ui body.lu-band-mode[data-festival-look] :is(#lueCoreDrawer, #inspectorPanel) :is(
+  .dock-section,
+  .lue-create-card,
+  .card-block,
+  .lue-record-notes
+) {
+  background: rgb(255 255 255 / .56) !important;
+  border: 1px solid rgb(36 72 67 / .10) !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .80) !important;
+}
+
+.lu-perceptual-ui body.lu-band-mode[data-festival-look] :is(#lueCoreDrawer, #inspectorPanel) :is(
+  .btn:not(.active),
+  select,
+  .lue-facet-close,
+  #inspectorCloseBtn,
+  .lue-related-link,
+  #tab-optics .material-samples button
+) {
+  color: var(--band-paper, #1b312f) !important;
+  background: rgb(255 255 255 / .68) !important;
+  border: 1px solid rgb(36 72 67 / .14) !important;
+  box-shadow: 0 1px 2px rgb(20 42 39 / .05) !important;
+}
+
+.lu-perceptual-ui body.lu-band-mode[data-festival-look] #tab-optics .material-samples button[aria-pressed="true"] {
+  background: #ffffff !important;
+  border-color: var(--band-accent, #244b46) !important;
+  box-shadow: 0 0 0 1.5px var(--band-accent, #244b46), 0 4px 12px rgb(20 42 39 / .10) !important;
+}
+
+/* Fix member buttons in #lueCoreDrawer so they are crisp and readable in both modes */
+.lu-perceptual-ui .band-v2-controls .lu-band-members button {
+  border: 0;
+  border-radius: 10px;
+  background: var(--lu-surface-1);
+  color: #e1e4e9;
+  font: inherit;
+  font-size: 12px;
+  transition: transform 160ms var(--lu-spring-ease), background-color 160ms ease, box-shadow 160ms ease;
+}
+
+.lu-perceptual-ui .band-v2-controls .lu-band-members button[aria-pressed="true"] {
+  background: var(--lu-surface-3);
+}
+
+.lu-perceptual-ui body.lu-band-mode[data-festival-look] .band-v2-controls .lu-band-members button {
+  color: var(--band-paper, #1b312f) !important;
+  background: rgb(255 255 255 / .64) !important;
+  box-shadow: inset 0 0 0 var(--lu-hairline) rgb(36 72 67 / .14), 0 1px 3px rgb(20 42 39 / .05);
+}
+
+.lu-perceptual-ui body.lu-band-mode[data-festival-look] .band-v2-controls .lu-band-members button[aria-pressed="true"] {
+  color: #ffffff !important;
+  background: var(--band-accent, #244b46) !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .28), 0 3px 8px rgb(20 42 39 / .18);
+}
+
+.lu-perceptual-ui .band-v2-controls .lu-band-controls label {
+  white-space: nowrap;
+}
+
+.lu-perceptual-ui :is(.lu-scroll-feather, .lu-band-members) {
+  scrollbar-width: thin;
+  scrollbar-color: #ffffff35 transparent;
+}
+
+.lu-perceptual-ui body.lu-band-mode[data-festival-look] :is(.lu-scroll-feather, .lu-band-members) {
+  scrollbar-color: rgb(36 72 67 / .24) transparent;
+}
+
+.lu-perceptual-ui :is(.lu-apple-icon-btn, .lu-apple-play-btn, #luAppleOrbBtn, .kinetic-mode-btn, .lue-facet-tab):active {
+  transform: none;
+}
+
+.lu-perceptual-ui :is(.lu-apple-track-title, .lu-band-lyric-orig) {
+  font-weight: 500;
+}
+
+.lu-perceptual-ui .lu-band-lyric-zh {
+  font-weight: 500;
+}
+
+.lu-scroll-feather {
+  --lu-fade-top: 0px;
+  --lu-fade-bottom: 0px;
+  mask-image: linear-gradient(to bottom,
+    transparent, #0000000d calc(var(--lu-fade-top)*.15), #00000026 calc(var(--lu-fade-top)*.30),
+    #0000004d calc(var(--lu-fade-top)*.45), #00000080 calc(var(--lu-fade-top)*.60),
+    #000000b3 calc(var(--lu-fade-top)*.75), #000000d9 calc(var(--lu-fade-top)*.87), #000 var(--lu-fade-top),
+    #000 calc(100% - var(--lu-fade-bottom)), #000000d9 calc(100% - var(--lu-fade-bottom)*.87),
+    #000000b3 calc(100% - var(--lu-fade-bottom)*.75), #00000080 calc(100% - var(--lu-fade-bottom)*.60),
+    #0000004d calc(100% - var(--lu-fade-bottom)*.45), #00000026 calc(100% - var(--lu-fade-bottom)*.30),
+    #0000000d calc(100% - var(--lu-fade-bottom)*.15), transparent);
+}
+
+.lu-scroll-feather:has(:focus-visible) {
+  mask-image: none;
+}
+
+.lu-ui-sound-setting {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 4px 10px;
+  color: #c9cad2;
+  font-size: 12px;
+}
+
+.lu-ui-sound-setting input {
+  accent-color: #c5ddea;
+}
+
+@keyframes lu-lyric-focus {
+  from { opacity: .3; filter: blur(2.5px); transform: translateY(3px); }
+  to { opacity: 1; filter: blur(0); transform: translateY(0); }
+}
+
+.lu-lyric-focusing {
+  animation: lu-lyric-focus 180ms cubic-bezier(.16, 1, .3, 1) both;
+}
+
+/* A single quiet sweep when a track or state changes. */
+@keyframes lu-quiet-sheen {
+  from { background-position: 140% 0; }
+  to { background-position: -50% 0; }
+}
+
+.lu-track-sheen {
+  background: linear-gradient(105deg, #d5d5dd 32%, #fff 48%, #d5d5dd 64%);
+  background-size: 220% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: lu-quiet-sheen 1100ms cubic-bezier(.714, .121, .211, .888) 1;
+}
+
+.lu-perceptual-ui body.lu-band-mode[data-festival-look] .lu-track-sheen {
+  background: linear-gradient(105deg, var(--band-paper, #1b312f) 30%, var(--band-accent, #2e6f67) 48%, var(--band-paper, #1b312f) 66%);
+  background-size: 220% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.lu-perceptual-ui #luAppleOrbBtn::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: linear-gradient(105deg, transparent 30%, #ffffff26 48%, transparent 65%);
+  background-size: 220% 100%;
+  pointer-events: none;
+  animation: lu-quiet-sheen 1100ms cubic-bezier(.714, .121, .211, .888) 1;
+}
+
+.lu-band-pyro-toggle {
+  position: absolute;
+  z-index: 7;
+  right: 12px;
+  top: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 22px;
+  background: #121b28b8;
+  box-shadow: inset 0 0 0 var(--lu-hairline, 1px) #d4e5f42b;
+  color: #e1e6eb;
+  font: 11px -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+  cursor: pointer;
+}
+
+.lu-band-pyro-toggle[aria-pressed="false"] {
+  color: #a7b1bb;
+}
+
+.lu-band-pyro-toggle:focus-visible {
+  outline: 2px solid #b7e3ee;
+  outline-offset: 3px;
+}
+
+.lu-band-pyro-toggle[hidden] {
+  display: none;
+}
+
+.recording-preview .lu-band-pyro-toggle,
+.lue-core-open .lu-band-pyro-toggle {
+  visibility: hidden;
+}
+
+/* Lumno Floating Capsule Lyrics Deck (Slot Matrix Mode) & Full-Bleed Stage Clearance */
+.lu-perceptual-ui body.poster-mode .cube-lyrics-deck {
+  width: fit-content;
+  max-width: min(860px, calc(100vw - 28px));
+  min-height: 54px;
+  margin-inline: auto;
+  padding: 8px 20px;
+  border-radius: 18px;
+  background: linear-gradient(165deg var(--in-oklab), rgb(18 20 28 / .76), rgb(12 14 20 / .68));
+  backdrop-filter: blur(24px) saturate(165%);
+  -webkit-backdrop-filter: blur(24px) saturate(165%);
+  border: 0;
+  box-shadow: var(--lu-optical-ring-dark), 0 14px 36px rgb(0 0 0 / .36);
+}
+
+.lu-perceptual-ui body.poster-mode .cube-lyrics-deck:not(:has(.cube-slot))::before {
+  content: "✦ KINETIC SLOT MATRIX · 播放即刻唤醒三维字槽";
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 500 11px/1.2 var(--lu-font-mono);
+  letter-spacing: 0.12em;
+  color: rgb(244 238 228 / .62);
+  text-transform: uppercase;
+}
+
+@supports (corner-shape: superellipse(1.25)) {
+  .lu-perceptual-ui body.poster-mode .cube-lyrics-deck {
+    corner-shape: superellipse(1.25);
+  }
+}
+
+/* ========================================================================= */
+/* Award-Tier Typography, Whitespace, Hierarchy, Color & Micro-Interactions  */
+/* ========================================================================= */
+
+/* 1. Precise Text Box Trimming & Tabular Numerals */
+@supports (text-box: trim-both cap alphabetic) {
+  .lu-perceptual-ui :is(
+    .lue-facet-tab > span,
+    .inspector-tab-btn,
+    .kinetic-mode-btn,
+    .lu-festival-switch button,
+    .pill-btn,
+    .lu-band-pyro-toggle,
+    .lu-quick-optics-btn > span,
+    .lu-lumno-dock-tip,
+    .lu-intro-skip,
+    .lu-intro-hint,
+    .brand-section .brand-tag
+  ) {
+    text-box: trim-both cap alphabetic;
+  }
+}
+
+.lu-perceptual-ui :is(#appleTimeLabel, #timeDisplay, output, .band-parameter output) {
+  font-family: var(--lu-font-mono) !important;
+  font-variant-numeric: tabular-nums !important;
+  letter-spacing: -0.01em;
+}
+
+/* 2. Intro Overlay Architectural Display Typography */
+.lu-perceptual-ui .lu-intro-wordmark {
+  font-family: var(--lu-font-editorial) !important;
+  font-weight: 800 !important;
+  font-size: clamp(3.8rem, 2.2rem + 7.2vw, 8.2rem) !important;
+  line-height: 0.9 !important;
+  letter-spacing: 0.08em !important;
+  transform: translateX(-50%) !important;
+  color: #f6fcf9 !important;
+  background: linear-gradient(180deg var(--in-oklab), #ffffff 0%, #eaf8f4 55%, color-mix(in oklab, #f4fbf7 75%, var(--lu-theme-edge, #6bc5d1)) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 1px rgb(255 255 255 / .38) !important;
+  text-shadow: none !important;
+  filter: drop-shadow(0 12px 32px rgb(2 14 22 / .68));
+}
+
+.lu-perceptual-ui .lu-intro-overlay[data-theme="naruto"] .lu-intro-wordmark {
+  background: linear-gradient(180deg var(--in-oklab), #2b2030 0%, #4e3b5c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 1px rgb(255 245 226 / .65) !important;
+  text-shadow: none !important;
+  filter: drop-shadow(0 8px 24px rgb(255 244 222 / .65));
+}
+
+.lu-perceptual-ui .lu-intro-dither-canvas {
+  opacity: 0.42 !important;
+}
+
+.lu-perceptual-ui .lu-intro-hint {
+  font-family: var(--lu-font-sans);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  padding: 7px 18px;
+}
+
+/* 3. Top-Center Editorial Masthead Lockup Across All Stage Modes */
+.lu-perceptual-ui body.poster-mode:not(.immersive):not(.recording-preview) .master-deck-hud .brand-section {
+  display: inline-flex !important;
+  position: fixed !important;
+  left: 50% !important;
+  top: max(14px, env(safe-area-inset-top)) !important;
+  transform: translateX(-50%) !important;
+  width: auto !important;
+  min-width: 0 !important;
+  height: 44px;
+  padding: 0 16px !important;
+  margin: 0 !important;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background-color: rgb(18 21 30 / .80) !important;
+  backdrop-filter: blur(20px) saturate(170%);
+  -webkit-backdrop-filter: blur(20px) saturate(170%);
+  box-shadow: var(--lu-optical-ring-dark);
+  pointer-events: auto;
+  z-index: 62;
+  transition:
+    background-color 260ms var(--lu-expo-out),
+    box-shadow 260ms var(--lu-expo-out),
+    transform 260ms var(--lu-expo-out);
+}
+
+.lu-perceptual-ui body.poster-mode.lu-band-mode[data-festival-look]:not(.immersive):not(.recording-preview) .master-deck-hud .brand-section {
+  background-color: rgb(255 249 239 / .88) !important;
+  box-shadow: var(--lu-optical-ring-light) !important;
+}
+
+.lu-perceptual-ui body.poster-mode .brand-section :is(.brand-glyph-box, .brand-sub, .lu-disclaimer-btn) {
+  display: none !important;
+}
+
+.lu-perceptual-ui body.poster-mode .brand-section .brand-text {
+  display: flex !important;
+  align-items: center;
+}
+
+.lu-perceptual-ui body.poster-mode .brand-section .brand-title {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--lu-font-editorial) !important;
+  font-size: clamp(0.95rem, 0.85rem + 0.32vw, 1.12rem) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em !important;
+  color: #f5f2eb !important;
+  text-shadow: none !important;
+}
+
+.lu-perceptual-ui body.poster-mode.lu-band-mode[data-festival-look] .brand-section .brand-title {
+  color: var(--band-paper, #1b312f) !important;
+}
+
+.lu-perceptual-ui body.poster-mode .brand-section .brand-tag {
+  display: inline-flex !important;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-family: var(--lu-font-sans) !important;
+  line-height: 1.2 !important;
+  color: rgb(245 242 235 / .90) !important;
+  background: rgb(255 255 255 / .11) !important;
+  border: 0 !important;
+  box-shadow: inset 0 0 0 var(--lu-hairline) rgb(255 255 255 / .18);
+}
+
+.lu-perceptual-ui body.poster-mode .brand-section .brand-tag-en {
+  font: 600 10px/1 var(--lu-font-mono);
+  letter-spacing: 0.11em;
+}
+
+.lu-perceptual-ui body.poster-mode .brand-section .brand-tag-sep {
+  margin-inline: 5px;
+  opacity: 0.45;
+  font-size: 10px;
+}
+
+.lu-perceptual-ui body.poster-mode .brand-section .brand-tag-zh {
+  font: 600 11px/1 var(--lu-font-sans);
+  letter-spacing: 0.04em;
+}
+
+.lu-perceptual-ui body.poster-mode.lu-band-mode[data-festival-look] .brand-section .brand-tag {
+  color: var(--band-paper, #1b312f) !important;
+  background: rgb(36 72 67 / .09) !important;
+  box-shadow: inset 0 0 0 var(--lu-hairline) rgb(36 72 67 / .18);
+}
+
+/* 4. Top-Right Quick Optics Inspector Pill (#luQuickOpticsBtn) */
+.lu-quick-optics-btn {
+  position: fixed;
+  top: max(14px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  z-index: 62;
+  min-height: 44px;
+  height: 44px;
+  min-width: 44px;
+  padding: 0 15px;
+  border: 0;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: 500 12px/1 var(--lu-font-sans);
+  letter-spacing: 0.02em;
+  color: #f2efe9;
+  background-color: rgb(18 21 30 / .80) !important;
+  backdrop-filter: blur(20px) saturate(170%);
+  -webkit-backdrop-filter: blur(20px) saturate(170%);
+  box-shadow: var(--lu-optical-ring-dark);
+  cursor: pointer;
+  transition:
+    right 260ms var(--lu-expo-out),
+    background-color 220ms ease,
+    color 220ms ease,
+    box-shadow 220ms ease,
+    opacity 200ms ease;
+}
+
+.lu-quick-optics-btn .lu-optics-gem {
+  font-size: 13px;
+  color: #e6c17a;
+  transition: transform 280ms var(--lu-overshoot);
+}
+
+.lu-quick-optics-btn:hover .lu-optics-gem,
+.lu-quick-optics-btn.active .lu-optics-gem {
+  transform: rotate(45deg) scale(1.15);
+}
+
+.lu-quick-optics-btn.active {
+  background-color: #c65035 !important;
+  color: #ffffff !important;
+}
+
+.lu-quick-optics-btn.active .lu-optics-gem {
+  color: #ffffff !important;
+}
+
+/* In Band mode, keep top-right to a single pill (.lu-band-pyro-toggle) unless Inspector is active */
+.lu-perceptual-ui body.lu-band-mode:not(.inspector-open):not(:has(#inspectorPanel:not(.collapsed))) .lu-quick-optics-btn {
+  display: none !important;
+}
+
+.lu-perceptual-ui body.lu-band-mode .lu-quick-optics-btn {
+  right: calc(max(16px, env(safe-area-inset-right)) + 106px);
+}
+
+.lu-perceptual-ui body.lu-band-mode[data-festival-look] .lu-quick-optics-btn:not(.active) {
+  color: var(--band-paper, #1b312f) !important;
+  background-color: rgb(255 249 239 / .88) !important;
+  box-shadow: var(--lu-optical-ring-light) !important;
+}
+
+.lu-perceptual-ui body.lu-band-mode[data-festival-look] .lu-quick-optics-btn:not(.active) .lu-optics-gem {
+  color: var(--band-accent, #cf6d49);
+}
+
+.lu-perceptual-ui body:is(.immersive, .recording-preview, .lue-core-open) .lu-quick-optics-btn {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Hardware REC indicator icon clarity on #appleRecordMenuBtn */
+.lu-perceptual-ui #appleRecordMenuBtn svg {
+  color: currentColor !important;
+}
+
+.lu-perceptual-ui #appleRecordMenuBtn svg circle:last-of-type {
+  fill: #d9483b !important;
+  transition: transform 200ms var(--lu-overshoot), fill 200ms ease;
+  transform-origin: center;
+}
+
+.lu-perceptual-ui #appleRecordMenuBtn:hover svg circle:last-of-type,
+.lu-perceptual-ui #appleRecordMenuBtn[data-record-state="recording"] svg circle:last-of-type {
+  fill: #ff3b30 !important;
+  transform: scale(1.18);
+}
+
+/* Keyboard-only focus-visible discipline (suppress false ring on initial programmatic focus) */
+html.lu-perceptual-ui:not([data-lu-input-modality="keyboard"]) #performanceCapsule:focus-visible {
+  outline: none !important;
+}
+
+html.lu-perceptual-ui[data-lu-input-modality="keyboard"] :is(#performanceCapsule, #luAppleDock button, .lu-band-pyro-toggle, #luQuickOpticsBtn):focus-visible {
+  outline: 2px solid var(--band-accent, #cf6d49) !important;
+  outline-offset: 3px !important;
+}
+
+/* 5. Eliminate .lu-band-status Top-Left Collision & Drawer Clipping */
+.lu-perceptual-ui body.poster-mode :is(.lu-band-status, .lu-band-score, #luScorePanel) {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+@media (min-width: 761px) {
+  .lu-perceptual-ui #lueCoreDrawer {
+    max-height: min(520px, calc(100dvh - 190px)) !important;
+  }
+  .lu-perceptual-ui #lueCoreDrawer .lue-facet-panels {
+    max-height: min(462px, calc(100dvh - 246px)) !important;
+    padding: 16px 20px 22px !important;
+  }
+}
+
+/* 6. Custom Glass <select> Dropdowns & High-Contrast Daylight Links */
+.lu-perceptual-ui :is(#lueCoreDrawer, #inspectorPanel) select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 6px 30px 6px 12px !important;
+  border-radius: 10px !important;
+  font-weight: 500;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23e5e7eb' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 10px center !important;
+  background-size: 12px 12px !important;
+  cursor: pointer;
+}
+
+.lu-perceptual-ui body.lu-band-mode[data-festival-look] :is(#lueCoreDrawer, #inspectorPanel) select {
+  background-color: rgb(255 255 255 / .78) !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%231b312f' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") !important;
+}
+
+.lu-perceptual-ui body.lu-band-mode[data-festival-look] #lueCoreDrawer :is(.band-quick-controls a, .band-adjustments summary span) {
+  color: #8f3b1e !important;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.lu-perceptual-ui body.lu-band-mode[data-festival-look] #lueCoreDrawer .band-quick-controls a {
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgb(207 109 73 / .12);
+  transition: background-color 160ms ease;
+}
+
+.lu-perceptual-ui body.lu-band-mode[data-festival-look] #lueCoreDrawer .band-quick-controls a:hover {
+  background: rgb(207 109 73 / .22);
+}
+
+/* 7. Stage Lyric Editorial Hierarchy & Tactile Keycap Gesture Hint */
+.lu-perceptual-ui body.poster-mode:not(.apple-dock-hidden):not(:has(#luAppleDock[data-visibility="hidden"])) #cubeLyricsDeck {
+  margin-bottom: 122px !important;
+}
+
+.lu-perceptual-ui body.poster-mode.lu-band-mode:not(.apple-dock-hidden):not(:has(#luAppleDock[data-visibility="hidden"])) #stageWrap .lu-band-lyric {
+  bottom: 140px !important;
+  max-width: min(68ch, calc(100vw - 32px));
+  margin-inline: auto;
+  text-wrap: balance;
+}
+
+.lu-perceptual-ui body.lu-band-mode .lu-band-lyric-orig {
+  font-family: var(--lu-font-editorial) !important;
+  font-size: clamp(1.15rem, 1rem + 0.45vw, 1.42rem) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.05em !important;
+}
+
+.lu-perceptual-ui :is(.lu-band-lyric-trans, .lue-help-text) {
+  text-wrap: pretty;
+}
+
+.lu-perceptual-ui body.lu-band-mode:not(.apple-dock-hidden):not(:has(#luAppleDock[data-visibility="hidden"])) .lu-pet-hint {
+  bottom: 112px !important;
+  width: fit-content !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%);
+  display: inline-flex !important;
+  align-items: center;
+  gap: 5px;
+  min-height: 26px;
+  padding: 3px 12px !important;
+  border-radius: 999px;
+  font: 500 11px/1.2 var(--lu-font-sans) !important;
+  color: var(--band-paper, #1b312f) !important;
+  background-color: rgb(255 251 244 / .82) !important;
+  backdrop-filter: blur(16px) saturate(165%);
+  -webkit-backdrop-filter: blur(16px) saturate(165%);
+  box-shadow:
+    0 0 0 var(--lu-hairline) rgb(26 48 45 / .14),
+    inset 0 1px 0 rgb(255 255 255 / .9),
+    0 4px 14px rgb(18 34 32 / .09);
+  text-shadow: none !important;
+  transition: opacity 180ms var(--lu-expo-out), transform 180ms var(--lu-expo-out);
+}
+
+.lu-perceptual-ui body.lu-band-mode:has(#luAppleDock:hover) .lu-pet-hint {
+  opacity: 0 !important;
+  transform: translateX(-50%) translateY(4px) scale(0.96);
+}
+
+.lu-perceptual-ui .lu-pet-hint kbd {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border-radius: 5px;
+  font: 600 10px/1.2 var(--lu-font-sans);
+  color: var(--band-accent, #b85332);
+  background: rgb(36 72 67 / .08);
+  box-shadow: inset 0 0 0 0.5px rgb(36 72 67 / .18);
+}
+
+.lu-perceptual-ui .lu-pet-hint i {
+  font-style: normal;
+  opacity: 0.45;
+  margin-inline: 2px;
+}
+
+/* 8. Pointer-Tracked Specular Glass Spotlight & Tactile Scrubber */
+.lu-perceptual-ui :is(#luAppleDock, #performanceCapsule, #lueCoreDrawer, #inspectorPanel, #luQuickOpticsBtn, .master-deck-hud .brand-section) {
+  background-image: radial-gradient(
+    240px circle at var(--lu-spot-x, 50%) var(--lu-spot-y, -200px),
+    rgb(255 255 255 / calc(0.11 * var(--lu-spot-opacity, 0))),
+    transparent 70%
+  );
+}
+
+.lu-perceptual-ui .lu-apple-scrub-wrap:hover .lu-apple-scrub-input::-webkit-slider-runnable-track {
+  height: 5px !important;
+}
+
+.lu-perceptual-ui .lu-apple-scrub-input::-webkit-slider-thumb {
+  transition: transform 200ms var(--lu-overshoot), box-shadow 200ms ease;
+}
+
+.lu-perceptual-ui .lu-apple-scrub-wrap:hover .lu-apple-scrub-input::-webkit-slider-thumb {
+  transform: scale(1.28);
+}
+
+/* 9. Orchestrated Slow-Fast-Boom-Stop HUD Entrance Choreography */
+@keyframes lu-hud-rise-in {
+  from {
+    opacity: 0;
+    translate: 0 10px;
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    filter: blur(0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lu-perceptual-ui body:not(.lu-intro-active) #performanceCapsule {
+    animation: lu-hud-rise-in 520ms var(--lu-expo-out) 0ms both;
+  }
+  .lu-perceptual-ui body:not(.lu-intro-active) .master-deck-hud .brand-section {
+    animation: lu-hud-rise-in 560ms var(--lu-expo-out) 60ms both;
+  }
+  .lu-perceptual-ui body:not(.lu-intro-active) :is(#luQuickOpticsBtn, .lu-band-pyro-toggle) {
+    animation: lu-hud-rise-in 580ms var(--lu-expo-out) 110ms both;
+  }
+  .lu-perceptual-ui body:not(.lu-intro-active) #luAppleDock {
+    animation: lu-hud-rise-in 640ms var(--lu-expo-out) 160ms both;
+  }
+}
+
+/* 10. Container Queries (cqi + @container) & Mobile Responsive Harmony */
+.lu-perceptual-ui #luAppleDock,
+.lu-perceptual-ui #lueCoreDrawer {
+  container-type: inline-size;
+}
+
+.lu-perceptual-ui #luAppleDock .lu-apple-track-title {
+  font-size: clamp(0.84rem, 2.1cqi, 0.96rem);
+}
+
+.lu-perceptual-ui #lueCoreDrawer .lue-facet-panels {
+  padding-inline: clamp(12px, 3.6cqi, 20px) !important;
+}
+
+@container (max-width: 560px) {
+  .lu-perceptual-ui #luAppleDock .lu-apple-capsule-body {
+    column-gap: clamp(3px, 1.2cqi, 8px);
+  }
+  .lu-perceptual-ui #lueCoreDrawer .lue-facet-tab {
+    font-size: clamp(11px, 3.1cqi, 13px);
+  }
+}
+
+.lu-perceptual-ui body.lu-band-mode[data-festival-look] .lu-band-pyro-toggle {
+  top: max(14px, env(safe-area-inset-top)) !important;
+  min-height: 44px !important;
+  height: 44px !important;
+}
+
+@media (max-width: 900px) {
+  .lu-perceptual-ui body.poster-mode:not(.immersive):not(.recording-preview) .master-deck-hud .brand-section,
+  .lu-perceptual-ui body.poster-mode.lu-band-mode[data-festival-look]:not(.immersive):not(.recording-preview) .master-deck-hud .brand-section {
+    display: none !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .lu-perceptual-ui :is(#luAppleDock, #performanceCapsule, #lueCoreDrawer, #inspectorPanel, .lu-band-pyro-toggle) {
+    backdrop-filter: blur(14px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(150%) !important;
+  }
+  .lu-perceptual-ui body.lu-band-mode[data-festival-look] .lu-band-pyro-toggle {
+    top: max(8px, env(safe-area-inset-top)) !important;
+    right: 10px !important;
+    min-height: 44px !important;
+    height: 44px !important;
+  }
+  .lu-perceptual-ui body.lu-band-mode :is(#appleModeBtn, #appleRecordMenuBtn) {
+    flex-direction: column !important;
+    gap: 2px !important;
+    padding: 2px 4px !important;
+  }
+  .lu-perceptual-ui body.lu-band-mode :is(.lu-apple-mode-label, #appleRecordMenuBtn > span) {
+    display: block !important;
+    font-size: 10px !important;
+    line-height: 1 !important;
+    letter-spacing: 0.02em;
+    opacity: 0.86;
+  }
+  .lu-perceptual-ui body.lu-band-mode #appleModeBtn .lu-apple-mode-icon {
+    width: 18px !important;
+    height: 18px !important;
+  }
+  .lu-perceptual-ui body.lu-band-mode #appleRecordMenuBtn svg {
+    width: 17px !important;
+    height: 17px !important;
+  }
+  .lu-perceptual-ui body.poster-mode .cube-lyrics-deck {
+    max-width: calc(100vw - 20px);
+    padding: 6px 12px;
+    border-radius: 15px;
+  }
+  .lu-perceptual-ui body.poster-mode.lu-band-mode:not(.apple-dock-hidden):not(:has(#luAppleDock[data-visibility="hidden"])) #stageWrap .lu-band-lyric {
+    bottom: 184px !important;
+  }
+  .lu-perceptual-ui body.lu-band-mode:not(.apple-dock-hidden):not(:has(#luAppleDock[data-visibility="hidden"])) .lu-pet-hint {
+    bottom: 154px !important;
+  }
+}
+
+@media (max-width: 375px) {
+  .lu-perceptual-ui #performanceCapsule {
+    max-width: calc(100vw - 128px) !important;
+    min-width: 0 !important;
+  }
+}
+
+@keyframes lu-stage-mode-enter {
+  from { opacity: .58; }
+  to { opacity: 1; }
+}
+/* Keep the existing system-motion opt-in below the core capsule's hit area. */
+body.poster-mode .stage-hud-left:has(#motionPreferenceBtn:not([hidden])) {
+  top: 76px !important;
+  left: 16px !important;
+}
+body.poster-mode #motionPreferenceBtn { max-width: calc(100vw - 32px); }
+body.lu-mode-transitioning .lu-band-scene,
+body.lu-mode-transitioning #stage > canvas,
+body.lu-mode-transitioning #canvas-container {
+  animation: lu-stage-mode-enter 260ms cubic-bezier(.16,1,.3,1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.lu-mode-transitioning .lu-band-scene,
+  body.lu-mode-transitioning #stage > canvas,
+  body.lu-mode-transitioning #canvas-container { animation: none; }
+  .lu-lyric-focusing,
+  .lu-track-sheen,
+  .lu-perceptual-ui #luAppleOrbBtn::after {
+    animation: none;
+    filter: none;
+  }
+  .lu-perceptual-ui .lu-lumno-indicator,
+  .lu-lumno-dock-tip {
+    transition: none !important;
+  }
+}
+
+/* Tactile action buttons. Extend the existing class/token system, no new component.
+ * The named important layer intentionally wins the legacy theme !important rules.
+ * Variant selectors only set material values; one shadow recipe owns every state.
+ * Three inset slots + two drop slots remain in the same order during transitions.
+ */
+@layer lu-button-material {
+  .lu-perceptual-ui :where(
+    .btn, .lu-apple-icon-btn, .lu-apple-play-btn, .lu-apple-record-start,
+    .lu-apple-import-trigger, .lue-quick-pill, .lue-facet-close,
+    .lu-festival-switch > button, .lu-apple-aspect-group > button,
+    .lu-band-controls > button, .lu-band-members > button,
+    .pill-btn, .preset-cam-btn, .inspector-tab-btn, .lue-facet-tab, .kinetic-mode-btn,
+    .material-families > button, .studio-lighting button,
+    .lu-intro-tools button, .lu-intro-skip, .lu-band-pyro-toggle,
+    #inspectorCloseBtn, #workbenchHandle, #inspectorDockButton
+  ) {
+    --lu-button-material: tactile;
+    --lu-button-label-size: 14px;
+    --lu-button-u: calc(var(--lu-button-label-size) / 14);
+    --lu-button-rest-top: #ffffff;
+    --lu-button-rest-bottom: #f4f5f7;
+    --lu-button-hover-top: #ffffff;
+    --lu-button-hover-bottom: #fafbfc;
+    --lu-button-edge: rgb(15 23 42 / .14);
+    --lu-button-label: #374151;
+    --lu-button-highlight: rgb(255 255 255 / 1);
+    --lu-button-bottom-shade: rgb(0 0 0 / .06);
+    --lu-button-contact: rgb(0 0 0 / .06);
+    --lu-button-lift: rgb(0 0 0 / .09);
+    --lu-button-well: rgb(0 0 0 / .14);
+    --lu-button-paper-line: rgb(255 255 255 / .9);
+    --lu-button-text-shadow: transparent;
+    --lu-button-face-top: var(--lu-button-rest-top);
+    --lu-button-face-bottom: var(--lu-button-rest-bottom);
+    --lu-button-inset-top: inset 0 var(--lu-button-u) 0 var(--lu-button-highlight);
+    --lu-button-inset-bottom: inset 0 calc(-1 * var(--lu-button-u)) 0 var(--lu-button-bottom-shade);
+    --lu-button-inset-pad: inset 0 0 0 transparent;
+    --lu-button-drop-contact: 0 var(--lu-button-u) calc(2 * var(--lu-button-u)) var(--lu-button-contact);
+    --lu-button-drop-lift: 0 calc(4 * var(--lu-button-u)) calc(10 * var(--lu-button-u)) calc(-3 * var(--lu-button-u)) var(--lu-button-lift);
+    box-sizing: border-box !important;
+    height: calc(40 * var(--lu-button-u)) !important;
+    min-height: calc(40 * var(--lu-button-u)) !important;
+    padding: 0 calc(18 * var(--lu-button-u)) !important;
+    gap: calc(8 * var(--lu-button-u)) !important;
+    border: var(--lu-button-u) solid var(--lu-button-edge) !important;
+    border-radius: calc(10 * var(--lu-button-u)) !important;
+    corner-shape: round !important;
+    font-size: var(--lu-button-label-size) !important;
+    font-weight: 600 !important;
+    line-height: 1.25 !important;
+    letter-spacing: normal !important;
+    color: var(--lu-button-label) !important;
+    background: linear-gradient(180deg, var(--lu-button-face-top), var(--lu-button-face-bottom)) !important;
+    box-shadow: var(--lu-button-inset-top), var(--lu-button-inset-bottom), var(--lu-button-inset-pad), var(--lu-button-drop-contact), var(--lu-button-drop-lift) !important;
+    text-shadow: 0 calc(-1 * var(--lu-button-u)) 0 var(--lu-button-text-shadow) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    transform: translateY(var(--lu-button-press-y, 0px)) !important;
+    transition: transform 120ms ease, box-shadow 140ms ease,
+      --lu-button-face-top 160ms ease, --lu-button-face-bottom 160ms ease,
+      color 160ms ease, border-color 160ms ease !important;
+
+    @media (hover: hover) {
+      &:not(:disabled):not([aria-disabled="true"]):hover {
+        --lu-button-face-top: var(--lu-button-hover-top);
+        --lu-button-face-bottom: var(--lu-button-hover-bottom);
+        --lu-button-drop-lift: 0 calc(8 * var(--lu-button-u)) calc(16 * var(--lu-button-u)) calc(-5 * var(--lu-button-u)) var(--lu-button-lift);
+      }
+    }
+    &:not(:disabled):not([aria-disabled="true"]):active {
+      --lu-button-face-top: var(--lu-button-rest-bottom);
+      --lu-button-face-bottom: var(--lu-button-rest-top);
+      --lu-button-inset-top: inset 0 var(--lu-button-u) calc(2 * var(--lu-button-u)) var(--lu-button-well);
+      --lu-button-inset-bottom: inset 0 0 0 transparent;
+      --lu-button-drop-contact: 0 var(--lu-button-u) 0 var(--lu-button-paper-line);
+      --lu-button-drop-lift: 0 var(--lu-button-u) var(--lu-button-u) var(--lu-button-contact);
+      --lu-button-press-y: var(--lu-button-u);
+    }
+    &:is(:disabled, [aria-disabled="true"]) {
+      --lu-button-drop-contact: 0 0 0 transparent;
+      --lu-button-drop-lift: 0 0 0 transparent;
+      --lu-button-press-y: 0px;
+      cursor: default !important;
+      opacity: .45 !important;
+    }
+  }
+
+  /* Primary, including persistent selected states. Selection is not :active. */
+  .lu-perceptual-ui :is(
+    .btn-primary, .lu-apple-play-btn, .lu-apple-record-start,
+    #playPauseBtn, #recordToggle, .lu-band-pyro-toggle[aria-pressed="true"],
+    .btn.active, .pill-btn.active, .preset-cam-btn.active,
+    #appleOrderModeBtn[aria-pressed="true"],
+    .lue-facet-tab.active, .inspector-tab-btn.active, .kinetic-mode-btn.active,
+    .lu-festival-switch > button[aria-pressed="true"],
+    .lu-apple-aspect-group > button[aria-pressed="true"],
+    .lu-band-members > button[aria-pressed="true"],
+    .material-families > button[aria-pressed="true"],
+    .studio-lighting button[aria-pressed="true"]
+  ) {
+    --lu-button-rest-top: #404859;
+    --lu-button-rest-bottom: #273042;
+    --lu-button-hover-top: #4a5365;
+    --lu-button-hover-bottom: #313b50;
+    --lu-button-edge: #12161f;
+    --lu-button-label: #ffffff;
+    --lu-button-highlight: rgb(255 255 255 / .18);
+    --lu-button-bottom-shade: rgb(0 0 0 / .22);
+    --lu-button-contact: rgb(0 0 0 / .18);
+    --lu-button-lift: rgb(0 0 0 / .28);
+    --lu-button-well: rgb(0 0 0 / .4);
+    --lu-button-paper-line: transparent;
+    --lu-button-text-shadow: rgb(0 0 0 / .28);
+  }
+
+  .lu-perceptual-ui :is(.btn-tertiary, #appleStopBtn, #resetCam, #bandDemoExit) {
+    --lu-button-rest-top: #f3f4f6;
+    --lu-button-rest-bottom: #e7e9ec;
+    --lu-button-hover-top: #fafbfc;
+    --lu-button-hover-bottom: #eff1f4;
+    --lu-button-edge: rgb(15 23 42 / .1);
+    --lu-button-highlight: rgb(255 255 255 / .85);
+    --lu-button-well: rgb(0 0 0 / .12);
+  }
+
+  .lu-perceptual-ui :is(
+    .btn-ghost, .lue-facet-close, .lu-intro-tools button,
+    #appleOrderModeBtn:not([aria-pressed="true"]), #appleRecordCloseBtn, #inspectorCloseBtn,
+    #applePlaylistBtn, #appleSettingsBtn, #appleCollapseOrbBtn
+  ) {
+    --lu-button-rest-top: transparent;
+    --lu-button-rest-bottom: transparent;
+    --lu-button-hover-top: rgb(128 135 145 / .08);
+    --lu-button-hover-bottom: rgb(128 135 145 / .12);
+    --lu-button-edge: transparent;
+    --lu-button-highlight: transparent;
+    --lu-button-bottom-shade: transparent;
+    --lu-button-contact: transparent;
+    --lu-button-lift: transparent;
+    --lu-button-well: rgb(0 0 0 / .14);
+    --lu-button-paper-line: rgb(255 255 255 / .9);
+  }
+
+  .lu-perceptual-ui :is(.btn-text, .lue-related-link, .lu-intro-skip) {
+    --lu-button-rest-top: transparent;
+    --lu-button-rest-bottom: transparent;
+    --lu-button-hover-top: transparent;
+    --lu-button-hover-bottom: transparent;
+    --lu-button-edge: transparent;
+    --lu-button-label: #4b5563;
+    --lu-button-highlight: transparent;
+    --lu-button-bottom-shade: transparent;
+    --lu-button-contact: transparent;
+    --lu-button-lift: transparent;
+    --lu-button-well: transparent;
+    --lu-button-paper-line: transparent;
+    text-decoration-line: underline !important;
+    text-decoration-thickness: var(--lu-button-u) !important;
+    text-underline-offset: calc(3 * var(--lu-button-u)) !important;
+  }
+
+  /* Auxiliary labels retain readable neutral contrast on the existing dark UI. */
+  .lu-perceptual-ui body:not(.lu-band-mode[data-festival-look]) :is(
+    .btn-ghost, .btn-text, .lue-related-link, .lue-facet-close, .lu-intro-skip,
+    .lu-intro-tools button, #appleOrderModeBtn:not([aria-pressed="true"]), #appleRecordCloseBtn,
+    #inspectorCloseBtn, #applePlaylistBtn, #appleSettingsBtn, #appleCollapseOrbBtn
+  ) { --lu-button-label: #d1d5db; }
+
+  /* The unit changes once; height, edge, radius, icons and all shadows follow. */
+  .lu-perceptual-ui :is(.btn-lg, .lu-apple-play-btn) {
+    --lu-button-label-size: 16px;
+  }
+  .lu-perceptual-ui .btn-md { --lu-button-label-size: 14px; }
+
+  .lu-perceptual-ui :where(
+    .lu-apple-icon-btn, .lu-apple-play-btn, .lu-intro-tools button
+  ) {
+    width: calc(40 * var(--lu-button-u)) !important;
+    min-width: calc(40 * var(--lu-button-u)) !important;
+    padding-inline: 0 !important;
+    flex-shrink: 0 !important;
+  }
+  .lu-perceptual-ui :is(#appleModeBtn, #appleRecordMenuBtn) {
+    width: auto !important;
+    min-width: calc(60 * var(--lu-button-u)) !important;
+    padding-inline: calc(8 * var(--lu-button-u)) !important;
+    gap: calc(5 * var(--lu-button-u)) !important;
+  }
+  .lu-perceptual-ui :where(
+    .btn, .lu-apple-icon-btn, .lu-apple-play-btn, .lue-quick-pill,
+    .lu-apple-record-start, .lue-facet-tab, .inspector-tab-btn, .kinetic-mode-btn
+  ) :is(svg, .lu-apple-mode-icon) {
+    width: calc(16 * var(--lu-button-u)) !important;
+    height: calc(16 * var(--lu-button-u)) !important;
+    flex-shrink: 0 !important;
+    filter: grayscale(1) !important;
+    scale: 1 !important;
+    translate: none !important;
+  }
+  .lu-perceptual-ui :where(.lu-apple-mode-label, #appleRecordMenuBtn > span) {
+    font-size: inherit !important;
+    color: inherit !important;
+  }
+
+  /* These controls identify scenes/modes by color; keep the neutral key faces. */
+  .lu-perceptual-ui :is(#appleModeBtn, .kinetic-mode-btn) svg {
+    filter: none !important;
+  }
+  .lu-perceptual-ui #appleModeBtn > .lu-apple-mode-icon {
+    width: calc(24 * var(--lu-button-u)) !important;
+    height: calc(24 * var(--lu-button-u)) !important;
+  }
+  .lu-perceptual-ui #appleModeBtn {
+    width: calc(40 * var(--lu-button-u)) !important;
+    min-width: calc(40 * var(--lu-button-u)) !important;
+    padding-inline: 0 !important;
+  }
+  .lu-perceptual-ui #appleModeLabel { display: none !important; }
+
+  .lu-perceptual-ui .lu-festival-switch {
+    width: auto !important;
+    justify-self: end !important;
+  }
+  .lu-perceptual-ui .lu-festival-switch > button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: calc(40 * var(--lu-button-u)) !important;
+    min-width: calc(40 * var(--lu-button-u)) !important;
+    padding-inline: 0 !important;
+    flex: 0 0 auto !important;
+  }
+  .lu-perceptual-ui :is(.lu-stage-look-icon, .lu-pyro-sound-icon) {
+    width: calc(24 * var(--lu-button-u)) !important;
+    height: calc(24 * var(--lu-button-u)) !important;
+    flex-shrink: 0 !important;
+    filter: none !important;
+  }
+  .lu-perceptual-ui body .lu-band-pyro-toggle {
+    position: fixed !important;
+    top: max(calc(14 * var(--lu-button-u)), env(safe-area-inset-top)) !important;
+    right: max(calc(14 * var(--lu-button-u)), env(safe-area-inset-right)) !important;
+    z-index: 130 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: calc(44 * var(--lu-button-u)) !important;
+    min-width: calc(44 * var(--lu-button-u)) !important;
+    height: calc(44 * var(--lu-button-u)) !important;
+    min-height: calc(44 * var(--lu-button-u)) !important;
+    padding: 0 !important;
+  }
+  .lu-perceptual-ui .lu-band-pyro-toggle[hidden] { display: none !important; }
+  .lu-perceptual-ui .lu-band-pyro-toggle[aria-pressed="true"] .lu-pyro-sound-off,
+  .lu-perceptual-ui .lu-band-pyro-toggle[aria-pressed="false"] .lu-pyro-sound-on {
+    display: none !important;
+  }
+
+  /* Existing compact groups keep their fitted cells and 44px touch targets. */
+  .lu-perceptual-ui :is(.lue-facet-tab, .inspector-tab-btn, .kinetic-mode-btn) {
+    padding-inline: calc(8 * var(--lu-button-u)) !important;
+    min-width: 0 !important;
+    gap: calc(5 * var(--lu-button-u)) !important;
+  }
+  @media (pointer: coarse) {
+    .lu-perceptual-ui :is(.lu-apple-icon-btn, .lue-facet-tab, .inspector-tab-btn, .lu-festival-switch > button) {
+      min-height: calc(44 * var(--lu-button-u)) !important;
+    }
+    .lu-perceptual-ui body :is(.lu-apple-icon-btn, #appleModeBtn, #appleRecordMenuBtn, .lu-festival-switch > button) {
+      width: calc(44 * var(--lu-button-u)) !important;
+      min-width: calc(44 * var(--lu-button-u)) !important;
+    }
+  }
+
+  /* Put the material on the real key, rather than the moving indicator overlay. */
+  .lu-perceptual-ui [data-lumno-indicator]:not(#luIntroThemeSelect) > .lu-lumno-indicator {
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .lu-perceptual-ui :is(
+    .btn-ghost, .lue-facet-close, .lu-intro-tools button,
+    #appleOrderModeBtn:not([aria-pressed="true"]), #appleRecordCloseBtn, #inspectorCloseBtn,
+    #applePlaylistBtn, #appleSettingsBtn, #appleCollapseOrbBtn
+  ):not(:disabled):active {
+    --lu-button-face-top: #e2e5e9;
+    --lu-button-face-bottom: #eff1f4;
+  }
+  /* A masked arrow adds no generated text to the accessible name. */
+  .lu-perceptual-ui :is(.btn-text, .lue-related-link, .lu-intro-skip)::after {
+    content: "";
+    display: inline-block;
+    width: calc(14 * var(--lu-button-u));
+    height: calc(14 * var(--lu-button-u));
+    margin-inline-start: calc(5 * var(--lu-button-u));
+    vertical-align: middle;
+    background: currentColor;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8h10M9 4l4 4-4 4' fill='none' stroke='black' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+    transition: transform 120ms ease;
+  }
+  @media (hover: hover) {
+    .lu-perceptual-ui :is(.btn-text, .lue-related-link, .lu-intro-skip):not(:disabled):hover::after {
+      transform: translateX(calc(2 * var(--lu-button-u)));
+    }
+  }
+
+  @media (max-width: 760px) {
+    .lu-perceptual-ui .kinetic-mode-btn {
+      padding-inline: calc(4 * var(--lu-button-u)) !important;
+      gap: calc(4 * var(--lu-button-u)) !important;
+    }
+    .lu-perceptual-ui :is(#appleModeBtn, #appleRecordMenuBtn) {
+      min-width: calc(40 * var(--lu-button-u)) !important;
+      width: calc(40 * var(--lu-button-u)) !important;
+      padding-inline: 0 !important;
+    }
+    .lu-perceptual-ui .lu-festival-switch > button {
+      min-width: 0 !important;
+      padding-inline: 0 !important;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lu-perceptual-ui :where(button, a)[class],
+    .lu-perceptual-ui :is(.btn-text, .lue-related-link, .lu-intro-skip)::after {
+      transition: none !important;
+      transform: none !important;
+    }
+  }
+  @media (forced-colors: active) {
+    .lu-perceptual-ui :where(button, a)[class] {
+      --lu-button-edge: ButtonText;
+      --lu-button-label: ButtonText;
+      --lu-button-face-top: ButtonFace;
+      --lu-button-face-bottom: ButtonFace;
+      text-shadow: none !important;
+      box-shadow: none !important;
+    }
+  }
+}

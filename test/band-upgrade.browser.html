@@ -1,0 +1,113 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Band graphics upgrade regression</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="../css/lu-perceptual-ui.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.166.1/+esm"}}</script>
+<style>body{margin:0;background:#f4efdf}#stage{position:relative;width:1280px;height:720px}#stage>canvas{position:absolute;inset:0;width:100%;height:100%}#hits{position:absolute;inset:0}pre{white-space:pre-wrap}</style>
+<button id="run">运行图形与交互回归</button><pre id="result">就绪</pre><div id="stage"></div>
+<script type="module">
+import * as THREE from 'three';
+import * as canonical from 'https://cdn.jsdelivr.net/npm/three@0.166.1/+esm';
+import {createBandScene} from '../js/ui/band-scene.js';
+import {createBandMemberInteractions} from '../js/ui/band-member-interactions.js';
+import {defaultBandSettings} from '../js/ui/band-settings.js';
+import {createBandDemoScore} from '../js/audio/band-timeline.js';
+import {compileBandParts,sampleBandEnsemble} from '../js/audio/band-parts.js';
+import {runStageViewTransition} from '../js/ui/lu-perceptual-ui.js';
+
+const host=document.querySelector('#stage'),out=document.querySelector('#result');
+const assert=(condition,message)=>{if(!condition)throw Error(message);};
+const raf=()=>new Promise(resolve=>requestAnimationFrame(resolve));
+const settle=async(ms,update)=>{const start=performance.now();do{await raf();update?.();}while(performance.now()-start<ms);};
+window.runBandUpgrade=async()=>{
+ const checks=[],idleJobs=new Map();let idleId=0,scene,interactions;
+ const originalIdle=window.requestIdleCallback,originalCancel=window.cancelIdleCallback;
+ const originalTimeout=window.setTimeout,originalClear=window.clearTimeout;
+ window.requestIdleCallback=callback=>{idleJobs.set(++idleId,callback);return idleId;};
+ window.cancelIdleCallback=id=>idleJobs.delete(id);
+ out.textContent='运行中';
+ try{
+  assert(THREE.Vector3===canonical.Vector3,'importmap must use the canonical Three.js instance');
+  scene=await createBandScene(host);scene.setActive(true);await scene.configure('one-piece');
+  const score=createBandDemoScore(),parts=compileBandParts(score,'one-piece'),settings=defaultBandSettings();
+  const frame=sampleBandEnsemble(score,parts,6),draw=(extra={})=>scene.update(frame,{score,parts,settings,...extra});draw();
+  const fast=scene.memberProjections,full=scene.diagnostics.members;
+  assert(fast===scene.memberProjections,'unchanged projections must be cached');
+  assert(full.every((m,i)=>JSON.stringify(m.bounds)===JSON.stringify(fast[i].bounds)&&m.spatial.pan===fast[i].spatial.pan),'fast hit bounds must match full spatial diagnostics');
+  checks.push('cached projections match diagnostics and spatial values');
+
+  const hits=document.createElement('div');hits.id='hits';host.append(hits);interactions=createBandMemberInteractions(hits);interactions.setParts(parts);
+  const view={members:fast,visible:true,enabled:true,mutedIds:[],pendingIds:[]};interactions.update(view);
+  const mo=new MutationObserver(()=>{});mo.observe(hits,{subtree:true,attributes:true,childList:true,characterData:true});
+  interactions.update(view);assert(mo.takeRecords().length===0,'identical hit-state must not rewrite the DOM');
+  const button=hits.querySelector('.lu-pet-hit');
+  assert(['left','top','width','height'].every(k=>Number.parseFloat(button.style[k])*2%1===0),'hit bounds must use half pixels');
+  interactions.setParts(parts);mo.takeRecords();interactions.update(view);
+  assert(button.getAttribute('aria-label').includes('已加入'),'rebinding parts must refresh the accessible state');mo.disconnect();
+  checks.push('dirty DOM updates, half-pixel hit targets and accessible rebinding');
+
+  draw({focus:parts[0].id});let d=scene.diagnostics;
+  assert(d.members[0].ringShader.solo===1,'solo ring must receive focus');
+  assert(d.members.every(m=>m.labelSize[0]===768&&m.labelSize[1]===144),'world labels must be Retina sized');
+  const mutedFrame={...frame,parts:frame.parts.map((p,i)=>({...p,userMuted:i===0}))};
+  scene.update(mutedFrame,{score,parts,settings});assert(scene.diagnostics.members[0].ringShader.muted===1,'muted ring must remain distinct');draw();
+  checks.push('solo/mute shader state and Retina labels');
+
+  let member=scene.memberProjections[0];const rect=scene.canvas.getBoundingClientRect();
+  const x=(member.centerNdc.x+1)*rect.width/2+rect.left,y=(1-member.centerNdc.y)*rect.height/2+rect.top;
+  scene.startDrag(member.id,x,y);await settle(230,()=>draw());
+  assert(scene.diagnostics.members[0].dragPhysics.lift>.16,'paused drag must lift on the UI clock');
+  const spatialKey=parts[0].stemId||parts[0].id,pan=scene.spatial[spatialKey].pan;scene.moveDrag(member.id,x+90,y);draw();
+  assert(scene.spatial[spatialKey].pan!==pan,'drag must preserve spatial audio mapping');
+  scene.endDrag(member.id);await settle(20,()=>draw());assert(scene.diagnostics.members[0].dragPhysics.landingPulse>0,'release must start a landing spring');
+  await settle(650,()=>draw());assert(scene.diagnostics.members[0].dragPhysics.lift<.005&&scene.diagnostics.members[0].dragPhysics.landingPulse===0,'landing must settle while the song clock is paused');
+  scene.startDrag(member.id,x,y);draw({reduced:true});assert(scene.diagnostics.members[0].dragPhysics.lift===0,'reduced motion must bypass tactile movement');scene.endDrag(member.id,{cancelled:true});draw();
+  checks.push('paused drag lift, live spatial mapping, landing settle and reduced motion');
+
+  settings.stageLook='island';draw();d=scene.diagnostics;
+  assert(d.stage.look==='island'&&d.stage.stageLook==='island'&&d.stage.lookMix<1,'look diagnostics must synchronously expose the target during the fade');
+  const overlay=host.querySelector('.lu-band-look-snapshot');assert(overlay&&!overlay.hidden,'old geometry must remain covered until the target frame is ready');
+  const recording=document.createElement('canvas');recording.width=1280;recording.height=720;scene.drawTo(recording.getContext('2d'));
+  await settle(720,()=>draw());assert(scene.diagnostics.stage.lookMix===1&&overlay.hidden,'paused transition must finish and release its snapshot');
+  for(const look of ['cream','island','cream']){settings.stageLook=look;draw();await raf();}
+  await settle(720,()=>draw());assert(scene.diagnostics.stage.look==='cream'&&overlay.hidden,'interrupted transitions must reach the final look');
+  settings.stageLook='island';draw({reduced:true});assert(scene.diagnostics.stage.lookMix===1&&overlay.hidden,'reduced motion must apply the look immediately');
+  checks.push('paused/interrupted look crossfades, synchronous target state and recording composition');
+
+  let synchronous=0;const value=runStageViewTransition(()=>{synchronous=1;return 42;});
+  assert(synchronous===1&&value===42,'mode callback and return value must remain synchronous');
+  checks.push('mode transition retains synchronous engine contract');
+
+  assert(scene.diagnostics.prewarm.started&&idleJobs.size===1,'prewarm must be scheduled after the active first frame');
+  scene.setActive(false);assert(idleJobs.size===0,'inactive scene must cancel queued idle work');
+  scene.setActive(true);const job=idleJobs.entries().next().value;idleJobs.delete(job[0]);job[1]({didTimeout:false,timeRemaining:()=>10});scene.setActive(false);
+  const deadline=performance.now()+15000;while(scene.diagnostics.prewarm.busy&&performance.now()<deadline)await raf();
+  assert(!scene.diagnostics.prewarm.busy&&scene.diagnostics.prewarm.loaded===1&&idleJobs.size===0,'at most one in-flight prewarm may finish after deactivation');
+  scene.setActive(true);
+  while((idleJobs.size||scene.diagnostics.prewarm.busy)&&performance.now()<deadline){
+   if(idleJobs.size){const [id,cb]=idleJobs.entries().next().value;idleJobs.delete(id);cb({didTimeout:false,timeRemaining:()=>10});}
+   await raf();
+  }
+  assert(scene.diagnostics.prewarm.pending===0&&!scene.diagnostics.prewarm.busy&&scene.diagnostics.prewarm.failed.length===0,'serial idle prewarming must finish without missing sprites');
+  checks.push('idle prewarming starts after paint, pauses when inactive and loads serially');
+  const gl=scene.canvas.getContext('webgl2');assert(gl.getError()===gl.NO_ERROR,'shader and transition rendering must not leave GL errors');
+  const prewarm=scene.diagnostics.prewarm;scene.dispose();scene=null;interactions.dispose();interactions=null;hits.remove();
+  // Exercise the Safari-style timer fallback without a real 1.5s delay.
+  const timers=new Map();let timerId=100000000;
+  window.requestIdleCallback=window.cancelIdleCallback=undefined;
+  window.setTimeout=(callback,ms,...args)=>{if(ms!==1500)return originalTimeout(callback,ms,...args);timers.set(++timerId,()=>callback(...args));return timerId;};
+  window.clearTimeout=id=>{if(timers.has(id))timers.delete(id);else originalClear(id);};
+  scene=await createBandScene(host);await scene.configure('one-piece');scene.setActive(true);
+  assert(timers.size===1,'idle API absence must schedule the 1500ms fallback');
+  scene.setActive(false);assert(timers.size===0,'inactive fallback must cancel its timer');scene.setActive(true);
+  const [timer,callback]=timers.entries().next().value;timers.delete(timer);callback();
+  const fallbackDeadline=performance.now()+15000;while(scene.diagnostics.prewarm.busy&&performance.now()<fallbackDeadline)await raf();
+  assert(scene.diagnostics.prewarm.loaded===1&&timers.size===1,'fallback must load one sprite and schedule the next');
+  checks.push('timer prewarm fallback and cancellation');
+  window.bandUpgradeResult={checks,prewarm};out.textContent='PASS '+JSON.stringify(window.bandUpgradeResult,null,2);return window.bandUpgradeResult;
+ }catch(error){out.textContent='FAIL '+error.stack;throw error;}
+ finally{interactions?.dispose();scene?.dispose();window.requestIdleCallback=originalIdle;window.cancelIdleCallback=originalCancel;window.setTimeout=originalTimeout;window.clearTimeout=originalClear;}
+};
+document.querySelector('#run').onclick=()=>window.runBandUpgrade().catch(console.error);
+</script>

@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>律 · 十位角色整帧动作</title>
+<style>
+:root{font:16px system-ui,"PingFang SC",sans-serif;color:#263e34;background:#f3f1e9}*{box-sizing:border-box}body{margin:0}main{max-width:1020px;margin:auto;padding:30px 20px 50px}h1{font-size:26px;margin:10px 0}p{font-size:14px;line-height:1.7;color:#657567}small{font-size:12px}button,a{font:inherit}button{border:1px solid #bccabe;background:#fffdf7;color:inherit;border-radius:10px;min-height:42px;padding:8px 15px;cursor:pointer}button[aria-pressed=true],#play{background:#2d5843;color:#fff}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0}.comparison{display:grid;grid-template-columns:1fr 1fr;gap:18px}figure{margin:0;border:1px solid #d3dacd;border-radius:18px;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,#fffefa,#e1e8df)}canvas{display:block;width:100%;height:auto}figcaption{padding:15px 20px;background:#faf9f4;font-size:14px}figcaption strong{display:block;font-size:18px;margin-bottom:5px}.seek{display:flex;gap:12px;align-items:center;margin-top:18px}input{min-width:0;flex:1;accent-color:#315f46}output{font-size:13px;font-variant-numeric:tabular-nums}a{color:#426044;text-underline-offset:4px}.links{display:flex;gap:18px;flex-wrap:wrap;font-size:14px;margin-top:20px}#error{color:#a43231}.notice{border-left:3px solid #b68b52;padding:10px 15px;background:#fcf8ef}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #c19049;outline-offset:3px}@media(max-width:550px){main{padding:20px 12px}.comparison{gap:8px}figcaption{padding:12px 10px;font-size:12px}figcaption strong{font-size:16px}h1{font-size:23px}.toolbar{gap:6px}button{font-size:14px;padding:8px 10px}}
+</style>
+<main><small>『律』LÜ · 角色动作</small><h1>沿用原来的完整人物，增加整帧动作</h1>
+<p><strong id="actorName">索隆</strong> · 普通演奏、重拍、休止。两边使用相同的人物显示高度。</p>
+<div class="toolbar" id="roster" aria-label="选择角色"></div>
+<div class="toolbar"><button id="play" disabled>载入中…</button><button data-action="play" aria-pressed="true">普通弹奏</button><button data-action="accent" aria-pressed="false">重拍</button><button data-action="rest" aria-pressed="false">休止</button><button id="slow" aria-pressed="false">慢放</button></div>
+<div class="comparison"><figure><canvas id="original" width="640" height="640" aria-label="原四帧动画"></canvas><figcaption><strong>原版</strong>原完整人物 · 4 帧</figcaption></figure><figure><canvas id="expanded" width="640" height="640" aria-label="补充整帧动作"></canvas><figcaption><strong>补帧样片</strong>新增 16 个完整姿态 · 2 组动作</figcaption></figure></div>
+<div class="seek"><input id="seek" aria-label="动作时间" type="range" min="0" max="6" step=".0166667" value="0"><output id="time">0.00 s</output></div>
+<p class="notice">十位角色均以完整人物逐帧播放，每人新增16个姿态。主站按歌曲时间切换演奏、重拍与休止；本页是无声动作检查。</p>
+<div class="links"><a href="./index.html?intro=skip&band=anime_op_one_day">返回演出</a></div><p id="error" role="alert"></p></main>
+<script type="module" src="./js/ui/sprite-animation-review.js?v=20261030-sprites-all"></script></html>
