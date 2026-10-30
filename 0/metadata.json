@@ -29,5 +29,56 @@
       "provider_token": 0,
       "shell_stdin": 0
     }
+  },
+  "summary": {
+    "intent": "Verify and refine character animations in the Three.js band project (`threejs-material-lab`), pivoting from a distorted layered rig-v3 approach back to original whole-frame 4-frame sprites on the main stage while developing and visually reviewing a 17-frame expanded sprite animation sample for Zoro.",
+    "outcome": "Confirmed the main site restored all ten characters to the original 4-frame whole-sprite sequence (`layered: false`), and iteratively verified the expanded 17-frame Zoro sprite sample (`sprite-animation-review.html`), confirming that frame retiming mitigated head-tilt jitter across keyframes and loop boundaries while preparing a final check on updated accent poses.",
+    "learnings": {
+      "repo": [
+        "The project includes dedicated review pages (`character-rig-review.html` and `sprite-animation-review.html`) that expose global inspection handles (`window.characterRigReview`, `window.spriteAnimationReview`) and main app diagnostics (`window.luBand.diagnostics`) for automated Playwright verification.",
+        "Playback on the main stage (`index.html`) intentionally auto-hides the bottom dock; automated tests must move the mouse pointer near the bottom edge (e.g., `(4, viewportHeight - 4)`) to reveal stage switch and playback controls.",
+        "Expanded sprite animations are configured via `assets/band-pet-actions/<group>/<actor>/manifest.json` using 320x320 frames at 12 fps with ping-pong frame index arrays for `rest`, `play`, and `accent` clips."
+      ],
+      "code": [
+        {
+          "path": "js/ui/character-rig-review.js",
+          "line": 3,
+          "end_line": 20,
+          "finding": "Exposes `window.characterRigReview` with `selectActor`, `setTime`, and `setPlaying`, and evaluates arm `contactError` (< 0.01 threshold) while respecting `prefers-reduced-motion: reduce`."
+        },
+        {
+          "path": "scripts/validate-shell-live.mjs",
+          "line": 1,
+          "end_line": 240,
+          "finding": "Automates end-to-end regression checks for the main performance page using `window.luBand.diagnostics`, verifying GLB loading, 9-track audio chunk caching across seeks, stage switching, and responsive widths (390px and 320px)."
+        },
+        {
+          "path": "js/ui/sprite-animation-review.js",
+          "line": 1,
+          "end_line": 23,
+          "finding": "Renders side-by-side canvas comparisons of the original 4-frame sprite (`petFrameAt`) and expanded sprite sheets (`spriteActionFrame`), exposing `window.spriteAnimationReview` for deterministic time-scrubbing and state inspection."
+        },
+        {
+          "path": "assets/band-pet-actions/one-piece/zoro/manifest.json",
+          "line": 1,
+          "end_line": 120,
+          "finding": "Defines Zoro's 17-frame expanded sprite sheet (`zoro-actions.webp`) with per-frame `sourceBounds`, `uniformScale`, and `translation` metadata."
+        }
+      ],
+      "workflow": [
+        "Combining headless Playwright frame-stepping with Python PIL contact-sheet generation (`Image`, `ImageDraw`) enables rapid visual inspection of animation continuity, loop boundaries, and visual occlusion across multiple timestamps.",
+        "Launching headless Chromium with `--use-angle=swiftshader` and `--enable-unsafe-swiftshader` ensures WebGL/Three.js scenes render reliably in automated verification scripts."
+      ]
+    },
+    "friction": [
+      "The segmented character rig (`rig-v3`) produced distorted, unnatural limb geometry and contact issues (such as Robin's flower crown occluding her eye and Usopp's hand grabbing the slingshot fork instead of the fretboard), leading the user to reject the layered rig approach in favor of whole-frame sprite animations.",
+      "Initial frames in the expanded Zoro sprite sample exhibited noticeable head-tilt jitter (tilting at frame 4, snapping upright at frame 5, and tilting again at frame 6) and minimal visual differentiation between normal play and accent strumming gestures.",
+      "Sandbox restrictions blocked `ps` commands (`operation not permitted: ps`) and required escalated permissions for each local Playwright execution, while headless execution prevented real-time subjective video and audio evaluation."
+    ],
+    "open_items": [
+      "Complete the visual inspection of the newly updated 8 accent poses for the Zoro sprite sample (`/private/tmp/sprite-final-accent.mjs`).",
+      "Expand whole-frame sprite animations to the remaining 9 band characters and integrate them into the main performance stage once the Zoro sample style is approved.",
+      "Deconstruct the original 'One Day' track to properly separate and rearrange the lead vocals/chorus and 9 accompaniment instrument stems, replacing the legacy placeholder audio arrangement."
+    ]
   }
 }
